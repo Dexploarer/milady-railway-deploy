@@ -110,7 +110,7 @@
         "pdfjs-dist": "^5.4.530",
         "pg": "^8.16.3",
         "pino": "^10.3.1",
-        "pty-manager": "1.9.4",
+        "pty-manager": "1.9.5",
         "puppeteer-core": "^24.37.5",
         "qrcode": "^1.5.4",
         "sharp": "^0.33.5",
@@ -449,7 +449,7 @@
     "ai": "6.0.30",
     "drizzle-orm": "0.45.1",
     "libsignal": "git+https://github.com/whiskeysockets/libsignal-node.git#1c30d7d7e76a3b0aa120b04dc6a26f5a12dccf67",
-    "pty-manager": "1.9.4",
+    "pty-manager": "1.9.5",
     "tar": "^7.5.7",
   },
   "packages": {
@@ -3169,7 +3169,7 @@
 
     "pty-console": ["pty-console@0.3.1", "", { "dependencies": { "pty-manager": "^1.9.0" } }, "sha512-ZiI3Oav83AEq1kWIQWfloMN0gM6RiAh+fCMm+ee+8wduOLqfW5AYZx5BEg3eJblCKKVQW22x2mB9UTUoM/Vpcw=="],
 
-    "pty-manager": ["pty-manager@1.9.4", "", { "dependencies": { "node-pty": "^1.0.0" }, "bin": { "pty-worker": "dist/pty-worker.js" } }, "sha512-hB3Br0gOVxG7gSljGLS+J73i+YmoidsECr1J/Bv9DrQhIQfHUIhjACKosOaOEP2nqJBmNZ2gWM2Me6o635fjDw=="],
+    "pty-manager": ["pty-manager@1.9.5", "", { "dependencies": { "node-pty": "^1.0.0" }, "bin": { "pty-worker": "dist/pty-worker.js" } }, "sha512-nB+VLhbZ8kgEAl4bfhzy590fmzgvfmvUHHOmWCrYZE+MP9/M4T+GVCJ4at86pl/CW5tI52RQel1/p5kjTb8jXg=="],
 
     "public-encrypt": ["public-encrypt@4.0.3", "", { "dependencies": { "bn.js": "^4.1.0", "browserify-rsa": "^4.0.0", "create-hash": "^1.1.0", "parse-asn1": "^5.0.0", "randombytes": "^2.0.1", "safe-buffer": "^5.1.2" } }, "sha512-zVpa8oKZSz5bTMTFClc1fQOnyyEzpl5ozpi1B5YcvBrdohMjH2rfsBtyXcuNuwjsDIXmBYlF2N5FlJYhR29t8Q=="],
 
