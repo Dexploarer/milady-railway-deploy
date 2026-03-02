@@ -13,6 +13,7 @@ import {
 } from "@elizaos/core";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { startApiServer } from "../src/api/server";
+import { installDatabaseTrajectoryLogger } from "../src/runtime/trajectory-persistence";
 
 import pluginTrajectoryLogger from "@elizaos/plugin-trajectory-logger";
 import { default as pluginSql } from "@elizaos/plugin-sql";
