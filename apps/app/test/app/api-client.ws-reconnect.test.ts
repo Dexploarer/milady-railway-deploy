@@ -3,17 +3,17 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 /**
  * Tests for the WS reconnect logic in MiladyClient.
  *
- * We test the class directly by importing it and using a mock WebSocket
- * to verify the ws-reconnected synthetic event behavior.
+ * We import and test the real MiladyClient class, mocking WebSocket
+ * and browser globals so connectWs() and onWsEvent() can run in Node.
  */
 
 // ---------------------------------------------------------------------------
-// WebSocket stub
+// WebSocket stub — captures instances so tests can trigger onopen/onclose
 // ---------------------------------------------------------------------------
 
 let latestWs: {
   onopen: (() => void) | null;
-  onclose: (() => void) | null;
+  onclose: ((ev?: { code?: number }) => void) | null;
   onmessage: ((event: { data: string }) => void) | null;
   onerror: (() => void) | null;
   readyState: number;
@@ -28,7 +28,7 @@ class MockWebSocket {
   static readonly CLOSED = 3;
 
   onopen: (() => void) | null = null;
-  onclose: (() => void) | null = null;
+  onclose: ((ev?: { code?: number }) => void) | null = null;
   onmessage: ((event: { data: string }) => void) | null = null;
   onerror: (() => void) | null = null;
   readyState = MockWebSocket.OPEN;
@@ -40,10 +40,8 @@ class MockWebSocket {
   }
 }
 
-// Install global WebSocket mock before importing the client
+// Install global mocks before importing the client module
 vi.stubGlobal("WebSocket", MockWebSocket);
-
-// Stub fetch globally so the client constructor doesn't fail
 vi.stubGlobal(
   "fetch",
   vi.fn().mockResolvedValue({
@@ -53,103 +51,108 @@ vi.stubGlobal(
   }),
 );
 
+// Mock deep type imports that api-client.ts relies on
+vi.mock("../../../../src/config/types.milady", () => ({}));
+vi.mock("../../../../src/contracts/drop", () => ({}));
+vi.mock("../../../../src/contracts/onboarding", () => ({}));
+vi.mock("../../../../src/contracts/verification", () => ({}));
+vi.mock("../../../../src/contracts/wallet", () => ({}));
+vi.mock("../../../../src/permissions/types", () => ({}));
+
+// Provide window.location so connectWs() can build a WS URL
+vi.stubGlobal("window", {
+  location: { protocol: "http:", host: "localhost:2138" },
+  sessionStorage: { getItem: () => null, setItem: () => {} },
+  navigator: { userAgent: "" },
+  __MILADY_API_BASE__: undefined,
+});
+
 // ---------------------------------------------------------------------------
-// Import the actual client
+// Import the real MiladyClient
 // ---------------------------------------------------------------------------
 
-// We need to import the actual module, but it has deep relative imports
-// that won't resolve in the test environment. Instead, we test the
-// wsHasConnectedOnce behavior by directly verifying the pattern.
+const { MiladyClient } = await import("../../src/api-client");
 
 describe("MiladyClient WS reconnect", () => {
-  let wsHasConnectedOnce: boolean;
-  let reconnectedFired: number;
+  let client: InstanceType<typeof MiladyClient>;
 
   beforeEach(() => {
-    vi.useFakeTimers();
-    wsHasConnectedOnce = false;
-    reconnectedFired = 0;
     latestWs = null;
+    client = new MiladyClient("http://localhost:2138");
   });
 
   afterEach(() => {
-    vi.useRealTimers();
+    client.disconnectWs();
   });
 
-  /**
-   * Simulates the onopen logic from MiladyClient.connectWs().
-   * This mirrors the exact pattern in api-client.ts lines 3495-3507.
-   */
-  function simulateOnOpen(
-    handlers: Map<string, Set<(data: Record<string, unknown>) => void>>,
-  ) {
-    if (wsHasConnectedOnce) {
-      const reconnectHandlers = handlers.get("ws-reconnected");
-      if (reconnectHandlers) {
-        for (const handler of reconnectHandlers) {
-          handler({ type: "ws-reconnected" });
-        }
-      }
-    }
-    wsHasConnectedOnce = true;
-  }
-
-  it("wsHasConnectedOnce is false on first connect, true after", () => {
-    const handlers = new Map<
-      string,
-      Set<(data: Record<string, unknown>) => void>
-    >();
-
-    expect(wsHasConnectedOnce).toBe(false);
-
-    // First connection
-    simulateOnOpen(handlers);
-    expect(wsHasConnectedOnce).toBe(true);
-  });
-
-  it("ws-reconnected fires only on reconnect, not first connect", () => {
-    const handlers = new Map<
-      string,
-      Set<(data: Record<string, unknown>) => void>
-    >();
+  it("does not fire ws-reconnected on first connect", () => {
     const handler = vi.fn();
-    handlers.set("ws-reconnected", new Set([handler]));
+    client.onWsEvent("ws-reconnected", handler);
 
-    // First connect — should NOT fire ws-reconnected
-    simulateOnOpen(handlers);
+    client.connectWs();
+    // Simulate WebSocket open
+    latestWs?.onopen?.();
+
+    expect(handler).not.toHaveBeenCalled();
+  });
+
+  it("fires ws-reconnected on reconnect after first connect", () => {
+    const handler = vi.fn();
+    client.onWsEvent("ws-reconnected", handler);
+
+    // First connect
+    client.connectWs();
+    latestWs?.onopen?.();
     expect(handler).not.toHaveBeenCalled();
 
-    // Reconnect — SHOULD fire ws-reconnected
-    simulateOnOpen(handlers);
+    // Simulate disconnect + reconnect
+    const oldWs = latestWs;
+    if (oldWs) oldWs.readyState = MockWebSocket.CLOSED;
+    client.connectWs();
+    latestWs?.onopen?.();
+
     expect(handler).toHaveBeenCalledTimes(1);
-    expect(handler).toHaveBeenCalledWith({ type: "ws-reconnected" });
+    expect(handler).toHaveBeenCalledWith(
+      expect.objectContaining({ type: "ws-reconnected" }),
+    );
   });
 
-  it("ws-reconnected fires on every subsequent reconnect", () => {
-    const handlers = new Map<
-      string,
-      Set<(data: Record<string, unknown>) => void>
-    >();
+  it("fires ws-reconnected on every subsequent reconnect", () => {
     const handler = vi.fn();
-    handlers.set("ws-reconnected", new Set([handler]));
+    client.onWsEvent("ws-reconnected", handler);
 
-    simulateOnOpen(handlers); // first connect — no fire
-    simulateOnOpen(handlers); // reconnect 1
-    simulateOnOpen(handlers); // reconnect 2
-    simulateOnOpen(handlers); // reconnect 3
+    // First connect
+    client.connectWs();
+    latestWs?.onopen?.();
 
-    expect(handler).toHaveBeenCalledTimes(3);
+    // Reconnect 1
+    if (latestWs) latestWs.readyState = MockWebSocket.CLOSED;
+    client.connectWs();
+    latestWs?.onopen?.();
+
+    // Reconnect 2
+    if (latestWs) latestWs.readyState = MockWebSocket.CLOSED;
+    client.connectWs();
+    latestWs?.onopen?.();
+
+    expect(handler).toHaveBeenCalledTimes(2);
   });
 
-  it("does not fire ws-reconnected if no handlers registered", () => {
-    const handlers = new Map<
-      string,
-      Set<(data: Record<string, unknown>) => void>
-    >();
+  it("onWsEvent returns an unsubscribe function", () => {
+    const handler = vi.fn();
+    const unsub = client.onWsEvent("ws-reconnected", handler);
 
-    // Should not throw even with no handlers
-    simulateOnOpen(handlers);
-    simulateOnOpen(handlers);
-    // No assertion needed — just verifying no error thrown
+    // First connect
+    client.connectWs();
+    latestWs?.onopen?.();
+
+    // Unsubscribe before reconnect
+    unsub();
+
+    if (latestWs) latestWs.readyState = MockWebSocket.CLOSED;
+    client.connectWs();
+    latestWs?.onopen?.();
+
+    expect(handler).not.toHaveBeenCalled();
   });
 });

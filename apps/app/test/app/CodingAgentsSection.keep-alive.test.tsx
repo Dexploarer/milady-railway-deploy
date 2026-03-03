@@ -111,10 +111,10 @@ describe("CodingAgentsSection — terminal keep-alive", () => {
     });
 
     // Initially no XTerminals should be mounted
-    let terminals = findAllByTestId(tree!.root, /^xterminal-/);
+    let terminals = findAllByTestId(tree?.root, /^xterminal-/);
     expect(terminals.length).toBe(0);
 
-    const buttons = sessionCardButtons(tree!.root);
+    const buttons = sessionCardButtons(tree?.root);
     expect(buttons.length).toBe(2);
 
     // Click first session card to expand it
@@ -124,9 +124,9 @@ describe("CodingAgentsSection — terminal keep-alive", () => {
     await flush();
 
     // Now s-1's XTerminal should be mounted
-    terminals = findAllByTestId(tree!.root, /^xterminal-/);
+    terminals = findAllByTestId(tree?.root, /^xterminal-/);
     expect(terminals.length).toBe(1);
-    expect(findByTestId(tree!.root, "xterminal-s-1")).not.toBeNull();
+    expect(findByTestId(tree?.root, "xterminal-s-1")).not.toBeNull();
 
     // Toggle s-2 open
     await act(async () => {
@@ -135,10 +135,10 @@ describe("CodingAgentsSection — terminal keep-alive", () => {
     await flush();
 
     // Both should be mounted (s-1 hidden, s-2 active)
-    terminals = findAllByTestId(tree!.root, /^xterminal-/);
+    terminals = findAllByTestId(tree?.root, /^xterminal-/);
     expect(terminals.length).toBe(2);
-    expect(findByTestId(tree!.root, "xterminal-s-1")).not.toBeNull();
-    expect(findByTestId(tree!.root, "xterminal-s-2")).not.toBeNull();
+    expect(findByTestId(tree?.root, "xterminal-s-1")).not.toBeNull();
+    expect(findByTestId(tree?.root, "xterminal-s-2")).not.toBeNull();
   });
 
   it("hidden terminals render with height: 0", async () => {
@@ -151,7 +151,7 @@ describe("CodingAgentsSection — terminal keep-alive", () => {
       );
     });
 
-    const buttons = sessionCardButtons(tree!.root);
+    const buttons = sessionCardButtons(tree?.root);
 
     // Open s-1
     await act(async () => {
@@ -166,7 +166,7 @@ describe("CodingAgentsSection — terminal keep-alive", () => {
     await flush();
 
     // Find the wrapper divs with height style
-    const wrapperDivs = tree!.root.findAll(
+    const wrapperDivs = tree?.root.findAll(
       (node) =>
         node.type === "div" &&
         node.props.style &&
@@ -193,7 +193,7 @@ describe("CodingAgentsSection — terminal keep-alive", () => {
       );
     });
 
-    const buttons = sessionCardButtons(tree!.root);
+    const buttons = sessionCardButtons(tree?.root);
 
     // Open both terminals
     await act(async () => {
@@ -206,7 +206,7 @@ describe("CodingAgentsSection — terminal keep-alive", () => {
     await flush();
 
     // Both should be mounted
-    let terminals = findAllByTestId(tree!.root, /^xterminal-/);
+    let terminals = findAllByTestId(tree?.root, /^xterminal-/);
     expect(terminals.length).toBe(2);
 
     // Remove s-1 from sessions (simulating task completion)
@@ -218,9 +218,9 @@ describe("CodingAgentsSection — terminal keep-alive", () => {
     await flush();
 
     // s-1's terminal should be cleaned up, only s-2 remains
-    terminals = findAllByTestId(tree!.root, /^xterminal-/);
+    terminals = findAllByTestId(tree?.root, /^xterminal-/);
     expect(terminals.length).toBe(1);
-    expect(findByTestId(tree!.root, "xterminal-s-2")).not.toBeNull();
-    expect(findByTestId(tree!.root, "xterminal-s-1")).toBeNull();
+    expect(findByTestId(tree?.root, "xterminal-s-2")).not.toBeNull();
+    expect(findByTestId(tree?.root, "xterminal-s-1")).toBeNull();
   });
 });

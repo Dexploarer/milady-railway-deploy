@@ -77,6 +77,7 @@ import {
 import { isLifoPopoutMode } from "./lifo-popout";
 import { pathForTab, type Tab, tabFromPath } from "./navigation";
 import { getMissingOnboardingPermissions } from "./onboarding-permissions";
+import { mapServerTasksToSessions } from "./pty-session-hydrate";
 
 // ── VRM helpers ─────────────────────────────────────────────────────────
 
@@ -4985,26 +4986,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
       void loadPlugins(); // Hydrate plugin state early so Nav sees streaming-base toggle
 
       // Hydrate coding agent sessions (also re-called on WS reconnect / server restart)
-      const TERMINAL_STATUSES = new Set(["completed", "stopped", "error"]);
       const hydratePtySessions = () => {
         client
           .getCodingAgentStatus()
           .then((status) => {
             if (status?.tasks) {
-              setPtySessions(
-                status.tasks
-                  .filter((t) => !TERMINAL_STATUSES.has(t.status ?? ""))
-                  .map((t) => ({
-                    sessionId: t.sessionId,
-                    agentType: t.agentType ?? "claude",
-                    label: t.label ?? t.sessionId,
-                    originalTask: t.originalTask ?? "",
-                    workdir: t.workdir ?? "",
-                    status: t.status ?? "active",
-                    decisionCount: t.decisionCount ?? 0,
-                    autoResolvedCount: t.autoResolvedCount ?? 0,
-                  })),
-              );
+              setPtySessions(mapServerTasksToSessions(status.tasks));
             }
           })
           .catch(() => {}); // non-critical
@@ -5013,7 +5000,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
       // Connect WebSocket
       client.connectWs();
-      const ptyHydratedViaWs = false;
 
       // Re-hydrate PTY sessions on WS reconnect — events sent during
       // the disconnect gap are lost, so we reconcile from the server.
@@ -5244,15 +5230,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
             return prev;
           };
 
+          let needsHydrate = false;
           setPtySessions((prev) => {
             const next = applyUpdate(prev);
             if (next === prev && !prev.some((s) => s.sessionId === sessionId)) {
-              // Unknown session — re-hydrate from server to pick up missed registrations
-              hydratePtySessions();
+              // Unknown session — flag for re-hydration outside the updater
+              needsHydrate = true;
               return prev;
             }
             return next;
           });
+          if (needsHydrate) {
+            // Re-hydrate from server to pick up missed registrations
+            hydratePtySessions();
+          }
         }
       });
 
