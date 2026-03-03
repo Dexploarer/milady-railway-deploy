@@ -34,12 +34,12 @@ const HYPERSCAPE_SCRIPTED_ROLE_OPTIONS: Array<{
   value: HyperscapeScriptedRole;
   label: string;
 }> = [
-  { value: "balanced", label: "Balanced" },
-  { value: "combat", label: "Combat" },
-  { value: "woodcutting", label: "Woodcutting" },
-  { value: "fishing", label: "Fishing" },
-  { value: "mining", label: "Mining" },
-];
+    { value: "balanced", label: "Balanced" },
+    { value: "combat", label: "Combat" },
+    { value: "woodcutting", label: "Woodcutting" },
+    { value: "fishing", label: "Fishing" },
+    { value: "mining", label: "Mining" },
+  ];
 
 const CATEGORY_LABELS: Record<string, string> = {
   game: "Game",
@@ -517,18 +517,13 @@ export function AppsView() {
   ]);
 
   const normalizedSearch = searchQuery.trim().toLowerCase();
-  const ALLOWED_APP_KEYWORDS = [
-    "2004scape",
-    "hyperscape",
-    "hyperfy",
-    "babylon",
-  ];
-
   const filtered = apps.filter((app) => {
-    const isAllowed = ALLOWED_APP_KEYWORDS.some((keyword) =>
-      app.name.toLowerCase().includes(keyword),
-    );
-    if (!isAllowed) return false;
+    if (app.category !== "app") return false;
+
+    // Hardcode disable non-clawbal apps in production for now
+    if (import.meta.env.PROD && !app.name.includes("clawbal")) {
+      return false;
+    }
 
     if (
       normalizedSearch &&
@@ -756,13 +751,13 @@ export function AppsView() {
                 <>
                   Goal: {hyperscapeGoalResponse.goal.description ?? "unknown"}
                   {typeof hyperscapeGoalResponse.goal.progressPercent ===
-                  "number"
+                    "number"
                     ? ` (${hyperscapeGoalResponse.goal.progressPercent}%)`
                     : ""}
                 </>
               ) : (
                 (hyperscapeGoalResponse?.message ??
-                "No active goal loaded for the selected agent.")
+                  "No active goal loaded for the selected agent.")
               )}
             </div>
 
