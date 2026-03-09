@@ -49,13 +49,13 @@ async function getNfaPlugin(): Promise<NfaPlugin | null> {
     const mod = await import(/* @vite-ignore */ pkgName);
     nfaPlugin =
       typeof mod?.buildMerkleRoot === "function" &&
-        typeof mod?.parseLearnings === "function" &&
-        typeof mod?.sha256 === "function"
+      typeof mod?.parseLearnings === "function" &&
+      typeof mod?.sha256 === "function"
         ? {
-          buildMerkleRoot: mod.buildMerkleRoot,
-          parseLearnings: mod.parseLearnings,
-          sha256: mod.sha256,
-        }
+            buildMerkleRoot: mod.buildMerkleRoot,
+            parseLearnings: mod.parseLearnings,
+            sha256: mod.sha256,
+          }
         : null;
   } catch {
     nfaPlugin = null;
@@ -65,7 +65,7 @@ async function getNfaPlugin(): Promise<NfaPlugin | null> {
 
 export interface NfaRouteContext
   extends RouteRequestMeta,
-  Pick<RouteHelpers, "json" | "error"> { }
+    Pick<RouteHelpers, "json" | "error"> {}
 
 interface NfaRecord {
   tokenId: string;
@@ -116,26 +116,26 @@ export async function handleNfaRoutes(ctx: NfaRouteContext): Promise<boolean> {
     json(res, {
       nfa: nfaRecord
         ? {
-          tokenId: nfaRecord.tokenId,
-          contractAddress: nfaRecord.contractAddress,
-          network: nfaRecord.network,
-          ownerAddress: nfaRecord.ownerAddress,
-          merkleRoot: nfaRecord.merkleRoot,
-          mintTxHash: nfaRecord.mintTxHash,
-          mintedAt: nfaRecord.mintedAt,
-          lastUpdatedAt: nfaRecord.lastUpdatedAt,
-          bscscanUrl: `${bscscanBase}/tx/${nfaRecord.mintTxHash}`,
-        }
+            tokenId: nfaRecord.tokenId,
+            contractAddress: nfaRecord.contractAddress,
+            network: nfaRecord.network,
+            ownerAddress: nfaRecord.ownerAddress,
+            merkleRoot: nfaRecord.merkleRoot,
+            mintTxHash: nfaRecord.mintTxHash,
+            mintedAt: nfaRecord.mintedAt,
+            lastUpdatedAt: nfaRecord.lastUpdatedAt,
+            bscscanUrl: `${bscscanBase}/tx/${nfaRecord.mintTxHash}`,
+          }
         : null,
       identity: identityRecord
         ? {
-          agentId: identityRecord.agentId,
-          network: identityRecord.network,
-          ownerAddress: identityRecord.ownerAddress,
-          agentURI: identityRecord.agentURI,
-          registeredAt: identityRecord.registeredAt,
-          scanUrl: `https://${identityRecord.network === "bsc" ? "www" : "testnet"}.8004scan.io/agent/${identityRecord.agentId}`,
-        }
+            agentId: identityRecord.agentId,
+            network: identityRecord.network,
+            ownerAddress: identityRecord.ownerAddress,
+            agentURI: identityRecord.agentURI,
+            registeredAt: identityRecord.registeredAt,
+            scanUrl: `https://${identityRecord.network === "bsc" ? "www" : "testnet"}.8004scan.io/agent/${identityRecord.agentId}`,
+          }
         : null,
       configured: !!(nfaRecord || identityRecord),
     });
@@ -156,7 +156,7 @@ export async function handleNfaRoutes(ctx: NfaRouteContext): Promise<boolean> {
         markdown = await readFile(p, "utf8");
         resolvedSource = p;
         break;
-      } catch { }
+      } catch {}
     }
 
     if (!markdown) {
