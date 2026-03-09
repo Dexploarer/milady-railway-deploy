@@ -68,7 +68,9 @@ describe("Electrobun release workflow drift", () => {
   it("pins Bun and runs release-check before the desktop matrix", () => {
     const workflow = fs.readFileSync(WORKFLOW_PATH, "utf8");
     const validateJobIndex = workflow.indexOf("name: Validate Release Inputs");
-    const buildJobIndex = workflow.indexOf("name: Build ${{ matrix.platform.name }}");
+    const buildJobIndex = workflow.indexOf(
+      "name: Build ${{ matrix.platform.name }}",
+    );
     const releaseCheckIndex = workflow.indexOf("run: bun run release:check");
 
     expect(workflow).toContain('BUN_VERSION: "1.3.5"');
@@ -87,10 +89,10 @@ describe("Electrobun release workflow drift", () => {
       "https://api.github.com/repos/blackboardsh/electrobun/releases/tags/v$version",
     );
     expect(workflow).toContain(
-      '$asset = @($release.assets) | Where-Object { $_.name -eq $assetName } | Select-Object -First 1',
+      "$asset = @($release.assets) | Where-Object { $_.name -eq $assetName } | Select-Object -First 1",
     );
     expect(workflow).toContain(
-      '$actualHash = (Get-FileHash -Path $tarPath -Algorithm SHA256).Hash.ToLowerInvariant()',
+      "$actualHash = (Get-FileHash -Path $tarPath -Algorithm SHA256).Hash.ToLowerInvariant()",
     );
     expect(workflow).toContain("electrobun CLI checksum mismatch");
     expect(workflow).toContain("Verified electrobun CLI SHA256:");
