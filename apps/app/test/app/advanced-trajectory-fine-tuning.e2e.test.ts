@@ -1,7 +1,5 @@
 // @vitest-environment jsdom
-import React from "react";
-import TestRenderer, { act } from "react-test-renderer";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import type {
   TrainingStatus,
   TrainingTrajectoryList,
@@ -10,6 +8,9 @@ import type {
   TrajectoryListResult,
   TrajectoryStats,
 } from "@milady/app-core/api";
+import React from "react";
+import TestRenderer, { act } from "react-test-renderer";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const { mockUseApp, mockClientFns } = vi.hoisted(() => ({
   mockUseApp: vi.fn(),
@@ -263,9 +264,7 @@ describe("Advanced trajectories/fine-tuning integration", () => {
     await flush();
 
     const fineTuningTabButton = tree?.root.findAll(
-      (node) =>
-        node.type === "button" &&
-        containsText(node, "Fine-Tuning"),
+      (node) => node.type === "button" && containsText(node, "Fine-Tuning"),
     )[0];
     expect(fineTuningTabButton).toBeDefined();
 

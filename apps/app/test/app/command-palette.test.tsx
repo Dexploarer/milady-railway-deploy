@@ -142,7 +142,7 @@ describe("CommandPalette keyboard behavior", () => {
       tree = TestRenderer.create(React.createElement(CommandPalette));
     });
 
-    const input = tree.root.find((node) => node.type === "input");
+    const _input = tree.root.find((node) => node.type === "input");
     const commandButtons = tree.root.findAll(
       (node: TestRenderer.ReactTestInstance) =>
         node.type === "button" &&

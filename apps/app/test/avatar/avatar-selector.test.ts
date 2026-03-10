@@ -59,8 +59,6 @@ describe("Avatar VRM Utilities", () => {
       expect(getVrmTitle(24)).toBe("MILADY-24");
     });
 
-
-
     it("returns label for named VRMs", () => {
       expect(getVrmTitle(25)).toBe("SHAW");
     });

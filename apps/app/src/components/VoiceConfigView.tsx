@@ -23,12 +23,12 @@ import {
   sanitizeApiKey,
   VOICE_PROVIDERS,
 } from "@milady/app-core/voice";
-import { useTimeout } from "../hooks/useTimeout";
 import type { SwabbleConfig } from "@milady/capacitor-swabble";
 import { Swabble } from "@milady/capacitor-swabble";
 import { Button, Input } from "@milady/ui";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useApp } from "../AppContext";
+import { useTimeout } from "../hooks/useTimeout";
 import {
   CloudConnectionStatus,
   CloudSourceModeToggle,
@@ -41,12 +41,12 @@ const MODEL_SIZES: Array<{
   id: NonNullable<SwabbleConfig["modelSize"]>;
   hint: string;
 }> = [
-    { id: "tiny", hint: "(faster)" },
-    { id: "base", hint: "(recommended)" },
-    { id: "small", hint: "" },
-    { id: "medium", hint: "(accurate)" },
-    { id: "large", hint: "(accurate)" },
-  ];
+  { id: "tiny", hint: "(faster)" },
+  { id: "base", hint: "(recommended)" },
+  { id: "small", hint: "" },
+  { id: "medium", hint: "(accurate)" },
+  { id: "large", hint: "(accurate)" },
+];
 
 function WakeWordSection({
   serverConfig,
@@ -185,13 +185,15 @@ function WakeWordSection({
         <button
           type="button"
           onClick={() => void handleToggle()}
-          className={`relative inline-flex h-5 w-9 cursor-pointer items-center rounded-full transition-colors ${enabled ? "bg-[var(--accent)]" : "bg-[var(--border)]"
-            }`}
+          className={`relative inline-flex h-5 w-9 cursor-pointer items-center rounded-full transition-colors ${
+            enabled ? "bg-[var(--accent)]" : "bg-[var(--border)]"
+          }`}
           aria-label={enabled ? "Disable wake word" : "Enable wake word"}
         >
           <span
-            className={`inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform ${enabled ? "translate-x-4" : "translate-x-0.5"
-              }`}
+            className={`inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform ${
+              enabled ? "translate-x-4" : "translate-x-0.5"
+            }`}
           />
         </button>
       </div>
@@ -285,9 +287,7 @@ function WakeWordSection({
               >
                 <div className="font-semibold">{m.id}</div>
                 {m.hint && (
-                  <div className="text-[10px] opacity-70 mt-0.5">
-                    {m.hint}
-                  </div>
+                  <div className="text-[10px] opacity-70 mt-0.5">{m.hint}</div>
                 )}
               </Button>
             );
@@ -420,10 +420,10 @@ export function VoiceConfigView() {
       const normalizedElevenLabs =
         provider === "elevenlabs"
           ? {
-            ...voiceConfig.elevenlabs,
-            modelId:
-              voiceConfig.elevenlabs?.modelId ?? DEFAULT_ELEVEN_FAST_MODEL,
-          }
+              ...voiceConfig.elevenlabs,
+              modelId:
+                voiceConfig.elevenlabs?.modelId ?? DEFAULT_ELEVEN_FAST_MODEL,
+            }
           : voiceConfig.elevenlabs;
       const sanitizedKey = sanitizeApiKey(normalizedElevenLabs?.apiKey);
       if (normalizedElevenLabs) {
@@ -467,7 +467,7 @@ export function VoiceConfigView() {
       setSaveError(err instanceof Error ? err.message : "Failed to save");
     }
     setSaving(false);
-  }, [swabbleServerConfig, voiceConfig]);
+  }, [swabbleServerConfig, voiceConfig, setTimeout]);
 
   if (loading) {
     return (
@@ -501,9 +501,7 @@ export function VoiceConfigView() {
                 onClick={() => handleProviderChange(p.id)}
               >
                 <div className="font-semibold">{p.label}</div>
-                <div className="text-[10px] opacity-70 mt-0.5">
-                  {p.hint}
-                </div>
+                <div className="text-[10px] opacity-70 mt-0.5">{p.hint}</div>
               </Button>
             );
           })}
@@ -518,10 +516,11 @@ export function VoiceConfigView() {
             : `${providerInfo?.label} — No API key needed`}
         </span>
         <span
-          className={`text-[10px] px-1.5 py-0.5 border ${isConfigured
+          className={`text-[10px] px-1.5 py-0.5 border ${
+            isConfigured
               ? "border-green-600 text-green-600"
               : "border-yellow-600 text-yellow-600"
-            }`}
+          }`}
         >
           {isConfigured ? "Configured" : "Needs Setup"}
         </span>
@@ -599,7 +598,9 @@ export function VoiceConfigView() {
                     className="h-auto flex-col items-start py-1.5 px-2 text-left"
                     onClick={() => handleVoiceSelect(preset.voiceId)}
                   >
-                    <div className="font-semibold truncate w-full">{preset.name}</div>
+                    <div className="font-semibold truncate w-full">
+                      {preset.name}
+                    </div>
                     <div className="text-[10px] opacity-70 truncate w-full">
                       {preset.hint}
                     </div>

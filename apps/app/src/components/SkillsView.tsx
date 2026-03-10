@@ -11,7 +11,6 @@ import type {
   SkillMarketplaceResult,
   SkillScanReportSummary,
 } from "@milady/app-core/api";
-import { useTimeout } from "../hooks/useTimeout";
 import { client } from "@milady/app-core/api";
 import {
   ConfirmDeleteControl,
@@ -21,6 +20,7 @@ import {
 import { Button, Input } from "@milady/ui";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useApp } from "../AppContext";
+import { useTimeout } from "../hooks/useTimeout";
 
 /* ── Skill Card ─────────────────────────────────────────────────────── */
 

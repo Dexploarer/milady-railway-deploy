@@ -18,7 +18,6 @@ import {
   dispatchWindowEvent,
   VOICE_CONFIG_UPDATED_EVENT,
 } from "@milady/app-core/events";
-import { useTimeout } from "../hooks/useTimeout";
 import type { ConfigUiHint } from "@milady/app-core/types";
 import { resolveApiUrl } from "@milady/app-core/utils";
 import {
@@ -29,6 +28,7 @@ import {
 import { Button, Input, TagEditor, Textarea, ThemedSelect } from "@milady/ui";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useApp } from "../AppContext";
+import { useTimeout } from "../hooks/useTimeout";
 import { AvatarSelector } from "./AvatarSelector";
 import type { JsonSchemaObject } from "./config-catalog";
 import { ConfigRenderer, defaultRegistry } from "./config-renderer";
@@ -377,7 +377,7 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
       );
     }
     setVoiceSaving(false);
-  }, [voiceConfig]);
+  }, [voiceConfig, setTimeout]);
 
   const d = characterDraft;
   const bioText =

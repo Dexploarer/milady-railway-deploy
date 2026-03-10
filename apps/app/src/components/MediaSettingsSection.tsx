@@ -17,10 +17,10 @@ import {
   type VideoProvider,
   type VisionProvider,
 } from "@milady/app-core/api";
-import { useTimeout } from "../hooks/useTimeout";
 import { Button, Input } from "@milady/ui";
 import { useCallback, useEffect, useState } from "react";
 import { useApp } from "../AppContext";
+import { useTimeout } from "../hooks/useTimeout";
 import {
   CloudConnectionStatus,
   CloudSourceModeToggle,
@@ -238,7 +238,7 @@ export function MediaSettingsSection() {
     setDirty(false);
     setTimeout(() => setSaveSuccess(false), 2500);
     setSaving(false);
-  }, [mediaConfig]);
+  }, [mediaConfig, setTimeout]);
 
   // Check if provider is configured
   const isProviderConfigured = useCallback(

@@ -1,8 +1,4 @@
-import {
-  act,
-  create,
-  type ReactTestRenderer,
-} from "react-test-renderer";
+import { act, create, type ReactTestRenderer } from "react-test-renderer";
 import { describe, expect, it, vi } from "vitest";
 import * as AppContext from "../AppContext";
 import { Header } from "./Header";

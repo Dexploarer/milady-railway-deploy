@@ -4,15 +4,12 @@ import { resolveAppAssetUrl } from "../utils/asset-url";
 const BASE_VRM_COUNT = 24;
 
 /** Named VRM avatars that don't follow the milady-N convention.
- *  flip: true  → model's eye-bone convention differs from milady; needs an
- *               explicit 180° Y rotation instead of auto-detection.
  */
 const NAMED_VRMS: {
     file: string;
     preview: string;
     label: string;
-    flip?: boolean;
-}[] = [{ file: "shaw.vrm", preview: "shaw.jpg", label: "Shaw", flip: true }];
+}[] = [{ file: "shaw.vrm", preview: "shaw.jpg", label: "Shaw" }];
 
 export const VRM_COUNT = BASE_VRM_COUNT + NAMED_VRMS.length;
 
@@ -74,14 +71,6 @@ export function getVrmTitle(index: number): string {
 /** Whether a bundled index points to the official Milady avatar set. */
 export function isOfficialVrmIndex(index: number): boolean {
     return false;
-}
-
-/** Whether a VRM index requires an explicit 180° face-camera flip instead of auto-detection. */
-export function getVrmNeedsFlip(index: number): boolean {
-    const normalized = normalizeAvatarIndex(index);
-    if (normalized <= BASE_VRM_COUNT) return false;
-    const named = NAMED_VRMS[normalized - BASE_VRM_COUNT - 1];
-    return named?.flip ?? false;
 }
 
 export { normalizeAvatarIndex };

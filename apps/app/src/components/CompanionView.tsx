@@ -1,7 +1,6 @@
 import { useCallback, useState } from "react";
 import {
   getVrmBackgroundUrl,
-  getVrmNeedsFlip,
   getVrmPreviewUrl,
   getVrmUrl,
   useApp,
@@ -22,12 +21,12 @@ export function CompanionView() {
     setUiShellMode,
     // Header properties
     agentStatus,
-    miladyCloudEnabled: miladyCloudEnabled,
-    miladyCloudConnected: miladyCloudConnected,
-    miladyCloudCredits: miladyCloudCredits,
-    miladyCloudCreditsCritical: miladyCloudCreditsCritical,
-    miladyCloudCreditsLow: miladyCloudCreditsLow,
-    miladyCloudTopUpUrl: miladyCloudTopUpUrl,
+    miladyCloudEnabled,
+    miladyCloudConnected,
+    miladyCloudCredits,
+    miladyCloudCreditsCritical,
+    miladyCloudCreditsLow,
+    miladyCloudTopUpUrl,
     walletAddresses,
     lifecycleBusy,
     lifecycleAction,
@@ -44,8 +43,8 @@ export function CompanionView() {
     agentState === "running"
       ? "text-ok border-ok"
       : agentState === "paused" ||
-        agentState === "restarting" ||
-        agentState === "starting"
+          agentState === "restarting" ||
+          agentState === "starting"
         ? "text-warn border-warn"
         : agentState === "error"
           ? "text-danger border-danger"
@@ -87,8 +86,6 @@ export function CompanionView() {
     selectedVrmIndex === 0 && customVrmUrl
       ? customBackgroundUrl || getVrmBackgroundUrl(1)
       : getVrmBackgroundUrl(safeSelectedVrmIndex);
-  const needsFlip =
-    selectedVrmIndex > 0 && getVrmNeedsFlip(safeSelectedVrmIndex);
 
   return (
     <div
@@ -105,7 +102,6 @@ export function CompanionView() {
       <VrmStage
         vrmPath={vrmPath}
         fallbackPreviewUrl={fallbackPreviewUrl}
-        needsFlip={needsFlip}
         cameraProfile={cameraZoomed ? "companion_close" : "companion"}
         t={t}
       />
