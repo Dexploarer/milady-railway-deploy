@@ -63,7 +63,9 @@ export function resolveConfigDir(opts?: {
   const homedir = opts?.homedir ?? os.homedir();
   if (platform === "win32") {
     const roaming =
-      opts?.appdata ?? process.env.APPDATA ?? path.join(homedir, "AppData", "Roaming");
+      opts?.appdata ??
+      process.env.APPDATA ??
+      path.join(homedir, "AppData", "Roaming");
     return path.join(roaming, "Milady");
   }
   return path.join(homedir, ".config", "Milady");

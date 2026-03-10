@@ -9,10 +9,7 @@
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 
-import {
-  getMiladyDistFallbackCandidates,
-  resolveConfigDir,
-} from "../agent";
+import { getMiladyDistFallbackCandidates, resolveConfigDir } from "../agent";
 
 // ---------------------------------------------------------------------------
 // resolveConfigDir
@@ -116,10 +113,7 @@ describe("getMiladyDistFallbackCandidates", () => {
       "/a/b",
       "/app/launcher.exe",
     );
-    const winResourcesPath = path.resolve(
-      "/app",
-      "resources/app/milady-dist",
-    );
+    const winResourcesPath = path.resolve("/app", "resources/app/milady-dist");
     expect(candidates).toContain(winResourcesPath);
   });
 });

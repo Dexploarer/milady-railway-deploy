@@ -96,23 +96,17 @@ const _CAPTURE_SCRIPT = (_quality: number) => `
 })()
 `;
 
-
 export class ScreenCaptureManager {
   private frameCaptureActive = false;
   private frameCaptureTimer: ReturnType<typeof setInterval> | null = null;
   private frameCaptureWindow: BrowserWindow | null = null;
-  /** Reference to the main webview for app-window capture. */
-  private mainWebview: Webview | null = null;
-
-  /** Optional override target webview (e.g. a popout window's webview). */
-  private captureTargetWebview: Webview | null = null;
 
   setSendToWebview(_fn: SendToWebview): void {
     // Screen capture posts directly to the HTTP endpoint; no webview push needed.
   }
 
-  setMainWebview(webview: Webview | null): void {
-    this.mainWebview = webview;
+  setMainWebview(_webview: Webview | null): void {
+    // Native CLI capture does not use the webview reference; retained for RPC compat.
   }
 
   /**
@@ -128,8 +122,8 @@ export class ScreenCaptureManager {
    * across rpc-schema.ts, rpc-handlers.ts, electrobun-bridge.ts, and the
    * renderer.
    */
-  setCaptureTarget(webview: Webview | null): void {
-    this.captureTargetWebview = webview;
+  setCaptureTarget(_webview: Webview | null): void {
+    // Intentionally inert — see docblock above.
   }
 
   async getSources() {
@@ -473,8 +467,6 @@ $bmp.Dispose()`;
 
   dispose(): void {
     this.stopFrameCapture();
-    this.mainWebview = null;
-    this.captureTargetWebview = null;
   }
 }
 
