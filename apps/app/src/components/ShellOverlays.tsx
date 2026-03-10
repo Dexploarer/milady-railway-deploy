@@ -9,7 +9,7 @@
 import { BugReportModal } from "./BugReportModal";
 import { CommandPalette } from "./CommandPalette";
 import { EmotePicker } from "./EmotePicker";
-import { MemoryDebugPanel } from "./MemoryDebugPanel";
+// import { MemoryDebugPanel } from "./MemoryDebugPanel";
 import { RestartBanner } from "./RestartBanner";
 import { ShortcutsOverlay } from "./ShortcutsOverlay";
 
@@ -20,25 +20,24 @@ export interface ActionNotice {
 
 export function ShellOverlays({
   actionNotice }: {
-  actionNotice: ActionNotice | null;
-}) {
+    actionNotice: ActionNotice | null;
+  }) {
   return (
     <>
       <CommandPalette />
       <EmotePicker />
       <RestartBanner />
-      <MemoryDebugPanel />
+      {/* <MemoryDebugPanel /> */}
       <BugReportModal />
       <ShortcutsOverlay />
       {actionNotice && (
         <div
-          className={`fixed bottom-6 left-1/2 -translate-x-1/2 px-5 py-2 rounded-lg text-[13px] font-medium z-[10000] text-white ${
-            actionNotice.tone === "error"
-              ? "bg-danger"
-              : actionNotice.tone === "success"
-                ? "bg-ok"
-                : "bg-accent"
-          }`}
+          className={`fixed bottom-6 left-1/2 -translate-x-1/2 px-5 py-2 rounded-lg text-[13px] font-medium z-[10000] text-white ${actionNotice.tone === "error"
+            ? "bg-danger"
+            : actionNotice.tone === "success"
+              ? "bg-ok"
+              : "bg-accent"
+            }`}
         >
           {actionNotice.text}
         </div>

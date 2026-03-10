@@ -1,6 +1,7 @@
 import {
   useWalletPanelState,
-  type WalletPanelProps } from "./useWalletPanelState";
+  type WalletPanelProps
+} from "./useWalletPanelState";
 import { WalletNftGallery } from "./WalletNftGallery";
 import { WalletPortfolioList } from "./WalletPortfolioList";
 import { WalletSendPanel } from "./WalletSendPanel";
@@ -172,7 +173,7 @@ export function CompanionWalletPanel(props: WalletPanelProps) {
             <div className="anime-wallet-address-list">
               {evmAddress && (
                 <div className="anime-wallet-address-row">
-                  <span className="anime-wallet-address-chain">{t("companionwalletpanel.BSC")}</span>
+                  <span className="anime-wallet-address-chain">{t("companionwalletpanel.EVM")}</span>
                   <code
                     className="anime-wallet-address-code"
                     title={evmAddress}
@@ -229,7 +230,8 @@ export function CompanionWalletPanel(props: WalletPanelProps) {
                     { key: "tokens", label: t("wallet.tokens") },
                     {
                       key: "collectibles",
-                      label: t("wallet.collectibles") },
+                      label: t("wallet.collectibles")
+                    },
                   ] as const
                 ).map((tab) => (
                   <button

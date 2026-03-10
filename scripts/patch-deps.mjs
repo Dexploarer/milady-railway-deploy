@@ -648,8 +648,8 @@ if (pdfTargets.length === 0) {
     if (target.includes("/dist/node/")) {
       if (src.includes(pdfLegacySpecifier)) {
         console.log("  - pdfjs-dist legacy Node import patch already present.");
-      } else if (src.includes('from "pdfjs-dist"')) {
-        src = src.replace(pdfNodeImportRegex, pdfLegacySpecifier);
+      } else if (src.includes('from "pdfjs-dist"') || src.includes('from "pdfjs-dist/legacy/build/pdf.mjs"')) {
+        src = src.replace(/from\s*"pdfjs-dist(\/legacy\/build\/pdf\.mjs)?"/g, pdfLegacySpecifier);
         patched = true;
         console.log(
           "  - Redirected plugin-pdf Node build to pdfjs-dist legacy entry.",

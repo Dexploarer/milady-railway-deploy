@@ -16,21 +16,13 @@ import type {
   KnowledgeDocument,
   KnowledgeFragment,
   KnowledgeSearchResult,
-  KnowledgeStats } from "../api-client";
+  KnowledgeStats
+} from "../api-client";
 import { client } from "../api-client";
 import { ConfirmDeleteControl } from "./shared/confirm-delete-control";
 import { formatByteSize, formatShortDate } from "./shared/format";
-
-/* ── Shared style constants ─────────────────────────────────────────── */
-
-const inputCls =
-  "w-full px-3 py-2 border border-[var(--border)] bg-[var(--card)] text-[var(--txt)] text-sm focus:border-[var(--accent)] focus:outline-none rounded";
-const btnPrimary =
-  "px-4 py-2 text-sm font-medium bg-[var(--accent)] text-[var(--accent-foreground)] border border-[var(--accent)] cursor-pointer hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-default rounded";
-const btnGhost =
-  "px-3 py-1.5 text-xs bg-transparent text-[var(--muted)] border border-[var(--border)] cursor-pointer hover:text-[var(--txt)] hover:border-[var(--txt)] transition-colors disabled:opacity-40 disabled:cursor-default rounded";
-const btnDanger =
-  "px-2 py-1 text-[11px] bg-transparent text-[var(--muted)] border border-[var(--border)] cursor-pointer hover:text-[#e74c3c] hover:border-[#e74c3c] transition-colors rounded";
+import { SearchBar } from "./shared/SearchBar";
+import { btnPrimary, btnGhost, btnDanger, inputCls } from "./shared/button-styles";
 const MAX_UPLOAD_REQUEST_BYTES = 32 * 1_048_576; // Must match server knowledge route limit
 const BULK_UPLOAD_TARGET_BYTES = 24 * 1_048_576;
 const MAX_BULK_REQUEST_DOCUMENTS = 100;
@@ -52,7 +44,8 @@ const SUPPORTED_UPLOAD_EXTENSIONS = new Set([
 ]);
 const DIRECTORY_INPUT_ATTRS = {
   webkitdirectory: "",
-  directory: "" } as Record<string, string>;
+  directory: ""
+} as Record<string, string>;
 
 export type KnowledgeUploadFile = File & {
   webkitRelativePath?: string;
@@ -97,10 +90,10 @@ function StatsCard({
   stats,
   loading,
   hasError }: {
-  stats: KnowledgeStats | null;
-  loading: boolean;
-  hasError?: boolean;
-}) {
+    stats: KnowledgeStats | null;
+    loading: boolean;
+    hasError?: boolean;
+  }) {
   const { t } = useApp();
   return (
     <div className="grid grid-cols-2 gap-4 mb-6">
@@ -142,14 +135,14 @@ function UploadZone({
   onUrlUpload,
   uploading,
   uploadStatus }: {
-  onFilesUpload: (
-    files: KnowledgeUploadFile[],
-    options: KnowledgeUploadOptions,
-  ) => void;
-  onUrlUpload: (url: string, options: KnowledgeUploadOptions) => void;
-  uploading: boolean;
-  uploadStatus: { current: number; total: number; filename: string } | null;
-}) {
+    onFilesUpload: (
+      files: KnowledgeUploadFile[],
+      options: KnowledgeUploadOptions,
+    ) => void;
+    onUrlUpload: (url: string, options: KnowledgeUploadOptions) => void;
+    uploading: boolean;
+    uploadStatus: { current: number; total: number; filename: string } | null;
+  }) {
   const { t } = useApp();
   const [dragOver, setDragOver] = useState(false);
   const [urlInput, setUrlInput] = useState("");
@@ -176,7 +169,8 @@ function UploadZone({
       const files = e.target.files;
       if (files && files.length > 0 && !uploading) {
         onFilesUpload(Array.from(files) as KnowledgeUploadFile[], {
-          includeImageDescriptions });
+          includeImageDescriptions
+        });
       }
       e.target.value = "";
     },
@@ -315,56 +309,14 @@ function UploadZone({
   );
 }
 
-/* ── Search Bar ─────────────────────────────────────────────────────── */
-
-function SearchBar({
-  onSearch,
-  searching }: {
-  onSearch: (query: string) => void;
-  searching: boolean;
-}) {
-  const { t } = useApp();
-  const [query, setQuery] = useState("");
-
-  const handleSubmit = useCallback(() => {
-    if (query.trim()) {
-      onSearch(query.trim());
-    }
-  }, [query, onSearch]);
-
-  return (
-    <div className="mb-6">
-      <div className="flex gap-2">
-        <input
-          type="text"
-          placeholder={t("knowledgeview.SearchKnowledge")}
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-          className={inputCls}
-          disabled={searching}
-        />
-        <button
-          type="button"
-          className={btnPrimary}
-          onClick={handleSubmit}
-          disabled={!query.trim() || searching}
-        >
-          {searching ? "Searching..." : "Search"}
-        </button>
-      </div>
-    </div>
-  );
-}
-
 /* ── Search Results ─────────────────────────────────────────────────── */
 
 function SearchResults({
   results,
   onClear }: {
-  results: KnowledgeSearchResult[];
-  onClear: () => void;
-}) {
+    results: KnowledgeSearchResult[];
+    onClear: () => void;
+  }) {
   const { t } = useApp();
   return (
     <div className="mb-6">
@@ -415,11 +367,11 @@ function DocumentCard({
   onSelect,
   onDelete,
   deleting }: {
-  doc: KnowledgeDocument;
-  onSelect: (id: string) => void;
-  onDelete: (id: string) => void;
-  deleting: boolean;
-}) {
+    doc: KnowledgeDocument;
+    onSelect: (id: string) => void;
+    onDelete: (id: string) => void;
+    deleting: boolean;
+  }) {
   const { t } = useApp();
   return (
     <div className="flex items-center justify-between p-4 border border-[var(--border)] bg-[var(--card)] rounded hover:border-[var(--accent)]/50 transition-colors">
@@ -469,9 +421,9 @@ function DocumentCard({
 function DocumentDetailModal({
   documentId,
   onClose }: {
-  documentId: string;
-  onClose: () => void;
-}) {
+    documentId: string;
+    onClose: () => void;
+  }) {
   const { t } = useApp();
   const [doc, setDoc] = useState<KnowledgeDocument | null>(null);
   const [fragments, setFragments] = useState<KnowledgeFragment[]>([]);
@@ -614,7 +566,7 @@ function DocumentDetailModal({
 
 export function KnowledgeView({ inModal }: { inModal?: boolean } = {}) {
   const { t } = useApp();
-  const { setActionNotice} = useApp();
+  const { setActionNotice } = useApp();
   const setActionNoticeRef = useRef(setActionNotice);
   setActionNoticeRef.current = setActionNotice;
   const [stats, setStats] = useState<KnowledgeStats | null>(null);
@@ -737,7 +689,9 @@ export function KnowledgeView({ inModal }: { inModal?: boolean } = {}) {
         contentType: file.type || "application/octet-stream",
         metadata: {
           includeImageDescriptions: options.includeImageDescriptions,
-          relativePath: file.webkitRelativePath || undefined } };
+          relativePath: file.webkitRelativePath || undefined
+        }
+      };
       const requestBytes = new TextEncoder().encode(
         JSON.stringify(request),
       ).length;
@@ -750,7 +704,8 @@ export function KnowledgeView({ inModal }: { inModal?: boolean } = {}) {
       return {
         filename: uploadFilename,
         request,
-        requestBytes };
+        requestBytes
+      };
     },
     [readKnowledgeFile],
   );
@@ -803,7 +758,8 @@ export function KnowledgeView({ inModal }: { inModal?: boolean } = {}) {
       setUploadStatus({
         current: 0,
         total: uploadQueue.length,
-        filename: "Preparing..." });
+        filename: "Preparing..."
+      });
 
       try {
         type PreparedUpload = {
@@ -834,11 +790,13 @@ export function KnowledgeView({ inModal }: { inModal?: boolean } = {}) {
           setUploadStatus({
             current: successful + failures.length,
             total: uploadQueue.length,
-            filename: `Uploading batch starting with ${batchLabel}` });
+            filename: `Uploading batch starting with ${batchLabel}`
+          });
 
           try {
             const result = await client.uploadKnowledgeDocumentsBulk({
-              documents: batchToUpload.map((item) => item.request) });
+              documents: batchToUpload.map((item) => item.request)
+            });
 
             for (const item of result.results) {
               const batchItem = batchToUpload[item.index];
@@ -866,7 +824,8 @@ export function KnowledgeView({ inModal }: { inModal?: boolean } = {}) {
           setUploadStatus({
             current: index + 1,
             total: uploadQueue.length,
-            filename: `Preparing: ${uploadFilename}` });
+            filename: `Preparing: ${uploadFilename}`
+          });
 
           try {
             const prepared = await buildKnowledgeUploadRequest(file, options);
@@ -953,7 +912,8 @@ export function KnowledgeView({ inModal }: { inModal?: boolean } = {}) {
       setUploading(true);
       try {
         const result = await client.uploadKnowledgeFromUrl(url, {
-          includeImageDescriptions: options.includeImageDescriptions });
+          includeImageDescriptions: options.includeImageDescriptions
+        });
 
         const baseMessage = result.isYouTubeTranscript
           ? `Imported YouTube transcript (${result.fragmentCount} fragments)`
@@ -985,7 +945,8 @@ export function KnowledgeView({ inModal }: { inModal?: boolean } = {}) {
       try {
         const result = await client.searchKnowledge(query, {
           threshold: 0.3,
-          limit: 20 });
+          limit: 20
+        });
         setSearchResults(result.results);
       } catch (err) {
         const message =

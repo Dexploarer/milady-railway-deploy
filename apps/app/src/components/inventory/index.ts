@@ -2,6 +2,7 @@ export { CopyableAddress } from "./CopyableAddress";
 export {
   BSC_GAS_READY_THRESHOLD,
   BSC_GAS_THRESHOLD,
+  isAvaxChainName,
   isBscChainName,
   loadTrackedBscTokens,
   loadTrackedTokens,
@@ -10,7 +11,16 @@ export {
   saveTrackedTokens,
   type TokenRow,
   type TrackedBscToken,
-  toNormalizedAddress } from "./constants";
+  toNormalizedAddress
+} from "./constants";
+export {
+  CHAIN_CONFIGS,
+  PRIMARY_CHAIN_KEYS,
+  type ChainConfig,
+  type ChainKey,
+  getChainConfig,
+  resolveChainKey,
+} from "../chainConfig";
 export { InventoryToolbar } from "./InventoryToolbar";
 export { NftGrid } from "./NftGrid";
 export { PortfolioHeader } from "./PortfolioHeader";

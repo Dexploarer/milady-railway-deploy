@@ -15,6 +15,7 @@ import {
   getTokenExplorerUrl,
   getWalletTxStatusLabel,
   HEX_ADDRESS_RE,
+  isAvaxChainName,
   isBscChainName,
   loadRecentTrades,
   MAX_WALLET_RECENT_TRADES,
@@ -25,7 +26,8 @@ import {
   type TranslatorFn,
   WALLET_RECENT_TRADES_KEY,
   type WalletRecentTrade,
-  type WalletTokenRow } from "../walletUtils";
+  type WalletTokenRow
+} from "../walletUtils";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -49,7 +51,8 @@ function makeTokenRow(
     valueUsd: 0,
     balance: "0",
     logoUrl: null,
-    ...partial };
+    ...partial
+  };
 }
 
 /** Build a minimal WalletRecentTrade for persistence tests. */
@@ -69,7 +72,8 @@ function makeTrade(
     nonce: 1,
     reason: null,
     explorerUrl: "https://bscscan.com/tx/0x123",
-    ...partial };
+    ...partial
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -187,7 +191,38 @@ describe("walletUtils", () => {
       expect(isBscChainName("ethereum")).toBe(false);
       expect(isBscChainName("solana")).toBe(false);
       expect(isBscChainName("polygon")).toBe(false);
+      expect(isBscChainName("avalanche")).toBe(false);
       expect(isBscChainName("")).toBe(false);
+    });
+  });
+
+  // ── isAvaxChainName ───────────────────────────────────────────────
+  describe("isAvaxChainName", () => {
+    it("recognizes 'avax' (case-insensitive)", () => {
+      expect(isAvaxChainName("avax")).toBe(true);
+      expect(isAvaxChainName("AVAX")).toBe(true);
+      expect(isAvaxChainName("Avax")).toBe(true);
+    });
+
+    it("recognizes 'avalanche' variants", () => {
+      expect(isAvaxChainName("avalanche")).toBe(true);
+      expect(isAvaxChainName("Avalanche")).toBe(true);
+    });
+
+    it("recognizes 'c-chain' variants", () => {
+      expect(isAvaxChainName("c-chain")).toBe(true);
+      expect(isAvaxChainName("avalanche c-chain")).toBe(true);
+    });
+
+    it("trims whitespace", () => {
+      expect(isAvaxChainName("  avax  ")).toBe(true);
+    });
+
+    it("rejects non-AVAX chains", () => {
+      expect(isAvaxChainName("ethereum")).toBe(false);
+      expect(isAvaxChainName("bsc")).toBe(false);
+      expect(isAvaxChainName("solana")).toBe(false);
+      expect(isAvaxChainName("")).toBe(false);
     });
   });
 
@@ -203,6 +238,12 @@ describe("walletUtils", () => {
       expect(resolvePortfolioChainKey("solana")).toBe("solana");
       expect(resolvePortfolioChainKey("Solana")).toBe("solana");
       expect(resolvePortfolioChainKey("sol")).toBe("solana");
+    });
+
+    it("returns 'avax' for Avalanche variants", () => {
+      expect(resolvePortfolioChainKey("avax")).toBe("avax");
+      expect(resolvePortfolioChainKey("Avalanche")).toBe("avax");
+      expect(resolvePortfolioChainKey("c-chain")).toBe("avax");
     });
 
     it("returns 'evm' for other chains", () => {
@@ -260,7 +301,8 @@ describe("walletUtils", () => {
       const row = makeTokenRow({
         chainKey: "bsc",
         chain: "bsc",
-        assetAddress: null });
+        assetAddress: null
+      });
       expect(getTokenExplorerUrl(row)).toBeNull();
     });
 
@@ -268,7 +310,8 @@ describe("walletUtils", () => {
       const row = makeTokenRow({
         chainKey: "evm",
         chain: "BSC",
-        assetAddress: validAddr });
+        assetAddress: validAddr
+      });
       expect(getTokenExplorerUrl(row)).toBe(
         `https://bscscan.com/token/${validAddr}`,
       );
@@ -278,7 +321,8 @@ describe("walletUtils", () => {
       const row = makeTokenRow({
         chainKey: "evm",
         chain: "BNB Chain",
-        assetAddress: validAddr });
+        assetAddress: validAddr
+      });
       expect(getTokenExplorerUrl(row)).toBe(
         `https://bscscan.com/token/${validAddr}`,
       );
@@ -288,7 +332,8 @@ describe("walletUtils", () => {
       const row = makeTokenRow({
         chainKey: "evm",
         chain: "ethereum",
-        assetAddress: validAddr });
+        assetAddress: validAddr
+      });
       expect(getTokenExplorerUrl(row)).toBe(
         `https://etherscan.io/token/${validAddr}`,
       );
@@ -298,7 +343,8 @@ describe("walletUtils", () => {
       const row = makeTokenRow({
         chainKey: "evm",
         chain: "mainnet",
-        assetAddress: validAddr });
+        assetAddress: validAddr
+      });
       expect(getTokenExplorerUrl(row)).toBe(
         `https://etherscan.io/token/${validAddr}`,
       );
@@ -308,7 +354,8 @@ describe("walletUtils", () => {
       const row = makeTokenRow({
         chainKey: "evm",
         chain: "base",
-        assetAddress: validAddr });
+        assetAddress: validAddr
+      });
       expect(getTokenExplorerUrl(row)).toBe(
         `https://basescan.org/token/${validAddr}`,
       );
@@ -318,7 +365,8 @@ describe("walletUtils", () => {
       const row = makeTokenRow({
         chainKey: "evm",
         chain: "arbitrum",
-        assetAddress: validAddr });
+        assetAddress: validAddr
+      });
       expect(getTokenExplorerUrl(row)).toBe(
         `https://arbiscan.io/token/${validAddr}`,
       );
@@ -328,7 +376,8 @@ describe("walletUtils", () => {
       const row = makeTokenRow({
         chainKey: "evm",
         chain: "optimism",
-        assetAddress: validAddr });
+        assetAddress: validAddr
+      });
       expect(getTokenExplorerUrl(row)).toBe(
         `https://optimistic.etherscan.io/token/${validAddr}`,
       );
@@ -338,7 +387,8 @@ describe("walletUtils", () => {
       const row = makeTokenRow({
         chainKey: "evm",
         chain: "polygon",
-        assetAddress: validAddr });
+        assetAddress: validAddr
+      });
       expect(getTokenExplorerUrl(row)).toBe(
         `https://polygonscan.com/token/${validAddr}`,
       );
@@ -349,7 +399,8 @@ describe("walletUtils", () => {
       const row = makeTokenRow({
         chainKey: "solana",
         chain: "solana",
-        assetAddress: solAddr });
+        assetAddress: solAddr
+      });
       expect(getTokenExplorerUrl(row)).toBe(
         `https://solscan.io/token/${solAddr}`,
       );
@@ -359,7 +410,8 @@ describe("walletUtils", () => {
       const row = makeTokenRow({
         chainKey: "solana",
         chain: "solana",
-        assetAddress: "invalid!" });
+        assetAddress: "invalid!"
+      });
       expect(getTokenExplorerUrl(row)).toBeNull();
     });
 
@@ -367,7 +419,8 @@ describe("walletUtils", () => {
       const row = makeTokenRow({
         chainKey: "evm",
         chain: "ethereum",
-        assetAddress: "not-an-address" });
+        assetAddress: "not-an-address"
+      });
       expect(getTokenExplorerUrl(row)).toBeNull();
     });
 
@@ -375,8 +428,31 @@ describe("walletUtils", () => {
       const row = makeTokenRow({
         chainKey: "evm",
         chain: "fantom",
-        assetAddress: validAddr });
+        assetAddress: validAddr
+      });
       expect(getTokenExplorerUrl(row)).toBeNull();
+    });
+
+    it("returns snowtrace URL for Avalanche", () => {
+      const row = makeTokenRow({
+        chainKey: "avax",
+        chain: "avalanche",
+        assetAddress: validAddr
+      });
+      expect(getTokenExplorerUrl(row)).toBe(
+        `https://snowtrace.io/token/${validAddr}`,
+      );
+    });
+
+    it("returns snowtrace URL for 'avax'", () => {
+      const row = makeTokenRow({
+        chainKey: "avax",
+        chain: "avax",
+        assetAddress: validAddr
+      });
+      expect(getTokenExplorerUrl(row)).toBe(
+        `https://snowtrace.io/token/${validAddr}`,
+      );
     });
   });
 
@@ -420,7 +496,8 @@ describe("walletUtils", () => {
         }),
         removeItem: vi.fn((key: string) => {
           delete storage[key];
-        }) });
+        })
+      });
     });
 
     afterEach(() => {
@@ -527,16 +604,21 @@ describe("walletUtils", () => {
               baseToken: {
                 address: contractAddr,
                 symbol: "TEST",
-                name: "Test Token" },
+                name: "Test Token"
+              },
               quoteToken: { address: `0x${"b".repeat(40)}` },
-              info: { imageUrl: "https://example.com/logo.png" } },
-          ] }) });
+              info: { imageUrl: "https://example.com/logo.png" }
+            },
+          ]
+        })
+      });
 
       const result = await fetchBscTokenMetadata(contractAddr);
       expect(result).toEqual({
         symbol: "TEST",
         name: "Test Token",
-        logoUrl: "https://example.com/logo.png" });
+        logoUrl: "https://example.com/logo.png"
+      });
     });
 
     it("returns null when no BSC pair is found", async () => {
@@ -547,8 +629,11 @@ describe("walletUtils", () => {
           pairs: [
             {
               chainId: "ethereum",
-              baseToken: { address: contractAddr, symbol: "TST", name: "Test" } },
-          ] }) });
+              baseToken: { address: contractAddr, symbol: "TST", name: "Test" }
+            },
+          ]
+        })
+      });
 
       const result = await fetchBscTokenMetadata(contractAddr);
       expect(result).toBeNull();
@@ -558,7 +643,8 @@ describe("walletUtils", () => {
       const contractAddr = `0x${"a".repeat(40)}`;
       fetchMock.mockResolvedValueOnce({
         ok: false,
-        json: async () => ({}) });
+        json: async () => ({})
+      });
 
       const result = await fetchBscTokenMetadata(contractAddr);
       expect(result).toBeNull();
@@ -583,19 +669,25 @@ describe("walletUtils", () => {
               baseToken: {
                 address: `0x${"d".repeat(40)}`,
                 symbol: "BASE",
-                name: "Base Token" },
+                name: "Base Token"
+              },
               quoteToken: {
                 address: contractAddr,
                 symbol: "QUOTE",
-                name: "Quote Token" },
-              info: { imageUrl: "https://example.com/quote.png" } },
-          ] }) });
+                name: "Quote Token"
+              },
+              info: { imageUrl: "https://example.com/quote.png" }
+            },
+          ]
+        })
+      });
 
       const result = await fetchBscTokenMetadata(contractAddr);
       expect(result).toEqual({
         symbol: "QUOTE",
         name: "Quote Token",
-        logoUrl: "https://example.com/quote.png" });
+        logoUrl: "https://example.com/quote.png"
+      });
     });
 
     it("falls back to default symbol/name when token ref fields are empty", async () => {
@@ -607,21 +699,26 @@ describe("walletUtils", () => {
             {
               chainId: "bsc",
               baseToken: { address: contractAddr, symbol: "", name: "" },
-              info: {} },
-          ] }) });
+              info: {}
+            },
+          ]
+        })
+      });
 
       const result = await fetchBscTokenMetadata(contractAddr);
       expect(result).toEqual({
-        symbol: "MILADY",
-        name: "Milady",
-        logoUrl: null });
+        symbol: "TOKEN",
+        name: "Unknown Token",
+        logoUrl: null
+      });
     });
 
     it("returns null when pairs is not an array", async () => {
       const contractAddr = `0x${"a".repeat(40)}`;
       fetchMock.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ pairs: "not-array" }) });
+        json: async () => ({ pairs: "not-array" })
+      });
 
       const result = await fetchBscTokenMetadata(contractAddr);
       expect(result).toBeNull();

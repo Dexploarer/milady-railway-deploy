@@ -263,8 +263,7 @@ async function postChatWithRetries(
         return response;
       }
       errors.push(
-        `attempt ${attempt}: status=${response.status}, textType=${typeof text}, textLength=${
-          typeof text === "string" ? text.length : 0
+        `attempt ${attempt}: status=${response.status}, textType=${typeof text}, textLength=${typeof text === "string" ? text.length : 0
         }`,
       );
     } catch (err) {
@@ -306,8 +305,7 @@ async function postChatPromptWithRetries(
         return response;
       }
       errors.push(
-        `attempt ${attempt}: status=${response.status}, textType=${typeof text}, textLength=${
-          typeof text === "string" ? text.length : 0
+        `attempt ${attempt}: status=${response.status}, textType=${typeof text}, textLength=${typeof text === "string" ? text.length : 0
         }`,
       );
     } catch (err) {
@@ -375,7 +373,6 @@ describe("Agent Runtime E2E", () => {
   const corePluginNames = [
     "@elizaos/plugin-trajectory-logger",
     "@elizaos/plugin-agent-skills",
-    "@elizaos/plugin-directives",
     "@elizaos/plugin-commands",
     "@elizaos/plugin-personality",
     "@elizaos/plugin-experience",

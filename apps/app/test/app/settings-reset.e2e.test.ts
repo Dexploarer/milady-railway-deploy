@@ -376,8 +376,8 @@ describe("Settings Reset UI", () => {
       // Simulate the actual handleReset behavior
       const confirmed = window.confirm(
         "This will completely reset the agent — wiping all config, memory, and data.\n\n" +
-          "You will be taken back to the onboarding wizard.\n\n" +
-          "Are you sure?",
+        "You will be taken back to the onboarding wizard.\n\n" +
+        "Are you sure?",
       );
       if (!confirmed) return;
 
@@ -394,6 +394,7 @@ describe("Settings Reset UI", () => {
 
     mockUseApp.mockReset();
     mockUseApp.mockImplementation(() => ({
+      t: (k: string) => k,
       ...state,
       setState: (key: string, value: unknown) => {
         state[key] = value;
@@ -585,6 +586,7 @@ describe("Reset to Onboarding Flow Integration", () => {
 
     mockUseApp.mockReset();
     mockUseApp.mockImplementation(() => ({
+      t: (k: string) => k,
       ...state,
       setState: (key: string, value: unknown) => {
         state[key] = value;

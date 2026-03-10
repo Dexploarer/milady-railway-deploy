@@ -13,6 +13,10 @@ export interface TagInputProps extends Omit<React.HTMLAttributes<HTMLDivElement>
     placeholder?: string
     /** Maximum number of tags */
     maxItems?: number
+    /** Label for the explicit add button */
+    addLabel?: string
+    /** Aria-label template for the remove button */
+    removeLabel?: string
 }
 
 export const TagInput = React.forwardRef<HTMLDivElement, TagInputProps>(
@@ -23,6 +27,8 @@ export const TagInput = React.forwardRef<HTMLDivElement, TagInputProps>(
             onChange,
             placeholder = "Add item…",
             maxItems,
+            addLabel = "Add",
+            removeLabel = "Remove",
             className,
             ...props
         },
@@ -69,7 +75,7 @@ export const TagInput = React.forwardRef<HTMLDivElement, TagInputProps>(
                         className="rounded-md border border-input bg-bg px-1.5 py-0.5 text-[10px] text-muted transition-colors hover:border-accent hover:text-accent"
                         onClick={addItem}
                     >
-                        Add
+                        {addLabel}
                     </button>
                 </div>
                 <div className="flex flex-wrap gap-1.5 rounded-md border border-border bg-bg-accent p-1.5 min-h-[60px] content-start">
@@ -83,7 +89,7 @@ export const TagInput = React.forwardRef<HTMLDivElement, TagInputProps>(
                                 type="button"
                                 className="text-muted hover:text-destructive transition-colors"
                                 onClick={() => removeItem(i)}
-                                aria-label={`Remove ${item}`}
+                                aria-label={`${removeLabel} ${item}`}
                             >
                                 <X className="h-3 w-3" />
                             </button>

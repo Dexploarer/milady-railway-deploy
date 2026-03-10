@@ -2,13 +2,14 @@ import { useCallback, useMemo, useState } from "react";
 import type {
   BscTransferExecuteRequest,
   BscTransferExecuteResponse,
-  EvmChainBalance } from "../../api-client";
+  EvmChainBalance
+} from "../../api-client";
+import { getStablecoinAddress } from "../chainConfig";
 import {
-  BSC_USDC_TOKEN_ADDRESS,
-  BSC_USDT_TOKEN_ADDRESS,
   HEX_ADDRESS_RE,
   mapWalletTradeError,
-  type TranslatorFn } from "./walletUtils";
+  type TranslatorFn
+} from "./walletUtils";
 
 export type UseWalletSendStateArgs = {
   evmAddress: string | null;
@@ -58,8 +59,8 @@ export function useWalletSendState(args: UseWalletSendStateArgs) {
     ) {
       return fromWallet.contractAddress.trim();
     }
-    if (normalizedAsset === "USDT") return BSC_USDT_TOKEN_ADDRESS;
-    if (normalizedAsset === "USDC") return BSC_USDC_TOKEN_ADDRESS;
+    if (normalizedAsset === "USDT") return getStablecoinAddress("bsc", "USDT");
+    if (normalizedAsset === "USDC") return getStablecoinAddress("bsc", "USDC");
     return null;
   }, [bscChain, sendAsset]);
 
@@ -91,7 +92,8 @@ export function useWalletSendState(args: UseWalletSendStateArgs) {
         ...(sendAssetTokenAddress
           ? { tokenAddress: sendAssetTokenAddress }
           : {}),
-        confirm: true });
+        confirm: true
+      });
 
       if (result.requiresUserSignature) {
         setSendUserSignTx(JSON.stringify(result.unsignedTx, null, 2));
@@ -151,5 +153,6 @@ export function useWalletSendState(args: UseWalletSendStateArgs) {
     sendUserSignTx,
     sendReady,
     handleSendExecute,
-    resetSendFlow };
+    resetSendFlow
+  };
 }

@@ -1,4 +1,5 @@
 import type { BscTradeQuoteResponse } from "../../api-client";
+import { getExplorerTxUrl } from "../chainConfig";
 import { BSC_SWAP_GAS_RESERVE, type TranslatorFn } from "./walletUtils";
 
 type SwapPresetButton = {
@@ -140,7 +141,7 @@ export function WalletSwapPanel({
       </div>
 
       <label className="anime-wallet-field">
-        <span>{t("wallet.tokenBscContract")}</span>
+        <span>{t("wallet.tokenContract")}</span>
         <input
           type="text"
           value={swapTokenAddress}
@@ -285,7 +286,7 @@ export function WalletSwapPanel({
             {swapLastTxHash.slice(-6)}
           </code>
           <a
-            href={`https://bscscan.com/tx/${swapLastTxHash}`}
+            href={getExplorerTxUrl("bsc", swapLastTxHash) ?? `https://bscscan.com/tx/${swapLastTxHash}`}
             target="_blank"
             rel="noopener noreferrer"
             className="anime-wallet-tx-link"

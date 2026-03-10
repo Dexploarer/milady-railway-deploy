@@ -4,6 +4,7 @@ import { resolveAppAssetUrl } from "../../asset-url";
 import { STOP_EMOTE_EVENT } from "../../events";
 import type { VrmEngine, VrmEngineState } from "../avatar/VrmEngine";
 import { VrmViewer } from "../avatar/VrmViewer";
+import { AvatarLoader } from "../avatar/AvatarLoader";
 import { BubbleEmote } from "../BubbleEmote";
 import type { TranslatorFn } from "./walletUtils";
 
@@ -13,12 +14,12 @@ export function VrmStage({
   needsFlip,
   chatDockOpen,
   t }: {
-  vrmPath: string;
-  fallbackPreviewUrl: string;
-  needsFlip: boolean;
-  chatDockOpen: boolean;
-  t: TranslatorFn;
-}) {
+    vrmPath: string;
+    fallbackPreviewUrl: string;
+    needsFlip: boolean;
+    chatDockOpen: boolean;
+    t: TranslatorFn;
+  }) {
   const [vrmLoaded, setVrmLoaded] = useState(false);
   const [showVrmFallback, setShowVrmFallback] = useState(false);
   const vrmEngineRef = useRef<VrmEngine | null>(null);
@@ -78,7 +79,8 @@ export function VrmStage({
         className="absolute inset-0"
         style={{
           opacity: vrmLoaded ? 1 : 0,
-          transition: "opacity 400ms ease" }}
+          transition: "opacity 400ms ease"
+        }}
       >
         <VrmViewer
           vrmPath={vrmPath}
@@ -99,6 +101,7 @@ export function VrmStage({
           className="anime-vrm-fallback"
         />
       )}
+      {!vrmLoaded && !showVrmFallback && <AvatarLoader />}
       <div className="anime-comp-bubble-wrap">
         <BubbleEmote
           moodTier="neutral"

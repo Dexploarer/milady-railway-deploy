@@ -13,7 +13,8 @@ import type {
   WalletNftsResponse,
   WalletTradingProfileResponse,
   WalletTradingProfileSourceFilter,
-  WalletTradingProfileWindow } from "../../api-client";
+  WalletTradingProfileWindow
+} from "../../api-client";
 import { useWalletPortfolio } from "./useWalletPortfolio";
 import { useWalletSendState } from "./useWalletSendState";
 import { useWalletSwapState } from "./useWalletSwapState";
@@ -21,7 +22,8 @@ import { useWalletTradeHistory } from "./useWalletTradeHistory";
 import {
   BSC_GAS_READY_THRESHOLD,
   isBscChainName,
-  type TranslatorFn } from "./walletUtils";
+  type TranslatorFn
+} from "./walletUtils";
 
 export type WalletPanelProps = {
   copyToClipboard: (text: string) => Promise<void>;
@@ -98,9 +100,9 @@ export function useWalletPanelState(props: WalletPanelProps) {
   const [walletPortfolioTab, setWalletPortfolioTab] = useState<
     "tokens" | "collectibles"
   >("tokens");
-  const [walletPortfolioChain, setWalletPortfolioChain] = useState<
-    "all" | "bsc" | "evm" | "solana"
-  >("all");
+  const [walletPortfolioChain, setWalletPortfolioChain] = useState<string>(
+    "all",
+  );
   const [walletSelectedTokenKey, setWalletSelectedTokenKey] = useState<
     string | null
   >(null);
@@ -137,7 +139,8 @@ export function useWalletPanelState(props: WalletPanelProps) {
     walletSelectedTokenKey,
     walletPanelOpen,
     walletReady,
-    t });
+    t
+  });
 
   // ---- Trade history sub-hook ----
 
@@ -146,7 +149,8 @@ export function useWalletPanelState(props: WalletPanelProps) {
     getBscTradeTxStatus,
     loadWalletTradingProfile,
     setActionNotice,
-    t });
+    t
+  });
 
   // ---- Swap sub-hook ----
 
@@ -161,7 +165,8 @@ export function useWalletPanelState(props: WalletPanelProps) {
     getBscTradeQuote,
     executeBscTrade,
     setActionNotice,
-    t });
+    t
+  });
 
   // ---- Send sub-hook ----
 
@@ -171,7 +176,8 @@ export function useWalletPanelState(props: WalletPanelProps) {
     loadBalances,
     executeBscTransfer,
     setActionNotice,
-    t });
+    t
+  });
 
   const walletRefreshBusy =
     walletLoading ||
@@ -206,7 +212,7 @@ export function useWalletPanelState(props: WalletPanelProps) {
 
   const handleSelectedTokenSwap = useCallback(() => {
     if (!portfolio.selectedWalletToken) return;
-    if (portfolio.selectedWalletToken.chainKey !== "bsc") {
+    if (portfolio.selectedWalletToken.chainKey !== "bsc" && portfolio.selectedWalletToken.chainKey !== "avax") {
       setActionNotice(t("wallet.tokenOpenWalletForSwap"), "info", 2600);
       return;
     }
@@ -469,7 +475,8 @@ export function useWalletPanelState(props: WalletPanelProps) {
     loadNfts,
     copyToClipboard,
     setActionNotice,
-    t };
+    t
+  };
 }
 
 export type WalletPanelState = ReturnType<typeof useWalletPanelState>;

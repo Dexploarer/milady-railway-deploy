@@ -1,3 +1,4 @@
+import { getExplorerTxUrl } from "../chainConfig";
 import { shortHash, type TranslatorFn } from "./walletUtils";
 
 type WalletSendPanelProps = {
@@ -33,7 +34,7 @@ export function WalletSendPanel({
   return (
     <div className="anime-wallet-action-body">
       <label className="anime-wallet-field">
-        <span>{t("wallet.toAddressBsc")}</span>
+        <span>{t("wallet.toAddress")}</span>
         <input
           type="text"
           value={sendTo}
@@ -101,7 +102,7 @@ export function WalletSendPanel({
           <span>{t("wallet.latestTx")}</span>
           <code>{shortHash(sendLastTxHash)}</code>
           <a
-            href={`https://bscscan.com/tx/${sendLastTxHash}`}
+            href={getExplorerTxUrl("bsc", sendLastTxHash) ?? `https://bscscan.com/tx/${sendLastTxHash}`}
             target="_blank"
             rel="noopener noreferrer"
             className="anime-wallet-tx-link"

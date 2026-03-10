@@ -5,10 +5,8 @@
  */
 
 import {
-  createContext,
   type ReactNode,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useRef,
@@ -18,7 +16,6 @@ import { createTranslator } from "./i18n";
 import {
   type AgentStartupDiagnostics,
   type AgentStatus,
-  type AppViewerAuthMessage,
   type BscTradeExecuteRequest,
   type BscTradeExecuteResponse,
   type BscTradePreflightResponse,
@@ -29,7 +26,6 @@ import {
   type BscTransferExecuteResponse,
   type CatalogSkill,
   type CharacterData,
-  type ChatTokenUsage,
   type CodingAgentSession,
   type Conversation,
   type ConversationChannelType,
@@ -57,7 +53,6 @@ import {
   type SkillScanReportSummary,
   type StreamEventEnvelope,
   type StylePreset,
-  type SystemPermissionId,
   type TriggerHealthSnapshot,
   type TriggerRunRecord,
   type TriggerSummary,
@@ -74,7 +69,7 @@ import {
   type WhitelistStatus,
   type WorkbenchOverview,
 } from "./api-client";
-import { resolveApiUrl, resolveAppAssetUrl } from "./asset-url";
+import { resolveApiUrl } from "./asset-url";
 import {
   type AutonomyEventStore,
   type AutonomyRunHealthMap,
@@ -88,10 +83,8 @@ import {
   expandSavedCustomCommand,
   loadSavedCustomCommands,
   normalizeSlashCommandName,
-  splitCommandArgs,
 } from "./chat-commands";
 import {
-  DEFAULT_UI_LANGUAGE,
   normalizeLanguage,
   t as translateText,
   type UiLanguage,
@@ -101,1171 +94,110 @@ import { pathForTab, type Tab, tabFromPath } from "./navigation";
 import { getMissingOnboardingPermissions } from "./onboarding-permissions";
 import { mapServerTasksToSessions } from "./pty-session-hydrate";
 
-// ── VRM helpers ─────────────────────────────────────────────────────────
-
-/** Number of bundled VRM avatars shipped with the app. */
-const BASE_VRM_COUNT = 24;
-const OFFICIAL_VRM_COUNT = 8;
-
-/** Named VRM avatars that don't follow the milady-N convention.
- *  flip: true  → model's eye-bone convention differs from milady; needs an
- *               explicit 180° Y rotation instead of auto-detection.
- */
-const NAMED_VRMS: {
-  file: string;
-  preview: string;
-  label: string;
-  flip?: boolean;
-}[] = [{ file: "shaw.vrm", preview: "shaw.jpg", label: "Shaw", flip: true }];
-
-export const VRM_COUNT =
-  BASE_VRM_COUNT + OFFICIAL_VRM_COUNT + NAMED_VRMS.length;
-
-function normalizeAvatarIndex(index: number): number {
-  if (!Number.isFinite(index)) return 1;
-  const n = Math.trunc(index);
-  if (n === 0) return 0;
-  if (n < 1 || n > VRM_COUNT) return 1;
-  return n;
-}
-
-/** Resolve a bundled VRM index (1–N) to its public asset URL. */
-export function getVrmUrl(index: number): string {
-  const normalized = normalizeAvatarIndex(index);
-  const safeIndex = normalized > 0 ? normalized : 1;
-  if (safeIndex <= BASE_VRM_COUNT) {
-    return resolveAppAssetUrl(`vrms/milady-${safeIndex}.vrm`);
-  }
-  if (safeIndex <= BASE_VRM_COUNT + OFFICIAL_VRM_COUNT) {
-    const officialIndex = safeIndex - BASE_VRM_COUNT;
-    return resolveAppAssetUrl(`vrms/milady-official-${officialIndex}.vrm`);
-  }
-  const named = NAMED_VRMS[safeIndex - BASE_VRM_COUNT - OFFICIAL_VRM_COUNT - 1];
-  return resolveAppAssetUrl(`vrms/${named.file}`);
-}
-
-/** Resolve a bundled VRM index (1–N) to its preview thumbnail URL. */
-export function getVrmPreviewUrl(index: number): string {
-  const normalized = normalizeAvatarIndex(index);
-  const safeIndex = normalized > 0 ? normalized : 1;
-  if (safeIndex <= BASE_VRM_COUNT) {
-    return resolveAppAssetUrl(`vrms/previews/milady-${safeIndex}.png`);
-  }
-  if (safeIndex <= BASE_VRM_COUNT + OFFICIAL_VRM_COUNT) {
-    const officialIndex = safeIndex - BASE_VRM_COUNT;
-    return resolveAppAssetUrl(
-      `vrms/previews/milady-official-${officialIndex}.png`,
-    );
-  }
-  const named = NAMED_VRMS[safeIndex - BASE_VRM_COUNT - OFFICIAL_VRM_COUNT - 1];
-  return resolveAppAssetUrl(`vrms/previews/${named.preview}`);
-}
-
-/** Resolve a bundled VRM index (1-N) to its custom background URL. */
-export function getVrmBackgroundUrl(index: number): string {
-  const normalized = normalizeAvatarIndex(index);
-  const safeIndex = normalized > 0 ? normalized : 1;
-  const EXT = "png";
-
-  if (safeIndex <= BASE_VRM_COUNT) {
-    return resolveAppAssetUrl(`vrms/backgrounds/milady-${safeIndex}.${EXT}`);
-  }
-  if (safeIndex <= BASE_VRM_COUNT + OFFICIAL_VRM_COUNT) {
-    const officialIndex = safeIndex - BASE_VRM_COUNT;
-    return resolveAppAssetUrl(
-      `vrms/backgrounds/milady-official-${officialIndex}.${EXT}`,
-    );
-  }
-  const named = NAMED_VRMS[safeIndex - BASE_VRM_COUNT - OFFICIAL_VRM_COUNT - 1];
-  const baseName = named.preview.split(".")[0];
-  return resolveAppAssetUrl(`vrms/backgrounds/${baseName}.${EXT}`);
-}
-
-/** Human-readable roster title for bundled avatars. */
-export function getVrmTitle(index: number): string {
-  const normalized = normalizeAvatarIndex(index);
-  const safeIndex = normalized > 0 ? normalized : 1;
-  if (safeIndex <= BASE_VRM_COUNT) {
-    return `MILADY-${String(safeIndex).padStart(2, "0")}`;
-  }
-  if (safeIndex <= BASE_VRM_COUNT + OFFICIAL_VRM_COUNT) {
-    const officialIndex = safeIndex - BASE_VRM_COUNT;
-    return `OFFICIAL-${String(officialIndex).padStart(2, "0")}`;
-  }
-  const named = NAMED_VRMS[safeIndex - BASE_VRM_COUNT - OFFICIAL_VRM_COUNT - 1];
-  return named.label.toUpperCase();
-}
-
-/** Whether a bundled index points to the official Milady avatar set. */
-export function isOfficialVrmIndex(index: number): boolean {
-  const normalized = normalizeAvatarIndex(index);
-  return (
-    normalized > BASE_VRM_COUNT &&
-    normalized <= BASE_VRM_COUNT + OFFICIAL_VRM_COUNT
-  );
-}
-
-/** Whether a VRM index requires an explicit 180° face-camera flip instead of auto-detection. */
-export function getVrmNeedsFlip(index: number): boolean {
-  const normalized = normalizeAvatarIndex(index);
-  if (normalized <= BASE_VRM_COUNT + OFFICIAL_VRM_COUNT) return false;
-  const named =
-    NAMED_VRMS[normalized - BASE_VRM_COUNT - OFFICIAL_VRM_COUNT - 1];
-  return named?.flip ?? false;
-}
-
-// ── Theme ──────────────────────────────────────────────────────────────
-
-const UI_LANGUAGE_STORAGE_KEY = "milady:ui-language";
-const UI_SHELL_MODE_STORAGE_KEY = "milady:ui-shell-mode";
-
-export type UiShellMode = "companion" | "native";
-
-const AGENT_TRANSFER_MIN_PASSWORD_LENGTH = 4;
-
-function loadUiLanguage(): UiLanguage {
-  try {
-    const stored = localStorage.getItem(UI_LANGUAGE_STORAGE_KEY);
-    return normalizeLanguage(stored ?? DEFAULT_UI_LANGUAGE);
-  } catch {
-    return DEFAULT_UI_LANGUAGE;
-  }
-}
-
-function saveUiLanguage(language: UiLanguage): void {
-  try {
-    localStorage.setItem(UI_LANGUAGE_STORAGE_KEY, normalizeLanguage(language));
-  } catch {
-    // ignore
-  }
-}
-
-function normalizeUiShellMode(mode: unknown): UiShellMode {
-  return mode === "native" ? "native" : "companion";
-}
-
-function loadUiShellMode(): UiShellMode {
-  try {
-    return normalizeUiShellMode(
-      localStorage.getItem(UI_SHELL_MODE_STORAGE_KEY),
-    );
-  } catch {
-    return "companion";
-  }
-}
-
-function saveUiShellMode(mode: UiShellMode): void {
-  try {
-    localStorage.setItem(UI_SHELL_MODE_STORAGE_KEY, normalizeUiShellMode(mode));
-  } catch {
-    // ignore
-  }
-}
-
-/* ── Avatar persistence ───────────────────────────────────────────────── */
-const AVATAR_INDEX_KEY = "milady_avatar_index";
-
-function loadAvatarIndex(): number {
-  try {
-    const stored = localStorage.getItem(AVATAR_INDEX_KEY);
-    if (stored) {
-      const n = parseInt(stored, 10);
-      return normalizeAvatarIndex(n);
-    }
-  } catch {
-    /* ignore */
-  }
-  return 1;
-}
-
-function saveAvatarIndex(index: number) {
-  try {
-    localStorage.setItem(AVATAR_INDEX_KEY, String(normalizeAvatarIndex(index)));
-  } catch {
-    /* ignore */
-  }
-}
-
-/* ── Chat UI persistence ──────────────────────────────────────────────── */
-const CHAT_AVATAR_VISIBLE_KEY = "milady:chat:avatarVisible";
-const CHAT_VOICE_MUTED_KEY = "milady:chat:voiceMuted";
-
-function loadChatAvatarVisible(): boolean {
-  try {
-    const stored = localStorage.getItem(CHAT_AVATAR_VISIBLE_KEY);
-    return stored === null ? true : stored === "true";
-  } catch {
-    return true;
-  }
-}
-
-function loadChatVoiceMuted(): boolean {
-  try {
-    const stored = localStorage.getItem(CHAT_VOICE_MUTED_KEY);
-    return stored === null ? true : stored === "true";
-  } catch {
-    return true;
-  }
-}
-
-function saveChatAvatarVisible(value: boolean): void {
-  try {
-    localStorage.setItem(CHAT_AVATAR_VISIBLE_KEY, String(value));
-  } catch {
-    /* ignore */
-  }
-}
-
-function saveChatVoiceMuted(value: boolean): void {
-  try {
-    localStorage.setItem(CHAT_VOICE_MUTED_KEY, String(value));
-  } catch {
-    /* ignore */
-  }
-}
-
-/* ── Chat mode persistence ─────────────────────────────────────────────── */
-const CHAT_MODE_KEY = "milady:chat:mode";
-
-function loadChatMode(): ConversationMode {
-  try {
-    const stored = localStorage.getItem(CHAT_MODE_KEY);
-    return stored === "power" ? "power" : "simple";
-  } catch {
-    return "simple";
-  }
-}
-
-function saveChatMode(value: ConversationMode): void {
-  try {
-    localStorage.setItem(CHAT_MODE_KEY, value);
-  } catch {
-    /* ignore */
-  }
-}
-
-// ── Onboarding step type ───────────────────────────────────────────────
-
-export type OnboardingStep =
-  | "welcome"
-  | "language"
-  | "name"
-  | "ownerName"
-  | "avatar"
-  | "style"
-  | "setupMode"
-  | "mint"
-  | "runMode"
-  | "dockerSetup"
-  | "cloudProvider"
-  | "modelSelection"
-  | "cloudLogin"
-  | "llmProvider"
-  | "inventorySetup"
-  | "connectors"
-  | "permissions";
-
-interface OnboardingNextOptions {
-  allowPermissionBypass?: boolean;
-}
-
-const ONBOARDING_PERMISSION_LABELS: Record<SystemPermissionId, string> = {
-  accessibility: "Accessibility",
-  "screen-recording": "Screen Recording",
-  microphone: "Microphone",
-  camera: "Camera",
-  shell: "Shell Access",
-};
-
-// ── Action notice ──────────────────────────────────────────────────────
-
-interface ActionNotice {
-  tone: string;
-  text: string;
-}
-
-type LifecycleAction =
-  | "start"
-  | "stop"
-  | "pause"
-  | "resume"
-  | "restart"
-  | "reset";
-
-const LIFECYCLE_MESSAGES: Record<
-  LifecycleAction,
-  {
-    inProgress: string;
-    progress: string;
-    success: string;
-    verb: string;
-  }
-> = {
-  start: {
-    inProgress: "starting",
-    progress: "Starting agent...",
-    success: "Agent started.",
-    verb: "start",
-  },
-  stop: {
-    inProgress: "stopping",
-    progress: "Stopping agent...",
-    success: "Agent stopped.",
-    verb: "stop",
-  },
-  pause: {
-    inProgress: "pausing",
-    progress: "Pausing agent...",
-    success: "Agent paused.",
-    verb: "pause",
-  },
-  resume: {
-    inProgress: "resuming",
-    progress: "Resuming agent...",
-    success: "Agent resumed.",
-    verb: "resume",
-  },
-  restart: {
-    inProgress: "restarting",
-    progress: "Restarting agent...",
-    success: "Agent restarted.",
-    verb: "restart",
-  },
-  reset: {
-    inProgress: "resetting",
-    progress: "Resetting agent...",
-    success: "Agent reset. Returning to onboarding.",
-    verb: "reset",
-  },
-};
-
-type GamePostMessageAuthPayload = AppViewerAuthMessage;
-
-const AGENT_STATES: ReadonlySet<AgentStatus["state"]> = new Set([
-  "not_started",
-  "starting",
-  "running",
-  "paused",
-  "stopped",
-  "restarting",
-  "error",
-]);
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
-}
-
-function parseAgentStatusEvent(
-  data: Record<string, unknown>,
-): AgentStatus | null {
-  const state = data.state;
-  const agentName = data.agentName;
-  if (
-    typeof state !== "string" ||
-    !AGENT_STATES.has(state as AgentStatus["state"])
-  ) {
-    return null;
-  }
-  if (typeof agentName !== "string") return null;
-  const model = typeof data.model === "string" ? data.model : undefined;
-  const startedAt =
-    typeof data.startedAt === "number" ? data.startedAt : undefined;
-  const uptime = typeof data.uptime === "number" ? data.uptime : undefined;
-  const startup = parseAgentStartupDiagnostics(data.startup);
-  return {
-    state: state as AgentStatus["state"],
-    agentName,
-    model,
-    startedAt,
-    uptime,
-    startup,
-  };
-}
-
-function parseAgentStartupDiagnostics(
-  value: unknown,
-): AgentStartupDiagnostics | undefined {
-  if (!isRecord(value)) return undefined;
-  const phase = value.phase;
-  const attempt = value.attempt;
-  if (typeof phase !== "string" || typeof attempt !== "number") {
-    return undefined;
-  }
-  const startup: AgentStartupDiagnostics = { phase, attempt };
-  if (typeof value.lastError === "string") startup.lastError = value.lastError;
-  if (typeof value.lastErrorAt === "number")
-    startup.lastErrorAt = value.lastErrorAt;
-  if (typeof value.nextRetryAt === "number")
-    startup.nextRetryAt = value.nextRetryAt;
-  return startup;
-}
-
-function parseStreamEventEnvelopeEvent(
-  data: Record<string, unknown>,
-): StreamEventEnvelope | null {
-  const type = data.type;
-  const eventId = data.eventId;
-  const ts = data.ts;
-  const payload = data.payload;
-  if (
-    (type !== "agent_event" &&
-      type !== "heartbeat_event" &&
-      type !== "training_event") ||
-    typeof eventId !== "string" ||
-    typeof ts !== "number" ||
-    !isRecord(payload)
-  ) {
-    return null;
-  }
-
-  const envelope: StreamEventEnvelope = {
-    type,
-    version: 1,
-    eventId,
-    ts,
-    payload,
-  };
-  if (typeof data.runId === "string") envelope.runId = data.runId;
-  if (typeof data.seq === "number") envelope.seq = data.seq;
-  if (typeof data.stream === "string") envelope.stream = data.stream;
-  if (typeof data.sessionKey === "string")
-    envelope.sessionKey = data.sessionKey;
-  if (typeof data.agentId === "string") envelope.agentId = data.agentId;
-  if (typeof data.roomId === "string") envelope.roomId = data.roomId;
-  return envelope;
-}
-
-function parseConversationMessageEvent(
-  value: unknown,
-): ConversationMessage | null {
-  if (!isRecord(value)) return null;
-  const id = value.id;
-  const role = value.role;
-  const text = value.text;
-  const timestamp = value.timestamp;
-  const source = value.source;
-  const from = value.from;
-  if (
-    typeof id !== "string" ||
-    (role !== "user" && role !== "assistant") ||
-    typeof text !== "string" ||
-    typeof timestamp !== "number"
-  ) {
-    return null;
-  }
-  const parsed: ConversationMessage = { id, role, text, timestamp };
-  if (typeof source === "string" && source.length > 0) {
-    parsed.source = source;
-  }
-  if (typeof from === "string" && from.length > 0) {
-    parsed.from = from;
-  }
-  return parsed;
-}
-
-function parseProactiveMessageEvent(
-  data: Record<string, unknown>,
-): { conversationId: string; message: ConversationMessage } | null {
-  const conversationId = data.conversationId;
-  if (typeof conversationId !== "string") return null;
-  const message = parseConversationMessageEvent(data.message);
-  if (!message) return null;
-  return { conversationId, message };
-}
-
-function computeStreamingDelta(existing: string, incoming: string): string {
-  if (!incoming) return "";
-  if (!existing) return incoming;
-  if (incoming === existing) return "";
-  if (incoming.startsWith(existing)) return incoming.slice(existing.length);
-  if (existing.startsWith(incoming)) return "";
-
-  // Small chunks are usually raw token deltas; keep them even if they
-  // duplicate suffix characters (e.g., "l" + "l" in "Hello").
-  if (incoming.length <= 3) return incoming;
-
-  const maxOverlap = Math.min(existing.length, incoming.length);
-  for (let overlap = maxOverlap; overlap > 0; overlap -= 1) {
-    if (existing.endsWith(incoming.slice(0, overlap))) {
-      const delta = incoming.slice(overlap);
-      if (!delta && overlap === incoming.length) return "";
-      return delta;
-    }
-  }
-  return incoming;
-}
-
-function normalizeStreamComparisonText(text: string): string {
-  return text.replace(/\s+/g, " ").trim();
-}
-
-function shouldApplyFinalStreamText(
-  streamed: string,
-  finalText: string,
-): boolean {
-  if (!finalText.trim()) return false;
-  if (!streamed) return true;
-  if (streamed === finalText) return false;
-  return (
-    normalizeStreamComparisonText(streamed) !==
-    normalizeStreamComparisonText(finalText)
-  );
-}
-
-type SlashCommandInput = {
-  name: string;
-  argsRaw: string;
-};
-
-function parseSlashCommandInput(text: string): SlashCommandInput | null {
-  if (!text.startsWith("/")) return null;
-  const body = text.slice(1).trim();
-  if (!body) return null;
-  const firstSpace = body.search(/\s/);
-  if (firstSpace === -1) {
-    return { name: normalizeSlashCommandName(body), argsRaw: "" };
-  }
-  return {
-    name: normalizeSlashCommandName(body.slice(0, firstSpace)),
-    argsRaw: body.slice(firstSpace + 1).trim(),
-  };
-}
-
-function normalizeCustomActionName(value: string): string {
-  return value
-    .trim()
-    .replace(/[\s-]+/g, "_")
-    .toUpperCase();
-}
-
-function parseCustomActionParams(
-  action: CustomActionDef,
-  argsRaw: string,
-): {
-  params: Record<string, string>;
-  missingRequired: string[];
-} {
-  const tokens = splitCommandArgs(argsRaw);
-  const named = new Map<string, string>();
-  const positional: string[] = [];
-
-  for (const token of tokens) {
-    const eq = token.indexOf("=");
-    if (eq > 0) {
-      const key = token.slice(0, eq).trim().toLowerCase();
-      const value = token.slice(eq + 1).trim();
-      if (key) {
-        named.set(key, value);
-        continue;
-      }
-    }
-    positional.push(token);
-  }
-
-  const params: Record<string, string> = {};
-  const defs = Array.isArray(action.parameters) ? action.parameters : [];
-  const defsByLower = new Map(
-    defs.map((def) => [def.name.trim().toLowerCase(), def.name]),
-  );
-
-  for (const [key, value] of named) {
-    const canonical = defsByLower.get(key);
-    if (canonical) {
-      params[canonical] = value;
-    } else {
-      params[key] = value;
-    }
-  }
-
-  for (const def of defs) {
-    if (params[def.name] == null && positional.length > 0) {
-      params[def.name] = positional.shift() as string;
-    }
-  }
-
-  if (positional.length > 0) {
-    const sink = defs.find((def) =>
-      ["input", "text", "query", "message", "prompt"].includes(
-        def.name.toLowerCase(),
-      ),
-    );
-    if (sink) {
-      const existing = params[sink.name];
-      params[sink.name] = existing
-        ? `${existing} ${positional.join(" ")}`
-        : positional.join(" ");
-    }
-  }
-
-  const missingRequired = defs
-    .filter((def) => def.required)
-    .map((def) => def.name)
-    .filter((name) => !(params[name] ?? "").trim());
-
-  return { params, missingRequired };
-}
-
-function formatSearchBullet(label: string, items: string[]): string {
-  if (items.length === 0) return `${label}: none`;
-  return `${label}:\n${items.map((item) => `- ${item}`).join("\n")}`;
-}
-
-type LoadConversationMessagesResult =
-  | { ok: true }
-  | { ok: false; status?: number; message: string };
-
-export type StartupPhase = "starting-backend" | "initializing-agent" | "ready";
-
-export type StartupErrorReason =
-  | "backend-timeout"
-  | "backend-unreachable"
-  | "agent-timeout"
-  | "agent-error";
-
-export interface StartupErrorState {
-  reason: StartupErrorReason;
-  phase: StartupPhase;
-  message: string;
-  detail?: string;
-  status?: number;
-  path?: string;
-}
-
-const AGENT_READY_TIMEOUT_MS = 90_000;
-
-interface ApiLikeError {
-  kind?: string;
-  status?: number;
-  path?: string;
-  message?: string;
-}
-
-function asApiLikeError(err: unknown): ApiLikeError | null {
-  if (!isRecord(err)) return null;
-  const kind = err.kind;
-  const status = err.status;
-  const path = err.path;
-  const message = err.message;
-  const hasApiShape =
-    typeof kind === "string" ||
-    typeof status === "number" ||
-    typeof path === "string";
-  if (!hasApiShape) return null;
-  return {
-    kind: typeof kind === "string" ? kind : undefined,
-    status: typeof status === "number" ? status : undefined,
-    path: typeof path === "string" ? path : undefined,
-    message: typeof message === "string" ? message : undefined,
-  };
-}
-
-function formatStartupErrorDetail(err: unknown): string | undefined {
-  const apiErr = asApiLikeError(err);
-  if (apiErr) {
-    const parts: string[] = [];
-    if (apiErr.path) parts.push(apiErr.path);
-    if (typeof apiErr.status === "number") parts.push(`HTTP ${apiErr.status}`);
-    if (apiErr.message) parts.push(apiErr.message);
-    return parts.filter(Boolean).join(" - ");
-  }
-  if (err instanceof Error && err.message.trim()) {
-    return err.message.trim();
-  }
-  return undefined;
-}
-
-export interface ChatTurnUsage extends ChatTokenUsage {
-  updatedAt: number;
-}
-
-// ── Context value type ─────────────────────────────────────────────────
-
-export interface AppState {
-  // Core
-  tab: Tab;
-  uiShellMode: UiShellMode;
-  uiLanguage: UiLanguage;
-  connected: boolean;
-  agentStatus: AgentStatus | null;
-  onboardingComplete: boolean;
-  onboardingLoading: boolean;
-  startupPhase: StartupPhase;
-  startupError: StartupErrorState | null;
-  authRequired: boolean;
-  actionNotice: ActionNotice | null;
-  lifecycleBusy: boolean;
-  lifecycleAction: LifecycleAction | null;
-
-  // Deferred restart
-  pendingRestart: boolean;
-  pendingRestartReasons: string[];
-  restartBannerDismissed: boolean;
-
-  // Backend connection state (for crash handling)
-  backendConnection: {
-    state: "connected" | "disconnected" | "reconnecting" | "failed";
-    reconnectAttempt: number;
-    maxReconnectAttempts: number;
-    showDisconnectedUI: boolean;
-  };
-  backendDisconnectedBannerDismissed: boolean;
-
-  // System warnings
-  systemWarnings: string[];
-
-  // Pairing
-  pairingEnabled: boolean;
-  pairingExpiresAt: number | null;
-  pairingCodeInput: string;
-  pairingError: string | null;
-  pairingBusy: boolean;
-
-  // Chat
-  chatInput: string;
-  chatSending: boolean;
-  chatFirstTokenReceived: boolean;
-  chatLastUsage: ChatTurnUsage | null;
-  chatAvatarVisible: boolean;
-  chatAgentVoiceMuted: boolean;
-  chatMode: ConversationMode;
-  chatAvatarSpeaking: boolean;
-  conversations: Conversation[];
-  activeConversationId: string | null;
-  conversationMessages: ConversationMessage[];
-  autonomousEvents: StreamEventEnvelope[];
-  autonomousLatestEventId: string | null;
-  autonomousRunHealthByRunId: AutonomyRunHealthMap;
-  /** Active PTY coding agent sessions from the SwarmCoordinator. */
-  ptySessions: CodingAgentSession[];
-  /** Conversation IDs with unread proactive messages from the agent. */
-  unreadConversations: Set<string>;
-
-  // Triggers
-  triggers: TriggerSummary[];
-  triggersLoading: boolean;
-  triggersSaving: boolean;
-  triggerRunsById: Record<string, TriggerRunRecord[]>;
-  triggerHealth: TriggerHealthSnapshot | null;
-  triggerError: string | null;
-
-  // Plugins
-  plugins: PluginInfo[];
-  pluginFilter: "all" | "ai-provider" | "connector" | "feature" | "streaming";
-  pluginStatusFilter: "all" | "enabled" | "disabled";
-  pluginSearch: string;
-  pluginSettingsOpen: Set<string>;
-  pluginAdvancedOpen: Set<string>;
-  pluginSaving: Set<string>;
-  pluginSaveSuccess: Set<string>;
-
-  // Skills
-  skills: SkillInfo[];
-  skillsSubTab: "my" | "browse";
-  skillCreateFormOpen: boolean;
-  skillCreateName: string;
-  skillCreateDescription: string;
-  skillCreating: boolean;
-  skillReviewReport: SkillScanReportSummary | null;
-  skillReviewId: string;
-  skillReviewLoading: boolean;
-  skillToggleAction: string;
-  skillsMarketplaceQuery: string;
-  skillsMarketplaceResults: SkillMarketplaceResult[];
-  skillsMarketplaceError: string;
-  skillsMarketplaceLoading: boolean;
-  skillsMarketplaceAction: string;
-  skillsMarketplaceManualGithubUrl: string;
-
-  // Logs
-  logs: LogEntry[];
-  logSources: string[];
-  logTags: string[];
-  logTagFilter: string;
-  logLevelFilter: string;
-  logSourceFilter: string;
-
-  // Wallet / Inventory
-  walletAddresses: WalletAddresses | null;
-  walletConfig: WalletConfigStatus | null;
-  walletBalances: WalletBalancesResponse | null;
-  walletNfts: WalletNftsResponse | null;
-  walletLoading: boolean;
-  walletNftsLoading: boolean;
-  inventoryView: "tokens" | "nfts";
-  walletExportData: WalletExportResult | null;
-  walletExportVisible: boolean;
-  walletApiKeySaving: boolean;
-  inventorySort: "chain" | "symbol" | "value";
-  inventoryChainFocus: "bsc" | "all";
-  walletError: string | null;
-
-  // ERC-8004 Registry
-  registryStatus: RegistryStatus | null;
-  registryLoading: boolean;
-  registryRegistering: boolean;
-  registryError: string | null;
-
-  // Drop / Mint
-  dropStatus: DropStatus | null;
-  dropLoading: boolean;
-  mintInProgress: boolean;
-  mintResult: MintResult | null;
-  mintError: string | null;
-  mintShiny: boolean;
-
-  // Whitelist
-  whitelistStatus: WhitelistStatus | null;
-  whitelistLoading: boolean;
-  twitterVerifyMessage: string | null;
-  twitterVerifyUrl: string;
-  twitterVerifying: boolean;
-
-  // Character
-  characterData: CharacterData | null;
-  characterLoading: boolean;
-  characterSaving: boolean;
-  characterSaveSuccess: string | null;
-  characterSaveError: string | null;
-  characterDraft: CharacterData;
-  selectedVrmIndex: number;
-  customVrmUrl: string;
-  customBackgroundUrl: string;
-
-  // Cloud
-  cloudEnabled: boolean;
-  cloudConnected: boolean;
-  cloudCredits: number | null;
-  cloudCreditsLow: boolean;
-  cloudCreditsCritical: boolean;
-  cloudTopUpUrl: string;
-  cloudUserId: string | null;
-  cloudLoginBusy: boolean;
-  cloudLoginError: string | null;
-  cloudDisconnecting: boolean;
-
-  // Updates
-  updateStatus: UpdateStatus | null;
-  updateLoading: boolean;
-  updateChannelSaving: boolean;
-
-  // Extension
-  extensionStatus: ExtensionStatus | null;
-  extensionChecking: boolean;
-
-  // Store
-  storePlugins: RegistryPlugin[];
-  storeSearch: string;
-  storeFilter: "all" | "installed" | "ai-provider" | "connector" | "feature";
-  storeLoading: boolean;
-  storeInstalling: Set<string>;
-  storeUninstalling: Set<string>;
-  storeError: string | null;
-  storeDetailPlugin: RegistryPlugin | null;
-  storeSubTab: "plugins" | "skills";
-
-  // Catalog
-  catalogSkills: CatalogSkill[];
-  catalogTotal: number;
-  catalogPage: number;
-  catalogTotalPages: number;
-  catalogSort: "downloads" | "stars" | "updated" | "name";
-  catalogSearch: string;
-  catalogLoading: boolean;
-  catalogError: string | null;
-  catalogDetailSkill: CatalogSkill | null;
-  catalogInstalling: Set<string>;
-  catalogUninstalling: Set<string>;
-
-  // Workbench
-  workbenchLoading: boolean;
-  workbench: WorkbenchOverview | null;
-  workbenchTasksAvailable: boolean;
-  workbenchTriggersAvailable: boolean;
-  workbenchTodosAvailable: boolean;
-
-  // Agent export/import
-  exportBusy: boolean;
-  exportPassword: string;
-  exportIncludeLogs: boolean;
-  exportError: string | null;
-  exportSuccess: string | null;
-  importBusy: boolean;
-  importPassword: string;
-  importFile: File | null;
-  importError: string | null;
-  importSuccess: string | null;
-
-  // Onboarding
-  onboardingStep: OnboardingStep;
-  onboardingOptions: OnboardingOptions | null;
-  onboardingName: string;
-  onboardingOwnerName: string;
-  onboardingSetupMode: "" | "quick" | "advanced";
-  onboardingStyle: string;
-  onboardingRunMode: "local-rawdog" | "local-sandbox" | "cloud" | "";
-  onboardingCloudProvider: string;
-  onboardingSmallModel: string;
-  onboardingLargeModel: string;
-  onboardingProvider: string;
-  onboardingApiKey: string;
-  onboardingOpenRouterModel: string;
-  onboardingPrimaryModel: string;
-  onboardingTelegramToken: string;
-  onboardingDiscordToken: string;
-  onboardingWhatsAppSessionPath: string;
-  onboardingTwilioAccountSid: string;
-  onboardingTwilioAuthToken: string;
-  onboardingTwilioPhoneNumber: string;
-  onboardingBlooioApiKey: string;
-  onboardingBlooioPhoneNumber: string;
-  onboardingGithubToken: string;
-  onboardingSubscriptionTab: "token" | "oauth";
-  onboardingElizaCloudTab: "login" | "apikey";
-  onboardingSelectedChains: Set<string>;
-  onboardingRpcSelections: Record<string, string>;
-  onboardingRpcKeys: Record<string, string>;
-  onboardingAvatar: number;
-  onboardingRestarting: boolean;
-
-  // Command palette
-  commandPaletteOpen: boolean;
-  commandQuery: string;
-  commandActiveIndex: number;
-  closeCommandPalette: () => void;
-
-  // Emote picker
-  emotePickerOpen: boolean;
-
-  // MCP
-  mcpConfiguredServers: Record<string, McpServerConfig>;
-  mcpServerStatuses: McpServerStatus[];
-  mcpMarketplaceQuery: string;
-  mcpMarketplaceResults: McpMarketplaceResult[];
-  mcpMarketplaceLoading: boolean;
-  mcpAction: string;
-  mcpAddingServer: McpRegistryServerDetail | null;
-  mcpAddingResult: McpMarketplaceResult | null;
-  mcpEnvInputs: Record<string, string>;
-  mcpHeaderInputs: Record<string, string>;
-
-  // Share ingest
-  droppedFiles: string[];
-  shareIngestNotice: string;
-
-  // Chat image attachments queued for the next message
-  chatPendingImages: ImageAttachment[];
-
-  // Game
-  activeGameApp: string;
-  activeGameDisplayName: string;
-  activeGameViewerUrl: string;
-  activeGameSandbox: string;
-  activeGamePostMessageAuth: boolean;
-  activeGamePostMessagePayload: GamePostMessageAuthPayload | null;
-
-  /** When true, the game iframe persists as a floating overlay across all tabs. */
-  gameOverlayEnabled: boolean;
-
-  // Sub-tabs
-  appsSubTab: "browse" | "games";
-  agentSubTab: "character" | "inventory" | "knowledge";
-  pluginsSubTab: "features" | "connectors" | "plugins";
-  databaseSubTab: "tables" | "media" | "vectors";
-
-  // Config text
-  configRaw: Record<string, unknown>;
-  configText: string;
-}
-
-export interface AppActions {
-  // Navigation
-  setTab: (tab: Tab) => void;
-  setUiShellMode: (mode: UiShellMode) => void;
-  setUiLanguage: (language: UiLanguage) => void;
-
-  // Lifecycle
-  handleStart: () => Promise<void>;
-  handleStop: () => Promise<void>;
-  handlePauseResume: () => Promise<void>;
-  handleRestart: () => Promise<void>;
-  handleReset: () => Promise<void>;
-  retryStartup: () => void;
-  dismissRestartBanner: () => void;
-  triggerRestart: () => Promise<void>;
-  dismissBackendDisconnectedBanner: () => void;
-  retryBackendConnection: () => void;
-  restartBackend: () => Promise<void>;
-  dismissSystemWarning: (message: string) => void;
-
-  // Chat
-  handleChatSend: (channelType?: ConversationChannelType) => Promise<void>;
-  handleChatStop: () => void;
-  handleChatRetry: (assistantMsgId: string) => void;
-  handleChatClear: () => Promise<void>;
-  handleNewConversation: () => Promise<void>;
-  setChatPendingImages: React.Dispatch<React.SetStateAction<ImageAttachment[]>>;
-  handleSelectConversation: (id: string) => Promise<void>;
-  handleDeleteConversation: (id: string) => Promise<void>;
-  handleRenameConversation: (id: string, title: string) => Promise<void>;
-  /** Send a programmatic message (e.g. from a UiSpec action) without touching chatInput. */
-  sendActionMessage: (text: string) => Promise<void>;
-
-  // Triggers
-  loadTriggers: () => Promise<void>;
-  createTrigger: (
-    request: CreateTriggerRequest,
-  ) => Promise<TriggerSummary | null>;
-  updateTrigger: (
-    id: string,
-    request: UpdateTriggerRequest,
-  ) => Promise<TriggerSummary | null>;
-  deleteTrigger: (id: string) => Promise<boolean>;
-  runTriggerNow: (id: string) => Promise<boolean>;
-  loadTriggerRuns: (id: string) => Promise<void>;
-  loadTriggerHealth: () => Promise<void>;
-
-  // Pairing
-  handlePairingSubmit: () => Promise<void>;
-
-  // Plugins
-  loadPlugins: () => Promise<void>;
-  handlePluginToggle: (pluginId: string, enabled: boolean) => Promise<void>;
-  handlePluginConfigSave: (
-    pluginId: string,
-    config: Record<string, string>,
-  ) => Promise<void>;
-
-  // Skills
-  loadSkills: () => Promise<void>;
-  refreshSkills: () => Promise<void>;
-  handleSkillToggle: (skillId: string, enabled: boolean) => Promise<void>;
-  handleCreateSkill: () => Promise<void>;
-  handleOpenSkill: (skillId: string) => Promise<void>;
-  handleDeleteSkill: (skillId: string, name: string) => Promise<void>;
-  handleReviewSkill: (skillId: string) => Promise<void>;
-  handleAcknowledgeSkill: (skillId: string) => Promise<void>;
-  searchSkillsMarketplace: () => Promise<void>;
-  installSkillFromMarketplace: (item: SkillMarketplaceResult) => Promise<void>;
-  uninstallMarketplaceSkill: (skillId: string, name: string) => Promise<void>;
-  installSkillFromGithubUrl: () => Promise<void>;
-
-  // Logs
-  loadLogs: () => Promise<void>;
-
-  // Inventory
-  loadInventory: () => Promise<void>;
-  loadBalances: () => Promise<void>;
-  loadNfts: () => Promise<void>;
-  executeBscTrade: (
-    request: BscTradeExecuteRequest,
-  ) => Promise<BscTradeExecuteResponse>;
-  executeBscTransfer: (
-    request: BscTransferExecuteRequest,
-  ) => Promise<BscTransferExecuteResponse>;
-  getBscTradePreflight: (
-    tokenAddress?: string,
-  ) => Promise<BscTradePreflightResponse>;
-  getBscTradeQuote: (
-    request: BscTradeQuoteRequest,
-  ) => Promise<BscTradeQuoteResponse>;
-  getBscTradeTxStatus: (hash: string) => Promise<BscTradeTxStatusResponse>;
-  loadWalletTradingProfile: (
-    window?: WalletTradingProfileWindow,
-    source?: WalletTradingProfileSourceFilter,
-  ) => Promise<WalletTradingProfileResponse>;
-  handleWalletApiKeySave: (config: Record<string, string>) => Promise<void>;
-  handleExportKeys: () => Promise<void>;
-
-  // Registry / Drop
-  loadRegistryStatus: () => Promise<void>;
-  registerOnChain: () => Promise<void>;
-  syncRegistryProfile: () => Promise<void>;
-  loadDropStatus: () => Promise<void>;
-  mintFromDrop: (shiny: boolean) => Promise<void>;
-  loadWhitelistStatus: () => Promise<void>;
-
-  // Character
-  loadCharacter: () => Promise<void>;
-  handleSaveCharacter: () => Promise<void>;
-  handleCharacterFieldInput: <K extends keyof CharacterData>(
-    field: K,
-    value: CharacterData[K],
-  ) => void;
-  handleCharacterArrayInput: (
-    field: "adjectives" | "topics" | "postExamples",
-    value: string,
-  ) => void;
-  handleCharacterStyleInput: (
-    subfield: "all" | "chat" | "post",
-    value: string,
-  ) => void;
-  handleCharacterMessageExamplesInput: (value: string) => void;
-
-  // Onboarding
-  handleOnboardingNext: (options?: OnboardingNextOptions) => Promise<void>;
-  handleOnboardingBack: () => void;
-
-  // Cloud
-  handleCloudLogin: () => Promise<void>;
-  handleCloudDisconnect: () => Promise<void>;
-
-  // Updates
-  loadUpdateStatus: (force?: boolean) => Promise<void>;
-  handleChannelChange: (channel: ReleaseChannel) => Promise<void>;
-
-  // Extension
-  checkExtensionStatus: () => Promise<void>;
-
-  // Emote picker
-  openEmotePicker: () => void;
-  closeEmotePicker: () => void;
-
-  // Workbench
-  loadWorkbench: () => Promise<void>;
-
-  // Agent export/import
-  handleAgentExport: () => Promise<void>;
-  handleAgentImport: () => Promise<void>;
-
-  // Action notice
-  setActionNotice: (
-    text: string,
-    tone?: "info" | "success" | "error",
-    ttlMs?: number,
-  ) => void;
-
-  // Generic state setter
-  setState: <K extends keyof AppState>(key: K, value: AppState[K]) => void;
-
-  // Clipboard
-  copyToClipboard: (text: string) => Promise<void>;
-
-  // Translations
-  t: (key: string, values?: Record<string, any>) => string;
-}
-
-type AppContextValue = AppState & AppActions;
-
-const AppContext = createContext<AppContextValue | null>(null);
-
-export function useApp(): AppContextValue {
-  const ctx = useContext(AppContext);
-  if (!ctx) {
-    if (typeof process !== "undefined" && process.env.NODE_ENV === "test") {
-      // In tests, if rendered outside AppProvider, return a dummy context
-      return new Proxy({} as AppContextValue, {
-        get(_, prop) {
-          if (prop === "t") return (k: string) => k;
-          if (prop === "uiLanguage") return "en";
-          // We don't have vitest `vi` in scope, just return a no-op function for any action
-          return () => { };
-        },
-      });
-    }
-    throw new Error("useApp must be used within AppProvider");
-  }
-  return ctx;
-}
+import {
+  type AppState,
+  type AppContextValue,
+  parseAgentStatusEvent,
+  parseProactiveMessageEvent,
+  parseStreamEventEnvelopeEvent,
+  computeStreamingDelta,
+  shouldApplyFinalStreamText,
+  parseSlashCommandInput,
+  normalizeCustomActionName,
+  parseCustomActionParams,
+  formatSearchBullet,
+  asApiLikeError,
+  formatStartupErrorDetail,
+  loadUiLanguage,
+  loadUiShellMode,
+  saveUiShellMode,
+  loadAvatarIndex,
+  saveAvatarIndex,
+  loadChatAvatarVisible,
+  loadChatVoiceMuted,
+  saveChatAvatarVisible,
+  saveChatVoiceMuted,
+  loadChatMode,
+  saveChatMode,
+  saveUiLanguage,
+  normalizeAvatarIndex,
+  type UiShellMode,
+  normalizeUiShellMode,
+  type LifecycleAction,
+  LIFECYCLE_MESSAGES,
+  type OnboardingNextOptions,
+  ONBOARDING_PERMISSION_LABELS,
+  AGENT_TRANSFER_MIN_PASSWORD_LENGTH,
+  AGENT_READY_TIMEOUT_MS,
+  type StartupErrorState,
+  AppContext,
+  type StartupPhase,
+  type ActionNotice,
+  type ChatTurnUsage,
+  type OnboardingStep,
+  type GamePostMessageAuthPayload,
+  type LoadConversationMessagesResult,
+} from "@milady/app-core/state";
+
+export {
+  AppContext,
+  useApp,
+  parseAgentStatusEvent,
+  parseProactiveMessageEvent,
+  parseStreamEventEnvelopeEvent,
+  computeStreamingDelta,
+  shouldApplyFinalStreamText,
+  parseSlashCommandInput,
+  normalizeCustomActionName,
+  parseCustomActionParams,
+  formatSearchBullet,
+  asApiLikeError,
+  formatStartupErrorDetail,
+  loadUiLanguage,
+  loadUiShellMode,
+  saveUiShellMode,
+  loadAvatarIndex,
+  saveAvatarIndex,
+  loadChatAvatarVisible,
+  loadChatVoiceMuted,
+  saveChatAvatarVisible,
+  saveChatVoiceMuted,
+  loadChatMode,
+  saveChatMode,
+  saveUiLanguage,
+  normalizeAvatarIndex,
+  normalizeUiShellMode,
+  LIFECYCLE_MESSAGES,
+  ONBOARDING_PERMISSION_LABELS,
+  AGENT_TRANSFER_MIN_PASSWORD_LENGTH,
+  AGENT_READY_TIMEOUT_MS,
+  getVrmUrl,
+  getVrmPreviewUrl,
+  getVrmBackgroundUrl,
+  getVrmTitle,
+  isOfficialVrmIndex,
+  getVrmNeedsFlip,
+  VRM_COUNT,
+  AGENT_STATES,
+  parseAgentStartupDiagnostics,
+  parseConversationMessageEvent,
+  normalizeStreamComparisonText,
+  type AppState,
+  type AppContextValue,
+  type UiShellMode,
+  type LifecycleAction,
+  type OnboardingNextOptions,
+  type StartupErrorState,
+  type StartupPhase,
+  type ActionNotice,
+  type ChatTurnUsage,
+  type OnboardingStep,
+  type GamePostMessageAuthPayload,
+  type LoadConversationMessagesResult,
+  type AppActions,
+  type SlashCommandInput,
+  type StartupErrorReason,
+} from "@milady/app-core/state";
 
 // ── Provider ───────────────────────────────────────────────────────────
 
@@ -1484,7 +416,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [inventorySort, setInventorySort] = useState<
     "chain" | "symbol" | "value"
   >("value");
-  const [inventoryChainFocus, setInventoryChainFocus] = useState<"bsc" | "all">(
+  const [inventoryChainFocus, setInventoryChainFocus] = useState<string>(
     "bsc",
   );
   const [walletError, setWalletError] = useState<string | null>(null);

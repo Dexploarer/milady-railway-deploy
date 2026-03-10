@@ -254,6 +254,7 @@ describe("pages navigation smoke (e2e)", () => {
 
   beforeEach(() => {
     state = {
+      t: (k: string) => k,
       onboardingLoading: false,
       authRequired: false,
       onboardingComplete: true,
@@ -464,33 +465,34 @@ describe("pages navigation smoke (e2e)", () => {
       patch: Partial<HarnessState>;
       token: string;
     }> = [
-      {
-        name: "loading",
-        patch: { onboardingLoading: true, onboardingComplete: false },
-        token: "LoadingScreen",
-      },
-      {
-        name: "pairing",
-        patch: {
-          onboardingLoading: false,
-          onboardingComplete: true,
-          authRequired: true,
+        {
+          name: "loading",
+          patch: { onboardingLoading: true, onboardingComplete: false },
+          token: "LoadingScreen",
         },
-        token: "PairingView",
-      },
-      {
-        name: "onboarding",
-        patch: {
-          onboardingLoading: false,
-          authRequired: false,
-          onboardingComplete: false,
+        {
+          name: "pairing",
+          patch: {
+            onboardingLoading: false,
+            onboardingComplete: true,
+            authRequired: true,
+          },
+          token: "PairingView",
         },
-        token: "OnboardingWizard",
-      },
-    ];
+        {
+          name: "onboarding",
+          patch: {
+            onboardingLoading: false,
+            authRequired: false,
+            onboardingComplete: false,
+          },
+          token: "OnboardingWizard",
+        },
+      ];
 
     for (const entry of cases) {
       state = {
+        t: (k: string) => k,
         onboardingLoading: false,
         authRequired: false,
         onboardingComplete: true,

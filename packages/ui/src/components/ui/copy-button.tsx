@@ -8,10 +8,14 @@ export interface CopyButtonProps
     value: string
     /** Duration of the "copied" feedback in ms */
     feedbackDuration?: number
+    /** Aria-label for default state */
+    copyLabel?: string
+    /** Aria-label for copied state */
+    copiedLabel?: string
 }
 
 export const CopyButton = React.forwardRef<HTMLButtonElement, CopyButtonProps>(
-    ({ value, feedbackDuration = 2000, className, children, ...props }, ref) => {
+    ({ value, feedbackDuration = 2000, copyLabel = "Copy", copiedLabel = "Copied", className, children, ...props }, ref) => {
         const [copied, setCopied] = React.useState(false)
 
         const handleCopy = React.useCallback(() => {
@@ -29,7 +33,7 @@ export const CopyButton = React.forwardRef<HTMLButtonElement, CopyButtonProps>(
                     "inline-flex items-center gap-1 rounded-md p-1.5 text-muted transition-colors hover:bg-bg-hover hover:text-txt",
                     className,
                 )}
-                aria-label={copied ? "Copied" : "Copy"}
+                aria-label={copied ? copiedLabel : copyLabel}
                 {...props}
             >
                 {copied ? (

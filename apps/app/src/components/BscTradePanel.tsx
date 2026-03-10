@@ -1,5 +1,5 @@
 /**
- * BSC quick-trade panel — token address input, amount presets, buy/sell,
+ * Quick-trade panel — token address input, amount presets, buy/sell,
  * quote display, execution confirmation, and tx status tracking.
  *
  * Extracted from InventoryView to keep that component focused on
@@ -13,12 +13,14 @@ import type {
   BscTradePreflightResponse,
   BscTradeQuoteRequest,
   BscTradeQuoteResponse,
-  BscTradeTxStatusResponse } from "../api-client";
+  BscTradeTxStatusResponse
+} from "../api-client";
 import { useApp } from "../AppContext";
+import { formatBalance } from "./inventory/constants";
+import { HEX_ADDRESS_RE } from "./companion/walletUtils";
 
 /* ── Constants ─────────────────────────────────────────────────────── */
 
-const BSC_ADDRESS_RE = /^0x[0-9a-fA-F]{40}$/;
 const AMOUNT_PRESETS = [0.05, 0.1, 0.2, 0.5];
 const DEFAULT_QUICK_AMOUNT = "0.1";
 
@@ -30,17 +32,10 @@ export interface TrackedToken {
   addedAt: number;
 }
 
-export interface BscTradePanelProps {
+export interface TradePanelProps {
   tradeReady: boolean;
   bnbBalance: number;
-  trackedTokens: TrackedToken[];
   onAddToken: (token: TrackedToken) => void;
-  copyToClipboard: (text: string) => Promise<void>;
-  setActionNotice: (
-    text: string,
-    tone?: "info" | "success" | "error",
-    ttlMs?: number,
-  ) => void;
   getBscTradePreflight?: (
     tokenAddress?: string,
   ) => Promise<BscTradePreflightResponse>;
@@ -53,32 +48,18 @@ export interface BscTradePanelProps {
   getBscTradeTxStatus?: (hash: string) => Promise<BscTradeTxStatusResponse>;
 }
 
-/* ── Balance formatter (shared) ────────────────────────────────────── */
-
-function formatBalance(balance: string): string {
-  const num = Number.parseFloat(balance);
-  if (Number.isNaN(num)) return balance;
-  if (num === 0) return "0";
-  if (num < 0.0001) return "<0.0001";
-  if (num < 1) return num.toFixed(6);
-  if (num < 1000) return num.toFixed(4);
-  return num.toLocaleString("en-US", { maximumFractionDigits: 2 });
-}
-
 /* ── Component ─────────────────────────────────────────────────────── */
 
-export function BscTradePanel({
+export function TradePanel({
   tradeReady,
   bnbBalance,
-  trackedTokens: _trackedTokens,
   onAddToken,
-  copyToClipboard,
-  setActionNotice,
   getBscTradePreflight,
   getBscTradeQuote,
   executeBscTrade,
-  getBscTradeTxStatus }: BscTradePanelProps) {
-  const { t } = useApp();
+  getBscTradeTxStatus,
+}: TradePanelProps) {
+  const { t, copyToClipboard, setActionNotice } = useApp();
   const [quickTokenAddress, setQuickTokenAddress] = useState("");
   const [quickAmount, setQuickAmount] = useState(DEFAULT_QUICK_AMOUNT);
   const [latestQuote, setLatestQuote] = useState<BscTradeQuoteResponse | null>(
@@ -106,7 +87,7 @@ export function BscTradePanel({
     async (side: "buy" | "sell") => {
       if (!getBscTradeQuote) return;
       const tokenAddress = quickTokenAddress.trim();
-      if (!BSC_ADDRESS_RE.test(tokenAddress)) {
+      if (!HEX_ADDRESS_RE.test(tokenAddress)) {
         setActionNotice(
           "Enter a valid token contract address first.",
           "error",
@@ -114,7 +95,8 @@ export function BscTradePanel({
         );
         setTradeFeedback({
           tone: "error",
-          text: "Enter a valid token contract address first." });
+          text: "Enter a valid token contract address first."
+        });
         return;
       }
       const amount = quickAmount.trim() || DEFAULT_QUICK_AMOUNT;
@@ -123,7 +105,8 @@ export function BscTradePanel({
         setActionNotice("Enter a valid BNB amount first.", "error", 3200);
         setTradeFeedback({
           tone: "error",
-          text: "Enter a valid BNB amount first." });
+          text: "Enter a valid BNB amount first."
+        });
         return;
       }
 
@@ -143,7 +126,8 @@ export function BscTradePanel({
             );
             setTradeFeedback({
               tone: "error",
-              text: preflight.reasons[0] ?? "Preflight checks failed." });
+              text: preflight.reasons[0] ?? "Preflight checks failed."
+            });
             return;
           }
         }
@@ -151,7 +135,8 @@ export function BscTradePanel({
         const result = await getBscTradeQuote({
           side,
           tokenAddress,
-          amount });
+          amount
+        });
         setLatestQuote(result);
         setLatestExecution(null);
         setTxStatus(null);
@@ -163,13 +148,15 @@ export function BscTradePanel({
         );
         setTradeFeedback({
           tone: "success",
-          text: `${side === "buy" ? "Quote ready" : "Sell quote ready"}: ${result.quoteOut?.amount ?? ""} ${result.quoteOut?.symbol ?? ""}`.trim() });
+          text: `${side === "buy" ? "Quote ready" : "Sell quote ready"}: ${result.quoteOut?.amount ?? ""} ${result.quoteOut?.symbol ?? ""}`.trim()
+        });
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
         setActionNotice(message, "error", 4600);
         setTradeFeedback({
           tone: "error",
-          text: message });
+          text: message
+        });
       }
     },
     [
@@ -184,7 +171,7 @@ export function BscTradePanel({
   const handlePreflight = useCallback(async () => {
     if (!getBscTradePreflight) return;
     const tokenAddress = quickTokenAddress.trim();
-    if (tokenAddress && !BSC_ADDRESS_RE.test(tokenAddress)) {
+    if (tokenAddress && !HEX_ADDRESS_RE.test(tokenAddress)) {
       setActionNotice(
         "Enter a valid token contract address first.",
         "error",
@@ -192,7 +179,8 @@ export function BscTradePanel({
       );
       setTradeFeedback({
         tone: "error",
-        text: "Enter a valid token contract address first." });
+        text: "Enter a valid token contract address first."
+      });
       return;
     }
     try {
@@ -205,7 +193,8 @@ export function BscTradePanel({
         );
         setTradeFeedback({
           tone: "error",
-          text: result.reasons[0] ?? "Preflight checks failed." });
+          text: result.reasons[0] ?? "Preflight checks failed."
+        });
         return;
       }
       const message = tokenAddress
@@ -214,13 +203,15 @@ export function BscTradePanel({
       setActionNotice(message, "success", 2600);
       setTradeFeedback({
         tone: "success",
-        text: message });
+        text: message
+      });
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       setActionNotice(message, "error", 4600);
       setTradeFeedback({
         tone: "error",
-        text: message });
+        text: message
+      });
     }
   }, [getBscTradePreflight, quickTokenAddress, setActionNotice]);
 
@@ -243,7 +234,8 @@ export function BscTradePanel({
     setPendingTrade({
       side: latestQuote.side,
       amount: quickAmount,
-      token: quickTokenAddress });
+      token: quickTokenAddress
+    });
   }, [latestQuote, quickAmount, quickTokenAddress]);
 
   const handleConfirmExecute = useCallback(async () => {
@@ -253,7 +245,8 @@ export function BscTradePanel({
       const result = await executeBscTrade({
         side: latestQuote.side,
         tokenAddress: pendingTrade.token,
-        amount: pendingTrade.amount });
+        amount: pendingTrade.amount
+      });
       setLatestExecution(result);
       if (result?.executed && result?.execution) {
         // Already executed on-chain
@@ -286,11 +279,12 @@ export function BscTradePanel({
   }, [getBscTradeTxStatus, latestExecution]);
 
   const handleAddToken = useCallback(() => {
-    if (!BSC_ADDRESS_RE.test(quickTokenAddress)) return;
+    if (!HEX_ADDRESS_RE.test(quickTokenAddress)) return;
     const newToken: TrackedToken = {
       address: quickTokenAddress,
       symbol: `TKN-${quickTokenAddress.slice(2, 6)}`,
-      addedAt: Date.now() };
+      addedAt: Date.now()
+    };
     onAddToken(newToken);
     setActionNotice("Token added to watchlist.", "success", 2600);
   }, [quickTokenAddress, onAddToken, setActionNotice]);
@@ -428,10 +422,10 @@ export function BscTradePanel({
         <div
           data-testid="wallet-trade-feedback"
           className={`border px-2 py-1.5 text-xs ${tradeFeedback.tone === "success"
-              ? "border-green-500/40 text-green-400"
-              : tradeFeedback.tone === "info"
-                ? "border-accent/40 text-accent"
-                : "border-red-500/40 text-red-400"
+            ? "border-green-500/40 text-green-400"
+            : tradeFeedback.tone === "info"
+              ? "border-accent/40 text-accent"
+              : "border-red-500/40 text-red-400"
             }`}
         >
           {tradeFeedback.text}
@@ -467,8 +461,8 @@ export function BscTradePanel({
               type="button"
               data-testid={`wallet-quick-amount-${amt}`}
               className={`px-2 py-0.5 border text-[10px] font-mono cursor-pointer ${quickAmount === String(amt)
-                  ? "border-accent text-accent"
-                  : "border-border bg-bg hover:border-accent"
+                ? "border-accent text-accent"
+                : "border-border bg-bg hover:border-accent"
                 }`}
               onClick={() => setQuickAmount(String(amt))}
             >
@@ -556,3 +550,8 @@ export function BscTradePanel({
     </>
   );
 }
+
+/** @deprecated Use TradePanel instead */
+export const BscTradePanel = TradePanel;
+/** @deprecated Use TradePanelProps instead */
+export type BscTradePanelProps = TradePanelProps;

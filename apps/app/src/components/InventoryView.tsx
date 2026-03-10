@@ -14,7 +14,8 @@ import {
   loadTrackedBscTokens,
   loadTrackedTokens,
   removeTrackedBscToken,
-  saveTrackedTokens } from "./inventory";
+  saveTrackedTokens
+} from "./inventory";
 import { InventoryToolbar } from "./inventory/InventoryToolbar";
 import { NftGrid } from "./inventory/NftGrid";
 import { PortfolioHeader } from "./inventory/PortfolioHeader";
@@ -43,7 +44,6 @@ export function InventoryView({ inModal }: { inModal?: boolean } = {}) {
     setTab,
     setState,
     setActionNotice,
-    copyToClipboard,
     executeBscTrade,
     getBscTradePreflight,
     getBscTradeQuote,
@@ -94,14 +94,15 @@ export function InventoryView({ inModal }: { inModal?: boolean } = {}) {
     bscChainError,
     bscNativeBalance,
     bscChain } = useInventoryData({
-    walletBalances,
-    walletAddresses,
-    walletConfig,
-    walletNfts,
-    inventorySort,
-    inventoryChainFocus,
-    trackedBscTokens,
-    trackedTokens });
+      walletBalances,
+      walletAddresses,
+      walletConfig,
+      walletNfts,
+      inventorySort,
+      inventoryChainFocus,
+      trackedBscTokens,
+      trackedTokens
+    });
 
   const bscNativeBalanceNum = Number.parseFloat(bscNativeBalance ?? "");
   const evmAddr = walletAddresses?.evmAddress ?? walletConfig?.evmAddress;
@@ -226,7 +227,6 @@ export function InventoryView({ inModal }: { inModal?: boolean } = {}) {
     return (
       <div className="space-y-2 mt-3">
         <PortfolioHeader
-          t={t}
           totalUsd={totalUsd}
           bscNativeBalance={bscNativeBalance}
           evmAddr={evmAddr ?? null}
@@ -235,8 +235,6 @@ export function InventoryView({ inModal }: { inModal?: boolean } = {}) {
           gasReady={gasReady}
           bscChainError={bscChainError}
           hasManagedBscRpc={hasManagedBscRpc}
-          copyToClipboard={copyToClipboard}
-          setActionNotice={setActionNotice}
           loadBalances={loadBalances}
           goToRpcSettings={goToRpcSettings}
         />
@@ -245,10 +243,7 @@ export function InventoryView({ inModal }: { inModal?: boolean } = {}) {
           <BscTradePanel
             tradeReady={tradeReady}
             bnbBalance={bnbBalance}
-            trackedTokens={trackedTokens}
             onAddToken={handleAddToken}
-            copyToClipboard={copyToClipboard}
-            setActionNotice={setActionNotice}
             getBscTradePreflight={getBscTradePreflight}
             getBscTradeQuote={getBscTradeQuote}
             executeBscTrade={executeBscTrade}

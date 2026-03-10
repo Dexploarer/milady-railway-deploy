@@ -2,22 +2,26 @@ import {
   act,
   create,
   type ReactTestInstance,
-  type ReactTestRenderer } from "react-test-renderer";
+  type ReactTestRenderer
+} from "react-test-renderer";
 import { describe, expect, it, vi } from "vitest";
 import * as AppContext from "../AppContext";
 import { Header } from "./Header";
 
 // Mock the AppContext
 vi.mock("../AppContext", () => ({
-  useApp: vi.fn() }));
+  useApp: vi.fn()
+}));
 
 vi.mock("../hooks/useBugReport", () => ({
-  useBugReport: () => ({ isOpen: false, open: vi.fn(), close: vi.fn() }) }));
+  useBugReport: () => ({ isOpen: false, open: vi.fn(), close: vi.fn() })
+}));
 
 describe("Header", () => {
   it("renders wallet overlay with correct hover classes", async () => {
     // Mock the useApp hook return value
     const mockUseApp = {
+      t: (k: string) => k,
       agentStatus: { state: "running", agentName: "Milady" },
       cloudEnabled: false,
       cloudConnected: false,
@@ -27,7 +31,8 @@ describe("Header", () => {
       cloudTopUpUrl: "",
       walletAddresses: {
         evmAddress: "0x1234567890123456789012345678901234567890",
-        solanaAddress: "So11111111111111111111111111111111111111112" },
+        solanaAddress: "So11111111111111111111111111111111111111112"
+      },
       lifecycleBusy: false,
       lifecycleAction: null,
       handlePauseResume: vi.fn(),
@@ -36,7 +41,8 @@ describe("Header", () => {
       setTab: vi.fn(),
       dropStatus: null,
       loadDropStatus: vi.fn(),
-      registryStatus: null };
+      registryStatus: null
+    };
 
     // @ts-expect-error - test uses a narrowed subset of the full app context type.
     vi.spyOn(AppContext, "useApp").mockReturnValue(mockUseApp);

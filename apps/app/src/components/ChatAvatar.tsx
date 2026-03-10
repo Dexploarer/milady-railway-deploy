@@ -10,12 +10,14 @@ import {
   getVrmNeedsFlip,
   getVrmPreviewUrl,
   getVrmUrl,
-  useApp } from "../AppContext";
+  useApp
+} from "@milady/app-core/state";
 import { client } from "../api-client";
 import { resolveAppAssetUrl } from "../asset-url";
 import { STOP_EMOTE_EVENT } from "../events";
 import type { VrmEngine, VrmEngineState } from "./avatar/VrmEngine";
 import { VrmViewer } from "./avatar/VrmViewer";
+import { AvatarLoader } from "./avatar/AvatarLoader";
 
 export interface ChatAvatarProps {
   /** Mouth openness value (0-1) for lip sync animation */
@@ -104,7 +106,8 @@ export function ChatAvatar({
           opacity: avatarVisible ? 0.95 : 0,
           transition: "opacity 0.45s ease-in-out",
           background:
-            "radial-gradient(circle at 50% 100%, rgba(255,255,255,0.08), transparent 60%)" }}
+            "radial-gradient(circle at 50% 100%, rgba(255,255,255,0.08), transparent 60%)"
+        }}
       >
         <div className="absolute inset-0 overflow-hidden">
           <div
@@ -114,7 +117,8 @@ export function ChatAvatar({
               transition: "opacity 0.45s ease",
               // Keep a stable full-body framing in the narrow chat sidebar.
               transform: "scale(1.02) translateY(1%)",
-              transformOrigin: "50% 42%" }}
+              transformOrigin: "50% 42%"
+            }}
           >
             <VrmViewer
               vrmPath={vrmPath}
@@ -135,6 +139,8 @@ export function ChatAvatar({
               className="absolute left-1/2 -translate-x-1/2 bottom-[-2%] h-[122%] object-contain opacity-90"
             />
           )}
+
+          {!vrmLoaded && !showFallback && <AvatarLoader />}
         </div>
       </div>
     </div>

@@ -72,6 +72,7 @@
   --font-body: var(--font-body);
   --font-mono: var(--mono);
   --font-display: var(--font-display);
+  --font-chat: var(--font-chat);
 
   /* Shadows */
   --shadow-sm: var(--shadow-sm);

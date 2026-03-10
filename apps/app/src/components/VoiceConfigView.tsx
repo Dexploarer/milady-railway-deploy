@@ -10,155 +10,23 @@
 
 import type { SwabbleConfig } from "@milady/capacitor-swabble";
 import { Swabble } from "@milady/capacitor-swabble";
-import { useCallback, useEffect, useRef, useState} from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useApp } from "../AppContext";
 import {
   client,
   type VoiceConfig,
   type VoiceMode,
-  type VoiceProvider } from "../api-client";
+  type VoiceProvider
+} from "../api-client";
 import { dispatchWindowEvent, VOICE_CONFIG_UPDATED_EVENT } from "../events";
 import {
   CloudConnectionStatus,
-  CloudSourceModeToggle } from "./CloudSourceControls";
+  CloudSourceModeToggle
+} from "./CloudSourceControls";
 import { ConfigSaveFooter } from "./ConfigSaveFooter";
-
-interface VoicePreset {
-  id: string;
-  name: string;
-  voiceId: string;
-  gender: "female" | "male" | "character";
-  hint: string;
-  previewUrl: string;
-}
-
-const VOICE_PRESETS: VoicePreset[] = [
-  // Female
-  {
-    id: "rachel",
-    name: "Rachel",
-    voiceId: "21m00Tcm4TlvDq8ikWAM",
-    gender: "female",
-    hint: "Calm, clear",
-    previewUrl:
-      "https://storage.googleapis.com/eleven-public-prod/premade/voices/21m00Tcm4TlvDq8ikWAM/df6788f9-5c96-470d-8312-aab3b3d8f50a.mp3" },
-  {
-    id: "sarah",
-    name: "Sarah",
-    voiceId: "EXAVITQu4vr4xnSDxMaL",
-    gender: "female",
-    hint: "Soft, warm",
-    previewUrl:
-      "https://storage.googleapis.com/eleven-public-prod/premade/voices/EXAVITQu4vr4xnSDxMaL/6851ec91-9950-471f-8586-357c52539069.mp3" },
-  {
-    id: "matilda",
-    name: "Matilda",
-    voiceId: "XrExE9yKIg1WjnnlVkGX",
-    gender: "female",
-    hint: "Warm, friendly",
-    previewUrl:
-      "https://storage.googleapis.com/eleven-public-prod/premade/voices/XrExE9yKIg1WjnnlVkGX/b930e18d-6b4d-466e-bab2-0ae97c6d8535.mp3" },
-  {
-    id: "lily",
-    name: "Lily",
-    voiceId: "pFZP5JQG7iQjIQuC4Bku",
-    gender: "female",
-    hint: "British, raspy",
-    previewUrl:
-      "https://storage.googleapis.com/eleven-public-prod/premade/voices/pFZP5JQG7iQjIQuC4Bku/0ab8bd74-fcd2-489d-b70a-3e1bcde8c999.mp3" },
-  // Male
-  {
-    id: "brian",
-    name: "Brian",
-    voiceId: "nPczCjzI2devNBz1zQrb",
-    gender: "male",
-    hint: "Deep, smooth",
-    previewUrl:
-      "https://storage.googleapis.com/eleven-public-prod/premade/voices/nPczCjzI2devNBz1zQrb/f4dbda0c-aff0-45c0-93fa-f5d5ec95a2eb.mp3" },
-  {
-    id: "adam",
-    name: "Adam",
-    voiceId: "pNInz6obpgDQGcFmaJgB",
-    gender: "male",
-    hint: "Deep, authoritative",
-    previewUrl:
-      "https://storage.googleapis.com/eleven-public-prod/premade/voices/pNInz6obpgDQGcFmaJgB/38a69695-2ca9-4b9e-b9ec-f07ced494a58.mp3" },
-  {
-    id: "josh",
-    name: "Josh",
-    voiceId: "TxGEqnHWrfWFTfGW9XjX",
-    gender: "male",
-    hint: "Young, deep",
-    previewUrl:
-      "https://storage.googleapis.com/eleven-public-prod/premade/voices/TxGEqnHWrfWFTfGW9XjX/3ae2fc71-d5f9-4769-bb71-2a43633cd186.mp3" },
-  {
-    id: "daniel",
-    name: "Daniel",
-    voiceId: "onwK4e9ZLuTAKqWW03F9",
-    gender: "male",
-    hint: "British, presenter",
-    previewUrl:
-      "https://storage.googleapis.com/eleven-public-prod/premade/voices/onwK4e9ZLuTAKqWW03F9/7eee0236-1a72-4b86-b303-5dcadc007ba9.mp3" },
-  // Character
-  {
-    id: "gigi",
-    name: "Gigi",
-    voiceId: "jBpfuIE2acCO8z3wKNLl",
-    gender: "character",
-    hint: "Childish, cute",
-    previewUrl:
-      "https://storage.googleapis.com/eleven-public-prod/premade/voices/jBpfuIE2acCO8z3wKNLl/3a7e4339-78fa-404e-8d10-c3ef5587935b.mp3" },
-  {
-    id: "mimi",
-    name: "Mimi",
-    voiceId: "zrHiDhphv9ZnVXBqCLjz",
-    gender: "character",
-    hint: "Cute, animated",
-    previewUrl:
-      "https://storage.googleapis.com/eleven-public-prod/premade/voices/zrHiDhphv9ZnVXBqCLjz/decbf20b-0f57-4fac-985b-a4f0290ebfc4.mp3" },
-  {
-    id: "charlotte",
-    name: "Charlotte",
-    voiceId: "XB0fDUnXU5powFXDhCwa",
-    gender: "character",
-    hint: "Alluring, game NPC",
-    previewUrl:
-      "https://storage.googleapis.com/eleven-public-prod/premade/voices/XB0fDUnXU5powFXDhCwa/942356dc-f10d-4d89-bda5-4f8505ee038b.mp3" },
-];
-
-const PROVIDERS: Array<{
-  id: VoiceProvider;
-  label: string;
-  hint: string;
-  needsKey: boolean;
-}> = [
-    {
-      id: "elevenlabs",
-      label: "ElevenLabs",
-      hint: "High quality, realistic voices",
-      needsKey: true },
-    {
-      id: "edge",
-      label: "Edge TTS",
-      hint: "Free, Microsoft voices",
-      needsKey: false },
-    {
-      id: "simple-voice",
-      label: "Simple Voice",
-      hint: "Basic browser TTS",
-      needsKey: false },
-  ];
+import { sanitizeApiKey, PREMADE_VOICES, VOICE_PROVIDERS } from "./shared/voice-types";
 
 const DEFAULT_ELEVEN_FAST_MODEL = "eleven_flash_v2_5";
-const REDACTED_SECRET = "[REDACTED]";
-
-function sanitizeApiKey(apiKey: string | undefined): string | undefined {
-  if (typeof apiKey !== "string") return undefined;
-  const trimmed = apiKey.trim();
-  if (!trimmed) return undefined;
-  if (trimmed.toUpperCase() === REDACTED_SECRET) return undefined;
-  return trimmed;
-}
 
 const MODEL_SIZES: Array<{
   id: NonNullable<SwabbleConfig["modelSize"]>;
@@ -173,8 +41,8 @@ const MODEL_SIZES: Array<{
 
 function WakeWordSection({
   serverConfig }: {
-  serverConfig?: Partial<SwabbleConfig> | null;
-}) {
+    serverConfig?: Partial<SwabbleConfig> | null;
+  }) {
   const { t } = useApp();
   const [triggers, setTriggers] = useState<string[]>(["milady"]);
   const [triggerInput, setTriggerInput] = useState("");
@@ -231,7 +99,8 @@ function WakeWordSection({
     (): SwabbleConfig => ({
       triggers,
       minPostTriggerGap: sensitivity,
-      modelSize }),
+      modelSize
+    }),
     [triggers, sensitivity, modelSize],
   );
 
@@ -430,7 +299,7 @@ function WakeWordSection({
 
 export function VoiceConfigView() {
   const { t } = useApp();
-  const { cloudConnected} = useApp();
+  const { cloudConnected } = useApp();
   const [voiceConfig, setVoiceConfig] = useState<VoiceConfig>({});
   const [swabbleServerConfig, setSwabbleServerConfig] =
     useState<Partial<SwabbleConfig> | null>(null);
@@ -478,7 +347,7 @@ export function VoiceConfigView() {
 
   const currentProvider = voiceConfig.provider ?? "elevenlabs";
   const currentMode: VoiceMode = voiceConfig.mode ?? "own-key";
-  const providerInfo = PROVIDERS.find((p) => p.id === currentProvider);
+  const providerInfo = VOICE_PROVIDERS.find((p) => p.id === currentProvider);
   const isConfigured =
     currentMode === "cloud"
       ? cloudConnected
@@ -499,14 +368,16 @@ export function VoiceConfigView() {
   const handleApiKeyChange = useCallback((apiKey: string) => {
     setVoiceConfig((prev) => ({
       ...prev,
-      elevenlabs: { ...prev.elevenlabs, apiKey: apiKey || undefined } }));
+      elevenlabs: { ...prev.elevenlabs, apiKey: apiKey || undefined }
+    }));
     setDirty(true);
   }, []);
 
   const handleVoiceSelect = useCallback((voiceId: string) => {
     setVoiceConfig((prev) => ({
       ...prev,
-      elevenlabs: { ...prev.elevenlabs, voiceId } }));
+      elevenlabs: { ...prev.elevenlabs, voiceId }
+    }));
     setDirty(true);
   }, []);
 
@@ -535,7 +406,8 @@ export function VoiceConfigView() {
           ? {
             ...voiceConfig.elevenlabs,
             modelId:
-              voiceConfig.elevenlabs?.modelId ?? DEFAULT_ELEVEN_FAST_MODEL }
+              voiceConfig.elevenlabs?.modelId ?? DEFAULT_ELEVEN_FAST_MODEL
+          }
           : voiceConfig.elevenlabs;
       const sanitizedKey = sanitizeApiKey(normalizedElevenLabs?.apiKey);
       if (normalizedElevenLabs) {
@@ -549,7 +421,8 @@ export function VoiceConfigView() {
           provider === "elevenlabs"
             ? (voiceConfig.mode ?? "own-key")
             : undefined,
-        elevenlabs: normalizedElevenLabs };
+        elevenlabs: normalizedElevenLabs
+      };
       // Also persist swabble (wake word) config — fall back to server config
       // if the plugin isn't available on this platform (e.g. Electrobun).
       let swabbleCfg: Partial<SwabbleConfig> | undefined;
@@ -567,7 +440,9 @@ export function VoiceConfigView() {
         messages: {
           ...messages,
           tts: normalizedVoiceConfig,
-          ...(swabbleCfg ? { swabble: swabbleCfg } : {}) } });
+          ...(swabbleCfg ? { swabble: swabbleCfg } : {})
+        }
+      });
       dispatchWindowEvent(VOICE_CONFIG_UPDATED_EVENT, normalizedVoiceConfig);
       setSaveSuccess(true);
       setDirty(false);
@@ -588,7 +463,7 @@ export function VoiceConfigView() {
   }
 
   const selectedVoiceId = voiceConfig.elevenlabs?.voiceId;
-  const selectedPreset = VOICE_PRESETS.find(
+  const selectedPreset = PREMADE_VOICES.find(
     (p) => p.voiceId === selectedVoiceId,
   );
 
@@ -601,7 +476,7 @@ export function VoiceConfigView() {
           {t("voiceconfigview.TTSProvider")}
         </div>
         <div className="flex gap-2">
-          {PROVIDERS.map((p) => {
+          {VOICE_PROVIDERS.map((p) => {
             const active = currentProvider === p.id;
             return (
               <button
@@ -702,7 +577,7 @@ export function VoiceConfigView() {
           <div className="flex flex-col gap-2">
             <div className="text-xs font-semibold">{t("voiceconfigview.Voice")}</div>
             <div className="grid grid-cols-3 gap-1.5">
-              {VOICE_PRESETS.map((preset) => {
+              {PREMADE_VOICES.map((preset) => {
                 const active = selectedVoiceId === preset.voiceId;
                 return (
                   <button

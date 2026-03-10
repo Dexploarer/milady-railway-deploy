@@ -8,10 +8,12 @@ export interface SearchInputProps
     onClear?: () => void
     /** Show a loading indicator */
     loading?: boolean
+    /** Aria-label for the clear button */
+    clearLabel?: string
 }
 
 export const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
-    ({ className, value, onClear, loading, ...props }, ref) => {
+    ({ className, value, onClear, loading, clearLabel = "Clear search", ...props }, ref) => {
         const hasValue = typeof value === "string" ? value.length > 0 : !!value
 
         return (
@@ -29,7 +31,7 @@ export const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
                         type="button"
                         onClick={onClear}
                         className="absolute right-2 rounded-sm p-0.5 text-muted hover:text-txt transition-colors"
-                        aria-label="Clear search"
+                        aria-label={clearLabel}
                     >
                         <X className="h-3 w-3" />
                     </button>

@@ -1,15 +1,17 @@
 /**
- * Portfolio header block: total USD value, BNB sub-balance,
- * receive button, address, status dots, and inline BSC error.
+ * Portfolio header block: total USD value, native gas-token sub-balance,
+ * receive button, address, status dots, and inline chain error.
  */
 
-import type { createTranslator } from "../../i18n";
+
+import type { ChainConfig } from "../chainConfig";
 import { CopyableAddress } from "./CopyableAddress";
 import { BSC_GAS_READY_THRESHOLD, formatBalance } from "./constants";
 import { StatusDot } from "./StatusDot";
 
+import { useApp } from "../../AppContext";
+
 export interface PortfolioHeaderProps {
-  t: ReturnType<typeof createTranslator>;
   totalUsd: number;
   bscNativeBalance: string | null;
   evmAddr: string | null;
@@ -18,18 +20,13 @@ export interface PortfolioHeaderProps {
   gasReady: boolean;
   bscChainError: string | null;
   hasManagedBscRpc: boolean;
-  copyToClipboard: (text: string) => Promise<void>;
-  setActionNotice: (
-    text: string,
-    tone?: "info" | "success" | "error",
-    ttlMs?: number,
-  ) => void;
   loadBalances: () => Promise<void> | void;
   goToRpcSettings: () => void;
+  /** Optional chain config — when provided, displays that chain's name/symbol instead of BSC defaults. */
+  chainConfig?: ChainConfig;
 }
 
 export function PortfolioHeader({
-  t,
   totalUsd,
   bscNativeBalance,
   evmAddr,
@@ -38,17 +35,21 @@ export function PortfolioHeader({
   gasReady,
   bscChainError,
   hasManagedBscRpc,
-  copyToClipboard,
-  setActionNotice,
   loadBalances,
-  goToRpcSettings }: PortfolioHeaderProps) {
+  goToRpcSettings,
+  chainConfig,
+}: PortfolioHeaderProps) {
+  const { t, copyToClipboard, setActionNotice } = useApp();
+  const networkLabel = chainConfig ? `${chainConfig.name} Mainnet` : t("wallet.bscMainnet");
+  const nativeSymbol = chainConfig?.nativeSymbol ?? "BNB";
+  const gasThreshold = chainConfig?.gasReadyThreshold ?? BSC_GAS_READY_THRESHOLD;
   return (
     <div className="wt__portfolio">
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <div className="wt__portfolio-label">{t("wallet.portfolio")}</div>
-            <span className="wt__network-badge">{t("wallet.bscMainnet")}</span>
+            <span className="wt__network-badge">{networkLabel}</span>
           </div>
           <div className="wt__portfolio-value" data-testid="bsc-balance-value">
             {totalUsd > 0
@@ -57,7 +58,7 @@ export function PortfolioHeader({
           </div>
           {bscNativeBalance !== null && (
             <div className="wt__bnb-sub">
-              {formatBalance(bscNativeBalance)}  {t("portfolioheader.BNB")}
+              {formatBalance(bscNativeBalance)}  {nativeSymbol}
             </div>
           )}
         </div>
@@ -106,7 +107,8 @@ export function PortfolioHeader({
               ? t("wallet.status.feedLiveTitle")
               : bscChainError
                 ? t("wallet.status.feedErrorTitle", {
-                  error: bscChainError })
+                  error: bscChainError
+                })
                 : t("wallet.status.feedOfflineTitle")
           }
         />
@@ -122,7 +124,8 @@ export function PortfolioHeader({
               ? t("wallet.status.tradeReadyTitle")
               : rpcReady
                 ? t("wallet.status.tradeNeedGasTitle", {
-                  threshold: BSC_GAS_READY_THRESHOLD })
+                  threshold: gasThreshold
+                })
                 : t("wallet.status.tradeFeedRequired")
           }
         />

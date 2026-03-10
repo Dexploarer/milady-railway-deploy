@@ -34,10 +34,12 @@ export interface BannerProps
     dismissible?: boolean
     /** Called when dismiss is clicked */
     onDismiss?: () => void
+    /** Aria-label for dismiss button */
+    dismissLabel?: string
 }
 
 export const Banner = React.forwardRef<HTMLDivElement, BannerProps>(
-    ({ variant = "info", action, dismissible, onDismiss, className, children, ...props }, ref) => {
+    ({ variant = "info", action, dismissible, onDismiss, dismissLabel = "Dismiss", className, children, ...props }, ref) => {
         const Icon = ICONS[variant ?? "info"]
 
         return (
@@ -55,7 +57,7 @@ export const Banner = React.forwardRef<HTMLDivElement, BannerProps>(
                         type="button"
                         onClick={onDismiss}
                         className="rounded-sm p-0.5 opacity-70 hover:opacity-100 transition-opacity"
-                        aria-label="Dismiss"
+                        aria-label={dismissLabel}
                     >
                         <X className="h-3.5 w-3.5" />
                     </button>

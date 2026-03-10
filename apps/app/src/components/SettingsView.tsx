@@ -38,6 +38,8 @@ import { ConfigPageView } from "./ConfigPageView";
 import { MediaSettingsSection } from "./MediaSettingsSection";
 import { PermissionsSection } from "./PermissionsSection";
 import { ProviderSwitcher } from "./ProviderSwitcher";
+import { Modal } from "./shared/Modal";
+import { SectionCard } from "./shared/SectionCard";
 import { VoiceConfigView } from "./VoiceConfigView";
 
 interface SettingsSectionDef {
@@ -113,81 +115,6 @@ function matchesSettingsSection(
   return (
     section.label.toLowerCase().includes(normalized) ||
     section.description?.toLowerCase().includes(normalized) === true
-  );
-}
-
-/* ── Modal shell ─────────────────────────────────────────────────────── */
-
-export function Modal({
-  open,
-  onClose,
-  title,
-  children }: {
-    open: boolean;
-    onClose: () => void;
-    title: string;
-    children: React.ReactNode;
-  }) {
-  if (!open) return null;
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-      onKeyDown={(e) => {
-        if (e.key === "Escape") {
-          e.preventDefault();
-          onClose();
-        }
-      }}
-      role="dialog"
-      aria-modal="true"
-    >
-      <div className="w-full max-w-md border border-border bg-card p-5 shadow-2xl rounded-lg">
-        <div className="flex items-center justify-between mb-4">
-          <div className="font-bold text-sm">{title}</div>
-          <button
-            type="button"
-            className="text-muted hover:text-txt text-lg leading-none px-2 py-1 rounded-md hover:bg-bg-hover transition-colors"
-            onClick={onClose}
-            aria-label="Close modal"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-        {children}
-      </div>
-    </div>
-  );
-}
-
-/* ── Section Card Component ──────────────────────────────────────────── */
-
-function SectionCard({
-  id,
-  title,
-  description,
-  children,
-  className = "" }: {
-    id: string;
-    title: string;
-    description?: string;
-    children: React.ReactNode;
-    className?: string;
-  }) {
-  return (
-    <section
-      id={id}
-      className={`p-5 border border-border bg-card rounded-xl shadow-sm transition-all duration-200 ${className}`}
-    >
-      <div className="flex items-center gap-3 mb-3">
-        <div className="w-1 h-6 bg-accent rounded-full" />
-        <h3 className="font-bold text-base text-txt-strong">{title}</h3>
-      </div>
-      {description && <p className="text-sm text-muted mb-4">{description}</p>}
-      {children}
-    </section>
   );
 }
 

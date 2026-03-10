@@ -2,7 +2,8 @@ import {
   MToonMaterialLoaderPlugin,
   type VRM,
   VRMLoaderPlugin,
-  VRMUtils } from "@pixiv/three-vrm";
+  VRMUtils
+} from "@pixiv/three-vrm";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
@@ -10,13 +11,15 @@ import { resolveAppAssetUrl } from "../../asset-url";
 import {
   type AnimationLoaderContext,
   loadEmoteClip,
-  loadIdleClip } from "./VrmAnimationLoader";
+  loadIdleClip
+} from "./VrmAnimationLoader";
 import { VrmBlinkController } from "./VrmBlinkController";
 import {
   type CameraAnimationConfig,
   type CameraProfile,
   type InteractionMode,
-  VrmCameraManager } from "./VrmCameraManager";
+  VrmCameraManager
+} from "./VrmCameraManager";
 import { VrmFootShadow } from "./VrmFootShadow";
 
 export type { CameraAnimationConfig, CameraProfile, InteractionMode };
@@ -55,7 +58,8 @@ const DEFAULT_CAMERA_ANIMATION: CameraAnimationConfig = {
   swayAmplitude: 0.06,
   bobAmplitude: 0.03,
   rotationAmplitude: 0.01,
-  speed: 0.8 };
+  speed: 0.8
+};
 const MAX_RENDERER_PIXEL_RATIO = 2;
 
 function getRendererPixelRatio(): number {
@@ -81,7 +85,8 @@ async function createRenderer(
       const renderer = new WebGPURenderer({
         canvas,
         alpha: true,
-        antialias: true }) as unknown as RendererLike & { init?: () => Promise<unknown> };
+        antialias: true
+      }) as unknown as RendererLike & { init?: () => Promise<unknown> };
       await renderer.init?.();
       console.info("[VrmEngine] Using WebGPURenderer");
       return { backend: "webgpu", renderer };
@@ -95,7 +100,8 @@ async function createRenderer(
   const renderer = new THREE.WebGLRenderer({
     canvas,
     alpha: true,
-    antialias: true }) as unknown as RendererLike;
+    antialias: true
+  }) as unknown as RendererLike;
   console.info("[VrmEngine] Using WebGLRenderer");
   return { backend: "webgl", renderer };
 }
@@ -114,6 +120,10 @@ export class VrmEngine {
   private initialized = false;
   private loadingAborted = false;
   private vrmLoadRequestId = 0;
+  private vrmReady = false;
+  private teleportProgress = 1.0;
+  private teleportClipPlane = new THREE.Plane(new THREE.Vector3(0, -1, 0), 0);
+  private teleportClippedMaterials: THREE.Material[] = [];
   private mouthValue = 0;
   private mouthSmoothed = 0;
   private vrmName: string | null = null;
@@ -121,7 +131,8 @@ export class VrmEngine {
   private readonly idleGlbUrl = resolveAppAssetUrl("animations/idle.glb");
   private forceFaceCameraFlip = false;
   private cameraAnimation: CameraAnimationConfig = {
-    ...DEFAULT_CAMERA_ANIMATION };
+    ...DEFAULT_CAMERA_ANIMATION
+  };
   private baseCameraPosition = new THREE.Vector3();
   private elapsedTime = 0;
   private speaking = false;
@@ -277,6 +288,7 @@ export class VrmEngine {
       this.controls = null;
     }
     this.vrm = null;
+    this.vrmReady = false;
     this.vrmName = null;
     this.mixer = null;
     this.idleAction = null;
@@ -286,6 +298,8 @@ export class VrmEngine {
     }
     this.emoteAction = null;
     this.emoteClipCache.clear();
+    this.teleportProgress = 1.0;
+    this.cleanupTeleportClipping();
     if (this.renderer) {
       this.renderer.dispose();
       if (this.rendererBackend === "webgl") {
@@ -346,11 +360,12 @@ export class VrmEngine {
   getState(): VrmEngineState {
     const idlePlaying = this.idleAction?.isRunning() ?? false;
     return {
-      vrmLoaded: this.vrm !== null,
+      vrmLoaded: this.vrm !== null && this.vrmReady,
       vrmName: this.vrmName,
       idlePlaying,
       idleTime: this.idleAction?.time ?? 0,
-      idleTracks: this.idleAction?.getClip()?.tracks.length ?? 0 };
+      idleTracks: this.idleAction?.getClip()?.tracks.length ?? 0
+    };
   }
   setMouthOpen(value: number): void {
     this.mouthValue = Math.max(0, Math.min(1, value));
@@ -433,6 +448,7 @@ export class VrmEngine {
       this.scene.remove(this.vrm.scene);
       VRMUtils.deepDispose(this.vrm.scene);
       this.vrm = null;
+      this.vrmReady = false;
       this.vrmName = null;
       this.mixer = null;
       this.idleAction = null;
@@ -447,7 +463,8 @@ export class VrmEngine {
     loader.register((parser) => {
       if (webGpuNodes) {
         const mtoonMaterialPlugin = new MToonMaterialLoaderPlugin(parser, {
-          materialType: webGpuNodes.MToonNodeMaterial });
+          materialType: webGpuNodes.MToonNodeMaterial
+        });
         return new VRMLoaderPlugin(parser, { mtoonMaterialPlugin });
       }
       return new VRMLoaderPlugin(parser);
@@ -513,18 +530,75 @@ export class VrmEngine {
     try {
       await this.loadAndPlayIdle(vrm);
       if (!this.loadingAborted && this.vrm === vrm) {
+        this.vrmReady = true;
+        this.playTeleportReveal(vrm);
         vrm.scene.visible = true;
       }
     } catch {
       if (!this.loadingAborted && this.vrm === vrm) {
+        this.vrmReady = true;
+        this.playTeleportReveal(vrm);
         vrm.scene.visible = true;
       }
     }
   }
+
+  private playTeleportReveal(vrm: VRM) {
+    this.teleportProgress = 0.0;
+    this.cleanupTeleportClipping();
+
+    // Use a clipping plane that sweeps upward.
+    // Normal (0, -1, 0) + constant = clipY means: discard fragments with y > clipY.
+    // We start with clipY very low (everything clipped) and raise it.
+    const clipPlane = this.teleportClipPlane;
+    clipPlane.normal.set(0, -1, 0);
+    clipPlane.constant = -0.2; // start below feet
+
+    // Enable local clipping on the renderer
+    const r = this.renderer as any;
+    if (r && typeof r.localClippingEnabled !== 'undefined') {
+      r.localClippingEnabled = true;
+    }
+
+    // Attach the clip plane to every material on the VRM
+    vrm.scene.traverse((obj) => {
+      if (obj instanceof THREE.Mesh) {
+        const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+        for (const mat of mats) {
+          if (!mat.userData._teleportClipped) {
+            mat.userData._teleportClipped = true;
+            mat.clippingPlanes = mat.clippingPlanes
+              ? [...mat.clippingPlanes, clipPlane]
+              : [clipPlane];
+            mat.clipShadows = true;
+            mat.needsUpdate = true;
+            this.teleportClippedMaterials.push(mat);
+          }
+        }
+      }
+    });
+  }
+
+  private cleanupTeleportClipping(): void {
+    for (const mat of this.teleportClippedMaterials) {
+      if (mat.clippingPlanes) {
+        mat.clippingPlanes = mat.clippingPlanes.filter(
+          (p: THREE.Plane) => p !== this.teleportClipPlane,
+        );
+        if (mat.clippingPlanes.length === 0) {
+          mat.clippingPlanes = null;
+        }
+      }
+      delete mat.userData._teleportClipped;
+      mat.needsUpdate = true;
+    }
+    this.teleportClippedMaterials = [];
+  }
   private get animationLoaderContext(): AnimationLoaderContext {
     return {
       isAborted: () => this.loadingAborted,
-      isCurrentVrm: (vrm: VRM) => this.vrm === vrm };
+      isCurrentVrm: (vrm: VRM) => this.vrm === vrm
+    };
   }
   private loop(): void {
     this.animationFrameId = requestAnimationFrame(() => this.loop());
@@ -537,6 +611,19 @@ export class VrmEngine {
     this.elapsedTime += rawDelta;
     this.mixer?.update(rawDelta);
     if (this.vrm) {
+      if (this.teleportProgress < 1.0) {
+        this.teleportProgress += stableDelta * 0.7; // ~1.4 seconds duration
+        if (this.teleportProgress > 1.0) this.teleportProgress = 1.0;
+
+        // Animate clipping plane upward: from -0.2 (below feet) to 2.0 (above head)
+        const clipY = -0.2 + this.teleportProgress * 2.2;
+        this.teleportClipPlane.constant = clipY;
+
+        if (this.teleportProgress >= 1.0) {
+          this.cleanupTeleportClipping();
+        }
+      }
+
       this.applyMouthToVrm(this.vrm);
       const blinkValue = this.blinkController.update(rawDelta);
       this.vrm.expressionManager?.setValue("blink", blinkValue);

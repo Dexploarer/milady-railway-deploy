@@ -17,17 +17,7 @@ import { client } from "../api-client";
 import { ConfirmDeleteControl } from "./shared/confirm-delete-control";
 import { StatusBadge } from "./shared/ui-badges";
 import { Switch } from "./shared/ui-switch";
-
-/* ── Shared style constants ─────────────────────────────────────────── */
-
-const inputCls =
-  "px-2.5 py-1.5 border border-[var(--border)] bg-[var(--card)] text-[var(--txt)] text-xs focus:border-[var(--accent)] focus:outline-none";
-const btnPrimary =
-  "px-3 py-1.5 text-xs font-medium bg-[var(--accent)] text-[var(--accent-foreground)] border border-[var(--accent)] cursor-pointer hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-default";
-const btnGhost =
-  "px-3 py-1.5 text-xs bg-transparent text-[var(--muted)] border border-[var(--border)] cursor-pointer hover:text-[var(--txt)] hover:border-[var(--txt)] transition-colors disabled:opacity-40 disabled:cursor-default";
-const btnDanger =
-  "px-2 py-1 text-[11px] bg-transparent text-[var(--muted)] border border-[var(--border)] cursor-pointer hover:text-[#e74c3c] hover:border-[#e74c3c] transition-colors";
+import { btnPrimary, btnGhost, btnDanger, inputCls } from "./shared/button-styles";
 
 /* ── Skill Card ─────────────────────────────────────────────────────── */
 

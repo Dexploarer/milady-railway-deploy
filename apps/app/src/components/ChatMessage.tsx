@@ -111,10 +111,11 @@ export function ChatMessage({
 
         {/* Message Content */}
         <div
-          className={`relative group px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap break-words rounded-2xl ${isUser
+          className={`relative group px-4 py-2.5 text-[15px] leading-[1.7] whitespace-pre-wrap break-words rounded-2xl ${isUser
             ? "bg-accent text-accent-fg rounded-br-md"
             : "bg-bg-accent border border-border text-txt rounded-bl-md"
             }`}
+          style={{ fontFamily: 'var(--font-chat)' }}
         >
           <MessageContent message={message} />
 
@@ -192,9 +193,9 @@ export function ChatMessage({
 export function TypingIndicator({
   agentName,
   agentAvatarSrc }: {
-  agentName: string;
-  agentAvatarSrc?: string | null;
-}) {
+    agentName: string;
+    agentAvatarSrc?: string | null;
+  }) {
   const agentInitial = agentName.trim().charAt(0).toUpperCase() || "A";
 
   return (
@@ -265,7 +266,7 @@ export function ChatEmptyState({ agentName }: { agentName: string }) {
 
         {t("chatmessage.StartAConversation")}
       </h3>
-      <p className="text-sm text-muted max-w-sm mb-6">
+      <p className="text-sm text-muted max-w-sm mb-6" style={{ fontFamily: 'var(--font-chat)' }}>
 
         {t("chatmessage.SendAMessageTo")} {agentName}  {t("chatmessage.toBeginChattingY")}
       </p>

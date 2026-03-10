@@ -3,7 +3,8 @@
  */
 
 import { useState } from "react";
-import { chainIcon, isBscChainName } from "./constants";
+import { chainIcon } from "./constants";
+import { getNativeLogoUrl, getContractLogoUrl } from "../chainConfig";
 
 /* ── Logo URL resolver ──────────────────────────────────────────────── */
 
@@ -12,23 +13,11 @@ export function tokenLogoUrl(
   contractAddress: string | null,
 ): string | null {
   if (!contractAddress) {
-    if (isBscChainName(chain))
-      return "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/smartchain/info/logo.png";
-    const c = chain.toLowerCase();
-    if (c === "ethereum" || c === "mainnet")
-      return "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png";
-    if (c === "base")
-      return "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/base/info/logo.png";
-    if (c === "solana")
-      return "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/solana/info/logo.png";
-    return null;
+    // Use chain config for native logo resolution
+    return getNativeLogoUrl(chain);
   }
-  if (isBscChainName(chain))
-    return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/smartchain/assets/${contractAddress}/logo.png`;
-  const c = chain.toLowerCase();
-  if (c === "ethereum" || c === "mainnet")
-    return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${contractAddress}/logo.png`;
-  return null;
+  // Use chain config for contract logo resolution (TrustWallet CDN)
+  return getContractLogoUrl(chain, contractAddress);
 }
 
 /* ── Component ──────────────────────────────────────────────────────── */
@@ -39,12 +28,12 @@ export function TokenLogo({
   contractAddress,
   preferredLogoUrl = null,
   size = 32 }: {
-  symbol: string;
-  chain: string;
-  contractAddress: string | null;
-  preferredLogoUrl?: string | null;
-  size?: number;
-}) {
+    symbol: string;
+    chain: string;
+    contractAddress: string | null;
+    preferredLogoUrl?: string | null;
+    size?: number;
+  }) {
   const [errored, setErrored] = useState(false);
   const usePreferredLogo = Boolean(preferredLogoUrl?.startsWith("http"));
   const url = errored
