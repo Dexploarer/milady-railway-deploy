@@ -462,12 +462,7 @@ async function flush(): Promise<void> {
 describe("TriggersView UI E2E", () => {
   let server: { port: number; close: () => Promise<void> } | null = null;
   let runtimeHarness: TriggerRuntimeHarness;
-  let startApiServerFn:
-    | ((options?: {
-      port?: number;
-      runtime?: object;
-    }) => Promise<{ port: number; close: () => Promise<void> }>)
-    | null = null;
+  let startApiServerFn: typeof import("../../../../src/api/server").startApiServer | null = null;
 
   beforeAll(async () => {
     const serverModule = await import("../../../../src/api/server");
@@ -479,7 +474,7 @@ describe("TriggersView UI E2E", () => {
     runtimeHarness = createTriggerRuntimeHarness();
     server = await startApiServerFn({
       port: 0,
-      runtime: runtimeHarness.runtime,
+      runtime: runtimeHarness.runtime as any,
     });
   });
 
