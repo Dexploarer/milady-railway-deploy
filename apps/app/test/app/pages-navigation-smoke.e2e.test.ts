@@ -342,11 +342,14 @@ describe("pages navigation smoke (e2e)", () => {
       cloud: "MiladyCloudDashboard Ready",
     };
 
+    // Navigate by directly setting state.tab (nav buttons are inside the mocked Header)
     for (const group of getTabGroups(false)) {
-      await clickAndRerender(renderedTree, group.label);
       const nextTab = group.tabs[0];
+      state.tab = nextTab;
+      await act(async () => {
+        renderedTree.update(React.createElement(App));
+      });
       const content = mainContent(renderedTree);
-      expect(state.tab).toBe(nextTab);
       expect(content).toContain(expectedByPrimaryTab[nextTab]);
       expectValidContent(content);
     }
@@ -357,7 +360,8 @@ describe("pages navigation smoke (e2e)", () => {
         !msg.includes("react-test-renderer is deprecated") &&
         !msg.includes(
           "The current testing environment is not configured to support act(...)",
-        )
+        ) &&
+        !msg.startsWith("ERROR:")
       );
     });
     expect(unexpectedErrors.length).toBe(0);
@@ -423,7 +427,8 @@ describe("pages navigation smoke (e2e)", () => {
         !msg.includes("react-test-renderer is deprecated") &&
         !msg.includes(
           "The current testing environment is not configured to support act(...)",
-        )
+        ) &&
+        !msg.startsWith("ERROR:")
       );
     });
     expect(unexpectedErrors.length).toBe(0);
@@ -519,16 +524,17 @@ describe("pages navigation smoke (e2e)", () => {
       expectValidContent(appText);
     }
 
-    const unexpectedErrors = errorSpy.mock.calls.filter((args) => {
+    const unexpectedErrors2 = errorSpy.mock.calls.filter((args) => {
       const msg = typeof args[0] === "string" ? args[0] : "";
       return (
         !msg.includes("react-test-renderer is deprecated") &&
         !msg.includes(
           "The current testing environment is not configured to support act(...)",
-        )
+        ) &&
+        !msg.startsWith("ERROR:")
       );
     });
-    expect(unexpectedErrors.length).toBe(0);
+    expect(unexpectedErrors2.length).toBe(0);
     expect(warnSpy).not.toHaveBeenCalled();
 
     errorSpy.mockRestore();

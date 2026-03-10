@@ -159,6 +159,7 @@ function createUseAppMock(
     handleReset: vi.fn(),
     handleAgentExport: vi.fn(),
     handleAgentImport: vi.fn(),
+    loadDropStatus: vi.fn().mockResolvedValue(undefined),
     setState: (key: string, value: unknown) => {
       state[key] = value;
     },

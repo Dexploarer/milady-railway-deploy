@@ -42,7 +42,11 @@ export async function handleCloudCompatRoute(
 
   const apiKey = state.config.cloud?.apiKey?.trim();
   if (!apiKey) {
-    sendJsonError(res, "Not connected to Milady Cloud. Please log in first.", 401);
+    sendJsonError(
+      res,
+      "Not connected to Milady Cloud. Please log in first.",
+      401,
+    );
     return true;
   }
 

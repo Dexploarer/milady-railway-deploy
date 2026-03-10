@@ -377,6 +377,7 @@ describe("Cloud Login UI", () => {
       },
       handleReset: vi.fn(),
       setState: vi.fn(),
+      loadDropStatus: vi.fn().mockResolvedValue(undefined),
     }));
   });
 
@@ -479,6 +480,7 @@ describe("Cloud Connection Integration", () => {
       },
       handleReset: vi.fn(),
       setState: vi.fn(),
+      loadDropStatus: vi.fn().mockResolvedValue(undefined),
     }));
   });
 
@@ -552,6 +554,7 @@ describe("Cloud Credits Display", () => {
       handleCloudDisconnect: vi.fn(),
       handleReset: vi.fn(),
       setState: vi.fn(),
+      loadDropStatus: vi.fn().mockResolvedValue(undefined),
     }));
   });
 
@@ -611,6 +614,7 @@ describe("Cloud Error Handling", () => {
       handleCloudDisconnect: vi.fn(),
       handleReset: vi.fn(),
       setState: vi.fn(),
+      loadDropStatus: vi.fn().mockResolvedValue(undefined),
     }));
   });
 

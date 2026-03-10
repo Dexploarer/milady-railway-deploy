@@ -61,7 +61,7 @@ describe("Electrobun release workflow drift", () => {
       "arch -x86_64 bun install --frozen-lockfile --ignore-scripts",
     );
     expect(workflow).toContain("arch -x86_64 bunx tsdown");
-    expect(workflow).toContain("arch -x86_64 npx vite build");
+    expect(workflow).toContain("arch -x86_64 bunx vite build");
     expect(workflow).toContain("arch -x86_64 bun run build:whisper");
     expect(workflow).toContain(
       `arch -x86_64 electrobun build --env=\${{ needs.prepare.outputs.env }}`,

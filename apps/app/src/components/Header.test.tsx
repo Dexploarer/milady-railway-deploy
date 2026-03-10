@@ -1,3 +1,5 @@
+// @vitest-environment jsdom
+import React from "react";
 import { act, create, type ReactTestRenderer } from "react-test-renderer";
 import { describe, expect, it, vi } from "vitest";
 import * as AppContext from "../AppContext";
@@ -10,6 +12,46 @@ vi.mock("../AppContext", () => ({
 
 vi.mock("../hooks/useBugReport", () => ({
   useBugReport: () => ({ isOpen: false, open: vi.fn(), close: vi.fn() }),
+}));
+
+vi.mock("./shared/AgentModeDropdown", () => ({
+  AgentModeDropdown: () =>
+    React.createElement("div", null, "AgentModeDropdown"),
+}));
+
+vi.mock("@milady/app-core/navigation", () => ({
+  getTabGroups: () => [
+    {
+      label: "Chat",
+      tabs: ["chat"],
+      icon: () => React.createElement("span", null, "💬"),
+      description: "Chat",
+    },
+  ],
+}));
+
+vi.mock("@milady/app-core/components", () => ({
+  LanguageDropdown: () => React.createElement("div", null, "LanguageDropdown"),
+}));
+
+vi.mock("@milady/ui", () => ({
+  IconTooltip: ({
+    children,
+  }: {
+    children: React.ReactNode;
+    content?: string;
+    side?: string;
+  }) => React.createElement("div", null, children),
+}));
+
+vi.mock("lucide-react", () => ({
+  AlertTriangle: () => React.createElement("span", null, "⚠"),
+  Bug: () => React.createElement("span", null, "🐛"),
+  CircleDollarSign: () => React.createElement("span", null, "💰"),
+  Menu: () => React.createElement("span", null, "☰"),
+  Monitor: () => React.createElement("span", null, "🖥"),
+  Smartphone: () => React.createElement("span", null, "📱"),
+  X: () => React.createElement("span", null, "✕"),
 }));
 
 describe("Header", () => {
@@ -29,8 +71,10 @@ describe("Header", () => {
       handlePauseResume: vi.fn(),
       handleRestart: vi.fn(),
       handleStart: vi.fn(),
-      loadDropStatus: vi.fn(),
+      loadDropStatus: vi.fn().mockResolvedValue(undefined),
+      tab: "chat",
       setTab: vi.fn(),
+      plugins: [],
       uiLanguage: "en",
       setUiLanguage: vi.fn(),
       uiShellMode: "native",

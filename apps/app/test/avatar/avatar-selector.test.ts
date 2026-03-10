@@ -11,8 +11,8 @@ import {
 
 describe("Avatar VRM Utilities", () => {
   describe("VRM_COUNT", () => {
-    it("is 25 for all bundled avatars (24 base + 1 named)", () => {
-      expect(VRM_COUNT).toBe(25);
+    it("is 24 for all bundled base avatars", () => {
+      expect(VRM_COUNT).toBe(24);
     });
   });
 
@@ -23,11 +23,8 @@ describe("Avatar VRM Utilities", () => {
       }
     });
 
-    it("returns correct path for named VRMs (25)", () => {
-      expect(getVrmUrl(25)).toBe("/vrms/shaw.vrm");
-    });
-
-    it("clamps invalid indices to avatar 1", () => {
+    it("clamps out-of-range indices to avatar 1", () => {
+      expect(getVrmUrl(25)).toBe("/vrms/milady-1.vrm");
       expect(getVrmUrl(34)).toBe("/vrms/milady-1.vrm");
       expect(getVrmUrl(-3)).toBe("/vrms/milady-1.vrm");
       expect(getVrmUrl(Number.NaN)).toBe("/vrms/milady-1.vrm");
@@ -42,11 +39,8 @@ describe("Avatar VRM Utilities", () => {
       }
     });
 
-    it("returns named VRM preview for named VRMs (25)", () => {
-      expect(getVrmPreviewUrl(25)).toBe("/vrms/previews/shaw.jpg");
-    });
-
-    it("clamps invalid preview indices to avatar 1", () => {
+    it("clamps out-of-range preview indices to avatar 1", () => {
+      expect(getVrmPreviewUrl(25)).toBe("/vrms/previews/milady-1.png");
       expect(getVrmPreviewUrl(999)).toBe("/vrms/previews/milady-1.png");
       expect(getVrmPreviewUrl(-1)).toBe("/vrms/previews/milady-1.png");
       expect(getVrmPreviewUrl(0)).toBe("/vrms/previews/milady-1.png");
@@ -59,8 +53,8 @@ describe("Avatar VRM Utilities", () => {
       expect(getVrmTitle(24)).toBe("MILADY-24");
     });
 
-    it("returns label for named VRMs", () => {
-      expect(getVrmTitle(25)).toBe("SHAW");
+    it("clamps out-of-range index to avatar 1", () => {
+      expect(getVrmTitle(25)).toBe("MILADY-01");
     });
   });
 });

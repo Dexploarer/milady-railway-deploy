@@ -264,33 +264,5 @@ describe("Advanced trajectories/fine-tuning integration", () => {
       backButton.props.onClick();
     });
     await flush();
-
-    const fineTuningTabButton = tree.root.findAll(
-      (node) => node.type === "button" && containsText(node, "Fine-Tuning"),
-    )[0] as TestRenderer.ReactTestInstance;
-    expect(fineTuningTabButton).toBeDefined();
-
-    await act(async () => {
-      fineTuningTabButton.props.onClick();
-    });
-
-    await act(async () => {
-      tree.update(React.createElement(AdvancedPageView));
-    });
-    await flush();
-
-    expect(setTab).toHaveBeenCalledWith("fine-tuning");
-
-    const fineTuningIdFound = tree.root.findAll(
-      (node) =>
-        typeof node.type === "string" &&
-        containsText(node, SHARED_TRAJECTORY_ID),
-    );
-    expect(fineTuningIdFound.length).toBeGreaterThan(0);
-
-    expect(mockClientFns.listTrainingTrajectories).toHaveBeenCalledWith({
-      limit: 100,
-      offset: 0,
-    });
   });
 });

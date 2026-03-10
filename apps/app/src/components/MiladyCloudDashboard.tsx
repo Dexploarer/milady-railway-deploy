@@ -1,5 +1,5 @@
-import { Button, SectionCard } from "@milady/ui";
 import type { CloudCompatAgent } from "@milady/app-core/api";
+import { Button, SectionCard } from "@milady/ui";
 import {
   AlertCircle,
   CircleDollarSign,
@@ -45,9 +45,9 @@ function AgentStatusBadge({ status }: { status: string }) {
   const badge = STATUS_BADGE[status] ?? STATUS_BADGE.stopped;
   return (
     <span
-      className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider border ${badge!.className}`}
+      className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider border ${badge?.className}`}
     >
-      {badge!.label}
+      {badge?.label}
     </span>
   );
 }
@@ -94,7 +94,7 @@ function CloudAgentCard({
             variant="outline"
             size="sm"
             className="flex-1 rounded-xl h-8 text-xs border-border/40"
-            onClick={() => window.open(agent.web_ui_url!, "_blank")}
+            onClick={() => window.open(agent.web_ui_url ?? "", "_blank")}
           >
             <ExternalLink className="w-3 h-3 mr-1" />
             Open
@@ -167,28 +167,23 @@ export function CloudDashboard() {
     }
   }, []);
 
-  const handleDeleteAgent = useCallback(
-    async (agentId: string) => {
-      setDeletingAgentId(agentId);
-      try {
-        const res = await fetch(
-          `/api/cloud/compat/agents/${encodeURIComponent(agentId)}`,
-          { method: "DELETE" },
-        );
-        const data = await res.json();
-        if (data.success) {
-          setCloudAgents((prev) =>
-            prev.filter((a) => a.agent_id !== agentId),
-          );
-        }
-      } catch {
-        // Silently fail — user can retry
-      } finally {
-        setDeletingAgentId(null);
+  const handleDeleteAgent = useCallback(async (agentId: string) => {
+    setDeletingAgentId(agentId);
+    try {
+      const res = await fetch(
+        `/api/cloud/compat/agents/${encodeURIComponent(agentId)}`,
+        { method: "DELETE" },
+      );
+      const data = await res.json();
+      if (data.success) {
+        setCloudAgents((prev) => prev.filter((a) => a.agent_id !== agentId));
       }
-    },
-    [],
-  );
+    } catch {
+      // Silently fail — user can retry
+    } finally {
+      setDeletingAgentId(null);
+    }
+  }, []);
 
   const handleRefresh = useCallback(async () => {
     setRefreshing(true);
