@@ -10,9 +10,11 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
+import { createTranslator } from "./i18n";
 import {
   type AgentStartupDiagnostics,
   type AgentStatus,
@@ -214,58 +216,12 @@ export function getVrmNeedsFlip(index: number): boolean {
 
 // ── Theme ──────────────────────────────────────────────────────────────
 
-const THEME_STORAGE_KEY = "milady:theme";
 const UI_LANGUAGE_STORAGE_KEY = "milady:ui-language";
 const UI_SHELL_MODE_STORAGE_KEY = "milady:ui-shell-mode";
 
 export type UiShellMode = "companion" | "native";
 
-export type ThemeName =
-  | "milady"
-  | "milady-classic"
-  | "qt314"
-  | "web2000"
-  | "programmer"
-  | "haxor"
-  | "psycho"
-  | "dark";
-
-export const THEMES: ReadonlyArray<{
-  id: ThemeName;
-  label: string;
-  hint: string;
-}> = [
-    { id: "milady", label: "milady", hint: "BSC yellow default" },
-    { id: "milady-classic", label: "milady classic", hint: "sage green retro" },
-    { id: "qt314", label: "qt3.14", hint: "soft pastels" },
-    { id: "web2000", label: "web2000", hint: "green hacker vibes" },
-    { id: "programmer", label: "programmer", hint: "vscode dark" },
-    { id: "haxor", label: "haxor", hint: "terminal green" },
-    { id: "psycho", label: "psycho", hint: "pure chaos" },
-    { id: "dark", label: "dark", hint: "clean dark mode" },
-  ];
-
-const VALID_THEMES = new Set<string>(THEMES.map((t) => t.id));
 const AGENT_TRANSFER_MIN_PASSWORD_LENGTH = 4;
-
-function loadTheme(): ThemeName {
-  try {
-    const stored = localStorage.getItem(THEME_STORAGE_KEY);
-    if (stored && VALID_THEMES.has(stored)) return stored as ThemeName;
-  } catch {
-    /* ignore */
-  }
-  return "milady";
-}
-
-function applyTheme(name: ThemeName) {
-  document.documentElement.setAttribute("data-theme", name);
-  try {
-    localStorage.setItem(THEME_STORAGE_KEY, name);
-  } catch {
-    /* ignore */
-  }
-}
 
 function loadUiLanguage(): UiLanguage {
   try {
@@ -397,7 +353,6 @@ export type OnboardingStep =
   | "ownerName"
   | "avatar"
   | "style"
-  | "theme"
   | "setupMode"
   | "mint"
   | "runMode"
@@ -829,7 +784,6 @@ export interface AppState {
   // Core
   tab: Tab;
   uiShellMode: UiShellMode;
-  currentTheme: ThemeName;
   uiLanguage: UiLanguage;
   connected: boolean;
   agentStatus: AgentStatus | null;
@@ -1048,7 +1002,6 @@ export interface AppState {
   onboardingOwnerName: string;
   onboardingSetupMode: "" | "quick" | "advanced";
   onboardingStyle: string;
-  onboardingTheme: ThemeName;
   onboardingRunMode: "local-rawdog" | "local-sandbox" | "cloud" | "";
   onboardingCloudProvider: string;
   onboardingSmallModel: string;
@@ -1128,7 +1081,6 @@ export interface AppActions {
   // Navigation
   setTab: (tab: Tab) => void;
   setUiShellMode: (mode: UiShellMode) => void;
-  setTheme: (theme: ThemeName) => void;
   setUiLanguage: (language: UiLanguage) => void;
 
   // Lifecycle
@@ -1287,6 +1239,9 @@ export interface AppActions {
 
   // Clipboard
   copyToClipboard: (text: string) => Promise<void>;
+
+  // Translations
+  t: (key: string, values?: Record<string, any>) => string;
 }
 
 type AppContextValue = AppState & AppActions;
@@ -1306,7 +1261,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [tab, setTabRaw] = useState<Tab>("chat");
   const [uiShellMode, setUiShellModeState] =
     useState<UiShellMode>(loadUiShellMode);
-  const [currentTheme, setCurrentTheme] = useState<ThemeName>(loadTheme);
   const [uiLanguage, setUiLanguageState] = useState<UiLanguage>(loadUiLanguage);
   const [connected, setConnected] = useState(false);
   const [agentStatus, setAgentStatus] = useState<AgentStatus | null>(null);
@@ -1667,7 +1621,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
     "" | "quick" | "advanced"
   >("");
   const [onboardingStyle, setOnboardingStyle] = useState("");
-  const [onboardingTheme, setOnboardingTheme] = useState<ThemeName>(loadTheme);
   const [onboardingRunMode, setOnboardingRunMode] = useState<
     "local-rawdog" | "local-sandbox" | "cloud" | ""
   >("");
@@ -1848,14 +1801,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // ── Theme ──────────────────────────────────────────────────────────
-
-  const setTheme = useCallback((name: ThemeName) => {
-    setCurrentTheme(name);
-    applyTheme(name);
-    // Sync to server so headless stream capture uses the same theme
-    client.saveStreamSettings({ theme: name }).catch(() => { });
-  }, []);
+  // ── Language ────────────────────────────────────────────────────────
 
   const setUiLanguage = useCallback(
     (language: UiLanguage) => {
@@ -4302,7 +4248,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
     try {
       await client.submitOnboarding({
         name: onboardingName,
-        theme: onboardingTheme,
         runMode: apiRunMode as "local" | "cloud",
         sandboxMode:
           onboardingRunMode === "local-sandbox"
@@ -4362,7 +4307,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
     onboardingOptions,
     onboardingStyle,
     onboardingName,
-    onboardingTheme,
     onboardingRunMode,
     onboardingCloudProvider,
     onboardingSmallModel,
@@ -4401,11 +4345,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         case "avatar":
           setOnboardingStep("style");
           break;
-        case "style":
-          setOnboardingStep("theme");
-          break;
-        case "theme": {
-          setTheme(onboardingTheme);
+        case "style": {
           // If drop is enabled and user hasn't minted, go to mint step
           if (
             dropStatus?.dropEnabled &&
@@ -4509,9 +4449,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       onboardingStep,
       onboardingOptions,
       onboardingRunMode,
-      onboardingTheme,
       onboardingSetupMode,
-      setTheme,
       cloudConnected,
       setActionNotice,
       handleOnboardingFinish,
@@ -4535,11 +4473,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       case "style":
         setOnboardingStep("avatar");
         break;
-      case "theme":
-        setOnboardingStep("style");
-        break;
       case "mint":
-        setOnboardingStep("theme");
+        setOnboardingStep("style");
         break;
       case "setupMode":
         if (
@@ -4549,7 +4484,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         ) {
           setOnboardingStep("mint");
         } else {
-          setOnboardingStep("theme");
+          setOnboardingStep("style");
         }
         break;
       case "runMode":
@@ -4748,7 +4683,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
     if (exportPassword.length < AGENT_TRANSFER_MIN_PASSWORD_LENGTH) {
       setExportError(
-        `Password must be at least ${AGENT_TRANSFER_MIN_PASSWORD_LENGTH} characters.`,
+        `Password must be at least ${AGENT_TRANSFER_MIN_PASSWORD_LENGTH} characters.`
       );
       setExportSuccess(null);
       return;
@@ -4772,7 +4707,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
       setExportSuccess(
-        `Exported successfully (${(blob.size / 1024).toFixed(0)} KB)`,
+        `Exported successfully (${(blob.size / 1024).toFixed(0)} KB)`
       );
       setExportPassword("");
     } catch (err) {
@@ -4797,7 +4732,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
     if (importPassword.length < AGENT_TRANSFER_MIN_PASSWORD_LENGTH) {
       setImportError(
-        `Password must be at least ${AGENT_TRANSFER_MIN_PASSWORD_LENGTH} characters.`,
+        `Password must be at least ${AGENT_TRANSFER_MIN_PASSWORD_LENGTH} characters.`
       );
       setImportSuccess(null);
       return;
@@ -4818,7 +4753,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         .filter(Boolean)
         .join(", ");
       setImportSuccess(
-        `Imported "${result.agentName}" successfully: ${summary || "no data"}. Restart the agent to activate.`,
+        `Imported "${result.agentName}" successfully: ${summary || "no data"}. Restart the agent to activate.`
       );
       setImportPassword("");
       setImportFile(null);
@@ -4894,7 +4829,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
         onboardingOwnerName: setOnboardingOwnerName,
         onboardingSetupMode: setOnboardingSetupMode,
         onboardingStyle: setOnboardingStyle,
-        onboardingTheme: setOnboardingTheme,
         onboardingRunMode: setOnboardingRunMode,
         onboardingCloudProvider: setOnboardingCloudProvider,
         onboardingSmallModel: setOnboardingSmallModel,
@@ -4983,7 +4917,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
   // ── Initialization ─────────────────────────────────────────────────
 
   useEffect(() => {
-    applyTheme(currentTheme);
     const startupRunId = startupRetryNonce;
     let unbindStatus: (() => void) | null = null;
     let unbindAgentEvents: (() => void) | null = null;
@@ -5847,7 +5780,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [
     appendAutonomousEvent,
     checkExtensionStatus,
-    currentTheme,
     fetchAutonomyReplay,
     loadCharacter,
     loadInventory,
@@ -5894,11 +5826,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   // ── Context value ──────────────────────────────────────────────────
 
+  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+
   const value: AppContextValue = {
+    // Translations
+    t,
     // State
     tab,
     uiShellMode,
-    currentTheme,
     uiLanguage,
     connected,
     agentStatus,
@@ -6065,7 +6000,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
     onboardingOwnerName,
     onboardingSetupMode,
     onboardingStyle,
-    onboardingTheme,
     onboardingRunMode,
     onboardingCloudProvider,
     onboardingSmallModel,
@@ -6125,7 +6059,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
     // Actions
     setTab,
     setUiShellMode,
-    setTheme,
     setUiLanguage,
     handleStart,
     handleStop,
