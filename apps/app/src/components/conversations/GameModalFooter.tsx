@@ -9,8 +9,7 @@ import {
   COMPUTER_CAPABILITY_PLUGIN_IDS,
   estimateTokenCost,
   isNonChatModelLabel,
-  resolveProviderLabel,
-} from "./conversation-utils";
+  resolveProviderLabel } from "./conversation-utils";
 
 interface GameModalFooterProps {
   selfStatus: AgentSelfStatusSnapshot | null;
@@ -33,8 +32,7 @@ export function GameModalFooter({
   selfStatusLoading,
   agentStatusModel,
   chatLastUsage,
-  t,
-}: GameModalFooterProps) {
+  t }: GameModalFooterProps) {
   const selfModelLabel = (selfStatus?.model ?? "").trim();
   const observedModelLabelRaw = (chatLastUsage?.model ?? "").trim();
   const observedModelLabel = isNonChatModelLabel(observedModelLabelRaw)
@@ -103,32 +101,27 @@ export function GameModalFooter({
         key: "trade",
         label: t("chat.modal.capTrade"),
         enabled: tradeEnabled,
-        hint: tradeHint,
-      },
+        hint: tradeHint },
       {
         key: "autoTrade",
         label: t("chat.modal.capAutoTrade"),
         enabled: autoTradeEnabled,
-        hint: autoTradeHint,
-      },
+        hint: autoTradeHint },
       {
         key: "browser",
         label: t("chat.modal.capBrowser"),
         enabled: browserEnabled,
-        hint: browserHint,
-      },
+        hint: browserHint },
       {
         key: "computer",
         label: t("chat.modal.capComputer"),
         enabled: computerEnabled,
-        hint: computerHint,
-      },
+        hint: computerHint },
       {
         key: "terminal",
         label: t("chat.modal.capTerminal"),
         enabled: terminalEnabled,
-        hint: terminalHint,
-      },
+        hint: terminalHint },
     ] as const;
   }, [selfStatus, t]);
 

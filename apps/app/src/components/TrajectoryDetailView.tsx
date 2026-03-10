@@ -6,19 +6,16 @@
  */
 
 import { ChevronDown, ChevronRight } from "lucide-react";
-import { useCallback, useEffect, useState, useMemo } from "react";
+import { useCallback, useEffect, useState} from "react";
 import {
   client,
   type TrajectoryDetailResult,
-  type TrajectoryLlmCall,
-} from "../api-client";
+  type TrajectoryLlmCall } from "../api-client";
 import {
   formatTrajectoryDuration,
   formatTrajectoryTimestamp,
-  formatTrajectoryTokenCount,
-} from "./trajectory-format";
+  formatTrajectoryTokenCount } from "./trajectory-format";
 import { useApp } from "../AppContext";
-import { createTranslator } from "../i18n";
 
 interface TrajectoryDetailViewProps {
   trajectoryId: string;
@@ -40,8 +37,7 @@ function estimateCost(
     "claude-3-opus": [15, 75],
     "claude-3-sonnet": [3, 15],
     "claude-3-haiku": [0.25, 1.25],
-    "claude-3.5-sonnet": [3, 15],
-  };
+    "claude-3.5-sonnet": [3, 15] };
 
   // Find matching model (partial match)
   let inputCost = 1;
@@ -64,8 +60,7 @@ function estimateCost(
 }
 
 function CodeBlock({ content, label }: { content: string; label: string }) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  const { t } = useApp();
   const [expanded, setExpanded] = useState(false);
   const lines = content.split("\n").length;
   const shouldTruncate = !expanded && lines > 20;
@@ -110,13 +105,11 @@ function CodeBlock({ content, label }: { content: string; label: string }) {
 
 function LlmCallCard({
   call,
-  index,
-}: {
+  index }: {
   call: TrajectoryLlmCall;
   index: number;
 }) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  const { t } = useApp();
   const [showSystem, setShowSystem] = useState(false);
   const promptTokens = call.promptTokens ?? 0;
   const completionTokens = call.completionTokens ?? 0;
@@ -213,10 +206,8 @@ function LlmCallCard({
 
 export function TrajectoryDetailView({
   trajectoryId,
-  onBack,
-}: TrajectoryDetailViewProps) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  onBack }: TrajectoryDetailViewProps) {
+  const { t } = useApp();
   const [loading, setLoading] = useState(true);
   const [detail, setDetail] = useState<TrajectoryDetailResult | null>(null);
   const [error, setError] = useState<string | null>(null);

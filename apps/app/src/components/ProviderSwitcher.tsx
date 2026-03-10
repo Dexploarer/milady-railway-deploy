@@ -5,19 +5,17 @@
  * Composes SubscriptionStatus and ApiKeyConfig sub-components.
  */
 
-import { useCallback, useEffect, useRef, useState, useMemo } from "react";
+import { useCallback, useEffect, useRef, useState} from "react";
 import {
   client,
   type OnboardingOptions,
-  type PluginParamDef,
-} from "../api-client";
+  type PluginParamDef } from "../api-client";
 import type { ConfigUiHint } from "../types";
 import { ApiKeyConfig } from "./ApiKeyConfig";
 import type { JsonSchemaObject } from "./config-catalog";
 import { ConfigRenderer, defaultRegistry } from "./config-renderer";
 import { SubscriptionStatus } from "./SubscriptionStatus";
 import { useApp } from "../AppContext";
-import { createTranslator } from "../i18n";
 
 interface PluginInfo {
   id: string;
@@ -78,10 +76,9 @@ export function ProviderSwitcher({
   handleCloudLogin,
   handleCloudDisconnect,
   setState,
-  setTab,
-}: ProviderSwitcherProps) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  setTab }: ProviderSwitcherProps) {
+  const {
+    t } = useApp();
   /* ── Model selection state ─────────────────────────────────────── */
   const [modelOptions, setModelOptions] = useState<
     OnboardingOptions["models"] | null
@@ -290,10 +287,8 @@ export function ProviderSwitcher({
           await client.updateConfig({
             cloud: {
               services: { inference: false },
-              inferenceMode: "byok",
-            },
-            env: { vars: { MILADY_USE_PI_AI: "" } },
-          });
+              inferenceMode: "byok" },
+            env: { vars: { MILADY_USE_PI_AI: "" } } });
           setPiAiEnabled(false);
           setCloudHandlesInference(false);
           if (!willTogglePlugins) {
@@ -340,10 +335,8 @@ export function ProviderSwitcher({
         await client.updateConfig({
           cloud: {
             services: { inference: false },
-            inferenceMode: "byok",
-          },
-          env: { vars: { MILADY_USE_PI_AI: "" } },
-        });
+            inferenceMode: "byok" },
+          env: { vars: { MILADY_USE_PI_AI: "" } } });
         const switchId =
           providerId === "anthropic-subscription"
             ? "anthropic-subscription"
@@ -374,15 +367,12 @@ export function ProviderSwitcher({
         cloud: {
           enabled: true,
           services: { inference: true },
-          inferenceMode: "cloud",
-        },
+          inferenceMode: "cloud" },
         env: { vars: { MILADY_USE_PI_AI: "" } },
         agents: { defaults: { model: { primary: null } } },
         models: {
           small: currentSmallModel || "moonshotai/kimi-k2-turbo",
-          large: currentLargeModel || "moonshotai/kimi-k2-0905",
-        },
-      });
+          large: currentLargeModel || "moonshotai/kimi-k2-0905" } });
       setState("cloudEnabled", true);
       setCloudHandlesInference(true);
       setPiAiEnabled(false);
@@ -399,17 +389,12 @@ export function ProviderSwitcher({
       await client.updateConfig({
         cloud: {
           services: { inference: false },
-          inferenceMode: "byok",
-        },
+          inferenceMode: "byok" },
         env: { vars: { MILADY_USE_PI_AI: "1" } },
         agents: {
           defaults: {
             model: {
-              primary: piAiModelSpec.trim() || null,
-            },
-          },
-        },
-      });
+              primary: piAiModelSpec.trim() || null } } } });
       setPiAiEnabled(true);
       setPiAiSaveSuccess(true);
       setTimeout(() => setPiAiSaveSuccess(false), 2000);
@@ -451,13 +436,11 @@ export function ProviderSwitcher({
     ...subscriptionProviders.map((provider) => ({
       id: provider.id,
       label: provider.label,
-      disabled: false,
-    })),
+      disabled: false })),
     ...allAiProviders.map((provider) => ({
       id: provider.id,
       label: provider.name,
-      disabled: false,
-    })),
+      disabled: false })),
   ];
 
   if (totalCols === 0) {
@@ -600,20 +583,15 @@ export function ProviderSwitcher({
                       small: {
                         type: "string",
                         enum: modelOptions.small.map((m) => m.id),
-                        description: "Fast model for simple tasks",
-                      },
+                        description: "Fast model for simple tasks" },
                       large: {
                         type: "string",
                         enum: modelOptions.large.map((m) => m.id),
-                        description: "Powerful model for complex reasoning",
-                      },
-                    },
-                    required: [] as string[],
-                  };
+                        description: "Powerful model for complex reasoning" } },
+                    required: [] as string[] };
                   const modelHints: Record<string, ConfigUiHint> = {
                     small: { label: "Small Model", width: "half" },
-                    large: { label: "Large Model", width: "half" },
-                  };
+                    large: { label: "Large Model", width: "half" } };
                   const modelValues: Record<string, unknown> = {};
                   const modelSetKeys = new Set<string>();
                   if (currentSmallModel) {
@@ -638,8 +616,7 @@ export function ProviderSwitcher({
                         if (key === "large") setCurrentLargeModel(val);
                         const updated = {
                           small: key === "small" ? val : currentSmallModel,
-                          large: key === "large" ? val : currentLargeModel,
-                        };
+                          large: key === "large" ? val : currentLargeModel };
                         void (async () => {
                           setModelSaving(true);
                           try {

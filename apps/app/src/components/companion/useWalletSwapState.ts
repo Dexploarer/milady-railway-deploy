@@ -6,16 +6,14 @@ import type {
   BscTradeQuoteRequest,
   BscTradeQuoteResponse,
   BscTradeTxStatusResponse,
-  EvmChainBalance,
-} from "../../api-client";
+  EvmChainBalance } from "../../api-client";
 import {
   BSC_SWAP_GAS_RESERVE,
   formatRouteAddress,
   HEX_ADDRESS_RE,
   mapWalletTradeError,
   type TranslatorFn,
-  type WalletRecentTrade,
-} from "./walletUtils";
+  type WalletRecentTrade } from "./walletUtils";
 
 export type UseWalletSwapStateArgs = {
   bscChain: EvmChainBalance | null;
@@ -53,8 +51,7 @@ export function useWalletSwapState(args: UseWalletSwapStateArgs) {
     getBscTradeQuote,
     executeBscTrade,
     setActionNotice,
-    t,
-  } = args;
+    t } = args;
 
   const [swapSide, setSwapSide] = useState<"buy" | "sell">("buy");
   const [swapTokenAddress, setSwapTokenAddress] = useState("");
@@ -139,8 +136,7 @@ export function useWalletSwapState(args: UseWalletSwapStateArgs) {
       return {
         ...preset,
         value,
-        active: swapAmount.trim() === value,
-      };
+        active: swapAmount.trim() === value };
     });
   }, [formatSwapAmount, swapAmount, swapAvailableAmountNum, swapCanUsePresets]);
 
@@ -210,8 +206,7 @@ export function useWalletSwapState(args: UseWalletSwapStateArgs) {
         side: swapSide,
         tokenAddress: token,
         amount,
-        slippageBps: swapSlippageBps,
-      });
+        slippageBps: swapSlippageBps });
       setSwapQuote(quote);
       setSwapLastTxHash(null);
       setSwapUserSignTx(null);
@@ -258,8 +253,7 @@ export function useWalletSwapState(args: UseWalletSwapStateArgs) {
         tokenAddress: swapQuote.tokenAddress,
         amount: swapQuote.quoteIn.amount,
         slippageBps: swapQuote.slippageBps,
-        confirm: true,
-      });
+        confirm: true });
 
       if (result.executed && result.execution?.hash) {
         const txHash = result.execution.hash;
@@ -281,16 +275,14 @@ export function useWalletSwapState(args: UseWalletSwapStateArgs) {
           nonce: result.execution.nonce ?? null,
           reason: null,
           explorerUrl:
-            result.execution.explorerUrl || `https://bscscan.com/tx/${txHash}`,
-        });
+            result.execution.explorerUrl || `https://bscscan.com/tx/${txHash}` });
         if (initialStatus === "pending") {
           recentTxRefreshAtRef.current[txHash] = Date.now();
           void refreshRecentTradeStatus(txHash, true);
         }
         setActionNotice(
           t("wallet.tradeSentWithHash", {
-            hash: `${txHash.slice(0, 10)}...`,
-          }),
+            hash: `${txHash.slice(0, 10)}...` }),
           "success",
           3600,
         );
@@ -375,6 +367,5 @@ export function useWalletSwapState(args: UseWalletSwapStateArgs) {
     handleSwapQuote,
     handleSwapExecute,
     handleSwapPreset,
-    resetSwapFlow,
-  };
+    resetSwapFlow };
 }

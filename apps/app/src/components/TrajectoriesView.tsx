@@ -5,47 +5,41 @@
  * Supports filtering, search, export, and clearing trajectories.
  */
 
-import { useCallback, useEffect, useState, useMemo } from "react";
+import { useCallback, useEffect, useState} from "react";
 import {
   client,
   type TrajectoryConfig,
   type TrajectoryListResult,
   type TrajectoryRecord,
-  type TrajectoryStats,
-} from "../api-client";
+  type TrajectoryStats } from "../api-client";
 import {
   formatTrajectoryDuration,
   formatTrajectoryTimestamp,
-  formatTrajectoryTokenCount,
-} from "./trajectory-format";
+  formatTrajectoryTokenCount } from "./trajectory-format";
 import { useApp } from "../AppContext";
-import { createTranslator } from "../i18n";
 
 type StatusFilter = "" | "active" | "completed" | "error";
 
 const STATUS_COLORS: Record<string, { bg: string; fg: string }> = {
   active: { bg: "rgba(59, 130, 246, 0.15)", fg: "rgb(59, 130, 246)" },
   completed: { bg: "rgba(34, 197, 94, 0.15)", fg: "rgb(34, 197, 94)" },
-  error: { bg: "rgba(239, 68, 68, 0.15)", fg: "rgb(239, 68, 68)" },
-};
+  error: { bg: "rgba(239, 68, 68, 0.15)", fg: "rgb(239, 68, 68)" } };
 
 const SOURCE_COLORS: Record<string, { bg: string; fg: string }> = {
   chat: { bg: "rgba(99, 102, 241, 0.15)", fg: "rgb(99, 102, 241)" },
   autonomy: { bg: "rgba(245, 158, 11, 0.15)", fg: "rgb(245, 158, 11)" },
   telegram: { bg: "rgba(34, 197, 94, 0.15)", fg: "rgb(34, 197, 94)" },
   discord: { bg: "rgba(88, 101, 242, 0.15)", fg: "rgb(88, 101, 242)" },
-  api: { bg: "rgba(156, 163, 175, 0.15)", fg: "rgb(156, 163, 175)" },
-};
+  api: { bg: "rgba(156, 163, 175, 0.15)", fg: "rgb(156, 163, 175)" } };
 
 interface TrajectoriesViewProps {
   onSelectTrajectory?: (id: string) => void;
 }
 
 export function TrajectoriesView({
-  onSelectTrajectory,
-}: TrajectoriesViewProps) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  onSelectTrajectory }: TrajectoriesViewProps) {
+  const {
+    t } = useApp();
   const [loading, setLoading] = useState(true);
   const [result, setResult] = useState<TrajectoryListResult | null>(null);
   const [stats, setStats] = useState<TrajectoryStats | null>(null);
@@ -73,8 +67,7 @@ export function TrajectoriesView({
           offset: page * pageSize,
           status: statusFilter || undefined,
           source: sourceFilter || undefined,
-          search: searchQuery || undefined,
-        }),
+          search: searchQuery || undefined }),
         client.getTrajectoryStats(),
         client.getTrajectoryConfig(),
       ]);
@@ -187,12 +180,10 @@ export function TrajectoriesView({
             <span className="text-muted text-[10px]">
               (
               {formatTrajectoryTokenCount(stats.totalPromptTokens, {
-                emptyLabel: "0",
-              })}
+                emptyLabel: "0" })}
               ↑{" "}
               {formatTrajectoryTokenCount(stats.totalCompletionTokens, {
-                emptyLabel: "0",
-              })}
+                emptyLabel: "0" })}
               ↓)
             </span>
           </div>
@@ -399,8 +390,7 @@ export function TrajectoriesView({
                         className="inline-block text-[10px] px-1.5 py-px rounded"
                         style={{
                           background: sourceColor.bg,
-                          color: sourceColor.fg,
-                        }}
+                          color: sourceColor.fg }}
                       >
                         {traj.source}
                       </span>
@@ -410,8 +400,7 @@ export function TrajectoriesView({
                         className="inline-block text-[10px] px-1.5 py-px rounded"
                         style={{
                           background: statusColor.bg,
-                          color: statusColor.fg,
-                        }}
+                          color: statusColor.fg }}
                       >
                         {traj.status}
                       </span>

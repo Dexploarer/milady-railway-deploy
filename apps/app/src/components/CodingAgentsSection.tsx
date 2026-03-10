@@ -9,8 +9,7 @@ const AGENT_LABELS: Record<string, string> = {
   claude: "Claude",
   gemini: "Gemini",
   codex: "Codex",
-  aider: "Aider",
-};
+  aider: "Aider" };
 
 /** Status dot color classes. */
 const STATUS_DOT: Record<string, string> = {
@@ -19,8 +18,7 @@ const STATUS_DOT: Record<string, string> = {
   blocked: "bg-warn",
   error: "bg-danger",
   completed: "bg-ok opacity-50",
-  stopped: "bg-muted",
-};
+  stopped: "bg-muted" };
 
 interface CodingAgentsSectionProps {
   sessions: CodingAgentSession[];

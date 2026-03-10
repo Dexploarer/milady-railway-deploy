@@ -10,12 +10,11 @@
  */
 
 import { ChevronDown, X } from "lucide-react";
-import React, { useCallback, useRef, useState, useMemo } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import type { DynamicValue } from "../types";
 import type { FieldRenderer, FieldRenderProps } from "./config-catalog";
 import { resolveDynamic } from "./config-catalog";
 import { useApp } from "../AppContext";
-import { createTranslator } from "../i18n";
 
 // ── Action binding helper ──────────────────────────────────────────────
 
@@ -342,8 +341,7 @@ export function renderUrlField(props: FieldRenderProps) {
 
 /** Dropdown select. Options from hint.options or schema.enum. */
 export function renderSelectField(props: FieldRenderProps) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  const { t } = useApp();
   const enhancedOptions = (props.hint as Record<string, unknown>).options as
     | Array<{ value: string; label: string; description?: string }>
     | undefined;
@@ -357,12 +355,12 @@ export function renderSelectField(props: FieldRenderProps) {
     ? enhancedOptions.map((o) => ({
       value: o.value,
       label: o.label,
-      description: o.description,
+      description: o.description
     }))
     : plainOptions.map((o) => ({
       value: o,
       label: o,
-      description: undefined as string | undefined,
+      description: undefined as string | undefined
     }));
 
   const value = props.isSet ? String(props.value ?? "") : "";
@@ -406,14 +404,12 @@ export function renderSelectField(props: FieldRenderProps) {
 function SearchableSelectInner({
   fp: props,
   options,
-  effectiveValue,
-}: {
-  fp: FieldRenderProps;
-  options: Array<{ value: string; label: string; description?: string }>;
-  effectiveValue: string;
-}) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  effectiveValue }: {
+    fp: FieldRenderProps;
+    options: Array<{ value: string; label: string; description?: string }>;
+    effectiveValue: string;
+  }) {
+  const { t } = useApp();
   const matchingOpt = options.find((o) => o.value === effectiveValue);
   const [inputVal, setInputVal] = useState(
     matchingOpt?.label ?? effectiveValue,
@@ -690,7 +686,7 @@ function RadioFieldInner({ fp: props }: { fp: FieldRenderProps }) {
       | undefined) ??
     ((props.schema.enum as string[]) ?? []).map((v) => ({
       value: String(v),
-      label: String(v),
+      label: String(v)
     }));
 
   const initial = props.isSet
@@ -754,7 +750,7 @@ function MultiselectFieldInner({ fp: props }: { fp: FieldRenderProps }) {
       | undefined) ??
     ((props.schema.items?.enum as string[]) ?? []).map((v) => ({
       value: String(v),
-      label: String(v),
+      label: String(v)
     }));
 
   const rawVal = props.isSet ? props.value : [];
@@ -973,21 +969,19 @@ function ArrayItem({
   onRemove,
   onMoveUp,
   onMoveDown,
-  onBlur,
-}: {
-  index: number;
-  value: string;
-  total: number;
-  hasError: boolean;
-  readonly?: boolean;
-  onChange: (value: string) => void;
-  onRemove: () => void;
-  onMoveUp: () => void;
-  onMoveDown: () => void;
-  onBlur: () => void;
-}) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  onBlur }: {
+    index: number;
+    value: string;
+    total: number;
+    hasError: boolean;
+    readonly?: boolean;
+    onChange: (value: string) => void;
+    onRemove: () => void;
+    onMoveUp: () => void;
+    onMoveDown: () => void;
+    onBlur: () => void;
+  }) {
+  const { t } = useApp();
   return (
     <div className="flex items-center gap-1">
       {!readonly && (
@@ -1126,7 +1120,7 @@ function KeyValueFieldInner({ fp: props }: { fp: FieldRenderProps }) {
     rawVal && typeof rawVal === "object" && !Array.isArray(rawVal)
       ? Object.entries(rawVal as Record<string, unknown>).map(([k, v]) => ({
         key: k,
-        value: String(v ?? ""),
+        value: String(v ?? "")
       }))
       : [];
   const [pairs, setPairs] = useState(initialPairs);
@@ -1304,7 +1298,7 @@ export function renderCustomField(props: FieldRenderProps) {
  * Simple markdown renderer for preview mode.
  * Converts basic markdown patterns to React elements without external dependencies.
  */
-function renderMarkdown(text: string, t: (key: string) => string): React.ReactNode {
+function renderMarkdown(text: string): React.ReactNode {
   if (!text) return null;
 
   const blocks = text.split(/\n\n+/);
@@ -1463,8 +1457,7 @@ function processSimpleInline(text: string, key: number): React.ReactNode {
 }
 
 function MarkdownFieldInner(props: FieldRenderProps) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  const { t } = useApp();
   const [preview, setPreview] = useState(false);
   const value = typeof props.value === "string" ? props.value : "";
 
@@ -1501,7 +1494,7 @@ function MarkdownFieldInner(props: FieldRenderProps) {
           data-field-type="markdown"
         >
           {value ? (
-            renderMarkdown(value, t)
+            renderMarkdown(value)
           ) : (
             <span className="text-[var(--muted)] italic">
 
@@ -1552,7 +1545,7 @@ function CheckboxGroupInner(props: FieldRenderProps) {
     props.hint.options ??
     (props.schema.enum as string[] | undefined)?.map((v) => ({
       value: v,
-      label: v,
+      label: v
     })) ??
     [];
 
@@ -1781,7 +1774,7 @@ export const defaultRenderers: Record<string, FieldRenderer> = {
   markdown: renderMarkdownField,
   "checkbox-group": renderCheckboxGroupField,
   group: renderGroupField,
-  table: renderTableField,
+  table: renderTableField
 };
 
 // ── ConfigField wrapper component ───────────────────────────────────────
@@ -1793,12 +1786,11 @@ export const defaultRenderers: Record<string, FieldRenderer> = {
 export function ConfigField({
   renderProps,
   renderer,
-  pluginId,
-}: {
-  renderProps: FieldRenderProps;
-  renderer: FieldRenderer;
-  pluginId?: string;
-}) {
+  pluginId }: {
+    renderProps: FieldRenderProps;
+    renderer: FieldRenderer;
+    pluginId?: string;
+  }) {
   const { t } = useApp();
   const label = renderProps.hint.label ?? renderProps.key;
   const envKey = renderProps.key;
@@ -1834,7 +1826,7 @@ export function ConfigField({
             className="font-semibold leading-tight truncate"
             style={{
               fontSize: "var(--plugin-label-size)",
-              color: "var(--plugin-label)",
+              color: "var(--plugin-label)"
             }}
           >
             {label}
@@ -1872,7 +1864,7 @@ export function ConfigField({
                 className="leading-snug flex items-start gap-1"
                 style={{
                   fontSize: "var(--plugin-error-size)",
-                  color: "var(--plugin-error)",
+                  color: "var(--plugin-error)"
                 }}
               >
                 <span className="shrink-0 mt-px">{t("config-field.Times")}</span>
@@ -1888,7 +1880,7 @@ export function ConfigField({
             className="mt-1 leading-relaxed line-clamp-2"
             style={{
               fontSize: "var(--plugin-help-size)",
-              color: "var(--plugin-help)",
+              color: "var(--plugin-help)"
             }}
           >
             {renderProps.hint.help ?? renderProps.schema.description}

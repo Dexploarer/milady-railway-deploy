@@ -3,10 +3,8 @@ import { useApp } from "../AppContext.js";
 import {
   type AgentAutomationMode,
   client,
-  type TradePermissionMode,
-} from "../api-client.js";
+  type TradePermissionMode } from "../api-client.js";
 import { dispatchWindowEvent, SELF_STATUS_SYNC_EVENT } from "../events";
-import { createTranslator } from "../i18n";
 import { ChatView } from "./ChatView.js";
 import { ConversationsSidebar } from "./ConversationsSidebar.js";
 
@@ -55,8 +53,7 @@ interface ChatModalViewProps {
 
 export function ChatModalView({
   variant = "full-overlay",
-  onRequestClose,
-}: ChatModalViewProps) {
+  onRequestClose }: ChatModalViewProps) {
   const {
     conversations,
     activeConversationId,
@@ -65,9 +62,7 @@ export function ChatModalView({
     setActionNotice,
     setState,
     setTab,
-    uiLanguage,
-  } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+    t } = useApp();
 
   const [moreOpen, setMoreOpen] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
@@ -323,8 +318,7 @@ export function ChatModalView({
                 className="chat-game-mobile-sidebar-btn"
                 onClick={() => setMobileSidebarOpen((open) => !open)}
                 title={t("chat.modal.participants", {
-                  count: conversations.length,
-                })}
+                  count: conversations.length })}
               >
                 <svg
                   width="15"

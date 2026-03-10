@@ -10,8 +10,7 @@ import {
   getVrmNeedsFlip,
   getVrmPreviewUrl,
   getVrmUrl,
-  useApp,
-} from "../AppContext";
+  useApp } from "../AppContext";
 import { client } from "../api-client";
 import { resolveAppAssetUrl } from "../asset-url";
 import { STOP_EMOTE_EVENT } from "../events";
@@ -27,8 +26,7 @@ export interface ChatAvatarProps {
 
 export function ChatAvatar({
   mouthOpen = 0,
-  isSpeaking = false,
-}: ChatAvatarProps) {
+  isSpeaking = false }: ChatAvatarProps) {
   const { selectedVrmIndex, customVrmUrl } = useApp();
 
   // Resolve VRM path from selected index or custom upload
@@ -106,8 +104,7 @@ export function ChatAvatar({
           opacity: avatarVisible ? 0.95 : 0,
           transition: "opacity 0.45s ease-in-out",
           background:
-            "radial-gradient(circle at 50% 100%, rgba(255,255,255,0.08), transparent 60%)",
-        }}
+            "radial-gradient(circle at 50% 100%, rgba(255,255,255,0.08), transparent 60%)" }}
       >
         <div className="absolute inset-0 overflow-hidden">
           <div
@@ -117,8 +114,7 @@ export function ChatAvatar({
               transition: "opacity 0.45s ease",
               // Keep a stable full-body framing in the narrow chat sidebar.
               transform: "scale(1.02) translateY(1%)",
-              transformOrigin: "50% 42%",
-            }}
+              transformOrigin: "50% 42%" }}
           >
             <VrmViewer
               vrmPath={vrmPath}

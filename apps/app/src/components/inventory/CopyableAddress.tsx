@@ -6,8 +6,7 @@ import { useState } from "react";
 
 export function CopyableAddress({
   address,
-  onCopy,
-}: {
+  onCopy }: {
   address: string;
   onCopy: (text: string) => Promise<void>;
 }) {

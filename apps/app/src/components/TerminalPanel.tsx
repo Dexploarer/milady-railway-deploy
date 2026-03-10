@@ -11,20 +11,16 @@ import {
   Minimize2,
   Terminal,
   Trash2,
-  X,
-} from "lucide-react";
+  X } from "lucide-react";
 import {
   forwardRef,
   useCallback,
   useEffect,
   useImperativeHandle,
   useRef,
-  useState,
-  useMemo,
-} from "react";
+  useState } from "react";
 import { client } from "../api-client";
 import { useApp } from "../AppContext";
-import { createTranslator } from "../i18n";
 
 export interface TerminalPanelHandle {
   /** Programmatically run a command via the API. */
@@ -43,8 +39,8 @@ interface TerminalLine {
 
 export const TerminalPanel = forwardRef<TerminalPanelHandle>(
   function TerminalPanel(_props, ref) {
-    const { uiLanguage } = useApp();
-    const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+    const {
+    t } = useApp();
     const [open, setOpen] = useState(false);
     const [minimized, setMinimized] = useState(false);
     const [lines, setLines] = useState<TerminalLine[]>([]);
@@ -139,8 +135,7 @@ export const TerminalPanel = forwardRef<TerminalPanelHandle>(
       toggle: () => {
         setOpen((prev) => !prev);
       },
-      isOpen: () => open,
-    }));
+      isOpen: () => open }));
 
     const handleClear = useCallback(() => {
       setLines([]);

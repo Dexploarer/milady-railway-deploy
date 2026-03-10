@@ -9,7 +9,6 @@ import { useEffect, useMemo, useRef } from "react";
 import { registerWidget } from "../registry";
 import type { WidgetDefinition, WidgetRenderProps } from "../types";
 import { useApp } from "../../../../AppContext";
-import { createTranslator } from "../../../../i18n";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -88,10 +87,9 @@ function PeonHud({
   instance,
   events,
   agentMode,
-  agentName,
-}: WidgetRenderProps) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  agentName }: WidgetRenderProps) {
+  const {
+    t } = useApp();
   const accentColor = (instance.config.accentColor as string) ?? "#00e5ff";
   const showLabel = (instance.config.showLabel as boolean) ?? true;
   const showEventCount = (instance.config.showEventCount as boolean) ?? true;
@@ -164,8 +162,7 @@ function PeonHud({
         alignItems: "center",
         justifyContent: "center",
         fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
-        color: accentColor,
-      }}
+        color: accentColor }}
     >
       <canvas
         ref={canvasRef}
@@ -182,8 +179,7 @@ function PeonHud({
             letterSpacing: "0.15em",
             textTransform: "uppercase",
             opacity: 0.9,
-            textAlign: "center",
-          }}
+            textAlign: "center" }}
         >
           <div style={{ fontWeight: 600 }}>{modeLabel}</div>
           <div style={{ opacity: 0.6, fontSize: 9, marginTop: 2 }}>
@@ -198,8 +194,7 @@ function PeonHud({
             marginTop: 4,
             fontSize: 9,
             opacity: 0.5,
-            letterSpacing: "0.1em",
-          }}
+            letterSpacing: "0.1em" }}
         >
           {events.length}  {t("peonhudwidget.events")}
         </div>
@@ -224,26 +219,20 @@ const definition: WidgetDefinition = {
     accentColor: {
       type: "color",
       label: "Accent color",
-      default: "#00e5ff",
-    },
+      default: "#00e5ff" },
     showLabel: {
       type: "boolean",
       label: "Show mode label",
-      default: true,
-    },
+      default: true },
     showEventCount: {
       type: "boolean",
       label: "Show event count",
-      default: true,
-    },
-  },
+      default: true } },
   defaultConfig: {
     accentColor: "#00e5ff",
     showLabel: true,
-    showEventCount: true,
-  },
-  render: PeonHud,
-};
+    showEventCount: true },
+  render: PeonHud };
 
 registerWidget(definition);
 export default definition;

@@ -26,8 +26,7 @@ function normalizeOpenAICallbackInput(input: string):
   if (!trimmed) {
     return {
       ok: false,
-      error: "Paste the callback URL from the localhost:1455 page.",
-    };
+      error: "Paste the callback URL from the localhost:1455 page." };
   }
 
   const normalized =
@@ -62,8 +61,7 @@ function normalizeOpenAICallbackInput(input: string):
   if (!parsed.searchParams.get("code")) {
     return {
       ok: false,
-      error: "Callback URL is missing the ?code= parameter.",
-    };
+      error: "Callback URL is missing the ?code= parameter." };
   }
   return { ok: true, code: normalized };
 }
@@ -92,8 +90,7 @@ export function SubscriptionStatus({
   openaiConnected,
   setOpenaiConnected,
   handleSelectSubscription,
-  loadSubscriptionStatus,
-}: SubscriptionStatusProps) {
+  loadSubscriptionStatus }: SubscriptionStatusProps) {
     const { t } = useApp();
   const [subscriptionTab, setSubscriptionTab] = useState<"token" | "oauth">(
     "token",
@@ -304,8 +301,7 @@ export function SubscriptionStatus({
                 style={{
                   background: anthropicConnected
                     ? "var(--ok,#16a34a)"
-                    : "var(--warning,#f39c12)",
-                }}
+                    : "var(--warning,#f39c12)" }}
               />
               <span className="text-xs font-semibold">
                 {anthropicConnected
@@ -502,8 +498,7 @@ export function SubscriptionStatus({
                 style={{
                   background: openaiConnected
                     ? "var(--ok,#16a34a)"
-                    : "var(--warning,#f39c12)",
-                }}
+                    : "var(--warning,#f39c12)" }}
               />
               <span className="text-xs font-semibold">
                 {openaiConnected

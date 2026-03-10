@@ -19,8 +19,7 @@ export interface ActionNotice {
 }
 
 export function ShellOverlays({
-  actionNotice,
-}: {
+  actionNotice }: {
   actionNotice: ActionNotice | null;
 }) {
   return (

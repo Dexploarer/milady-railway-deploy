@@ -29,8 +29,7 @@ export function WalletSendPanel({
   sendUserSignTx,
   handleSendExecute,
   handleCopyUserSignPayload,
-  t,
-}: WalletSendPanelProps) {
+  t }: WalletSendPanelProps) {
   return (
     <div className="anime-wallet-action-body">
       <label className="anime-wallet-field">

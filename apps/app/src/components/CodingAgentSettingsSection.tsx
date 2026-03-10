@@ -2,8 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { client } from "../api-client";
 import { ConfigSaveFooter } from "./ConfigSaveFooter";
 import { useApp } from "../AppContext";
-import { useMemo } from "react";
-import { createTranslator } from "../i18n";
+import {} from "react";
 
 type AgentTab = "claude" | "gemini" | "codex" | "aider";
 type AiderProvider = "anthropic" | "openai" | "google";
@@ -19,13 +18,11 @@ const APPROVAL_PRESETS: {
     {
       value: "standard",
       label: "Standard",
-      desc: "Read + write, asks for shell/network",
-    },
+      desc: "Read + write, asks for shell/network" },
     {
       value: "permissive",
       label: "Permissive",
-      desc: "File ops auto-approved, asks for shell",
-    },
+      desc: "File ops auto-approved, asks for shell" },
     { value: "autonomous", label: "Autonomous", desc: "All tools auto-approved" },
   ];
 
@@ -45,8 +42,7 @@ const AGENT_PROVIDER_MAP: Record<AgentTab, string> = {
 const AIDER_PROVIDER_MAP: Record<AiderProvider, string> = {
   anthropic: "anthropic",
   openai: "openai",
-  google: "google-genai",
-};
+  google: "google-genai" };
 
 // Hardcoded fallbacks — only used when API fetch returns nothing
 const FALLBACK_MODELS: Record<string, ModelOption[]> = {
@@ -63,22 +59,19 @@ const FALLBACK_MODELS: Record<string, ModelOption[]> = {
     { value: "o3", label: "o3" },
     { value: "o4-mini", label: "o4-mini" },
     { value: "gpt-4o", label: "GPT-4o" },
-  ],
-};
+  ] };
 
 const AGENT_LABELS: Record<AgentTab, string> = {
   claude: "Claude",
   gemini: "Gemini",
   codex: "Codex",
-  aider: "Aider",
-};
+  aider: "Aider" };
 
 const ENV_PREFIX: Record<AgentTab, string> = {
   claude: "PARALLAX_CLAUDE",
   gemini: "PARALLAX_GEMINI",
   codex: "PARALLAX_CODEX",
-  aider: "PARALLAX_AIDER",
-};
+  aider: "PARALLAX_AIDER" };
 
 export function CodingAgentSettingsSection() {
   const [activeTab, setActiveTab] = useState<AgentTab>("claude");
@@ -90,8 +83,8 @@ export function CodingAgentSettingsSection() {
 
   // Model preferences stored by env var name
   const [prefs, setPrefs] = useState<Record<string, string>>({});
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  const {
+    t } = useApp();
 
   // Dynamic model lists keyed by provider ID (e.g. "anthropic" → ModelOption[])
   const [providerModels, setProviderModels] = useState<

@@ -1,7 +1,6 @@
-import { useCallback, useEffect, useRef, useState, useMemo } from "react";
+import { useCallback, useEffect, useRef, useState} from "react";
 import { client } from "../../api-client";
 import { useApp } from "../../AppContext";
-import { createTranslator } from "../../i18n";
 
 interface TerminalLine {
   id: string;
@@ -11,8 +10,8 @@ interface TerminalLine {
 }
 
 export function StreamTerminal() {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  const {
+    t } = useApp();
   const [lines, setLines] = useState<TerminalLine[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const lineIdRef = useRef(0);

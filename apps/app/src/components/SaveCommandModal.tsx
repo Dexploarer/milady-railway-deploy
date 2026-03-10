@@ -2,9 +2,8 @@
  * Modal for naming and saving a custom /command from selected text.
  */
 
-import { useCallback, useEffect, useId, useRef, useState, useMemo } from "react";
+import { useCallback, useEffect, useId, useRef, useState} from "react";
 import { useApp } from "../AppContext";
-import { createTranslator } from "../i18n";
 
 interface SaveCommandModalProps {
   open: boolean;
@@ -19,10 +18,9 @@ export function SaveCommandModal({
   open,
   text,
   onSave,
-  onClose,
-}: SaveCommandModalProps) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  onClose }: SaveCommandModalProps) {
+  const {
+    t } = useApp();
   const [name, setName] = useState("");
   const [error, setError] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);

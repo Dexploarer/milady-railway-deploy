@@ -5,7 +5,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useApp } from "../AppContext";
 import type { LogEntry } from "../api-client";
-import { createTranslator } from "../i18n";
 import { formatTime } from "./shared/format";
 
 /** Per-tag badge colour map. */
@@ -16,8 +15,7 @@ const TAG_COLORS: Record<string, { bg: string; fg: string }> = {
   cloud: { bg: "rgba(59, 130, 246, 0.15)", fg: "rgb(59, 130, 246)" },
   plugins: { bg: "rgba(168, 85, 247, 0.15)", fg: "rgb(168, 85, 247)" },
   autonomy: { bg: "rgba(245, 158, 11, 0.15)", fg: "rgb(245, 158, 11)" },
-  websocket: { bg: "rgba(20, 184, 166, 0.15)", fg: "rgb(20, 184, 166)" },
-};
+  websocket: { bg: "rgba(20, 184, 166, 0.15)", fg: "rgb(20, 184, 166)" } };
 
 export function LogsView() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -31,10 +29,8 @@ export function LogsView() {
     logSourceFilter,
     loadLogs,
     setState,
-  } = useApp();
+    t } = useApp();
 
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
 
   useEffect(() => {
     void loadLogs();
@@ -208,8 +204,7 @@ export function LogsView() {
                       style={{
                         background: c ? c.bg : "var(--bg-muted)",
                         color: c ? c.fg : "var(--muted)",
-                        fontFamily: "var(--font-body, sans-serif)",
-                      }}
+                        fontFamily: "var(--font-body, sans-serif)" }}
                     >
                       {t}
                     </span>

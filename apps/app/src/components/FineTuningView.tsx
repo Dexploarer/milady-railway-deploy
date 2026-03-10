@@ -1,10 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   parsePositiveFloat,
-  parsePositiveInteger,
-} from "../../../../src/utils/number-parsing";
+  parsePositiveInteger } from "../../../../src/utils/number-parsing";
 import { useApp } from "../AppContext";
-import { createTranslator } from "../i18n";
 import {
   client,
   type StartTrainingOptions,
@@ -15,8 +13,7 @@ import {
   type TrainingStatus,
   type TrainingStreamEvent,
   type TrainingTrajectoryDetail,
-  type TrainingTrajectoryList,
-} from "../api-client";
+  type TrainingTrajectoryList } from "../api-client";
 import { formatTime } from "./shared/format";
 
 const TRAINING_EVENT_KINDS = new Set<TrainingStreamEvent["kind"]>([
@@ -66,8 +63,7 @@ function asTrainingEvent(
       typeof payload.datasetId === "string" ? payload.datasetId : undefined,
     progress:
       typeof payload.progress === "number" ? payload.progress : undefined,
-    phase: typeof payload.phase === "string" ? payload.phase : undefined,
-  };
+    phase: typeof payload.phase === "string" ? payload.phase : undefined };
 }
 
 function summarizeAvailability(reason?: string): string {
@@ -80,8 +76,8 @@ function summarizeAvailability(reason?: string): string {
 }
 
 export function FineTuningView() {
-  const { handleRestart, setActionNotice, uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  const { handleRestart, setActionNotice,
+    t } = useApp();
 
   const [pageLoading, setPageLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -90,8 +86,7 @@ export function FineTuningView() {
   const [trajectoryList, setTrajectoryList] = useState<TrainingTrajectoryList>({
     available: false,
     total: 0,
-    trajectories: [],
-  });
+    trajectories: [] });
   const [selectedTrajectory, setSelectedTrajectory] =
     useState<TrainingTrajectoryDetail | null>(null);
   const [trajectoryLoading, setTrajectoryLoading] = useState(false);
@@ -154,8 +149,7 @@ export function FineTuningView() {
   const loadTrajectories = useCallback(async () => {
     const listed = await client.listTrainingTrajectories({
       limit: 100,
-      offset: 0,
-    });
+      offset: 0 });
     setTrajectoryList(listed);
   }, []);
 
@@ -268,8 +262,7 @@ export function FineTuningView() {
         model: startModel.trim() || undefined,
         iterations: parsePositiveInteger(startIterations),
         batchSize: parsePositiveInteger(startBatchSize),
-        learningRate: parsePositiveFloat(startLearningRate),
-      };
+        learningRate: parsePositiveFloat(startLearningRate) };
       const result = await client.startTrainingJob(options);
       setSelectedJobId(result.job.id);
       await Promise.all([loadJobs(), loadStatus()]);
@@ -329,8 +322,7 @@ export function FineTuningView() {
         {
           modelName: importModelName.trim() || undefined,
           baseModel: importBaseModel.trim() || undefined,
-          ollamaUrl: importOllamaUrl.trim() || undefined,
-        },
+          ollamaUrl: importOllamaUrl.trim() || undefined },
       );
       await loadModels();
       setActivateProviderModel(

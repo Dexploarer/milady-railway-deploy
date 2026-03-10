@@ -5,8 +5,7 @@ export function ConfigSaveFooter({
   saving,
   saveError,
   saveSuccess,
-  onSave,
-}: {
+  onSave }: {
   dirty: boolean;
   saving: boolean;
   saveError: string | null;

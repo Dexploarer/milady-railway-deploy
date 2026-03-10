@@ -24,8 +24,7 @@ export function TokensTable({
   visibleRows,
   visibleChainErrors,
   inventoryChainFocus,
-  handleUntrackToken,
-}: TokensTableProps) {
+  handleUntrackToken }: TokensTableProps) {
   if (walletLoading) {
     return (
       <div className="text-center py-10 text-muted italic text-xs">

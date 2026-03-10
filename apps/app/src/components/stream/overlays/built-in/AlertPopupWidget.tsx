@@ -26,8 +26,7 @@ function AlertPopup({ instance, events }: WidgetRenderProps) {
       title: isViewer ? "New Viewer!" : (from ?? "Alert"),
       body: isViewer
         ? `${from ?? "Someone"} joined the stream`
-        : getEventText(e),
-    } satisfies AlertEntry;
+        : getEventText(e) } satisfies AlertEntry;
   }, [events]);
 
   const [shown, setShown] = useState<AlertEntry | null>(null);
@@ -76,12 +75,9 @@ const definition: WidgetDefinition = {
       label: "Display duration (ms)",
       default: 5000,
       min: 2000,
-      max: 15000,
-    },
-  },
+      max: 15000 } },
   defaultConfig: { displayDuration: 5000 },
-  render: AlertPopup,
-};
+  render: AlertPopup };
 
 registerWidget(definition);
 export default definition;

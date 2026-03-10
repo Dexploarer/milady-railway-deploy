@@ -39,8 +39,7 @@ const definition: WidgetDefinition = {
   defaultZIndex: 14,
   configSchema: {},
   defaultConfig: {},
-  render: ViewerCount,
-};
+  render: ViewerCount };
 
 registerWidget(definition);
 export default definition;

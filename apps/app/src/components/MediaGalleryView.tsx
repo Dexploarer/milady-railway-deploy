@@ -77,8 +77,7 @@ function extractMediaFromRows(
             type: mediaType,
             filename: filenameFromUrl(url),
             source: tableName,
-            createdAt,
-          });
+            createdAt });
         }
       }
     }

@@ -1,21 +1,18 @@
 import { useEffect, useMemo, useRef } from "react";
-import { createTranslator } from "../../i18n";
 import type {
   ConversationMessage,
-  StreamEventEnvelope,
-} from "../../api-client";
+  StreamEventEnvelope } from "../../api-client";
 import { CHANNEL_COLORS, getEventSource, getEventText } from "./helpers";
 import { useApp } from "../../AppContext";
 
 export function ChatContent({
   events,
-  messages,
-}: {
+  messages }: {
   events: StreamEventEnvelope[];
   messages: ConversationMessage[];
 }) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  const {
+    t } = useApp();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const recentExchanges = useMemo(() => {
@@ -45,8 +42,7 @@ export function ChatContent({
         text: msg.text,
         source: msg.source,
         from: msg.from ?? eventFromLookup.get(msg.text.trim()),
-        ts: msg.timestamp,
-      });
+        ts: msg.timestamp });
     }
 
     const assistantEvents = events
@@ -60,8 +56,7 @@ export function ChatContent({
           role: "event",
           text,
           source: getEventSource(evt),
-          ts: evt.ts,
-        });
+          ts: evt.ts });
       }
     }
 

@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { type CustomActionDef, client } from "../api-client";
 import { useApp } from "../AppContext";
-import { createTranslator } from "../i18n";
 
 interface CustomActionsPanelProps {
   open: boolean;
@@ -12,22 +11,19 @@ interface CustomActionsPanelProps {
 const HANDLER_TYPE_COLORS: Record<string, string> = {
   http: "bg-blue-500/20 text-blue-400",
   shell: "bg-green-500/20 text-green-400",
-  code: "bg-purple-500/20 text-purple-400",
-};
+  code: "bg-purple-500/20 text-purple-400" };
 
 const HANDLER_TYPE_NAMES: Record<string, string> = {
   http: "HTTP",
   shell: "Shell",
-  code: "Code",
-};
+  code: "Code" };
 
 export function CustomActionsPanel({
   open,
   onClose,
-  onOpenEditor,
-}: CustomActionsPanelProps) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  onOpenEditor }: CustomActionsPanelProps) {
+  const {
+    t } = useApp();
   const [actions, setActions] = useState<CustomActionDef[]>([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
@@ -78,15 +74,13 @@ export function CustomActionsPanel({
     try {
       const next = !action.enabled;
       await client.updateCustomAction(action.id, {
-        enabled: next,
-      });
+        enabled: next });
       setActions((prev) =>
         prev.map((item) =>
           item.id === action.id
             ? {
               ...item,
-              enabled: next,
-            }
+              enabled: next }
             : item,
         ),
       );

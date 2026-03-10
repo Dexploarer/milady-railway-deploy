@@ -1,12 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { parsePositiveInteger } from "../../../../src/utils/number-parsing";
 import { useApp } from "../AppContext";
-import { createTranslator } from "../i18n";
 import type {
   CreateTriggerRequest,
   TriggerSummary,
-  UpdateTriggerRequest,
-} from "../api-client";
+  UpdateTriggerRequest } from "../api-client";
 import { formatDateTime, formatDurationMs } from "./shared/format";
 import { StatCard, StatusBadge, StatusDot } from "./shared/ui-badges";
 
@@ -34,8 +32,7 @@ const emptyForm: TriggerFormState = {
   scheduledAtIso: "",
   cronExpression: "0 * * * *",
   maxRuns: "",
-  enabled: true,
-};
+  enabled: true };
 
 const accentFg: React.CSSProperties = { color: "var(--accent-foreground)" };
 
@@ -61,8 +58,7 @@ function formFromTrigger(trigger: TriggerSummary): TriggerFormState {
     scheduledAtIso: trigger.scheduledAtIso ?? "",
     cronExpression: trigger.cronExpression ?? "0 * * * *",
     maxRuns: trigger.maxRuns ? String(trigger.maxRuns) : "",
-    enabled: trigger.enabled,
-  };
+    enabled: trigger.enabled };
 }
 
 function buildCreateRequest(form: TriggerFormState): CreateTriggerRequest {
@@ -79,8 +75,7 @@ function buildCreateRequest(form: TriggerFormState): CreateTriggerRequest {
       form.triggerType === "once" ? form.scheduledAtIso.trim() : undefined,
     cronExpression:
       form.triggerType === "cron" ? form.cronExpression.trim() : undefined,
-    maxRuns,
-  };
+    maxRuns };
 }
 
 function buildUpdateRequest(form: TriggerFormState): UpdateTriggerRequest {
@@ -143,9 +138,7 @@ export function TriggersView() {
     runTriggerNow,
     loadTriggerRuns,
     loadTriggerHealth,
-    uiLanguage,
-  } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+    t } = useApp();
 
   const [form, setForm] = useState<TriggerFormState>(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -243,8 +236,7 @@ export function TriggersView() {
             <StatCard
               label={t("triggersview.LastExec")}
               value={formatDateTime(triggerHealth.lastExecutionAt, {
-                fallback: "—",
-              })}
+                fallback: "—" })}
             />
           </div>
         ) : (
@@ -489,8 +481,7 @@ export function TriggersView() {
                             {" "}
                             · next{" "}
                             {formatDateTime(trigger.nextRunAtMs, {
-                              fallback: "—",
-                            })}
+                              fallback: "—" })}
                           </>
                         )}
                       </div>
@@ -516,8 +507,7 @@ export function TriggersView() {
                         className="px-2 py-1 text-[11px] border border-border hover:border-accent cursor-pointer"
                         onClick={() => {
                           void updateTrigger(trigger.id, {
-                            enabled: !trigger.enabled,
-                          });
+                            enabled: !trigger.enabled });
                         }}
                       >
                         {trigger.enabled ? "Disable" : "Enable"}
@@ -623,8 +613,7 @@ export function TriggersView() {
                                     {" "}
                                     ·{" "}
                                     {formatDateTime(run.finishedAt, {
-                                      fallback: "—",
-                                    })}{" "}
+                                      fallback: "—" })}{" "}
                                     · {formatDurationMs(run.latencyMs)} ·{" "}
                                     {run.source}
                                   </span>

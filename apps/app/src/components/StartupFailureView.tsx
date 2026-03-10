@@ -5,8 +5,7 @@ const REASON_LABELS: Record<StartupErrorState["reason"], string> = {
   "backend-timeout": "Backend Timeout",
   "backend-unreachable": "Backend Unreachable",
   "agent-timeout": "Agent Timeout",
-  "agent-error": "Agent Error",
-};
+  "agent-error": "Agent Error" };
 
 interface StartupFailureViewProps {
   error: StartupErrorState;
@@ -17,8 +16,7 @@ const APP_ORIGIN_URL = "https://app.milady.ai";
 
 export function StartupFailureView({
   error,
-  onRetry,
-}: StartupFailureViewProps) {
+  onRetry }: StartupFailureViewProps) {
     const { t } = useApp();
   const isBackendUnreachable = error.reason === "backend-unreachable";
 

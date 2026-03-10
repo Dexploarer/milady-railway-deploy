@@ -15,7 +15,7 @@ import React, {
   useCallback,
   useContext,
   useMemo,
-  useState,
+  useState
 } from "react";
 import { getByPath, setByPath } from "./config-catalog";
 import type {
@@ -26,10 +26,9 @@ import type {
   UiRenderContext,
   UiSpec,
   ValidationCheck,
-  VisibilityCondition,
+  VisibilityCondition
 } from "./ui-spec";
 import { useApp } from "../AppContext";
-import { createTranslator } from "../i18n";
 
 const UiContext = createContext<UiRenderContext | null>(null);
 
@@ -237,7 +236,7 @@ const BUILTIN_VALIDATORS: Record<
     }
   },
   min: (v, args) => Number(v) >= Number(args?.value ?? -Infinity),
-  max: (v, args) => Number(v) <= Number(args?.value ?? Infinity),
+  max: (v, args) => Number(v) <= Number(args?.value ?? Infinity)
 };
 
 // ── Validation runner ───────────────────────────────────────────────
@@ -322,14 +321,14 @@ const GAP: Record<string, string> = {
   sm: "gap-1.5",
   md: "gap-3",
   lg: "gap-5",
-  xl: "gap-8",
+  xl: "gap-8"
 };
 
 const ALIGN: Record<string, string> = {
   start: "items-start",
   center: "items-center",
   end: "items-end",
-  stretch: "items-stretch",
+  stretch: "items-stretch"
 };
 
 const JUSTIFY: Record<string, string> = {
@@ -337,7 +336,7 @@ const JUSTIFY: Record<string, string> = {
   center: "justify-center",
   end: "justify-end",
   between: "justify-between",
-  around: "justify-around",
+  around: "justify-around"
 };
 
 // ── Tailwind class constants ────────────────────────────────────────
@@ -431,7 +430,7 @@ const TextComponent: ComponentFn = (props) => {
     caption: "text-xs text-[var(--muted)]",
     muted: "text-sm text-[var(--muted)]",
     lead: "text-sm font-medium",
-    code: "text-xs font-mono bg-[var(--bg-hover)] px-1.5 py-0.5 border border-[var(--border)]",
+    code: "text-xs font-mono bg-[var(--bg-hover)] px-1.5 py-0.5 border border-[var(--border)]"
   };
   return <div className={cls[variant] ?? "text-sm"}>{text}</div>;
 };
@@ -822,8 +821,7 @@ const TableComponent: ComponentFn = (props) => {
 };
 
 const CarouselComponent: ComponentFn = (props) => {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  const { t } = useApp();
   const items =
     (props.items as Array<{ title: string; description: string }>) ?? [];
   const [current, setCurrent] = useState(0);
@@ -875,7 +873,7 @@ const BadgeComponent: ComponentFn = (props) => {
       "bg-[rgba(243,156,18,0.1)] text-[var(--warn,#f39c12)] border-[var(--warn,#f39c12)]",
     error:
       "bg-[rgba(231,76,60,0.1)] text-[var(--destructive)] border-[var(--destructive)]",
-    info: "bg-[rgba(52,152,219,0.1)] text-[var(--accent)] border-[var(--accent)]",
+    info: "bg-[rgba(52,152,219,0.1)] text-[var(--accent)] border-[var(--accent)]"
   };
   return (
     <span
@@ -939,13 +937,13 @@ const AlertComponent: ComponentFn = (props) => {
     info: "border-[var(--accent)]",
     success: "border-[var(--ok)]",
     warning: "border-[var(--warn,#f39c12)]",
-    error: "border-[var(--destructive)]",
+    error: "border-[var(--destructive)]"
   };
   const textCls: Record<string, string> = {
     info: "text-[var(--accent)]",
     success: "text-[var(--ok)]",
     warning: "text-[var(--warn,#f39c12)]",
-    error: "text-[var(--destructive)]",
+    error: "text-[var(--destructive)]"
   };
   return (
     <div
@@ -1054,7 +1052,7 @@ const ButtonComponent: ComponentFn = (props, _children, ctx, el) => {
     danger:
       "bg-[var(--destructive)] text-white border-[var(--destructive)] hover:opacity-90",
     ghost:
-      "bg-transparent text-[var(--text)] border-transparent hover:bg-[var(--bg-hover)]",
+      "bg-transparent text-[var(--text)] border-transparent hover:bg-[var(--bg-hover)]"
   };
   return (
     <button
@@ -1113,7 +1111,7 @@ const DropdownMenuComponent: ComponentFn = (props, _children, ctx) => {
                 if (ctx.onAction)
                   ctx.onAction("menuSelect", {
                     value: item.value,
-                    label: item.label,
+                    label: item.label
                   });
               }}
             >
@@ -1159,8 +1157,6 @@ const TabsComponent: ComponentFn = (props, _children, ctx) => {
 };
 
 const PaginationComponent: ComponentFn = (props, _children, ctx) => {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
   const total = Number(props.totalPages ?? 1);
   const [value, setValue] = useStatePath(
     props.statePath as string | undefined,
@@ -1176,7 +1172,7 @@ const PaginationComponent: ComponentFn = (props, _children, ctx) => {
         onClick={() => setValue(current - 1)}
       >
 
-        {t("ui-renderer.Larr")}
+        ←
       </button>
       {Array.from({ length: total }, (_, i) => i + 1).map((page) => (
         <button
@@ -1198,7 +1194,7 @@ const PaginationComponent: ComponentFn = (props, _children, ctx) => {
         onClick={() => setValue(current + 1)}
       >
 
-        {t("ui-renderer.Rarr")}
+        →
       </button>
     </div>
   );
@@ -1276,7 +1272,7 @@ const LineGraphComponent: ComponentFn = (props) => {
   const w = 100;
   const points = data.map((d, i) => ({
     x: (i / Math.max(data.length - 1, 1)) * w,
-    y: h - (d.value / maxVal) * h,
+    y: h - (d.value / maxVal) * h
   }));
   const pathD = points
     .map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`)
@@ -1353,8 +1349,6 @@ const TooltipComponent: ComponentFn = (props) => {
 };
 
 const PopoverComponent: ComponentFn = (props) => {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
   const [open, setOpen] = useState(false);
   return (
     <div className="relative inline-block">
@@ -1374,7 +1368,7 @@ const PopoverComponent: ComponentFn = (props) => {
             onClick={() => setOpen(false)}
           >
 
-            {t("ui-renderer.Close")}
+            Close
           </button>
         </div>
       )}
@@ -1446,8 +1440,6 @@ const AccordionComponent: ComponentFn = (props) => {
 };
 
 const DialogComponent: ComponentFn = (props, children, ctx) => {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
   const openPath = props.openPath as string | undefined;
   const isOpen = openPath ? !!getByPath(ctx.state, openPath) : false;
   if (!isOpen) return null;
@@ -1487,7 +1479,7 @@ const DialogComponent: ComponentFn = (props, children, ctx) => {
             onClick={close}
           >
 
-            {t("ui-renderer.Times")}
+            ×
           </button>
         </div>
         {children}
@@ -1585,7 +1577,7 @@ const COMPONENTS: Record<string, ComponentFn> = {
   Collapsible: CollapsibleComponent,
   Accordion: AccordionComponent,
   Dialog: DialogComponent,
-  Drawer: DrawerComponent,
+  Drawer: DrawerComponent
 };
 
 // ══════════════════════════════════════════════════════════════════════
@@ -1676,10 +1668,9 @@ export function UiRenderer({
   onAction,
   loading,
   auth,
-  validators,
-}: UiRendererProps) {
+  validators }: UiRendererProps) {
   const [state, setStateRaw] = useState<Record<string, unknown>>(() => ({
-    ...spec.state,
+    ...spec.state
   }));
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
@@ -1716,7 +1707,7 @@ export function UiRenderer({
       loading,
       validators,
       fieldErrors,
-      validateField,
+      validateField
     }),
     [
       spec,

@@ -25,8 +25,7 @@ export function ConfirmDeleteControl({
   triggerClassName,
   confirmClassName,
   cancelClassName,
-  promptClassName = "text-[11px] text-[#e74c3c] ml-1",
-}: ConfirmDeleteControlProps) {
+  promptClassName = "text-[11px] text-[#e74c3c] ml-1" }: ConfirmDeleteControlProps) {
   const [confirming, setConfirming] = useState(false);
 
   if (!confirming) {

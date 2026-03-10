@@ -6,9 +6,7 @@ import {
   getVrmTitle,
   getVrmUrl,
   useApp,
-  VRM_COUNT,
-} from "../AppContext";
-import { createTranslator } from "../i18n";
+  VRM_COUNT } from "../AppContext";
 import { ChatModalView } from "./ChatModalView";
 import { CompanionCharacterRoster } from "./companion/CompanionCharacterRoster";
 import { CompanionHeader } from "./companion/CompanionHeader";
@@ -39,8 +37,7 @@ export function CompanionView() {
     lifecycleAction,
     handlePauseResume,
     handleRestart,
-  } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+    t } = useApp();
 
   // Compute Header properties
   const name = agentStatus?.agentName ?? "Milady";
@@ -113,8 +110,7 @@ export function CompanionView() {
         return {
           index,
           previewUrl: getVrmPreviewUrl(index),
-          title: getVrmTitle(index),
-        };
+          title: getVrmTitle(index) };
       }),
     [],
   );
@@ -125,8 +121,7 @@ export function CompanionView() {
       style={{
         backgroundImage: `url("${vrmBackgroundUrl}")`,
         backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
+        backgroundPosition: "center" }}
     >
       <div className="anime-comp-bg-graphic" />
 

@@ -5,8 +5,7 @@ import type {
   StreamEventEnvelope,
   TriggerSummary,
   WorkbenchTask,
-  WorkbenchTodo,
-} from "../api-client";
+  WorkbenchTodo } from "../api-client";
 import { ChatControlsPanel } from "./ChatControlsPanel";
 import { CodingAgentsSection } from "./CodingAgentsSection";
 import { formatTime } from "./shared/format";
@@ -85,8 +84,7 @@ interface AutonomousPanelProps {
 
 export function AutonomousPanel({
   mobile = false,
-  onClose,
-}: AutonomousPanelProps) {
+  onClose }: AutonomousPanelProps) {
   const {
     t,
     agentStatus,
@@ -101,8 +99,7 @@ export function AutonomousPanel({
     chatAvatarVisible,
     chatAgentVoiceMuted,
     chatAvatarSpeaking,
-    setState,
-  } = useApp();
+    setState } = useApp();
 
   const [tasksCollapsed, setTasksCollapsed] = useState(false);
   const [triggersCollapsed, setTriggersCollapsed] = useState(false);

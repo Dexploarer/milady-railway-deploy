@@ -6,9 +6,8 @@
  *   2. Secrets (modal)
  */
 
-import { useCallback, useEffect, useState, useMemo } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useApp } from "../AppContext";
-import { createTranslator } from "../i18n";
 import { client } from "../api-client";
 import type { ConfigUiHint } from "../types";
 import type { JsonSchemaObject } from "./config-catalog";
@@ -65,10 +64,8 @@ function CloudRpcStatus({
   creditsCritical,
   topUpUrl,
   loginBusy,
-  onLogin,
-}: CloudRpcStatusProps) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  onLogin }: CloudRpcStatusProps) {
+  const { t } = useApp();
   if (connected) {
     return (
       <div className="flex items-center gap-2 text-xs">
@@ -144,17 +141,17 @@ function buildRpcRendererConfig(
     schema: {
       type: "object",
       properties: {},
-      required: [],
+      required: []
     },
     hints: {},
     values: {},
-    setKeys: new Set<string>(),
+    setKeys: new Set<string>()
   };
 
   for (const field of fields) {
     props.schema.properties[field.configKey] = {
       type: "string",
-      description: field.label,
+      description: field.label
     };
     props.hints[field.configKey] = {
       label: field.label,
@@ -162,7 +159,7 @@ function buildRpcRendererConfig(
       placeholder: field.isSet
         ? "Already set — leave blank to keep"
         : "Enter API key",
-      width: "full",
+      width: "full"
     };
     if (rpcFieldValues[field.configKey] !== undefined) {
       props.values[field.configKey] = rpcFieldValues[field.configKey];
@@ -200,8 +197,7 @@ function RpcConfigSection<T extends string>({
   rpcFieldValues,
   onRpcFieldChange,
   cloud,
-  containerClassName,
-}: RpcSectionProps<T>) {
+  containerClassName }: RpcSectionProps<T>) {
   const rpcConfig = buildRpcRendererConfig(
     selectedProvider,
     providerConfigs,
@@ -291,39 +287,38 @@ const CLOUD_SERVICE_DEFS: {
       key: "inference",
       label: "Model Inference",
       description:
-        "Use ElizaCloud for LLM calls. Turn off to use your own API keys (Anthropic, OpenAI, etc.)",
+        "Use ElizaCloud for LLM calls. Turn off to use your own API keys (Anthropic, OpenAI, etc.)"
     },
     {
       key: "rpc",
       label: "Blockchain RPC",
-      description: "Use ElizaCloud RPC endpoints for EVM, BSC, and Solana",
+      description: "Use ElizaCloud RPC endpoints for EVM, BSC, and Solana"
     },
     {
       key: "media",
       label: "Media Generation",
-      description: "Use ElizaCloud for image, video, audio, and vision",
+      description: "Use ElizaCloud for image, video, audio, and vision"
     },
     {
       key: "tts",
       label: "Text-to-Speech",
-      description: "Use ElizaCloud for TTS voice synthesis",
+      description: "Use ElizaCloud for TTS voice synthesis"
     },
     {
       key: "embeddings",
       label: "Embeddings",
-      description: "Use ElizaCloud for text embedding generation",
+      description: "Use ElizaCloud for text embedding generation"
     },
   ];
 
 function CloudServicesSection() {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  const { t } = useApp();
   const [services, setServices] = useState<Record<CloudServiceKey, boolean>>({
     inference: true,
     rpc: true,
     media: true,
     tts: true,
-    embeddings: true,
+    embeddings: true
   });
   const [saving, setSaving] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -346,7 +341,7 @@ function CloudServicesSection() {
               Object.entries(cloud.services ?? {}).filter(
                 ([, v]) => typeof v === "boolean",
               ),
-            ),
+            )
           }));
         }
         setLoaded(true);
@@ -369,7 +364,7 @@ function CloudServicesSection() {
 
       try {
         await client.updateConfig({
-          cloud: { services: updated, inferenceMode },
+          cloud: { services: updated, inferenceMode }
         });
         setNeedsRestart(true);
       } catch (err) {
@@ -442,8 +437,7 @@ function CloudServicesSection() {
 /* ── ConfigPageView ──────────────────────────────────────────────────── */
 
 export function ConfigPageView({ embedded = false }: { embedded?: boolean }) {
-  const { uiLanguage, cloudConnected, cloudCredits, cloudCreditsLow, cloudCreditsCritical, cloudTopUpUrl, cloudLoginBusy, walletConfig, walletApiKeySaving, handleWalletApiKeySave, handleCloudLogin } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  const { t, cloudConnected, cloudCredits, cloudCreditsLow, cloudCreditsCritical, cloudTopUpUrl, cloudLoginBusy, walletConfig, walletApiKeySaving, handleWalletApiKeySave, handleCloudLogin } = useApp();
 
   const [secretsOpen, setSecretsOpen] = useState(false);
 
@@ -480,23 +474,23 @@ export function ConfigPageView({ embedded = false }: { embedded?: boolean }) {
       {
         configKey: "ALCHEMY_API_KEY",
         label: "Alchemy API Key",
-        isSet: walletConfig?.alchemyKeySet ?? false,
+        isSet: walletConfig?.alchemyKeySet ?? false
       },
     ],
     infura: [
       {
         configKey: "INFURA_API_KEY",
         label: "Infura API Key",
-        isSet: walletConfig?.infuraKeySet ?? false,
+        isSet: walletConfig?.infuraKeySet ?? false
       },
     ],
     ankr: [
       {
         configKey: "ANKR_API_KEY",
         label: "Ankr API Key",
-        isSet: walletConfig?.ankrKeySet ?? false,
+        isSet: walletConfig?.ankrKeySet ?? false
       },
-    ],
+    ]
   };
 
   const bscRpcConfigs: RpcSectionConfigMap = {
@@ -504,16 +498,16 @@ export function ConfigPageView({ embedded = false }: { embedded?: boolean }) {
       {
         configKey: "NODEREAL_BSC_RPC_URL",
         label: "NodeReal BSC RPC URL",
-        isSet: walletConfig?.nodeRealBscRpcSet ?? false,
+        isSet: walletConfig?.nodeRealBscRpcSet ?? false
       },
     ],
     quicknode: [
       {
         configKey: "QUICKNODE_BSC_RPC_URL",
         label: "QuickNode BSC RPC URL",
-        isSet: walletConfig?.quickNodeBscRpcSet ?? false,
+        isSet: walletConfig?.quickNodeBscRpcSet ?? false
       },
-    ],
+    ]
   };
 
   const solanaRpcConfigs: RpcSectionConfigMap = {
@@ -521,14 +515,14 @@ export function ConfigPageView({ embedded = false }: { embedded?: boolean }) {
       {
         configKey: "HELIUS_API_KEY",
         label: "Helius API Key",
-        isSet: walletConfig?.heliusKeySet ?? false,
+        isSet: walletConfig?.heliusKeySet ?? false
       },
       {
         configKey: "BIRDEYE_API_KEY",
         label: "Birdeye API Key",
-        isSet: walletConfig?.birdeyeKeySet ?? false,
+        isSet: walletConfig?.birdeyeKeySet ?? false
       },
-    ],
+    ]
   };
 
   const cloudStatusProps = {
@@ -538,7 +532,7 @@ export function ConfigPageView({ embedded = false }: { embedded?: boolean }) {
     creditsCritical: cloudCreditsCritical,
     topUpUrl: cloudTopUpUrl,
     loginBusy: cloudLoginBusy,
-    onLogin: () => void handleCloudLogin(),
+    onLogin: () => void handleCloudLogin()
   };
 
   return (

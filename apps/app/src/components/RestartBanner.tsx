@@ -1,6 +1,5 @@
 import { useCallback, useState } from "react";
 import { useApp } from "../AppContext";
-import { createTranslator } from "../i18n";
 import { isElectrobunRuntime } from "../bridge/electrobun-runtime";
 
 export function RestartBanner() {
@@ -10,9 +9,7 @@ export function RestartBanner() {
     restartBannerDismissed,
     dismissRestartBanner,
     triggerRestart,
-    uiLanguage
-  } = useApp();
-  const t = createTranslator(uiLanguage);
+    t } = useApp();
 
   const [restarting, setRestarting] = useState(false);
 

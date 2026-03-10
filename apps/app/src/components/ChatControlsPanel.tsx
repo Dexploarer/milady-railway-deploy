@@ -16,8 +16,7 @@ export function ChatControlsPanel({
   chatAvatarVisible,
   chatAvatarSpeaking,
   chatAgentVoiceMuted,
-  setState,
-}: ChatControlsPanelProps) {
+  setState }: ChatControlsPanelProps) {
     const { t } = useApp();
   const [collapsed, setCollapsed] = useState(false);
 

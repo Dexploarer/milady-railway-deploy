@@ -24,8 +24,7 @@ import {
   tabFlags,
   viewWrapperOverflow,
   viewWrapperPadding,
-  viewWrapperStyle,
-} from "./companion-shell-styles";
+  viewWrapperStyle } from "./companion-shell-styles";
 import { InventoryView } from "./InventoryView";
 import { KnowledgeView } from "./KnowledgeView";
 import { LifoSandboxView } from "./LifoSandboxView";
@@ -98,8 +97,7 @@ export function CompanionShell({ tab }: CompanionShellProps) {
                   ? "0"
                   : f.isCentered
                     ? "1rem"
-                    : "0",
-              }}
+                    : "0" }}
             >
               {/* Top bar accent line */}
               {f.isCharacter && (
@@ -108,8 +106,7 @@ export function CompanionShell({ tab }: CompanionShellProps) {
                     className="w-1/2 h-full"
                     style={{
                       background:
-                        "linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.8), transparent)",
-                    }}
+                        "linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.8), transparent)" }}
                   />
                 </div>
               )}
@@ -117,8 +114,7 @@ export function CompanionShell({ tab }: CompanionShellProps) {
                 <div
                   className="absolute top-0 left-0 right-0 h-[2px] opacity-80"
                   style={{
-                    background: `linear-gradient(to right, transparent, ${topBarColor}, transparent)`,
-                  }}
+                    background: `linear-gradient(to right, transparent, ${topBarColor}, transparent)` }}
                 />
               )}
 

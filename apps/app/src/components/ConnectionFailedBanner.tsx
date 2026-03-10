@@ -12,8 +12,7 @@ export function ConnectionFailedBanner() {
     backendConnection,
     backendDisconnectedBannerDismissed,
     dismissBackendDisconnectedBanner,
-    retryBackendConnection,
-  } = useApp();
+    retryBackendConnection } = useApp();
 
   if (!backendConnection) return null;
 

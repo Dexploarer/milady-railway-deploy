@@ -14,8 +14,7 @@ import {
   type HyperscapeJsonValue,
   type HyperscapeQuickActionsResponse,
   type HyperscapeScriptedRole,
-  type RegistryAppInfo,
-} from "../api-client";
+  type RegistryAppInfo } from "../api-client";
 
 const DEFAULT_VIEWER_SANDBOX = "allow-scripts allow-same-origin allow-popups";
 const HYPERSCAPE_APP_NAME = "@elizaos/app-hyperscape";
@@ -44,19 +43,18 @@ const HYPERSCAPE_SCRIPTED_ROLE_OPTIONS: Array<{
   value: HyperscapeScriptedRole;
   label: string;
 }> = [
-  { value: "balanced", label: "Balanced" },
-  { value: "combat", label: "Combat" },
-  { value: "woodcutting", label: "Woodcutting" },
-  { value: "fishing", label: "Fishing" },
-  { value: "mining", label: "Mining" },
-];
+    { value: "balanced", label: "Balanced" },
+    { value: "combat", label: "Combat" },
+    { value: "woodcutting", label: "Woodcutting" },
+    { value: "fishing", label: "Fishing" },
+    { value: "mining", label: "Mining" },
+  ];
 
 const CATEGORY_LABELS: Record<string, string> = {
   game: "Game",
   social: "Social",
   platform: "Platform",
-  world: "World",
-};
+  world: "World" };
 
 function formatHyperscapePosition(
   position: HyperscapeEmbeddedAgent["position"],
@@ -96,7 +94,7 @@ export function AppsView() {
     activeGameViewerUrl,
     setState,
     setActionNotice,
-  } = useApp();
+    t } = useApp();
   const [apps, setApps] = useState<RegistryAppInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -373,8 +371,7 @@ export function AppsView() {
       const response = await client.createHyperscapeEmbeddedAgent({
         characterId,
         autoStart: hyperscapeAutoStart,
-        scriptedRole: hyperscapeScriptedRole || undefined,
-      });
+        scriptedRole: hyperscapeScriptedRole || undefined });
       setActionNotice(
         response.message ?? "Embedded agent created.",
         "success",
@@ -592,8 +589,8 @@ export function AppsView() {
 
           <div className="flex flex-col gap-1">
             <span className="text-[11px] text-muted">
-              
-                                        {t("appsview.EmbeddedAgents")}{hyperscapeAgents.length})
+
+              {t("appsview.EmbeddedAgents")}{hyperscapeAgents.length})
             </span>
             <select
               value={hyperscapeSelectedAgentId}
@@ -611,8 +608,8 @@ export function AppsView() {
             </select>
             {selectedHyperscapeAgent ? (
               <div className="text-[11px] text-muted">
-                
-                                              {t("appsview.Character")} {selectedHyperscapeAgent.characterId}  {t("appsview.Health")}{" "}
+
+                {t("appsview.Character")} {selectedHyperscapeAgent.characterId}  {t("appsview.Health")}{" "}
                 {selectedHyperscapeAgent.health ?? "n/a"}
                 {" / "}
                 {selectedHyperscapeAgent.maxHealth ?? "n/a"}  {t("appsview.Position")}{" "}
@@ -676,9 +673,9 @@ export function AppsView() {
                     setHyperscapeAutoStart(event.target.checked)
                   }
                 />
-                
-                                              {t("appsview.AutoStart")}
-                                            </span>
+
+                {t("appsview.AutoStart")}
+              </span>
               <button
                 type="button"
                 className="px-3 py-1 text-xs bg-accent text-accent-fg border border-accent cursor-pointer hover:bg-accent-hover disabled:opacity-40"
@@ -761,13 +758,13 @@ export function AppsView() {
                 <>
                   Goal: {hyperscapeGoalResponse.goal.description ?? "unknown"}
                   {typeof hyperscapeGoalResponse.goal.progressPercent ===
-                  "number"
+                    "number"
                     ? ` (${hyperscapeGoalResponse.goal.progressPercent}%)`
                     : ""}
                 </>
               ) : (
                 (hyperscapeGoalResponse?.message ??
-                "No active goal loaded for the selected agent.")
+                  "No active goal loaded for the selected agent.")
               )}
             </div>
 
@@ -810,8 +807,8 @@ export function AppsView() {
 
             {hyperscapeQuickActionsResponse?.nearbyLocations?.length ? (
               <div className="text-[11px] text-muted">
-                
-                                              {t("appsview.Nearby")}{" "}
+
+                {t("appsview.Nearby")}{" "}
                 {hyperscapeQuickActionsResponse.nearbyLocations
                   .slice(0, 4)
                   .map((location) => `${location.name} (${location.distance})`)
@@ -834,9 +831,9 @@ export function AppsView() {
           {activeGameDisplayName || activeGameApp || "Current game"}
         </div>
         <div className="text-[11px] text-muted">
-          
-                          {t("appsview.ResumeInFullScree")}
-                        </div>
+
+          {t("appsview.ResumeInFullScree")}
+        </div>
         <div className="text-[11px] text-muted break-all">
           {currentGameViewerUrl}
         </div>
@@ -846,17 +843,17 @@ export function AppsView() {
             onClick={handleOpenCurrentGame}
             className="px-3 py-1 text-xs bg-accent text-accent-fg border border-accent cursor-pointer hover:bg-accent-hover"
           >
-            
-                                {t("appsview.ResumeFullscreen")}
-                              </button>
+
+            {t("appsview.ResumeFullscreen")}
+          </button>
           <button
             type="button"
             onClick={handleOpenCurrentGameInNewTab}
             className="px-3 py-1 text-xs bg-accent text-accent-fg border border-accent cursor-pointer hover:bg-accent-hover"
           >
-            
-                                {t("appsview.OpenInNewTab")}
-                              </button>
+
+            {t("appsview.OpenInNewTab")}
+          </button>
         </div>
       </div>
     );
@@ -871,9 +868,9 @@ export function AppsView() {
             onClick={() => setSelectedAppName(null)}
             className="px-3 py-1 text-xs bg-accent text-accent-fg border border-accent cursor-pointer hover:bg-accent-hover"
           >
-            
-                                {t("appsview.Back")}
-                              </button>
+
+            {t("appsview.Back")}
+          </button>
           <div className="text-[11px] text-muted break-all">
             {selectedApp.name}
           </div>
@@ -900,14 +897,14 @@ export function AppsView() {
             <span className="flex-1" />
             {selectedAppIsActive ? (
               <span className="text-[10px] px-1.5 py-0.5 border border-ok text-ok">
-                
-                                            {t("appsview.Active")}
-                                          </span>
+
+                {t("appsview.Active")}
+              </span>
             ) : (
               <span className="text-[10px] px-1.5 py-0.5 border border-border text-muted">
-                
-                                                {t("appsview.Inactive")}
-                                              </span>
+
+                {t("appsview.Inactive")}
+              </span>
             )}
             {selectedApp.category ? (
               <span className="text-[10px] px-1.5 py-0.5 border border-border text-muted">
@@ -931,9 +928,9 @@ export function AppsView() {
                 className="text-xs px-3.5 py-1.5 bg-accent text-accent-fg border border-accent cursor-pointer hover:bg-accent-hover"
                 onClick={handleOpenCurrentGame}
               >
-                
-                                            {t("appsview.ViewActiveSession")}
-                                          </button>
+
+                {t("appsview.ViewActiveSession")}
+              </button>
             ) : null}
             {selectedAppHasActiveViewer ? (
               <button
@@ -941,9 +938,9 @@ export function AppsView() {
                 className="text-xs px-3.5 py-1.5 bg-accent text-accent-fg border border-accent cursor-pointer hover:bg-accent-hover"
                 onClick={handleOpenCurrentGameInNewTab}
               >
-                
-                                            {t("appsview.OpenViewerInNewT")}
-                                          </button>
+
+                {t("appsview.OpenViewerInNewT")}
+              </button>
             ) : null}
           </div>
 
@@ -1015,9 +1012,9 @@ export function AppsView() {
             <div className="border border-border p-2 flex flex-col gap-2">
               <div className="font-bold text-xs">{t("appsview.HyperscapeControls")}</div>
               <div className="text-[11px] text-muted">
-                
-                                            {t("appsview.EmbeddedAgentsCom")}
-                                          </div>
+
+                {t("appsview.EmbeddedAgentsCom")}
+              </div>
               {renderHyperscapeControls()}
             </div>
           ) : null}
@@ -1041,9 +1038,9 @@ export function AppsView() {
           onClick={() => void loadApps()}
           className="px-3 py-1 text-xs bg-accent text-accent-fg border border-accent cursor-pointer hover:bg-accent-hover"
         >
-          
-                            {t("appsview.Refresh")}
-                          </button>
+
+          {t("appsview.Refresh")}
+        </button>
       </div>
 
       <div className="flex items-center gap-2 mb-4 text-[11px] text-muted">
@@ -1067,9 +1064,9 @@ export function AppsView() {
 
       {loading ? (
         <div className="text-center py-10 text-muted italic">
-          
-                            {t("appsview.LoadingApps")}
-                          </div>
+
+          {t("appsview.LoadingApps")}
+        </div>
       ) : filtered.length === 0 ? (
         <div className="text-center py-10 text-muted italic">
           {showActiveOnly
@@ -1109,9 +1106,9 @@ export function AppsView() {
                   ) : null}
                   {isActive ? (
                     <span className="text-[10px] px-1.5 py-0.5 border border-ok text-ok">
-                      
-                                                      {t("appsview.Active")}
-                                                    </span>
+
+                      {t("appsview.Active")}
+                    </span>
                   ) : null}
                 </div>
 

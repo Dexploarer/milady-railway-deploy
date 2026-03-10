@@ -38,8 +38,7 @@ export function TokenLogo({
   chain,
   contractAddress,
   preferredLogoUrl = null,
-  size = 32,
-}: {
+  size = 32 }: {
   symbol: string;
   chain: string;
   contractAddress: string | null;

@@ -241,8 +241,7 @@ export async function fetchBscTokenMetadata(
     const response = await fetch(
       `https://api.dexscreener.com/latest/dex/tokens/${trimmed}`,
       {
-        signal: controller.signal,
-      },
+        signal: controller.signal },
     );
     if (!response.ok) return null;
     const payload = (await response.json()) as DexScreenerTokenResponse;
@@ -262,8 +261,7 @@ export async function fetchBscTokenMetadata(
     return {
       symbol: tokenRef?.symbol?.trim() || "MILADY",
       name: tokenRef?.name?.trim() || "Milady",
-      logoUrl: pair.info?.imageUrl?.trim() || null,
-    };
+      logoUrl: pair.info?.imageUrl?.trim() || null };
   } catch {
     return null;
   } finally {

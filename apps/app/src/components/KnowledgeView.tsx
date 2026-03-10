@@ -10,15 +10,13 @@
  * - Document detail view with fragments
  */
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useApp } from "../AppContext";
-import { createTranslator } from "../i18n";
 import type {
   KnowledgeDocument,
   KnowledgeFragment,
   KnowledgeSearchResult,
-  KnowledgeStats,
-} from "../api-client";
+  KnowledgeStats } from "../api-client";
 import { client } from "../api-client";
 import { ConfirmDeleteControl } from "./shared/confirm-delete-control";
 import { formatByteSize, formatShortDate } from "./shared/format";
@@ -54,8 +52,7 @@ const SUPPORTED_UPLOAD_EXTENSIONS = new Set([
 ]);
 const DIRECTORY_INPUT_ATTRS = {
   webkitdirectory: "",
-  directory: "",
-} as Record<string, string>;
+  directory: "" } as Record<string, string>;
 
 export type KnowledgeUploadFile = File & {
   webkitRelativePath?: string;
@@ -99,14 +96,12 @@ function isSupportedKnowledgeFile(file: Pick<File, "name">): boolean {
 function StatsCard({
   stats,
   loading,
-  hasError,
-}: {
+  hasError }: {
   stats: KnowledgeStats | null;
   loading: boolean;
   hasError?: boolean;
 }) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  const { t } = useApp();
   return (
     <div className="grid grid-cols-2 gap-4 mb-6">
       <div className="p-4 border border-[var(--border)] bg-[var(--card)] rounded">
@@ -146,8 +141,7 @@ function UploadZone({
   onFilesUpload,
   onUrlUpload,
   uploading,
-  uploadStatus,
-}: {
+  uploadStatus }: {
   onFilesUpload: (
     files: KnowledgeUploadFile[],
     options: KnowledgeUploadOptions,
@@ -156,8 +150,7 @@ function UploadZone({
   uploading: boolean;
   uploadStatus: { current: number; total: number; filename: string } | null;
 }) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  const { t } = useApp();
   const [dragOver, setDragOver] = useState(false);
   const [urlInput, setUrlInput] = useState("");
   const [showUrlInput, setShowUrlInput] = useState(false);
@@ -183,8 +176,7 @@ function UploadZone({
       const files = e.target.files;
       if (files && files.length > 0 && !uploading) {
         onFilesUpload(Array.from(files) as KnowledgeUploadFile[], {
-          includeImageDescriptions,
-        });
+          includeImageDescriptions });
       }
       e.target.value = "";
     },
@@ -327,13 +319,11 @@ function UploadZone({
 
 function SearchBar({
   onSearch,
-  searching,
-}: {
+  searching }: {
   onSearch: (query: string) => void;
   searching: boolean;
 }) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  const { t } = useApp();
   const [query, setQuery] = useState("");
 
   const handleSubmit = useCallback(() => {
@@ -371,13 +361,11 @@ function SearchBar({
 
 function SearchResults({
   results,
-  onClear,
-}: {
+  onClear }: {
   results: KnowledgeSearchResult[];
   onClear: () => void;
 }) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  const { t } = useApp();
   return (
     <div className="mb-6">
       <div className="flex items-center justify-between mb-3">
@@ -426,15 +414,13 @@ function DocumentCard({
   doc,
   onSelect,
   onDelete,
-  deleting,
-}: {
+  deleting }: {
   doc: KnowledgeDocument;
   onSelect: (id: string) => void;
   onDelete: (id: string) => void;
   deleting: boolean;
 }) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  const { t } = useApp();
   return (
     <div className="flex items-center justify-between p-4 border border-[var(--border)] bg-[var(--card)] rounded hover:border-[var(--accent)]/50 transition-colors">
       <button
@@ -482,13 +468,11 @@ function DocumentCard({
 
 function DocumentDetailModal({
   documentId,
-  onClose,
-}: {
+  onClose }: {
   documentId: string;
   onClose: () => void;
 }) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  const { t } = useApp();
   const [doc, setDoc] = useState<KnowledgeDocument | null>(null);
   const [fragments, setFragments] = useState<KnowledgeFragment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -629,8 +613,8 @@ function DocumentDetailModal({
 /* ── Main KnowledgeView Component ───────────────────────────────────── */
 
 export function KnowledgeView({ inModal }: { inModal?: boolean } = {}) {
-  const { setActionNotice, uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  const { t } = useApp();
+  const { setActionNotice} = useApp();
   const setActionNoticeRef = useRef(setActionNotice);
   setActionNoticeRef.current = setActionNotice;
   const [stats, setStats] = useState<KnowledgeStats | null>(null);
@@ -753,9 +737,7 @@ export function KnowledgeView({ inModal }: { inModal?: boolean } = {}) {
         contentType: file.type || "application/octet-stream",
         metadata: {
           includeImageDescriptions: options.includeImageDescriptions,
-          relativePath: file.webkitRelativePath || undefined,
-        },
-      };
+          relativePath: file.webkitRelativePath || undefined } };
       const requestBytes = new TextEncoder().encode(
         JSON.stringify(request),
       ).length;
@@ -768,8 +750,7 @@ export function KnowledgeView({ inModal }: { inModal?: boolean } = {}) {
       return {
         filename: uploadFilename,
         request,
-        requestBytes,
-      };
+        requestBytes };
     },
     [readKnowledgeFile],
   );
@@ -822,8 +803,7 @@ export function KnowledgeView({ inModal }: { inModal?: boolean } = {}) {
       setUploadStatus({
         current: 0,
         total: uploadQueue.length,
-        filename: "Preparing...",
-      });
+        filename: "Preparing..." });
 
       try {
         type PreparedUpload = {
@@ -854,13 +834,11 @@ export function KnowledgeView({ inModal }: { inModal?: boolean } = {}) {
           setUploadStatus({
             current: successful + failures.length,
             total: uploadQueue.length,
-            filename: `Uploading batch starting with ${batchLabel}`,
-          });
+            filename: `Uploading batch starting with ${batchLabel}` });
 
           try {
             const result = await client.uploadKnowledgeDocumentsBulk({
-              documents: batchToUpload.map((item) => item.request),
-            });
+              documents: batchToUpload.map((item) => item.request) });
 
             for (const item of result.results) {
               const batchItem = batchToUpload[item.index];
@@ -888,8 +866,7 @@ export function KnowledgeView({ inModal }: { inModal?: boolean } = {}) {
           setUploadStatus({
             current: index + 1,
             total: uploadQueue.length,
-            filename: `Preparing: ${uploadFilename}`,
-          });
+            filename: `Preparing: ${uploadFilename}` });
 
           try {
             const prepared = await buildKnowledgeUploadRequest(file, options);
@@ -976,8 +953,7 @@ export function KnowledgeView({ inModal }: { inModal?: boolean } = {}) {
       setUploading(true);
       try {
         const result = await client.uploadKnowledgeFromUrl(url, {
-          includeImageDescriptions: options.includeImageDescriptions,
-        });
+          includeImageDescriptions: options.includeImageDescriptions });
 
         const baseMessage = result.isYouTubeTranscript
           ? `Imported YouTube transcript (${result.fragmentCount} fragments)`
@@ -1009,8 +985,7 @@ export function KnowledgeView({ inModal }: { inModal?: boolean } = {}) {
       try {
         const result = await client.searchKnowledge(query, {
           threshold: 0.3,
-          limit: 20,
-        });
+          limit: 20 });
         setSearchResults(result.results);
       } catch (err) {
         const message =

@@ -1,14 +1,12 @@
-import { type CSSProperties, useEffect, useRef, useState, useMemo } from "react";
+import { type CSSProperties, useEffect, useRef, useState} from "react";
 import {
   type AgentMode,
   IS_POPOUT,
   isSupportedStreamUrl,
   STREAM_SOURCE_LABELS,
   type StreamSourceType,
-  toggleAlwaysOnTop,
-} from "./helpers";
+  toggleAlwaysOnTop } from "./helpers";
 import { useApp } from "../../AppContext";
-import { createTranslator } from "../../i18n";
 
 function formatUptime(seconds: number): string {
   const h = Math.floor(seconds / 3600);
@@ -40,8 +38,7 @@ export function StatusBar({
   streamSource,
   activeGameViewerUrl,
   onSourceChange,
-  onOpenSettings,
-}: {
+  onOpenSettings }: {
   agentName: string;
   mode: AgentMode;
   viewerCount: number | null;
@@ -66,8 +63,8 @@ export function StatusBar({
   onSourceChange: (sourceType: StreamSourceType, customUrl?: string) => void;
   onOpenSettings?: () => void;
 }) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  const {
+    t } = useApp();
   const isLive = streamLive;
   const [pinned, setPinned] = useState(IS_POPOUT); // popout starts pinned
   const [sourceOpen, setSourceOpen] = useState(false);

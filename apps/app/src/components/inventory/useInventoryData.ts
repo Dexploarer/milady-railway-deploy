@@ -9,16 +9,14 @@ import type {
   WalletAddresses,
   WalletBalancesResponse,
   WalletConfigStatus,
-  WalletNftsResponse,
-} from "../../api-client";
+  WalletNftsResponse } from "../../api-client";
 import type { TrackedToken } from "../BscTradePanel";
 import {
   isBscChainName,
   type NftItem,
   type TokenRow,
   type TrackedBscToken,
-  toNormalizedAddress,
-} from "./constants";
+  toNormalizedAddress } from "./constants";
 
 export interface InventoryDataInput {
   walletBalances: WalletBalancesResponse | null;
@@ -62,8 +60,7 @@ export function useInventoryData({
   inventorySort,
   inventoryChainFocus,
   trackedBscTokens,
-  trackedTokens,
-}: InventoryDataInput): InventoryDataOutput {
+  trackedTokens }: InventoryDataInput): InventoryDataOutput {
   const chainFocus = inventoryChainFocus ?? "all";
 
   // ── BSC chain data ────────────────────────────────────────────────
@@ -101,8 +98,7 @@ export function useInventoryData({
           balance: chain.nativeBalance,
           valueUsd: Number.parseFloat(chain.nativeValueUsd) || 0,
           balanceRaw: Number.parseFloat(chain.nativeBalance) || 0,
-          isNative: true,
-        });
+          isNative: true });
         if (chain.error) continue;
         for (const tk of chain.tokens) {
           rows.push({
@@ -115,8 +111,7 @@ export function useInventoryData({
             valueUsd: Number.parseFloat(tk.valueUsd) || 0,
             balanceRaw: Number.parseFloat(tk.balance) || 0,
             isNative: false,
-            isTracked: false,
-          });
+            isTracked: false });
         }
       }
       if (!hasBsc && knownEvmAddr) {
@@ -129,8 +124,7 @@ export function useInventoryData({
           balance: "0",
           valueUsd: 0,
           balanceRaw: 0,
-          isNative: true,
-        });
+          isNative: true });
       }
     } else if (knownEvmAddr) {
       rows.push({
@@ -142,8 +136,7 @@ export function useInventoryData({
         balance: "0",
         valueUsd: 0,
         balanceRaw: 0,
-        isNative: true,
-      });
+        isNative: true });
     }
 
     if (chainFocus !== "bsc" && walletBalances?.solana) {
@@ -156,8 +149,7 @@ export function useInventoryData({
         balance: walletBalances.solana.solBalance,
         valueUsd: Number.parseFloat(walletBalances.solana.solValueUsd) || 0,
         balanceRaw: Number.parseFloat(walletBalances.solana.solBalance) || 0,
-        isNative: true,
-      });
+        isNative: true });
       for (const tk of walletBalances.solana.tokens) {
         rows.push({
           chain: "Solana",
@@ -168,8 +160,7 @@ export function useInventoryData({
           balance: tk.balance,
           valueUsd: Number.parseFloat(tk.valueUsd) || 0,
           balanceRaw: Number.parseFloat(tk.balance) || 0,
-          isNative: false,
-        });
+          isNative: false });
       }
     }
 
@@ -196,8 +187,7 @@ export function useInventoryData({
           valueUsd: 0,
           balanceRaw: 0,
           isNative: false,
-          isTracked: true,
-        });
+          isTracked: true });
       }
       for (const tracked of trackedTokens) {
         const exists = rows.some(
@@ -215,8 +205,7 @@ export function useInventoryData({
             valueUsd: 0,
             balanceRaw: 0,
             isNative: false,
-            isTracked: true,
-          });
+            isTracked: true });
         }
       }
     }
@@ -276,8 +265,7 @@ export function useInventoryData({
           chain: chainData.chain,
           name: nft.name,
           imageUrl: nft.imageUrl,
-          collectionName: nft.collectionName || nft.tokenType,
-        });
+          collectionName: nft.collectionName || nft.tokenType });
       }
     }
     if (walletNfts.solana) {
@@ -286,8 +274,7 @@ export function useInventoryData({
           chain: "Solana",
           name: nft.name,
           imageUrl: nft.imageUrl,
-          collectionName: nft.collectionName,
-        });
+          collectionName: nft.collectionName });
       }
     }
     return items;
@@ -331,6 +318,5 @@ export function useInventoryData({
     totalUsd,
     visibleChainErrors,
     bscChainError,
-    bscNativeBalance,
-  };
+    bscNativeBalance };
 }

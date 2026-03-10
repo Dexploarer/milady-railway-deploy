@@ -11,10 +11,9 @@ import { useApp } from "../AppContext";
 import type {
   SkillInfo,
   SkillMarketplaceResult,
-  SkillScanReportSummary,
+  SkillScanReportSummary
 } from "../api-client";
 import { client } from "../api-client";
-import { createTranslator } from "../i18n";
 import { ConfirmDeleteControl } from "./shared/confirm-delete-control";
 import { StatusBadge } from "./shared/ui-badges";
 import { Switch } from "./shared/ui-switch";
@@ -43,20 +42,19 @@ function SkillCard({
   onDelete,
   onReview,
   onAcknowledge,
-  onDismissReview,
-}: {
-  skill: SkillInfo;
-  skillToggleAction: string;
-  skillReviewId: string;
-  skillReviewReport: ReturnType<typeof useApp>["skillReviewReport"];
-  skillReviewLoading: boolean;
-  onToggle: (id: string, enabled: boolean) => void;
-  onEdit: (skill: SkillInfo) => void;
-  onDelete: (id: string, name: string) => void;
-  onReview: (id: string) => void;
-  onAcknowledge: (id: string) => void;
-  onDismissReview: () => void;
-}) {
+  onDismissReview }: {
+    skill: SkillInfo;
+    skillToggleAction: string;
+    skillReviewId: string;
+    skillReviewReport: ReturnType<typeof useApp>["skillReviewReport"];
+    skillReviewLoading: boolean;
+    onToggle: (id: string, enabled: boolean) => void;
+    onEdit: (skill: SkillInfo) => void;
+    onDelete: (id: string, name: string) => void;
+    onReview: (id: string) => void;
+    onAcknowledge: (id: string) => void;
+    onDismissReview: () => void;
+  }) {
   const { t } = useApp();
   const isQuarantined =
     skill.scanStatus === "warning" || skill.scanStatus === "critical";
@@ -242,16 +240,14 @@ function MarketplaceCard({
   isInstalled,
   skillsMarketplaceAction,
   onInstall,
-  onUninstall,
-}: {
-  item: SkillMarketplaceResult;
-  isInstalled: boolean;
-  skillsMarketplaceAction: string;
-  onInstall: (item: SkillMarketplaceResult) => void;
-  onUninstall: (skillId: string, name: string) => void;
-}) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  onUninstall }: {
+    item: SkillMarketplaceResult;
+    isInstalled: boolean;
+    skillsMarketplaceAction: string;
+    onInstall: (item: SkillMarketplaceResult) => void;
+    onUninstall: (skillId: string, name: string) => void;
+  }) {
+  const { t } = useApp();
   const isInstalling = skillsMarketplaceAction === `install:${item.id}`;
   const isUninstalling = skillsMarketplaceAction === `uninstall:${item.id}`;
   const sourceLabel = item.repository || item.slug || item.id;
@@ -332,24 +328,22 @@ function InstallModal({
   uninstallMarketplaceSkill,
   installSkillFromGithubUrl,
   setState,
-  onClose,
-}: {
-  skills: SkillInfo[];
-  skillsMarketplaceQuery: string;
-  skillsMarketplaceResults: SkillMarketplaceResult[];
-  skillsMarketplaceError: string;
-  skillsMarketplaceLoading: boolean;
-  skillsMarketplaceAction: string;
-  skillsMarketplaceManualGithubUrl: string;
-  searchSkillsMarketplace: () => Promise<void>;
-  installSkillFromMarketplace: (item: SkillMarketplaceResult) => Promise<void>;
-  uninstallMarketplaceSkill: (skillId: string, name: string) => Promise<void>;
-  installSkillFromGithubUrl: () => Promise<void>;
-  setState: ReturnType<typeof useApp>["setState"];
-  onClose: () => void;
-}) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  onClose }: {
+    skills: SkillInfo[];
+    skillsMarketplaceQuery: string;
+    skillsMarketplaceResults: SkillMarketplaceResult[];
+    skillsMarketplaceError: string;
+    skillsMarketplaceLoading: boolean;
+    skillsMarketplaceAction: string;
+    skillsMarketplaceManualGithubUrl: string;
+    searchSkillsMarketplace: () => Promise<void>;
+    installSkillFromMarketplace: (item: SkillMarketplaceResult) => Promise<void>;
+    uninstallMarketplaceSkill: (skillId: string, name: string) => Promise<void>;
+    installSkillFromGithubUrl: () => Promise<void>;
+    setState: ReturnType<typeof useApp>["setState"];
+    onClose: () => void;
+  }) {
+  const { t } = useApp();
   const [tab, setTab] = useState<InstallTab>("search");
 
   return (
@@ -533,17 +527,15 @@ function CreateSkillForm({
   skillCreating,
   setState,
   onCancel,
-  onCreate,
-}: {
-  skillCreateName: string;
-  skillCreateDescription: string;
-  skillCreating: boolean;
-  setState: ReturnType<typeof useApp>["setState"];
-  onCancel: () => void;
-  onCreate: () => void;
-}) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  onCreate }: {
+    skillCreateName: string;
+    skillCreateDescription: string;
+    skillCreating: boolean;
+    setState: ReturnType<typeof useApp>["setState"];
+    onCancel: () => void;
+    onCreate: () => void;
+  }) {
+  const { t } = useApp();
   return (
     <div className="border border-[var(--accent)]/40 bg-[var(--card)] mb-4">
       <div className="px-4 py-3 border-b border-[var(--border)]">
@@ -608,15 +600,13 @@ function EditSkillModal({
   skillId,
   skillName,
   onClose,
-  onSaved,
-}: {
-  skillId: string;
-  skillName: string;
-  onClose: () => void;
-  onSaved: () => void;
-}) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  onSaved }: {
+    skillId: string;
+    skillName: string;
+    onClose: () => void;
+    onSaved: () => void;
+  }) {
+  const { t } = useApp();
   const [content, setContent] = useState("");
   const [originalContent, setOriginalContent] = useState("");
   const [loading, setLoading] = useState(true);
@@ -814,8 +804,7 @@ export function SkillsView({ inModal: _inModal }: { inModal?: boolean } = {}) {
     installSkillFromMarketplace,
     uninstallMarketplaceSkill,
     installSkillFromGithubUrl,
-    setState,
-  } = useApp();
+    setState } = useApp();
 
   const [installModalOpen, setInstallModalOpen] = useState(false);
   const [filterText, setFilterText] = useState("");
@@ -864,7 +853,7 @@ export function SkillsView({ inModal: _inModal }: { inModal?: boolean } = {}) {
         active,
         inactive,
         activeCount,
-        totalCount: skills.length,
+        totalCount: skills.length
       };
     }, [skills, filterText]);
 

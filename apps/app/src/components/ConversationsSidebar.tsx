@@ -2,11 +2,10 @@
  * Conversations sidebar component — left sidebar with conversation list.
  */
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useApp } from "../AppContext";
 import { type AgentSelfStatusSnapshot, client } from "../api-client";
 import { SELF_STATUS_SYNC_EVENT } from "../events";
-import { createTranslator } from "../i18n";
 import { ConversationListItem } from "./conversations/ConversationListItem";
 import { GameModalFooter } from "./conversations/GameModalFooter";
 
@@ -21,8 +20,7 @@ interface ConversationsSidebarProps {
 export function ConversationsSidebar({
   mobile = false,
   onClose,
-  variant = "default",
-}: ConversationsSidebarProps) {
+  variant = "default" }: ConversationsSidebarProps) {
   const {
     conversations,
     activeConversationId,
@@ -33,9 +31,7 @@ export function ConversationsSidebar({
     handleSelectConversation,
     handleDeleteConversation,
     handleRenameConversation,
-    uiLanguage,
-  } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+    t } = useApp();
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState("");

@@ -5,8 +5,7 @@
 export function StatusDot({
   ready,
   label,
-  title,
-}: {
+  title }: {
   ready: boolean;
   label: string;
   title?: string;

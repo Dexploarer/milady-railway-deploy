@@ -7,14 +7,13 @@
  *   3. Stream source selector (stream-tab, game, custom-url)
  */
 
-import { useState, useMemo } from "react";
+import { useState} from "react";
 import type { StreamSourceType } from "./helpers";
 import { isSupportedStreamUrl, STREAM_SOURCE_LABELS } from "./helpers";
 import { getAllWidgets } from "./overlays/registry";
 import type { WidgetConfigField, WidgetInstance } from "./overlays/types";
 import type { UseOverlayLayout } from "./overlays/useOverlayLayout";
 import { useApp } from "../../AppContext";
-import { createTranslator } from "../../i18n";
 
 type Section = "channel" | "overlays" | "source";
 
@@ -38,8 +37,7 @@ function ConfigField({
   fieldKey,
   field,
   value,
-  onChange,
-}: {
+  onChange }: {
   fieldKey: string;
   field: WidgetConfigField;
   value: unknown;
@@ -130,8 +128,7 @@ function ConfigField({
 function WidgetRow({
   instance,
   onToggle,
-  onUpdate,
-}: {
+  onUpdate }: {
   instance: WidgetInstance;
   onToggle: () => void;
   onUpdate: (patch: Partial<Pick<WidgetInstance, "config">>) => void;
@@ -213,10 +210,9 @@ export function StreamSettings({
   activeGameViewerUrl,
   onSourceChange,
   overlayLayout,
-  onClose,
-}: StreamSettingsProps) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  onClose }: StreamSettingsProps) {
+  const {
+    t } = useApp();
   const [section, setSection] = useState<Section>("channel");
   const [customUrlInput, setCustomUrlInput] = useState(
     streamSource.type === "custom-url" ? (streamSource.url ?? "") : "",

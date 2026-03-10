@@ -17,11 +17,9 @@ import {
   useEffect,
   useMemo,
   useRef,
-  useState,
-} from "react";
+  useState } from "react";
 import { useApp } from "../AppContext";
 import { client, isApiError } from "../api-client";
-import { createTranslator } from "../i18n";
 import { ActivityFeed } from "./stream/ActivityFeed";
 import { AvatarPip } from "./stream/AvatarPip";
 import { ChatContent } from "./stream/ChatContent";
@@ -33,8 +31,7 @@ import {
   IS_POPOUT,
   PIP_SIZE,
   type StreamSourceType,
-  TERMINAL_ACTIVE_WINDOW_MS,
-} from "./stream/helpers";
+  TERMINAL_ACTIVE_WINDOW_MS } from "./stream/helpers";
 import { IdleContent } from "./stream/IdleContent";
 import { OverlayLayer } from "./stream/overlays/OverlayLayer";
 import { useOverlayLayout } from "./stream/overlays/useOverlayLayout";
@@ -55,9 +52,7 @@ export function StreamView({ inModal }: { inModal?: boolean } = {}) {
     activeGameViewerUrl,
     activeGameSandbox,
     chatAvatarSpeaking,
-    uiLanguage,
-  } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+    t } = useApp();
 
   const agentName = agentStatus?.agentName ?? "Milady";
 
@@ -350,8 +345,7 @@ export function StreamView({ inModal }: { inModal?: boolean } = {}) {
       width: FULL_SIZE.width,
       height: FULL_SIZE.height,
       transform: `scale(${pipScale})`,
-      transformOrigin: "top left",
-    }
+      transformOrigin: "top left" }
     : undefined;
 
   return (

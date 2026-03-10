@@ -16,7 +16,7 @@ import React, {
   useCallback,
   useImperativeHandle,
   useMemo,
-  useState,
+  useState
 } from "react";
 import type { ConfigUiHint } from "../types";
 import type {
@@ -24,7 +24,7 @@ import type {
   FieldRenderer,
   FieldRenderProps,
   JsonSchemaObject,
-  ResolvedField,
+  ResolvedField
 } from "./config-catalog";
 import {
   defaultCatalog,
@@ -32,11 +32,10 @@ import {
   evaluateShowIf,
   evaluateVisibility,
   resolveFields,
-  runValidation,
+  runValidation
 } from "./config-catalog";
 import { ConfigField } from "./config-field";
 import { useApp } from "../AppContext";
-import { createTranslator } from "../i18n";
 
 // ── Props ──────────────────────────────────────────────────────────────
 
@@ -155,7 +154,7 @@ const GROUP_ICONS: Record<string, string> = {
   autonomy: "\u{1F916}",
   "background jobs": "\u{1F504}",
   "n8n connection": "\u{1F517}",
-  app: "\u{1F4F1}",
+  app: "\u{1F4F1}"
 };
 
 function groupIcon(group: string): string {
@@ -189,10 +188,8 @@ interface ValidationSummaryProps {
 function ValidationSummary({
   fieldErrors,
   fieldLabels,
-  pluginId,
-}: ValidationSummaryProps) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  pluginId }: ValidationSummaryProps) {
+  const { t } = useApp();
   const errorEntries = [...fieldErrors.entries()].filter(
     ([, errors]) => errors.length > 0,
   );
@@ -253,7 +250,7 @@ const THEME_TO_CSS: Record<keyof import("../types").PluginUiTheme, string> = {
   borderColor: "--plugin-border",
   focusRing: "--plugin-focus-ring",
   inputHeight: "--plugin-input-height",
-  maxFieldWidth: "--plugin-max-field-width",
+  maxFieldWidth: "--plugin-max-field-width"
 };
 
 // ── Component ──────────────────────────────────────────────────────────
@@ -273,8 +270,7 @@ export const ConfigRenderer = forwardRef<
     onChange,
     renderField: renderFieldOverride,
     showValidationSummary = true,
-    theme,
-  }: ConfigRendererProps,
+    theme }: ConfigRendererProps,
   ref,
 ) {
   const [advancedOpen, setAdvancedOpen] = useState(false);
@@ -411,7 +407,7 @@ export const ConfigRenderer = forwardRef<
             ? () => revealSecret(pluginId, field.key)
             : undefined,
         onAction: (action: string, params?: Record<string, unknown>) =>
-          executeAction(action, params),
+          executeAction(action, params)
       };
     },
     [
@@ -461,7 +457,7 @@ export const ConfigRenderer = forwardRef<
         groups: new Map<string, ResolvedField[]>(),
         advanced: [] as ResolvedField[],
         showHeaders: false,
-        allVisibleFields: [] as ResolvedField[],
+        allVisibleFields: [] as ResolvedField[]
       };
 
     const catalog = registry.catalog;
@@ -496,7 +492,7 @@ export const ConfigRenderer = forwardRef<
       groups: fieldGroups,
       advanced: advancedFields,
       showHeaders: fieldGroups.size > 1,
-      allVisibleFields: visibleFields,
+      allVisibleFields: visibleFields
     };
   }, [schema, hints, registry, isFieldVisible, values]);
 
@@ -563,8 +559,7 @@ export const ConfigRenderer = forwardRef<
   // ── Empty state ──────────────────────────────────────────────────────
 
   if (!schema) {
-    const { uiLanguage } = useApp();
-    const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+    const { t } = useApp();
     return (
       <div className="text-xs text-[var(--muted)] italic py-3">
 
@@ -587,7 +582,7 @@ export const ConfigRenderer = forwardRef<
               <div
                 className="h-full bg-[var(--warning,#f39c12)] rounded-full transition-all duration-300"
                 style={{
-                  width: `${(configProgress.requiredSet / configProgress.requiredTotal) * 100}%`,
+                  width: `${(configProgress.requiredSet / configProgress.requiredTotal) * 100}%`
                 }}
               />
             </div>
@@ -634,8 +629,7 @@ export const ConfigRenderer = forwardRef<
 });
 
 function ConfigProgressText({ configProgress }: { configProgress: { requiredSet: number; requiredTotal: number; configured: number; total: number } }) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  const { t } = useApp();
   return (
     <div className="flex items-center justify-between mb-1.5">
       <span className="text-[12px] font-semibold text-[var(--warning,#f39c12)]">
@@ -651,8 +645,7 @@ function ConfigProgressText({ configProgress }: { configProgress: { requiredSet:
 }
 
 function AdvancedSectionToggle({ advanced, advancedOpen, setAdvancedOpen }: { advanced: ResolvedField[]; advancedOpen: boolean; setAdvancedOpen: React.Dispatch<React.SetStateAction<boolean>> }) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  const { t } = useApp();
   return (
     <button
       type="button"

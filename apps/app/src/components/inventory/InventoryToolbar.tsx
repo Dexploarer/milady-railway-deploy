@@ -34,8 +34,7 @@ export function InventoryToolbar({
   walletNfts,
   setState,
   loadBalances,
-  loadNfts,
-}: InventoryToolbarProps) {
+  loadNfts }: InventoryToolbarProps) {
   return (
     <div className="wt__toolbar">
       <button

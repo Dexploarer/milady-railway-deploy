@@ -1,7 +1,6 @@
 import {
   useWalletPanelState,
-  type WalletPanelProps,
-} from "./useWalletPanelState";
+  type WalletPanelProps } from "./useWalletPanelState";
 import { WalletNftGallery } from "./WalletNftGallery";
 import { WalletPortfolioList } from "./WalletPortfolioList";
 import { WalletSendPanel } from "./WalletSendPanel";
@@ -37,8 +36,7 @@ export function CompanionWalletPanel(props: WalletPanelProps) {
     loadNfts,
     copyToClipboard,
     setActionNotice,
-    t,
-  } = state;
+    t } = state;
 
   if (!evmShort && !solShort) return null;
 
@@ -231,8 +229,7 @@ export function CompanionWalletPanel(props: WalletPanelProps) {
                     { key: "tokens", label: t("wallet.tokens") },
                     {
                       key: "collectibles",
-                      label: t("wallet.collectibles"),
-                    },
+                      label: t("wallet.collectibles") },
                   ] as const
                 ).map((tab) => (
                   <button

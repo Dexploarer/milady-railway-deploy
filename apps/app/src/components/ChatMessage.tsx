@@ -35,8 +35,7 @@ export function ChatMessage({
   agentAvatarSrc,
   onCopy,
   onRetry,
-  onDelete,
-}: ChatMessageProps) {
+  onDelete }: ChatMessageProps) {
   const { t } = useApp();
   const [copied, setCopied] = useState(false);
   const [showActions, setShowActions] = useState(false);
@@ -113,8 +112,8 @@ export function ChatMessage({
         {/* Message Content */}
         <div
           className={`relative group px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap break-words rounded-2xl ${isUser
-              ? "bg-accent text-accent-fg rounded-br-md"
-              : "bg-bg-accent border border-border text-txt rounded-bl-md"
+            ? "bg-accent text-accent-fg rounded-br-md"
+            : "bg-bg-accent border border-border text-txt rounded-bl-md"
             }`}
         >
           <MessageContent message={message} />
@@ -192,12 +191,10 @@ export function ChatMessage({
 
 export function TypingIndicator({
   agentName,
-  agentAvatarSrc,
-}: {
+  agentAvatarSrc }: {
   agentName: string;
   agentAvatarSrc?: string | null;
 }) {
-  const { t } = useApp();
   const agentInitial = agentName.trim().charAt(0).toUpperCase() || "A";
 
   return (

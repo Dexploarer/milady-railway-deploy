@@ -76,6 +76,5 @@ export function useCompanionViewState(_t: TranslatorFn) {
 
   return {
     handleRosterVrmUpload,
-    handleBgUpload,
-  };
+    handleBgUpload };
 }

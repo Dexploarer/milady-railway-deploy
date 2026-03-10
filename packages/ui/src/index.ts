@@ -15,6 +15,9 @@ export * from "./components/ui/spinner";
 export * from "./components/ui/skeleton";
 export * from "./components/ui/stack";
 export * from "./components/ui/grid";
+export * from "./components/ui/status-badge";
+export * from "./components/ui/copy-button";
+export * from "./components/ui/connection-status";
 
 // Molecules
 export * from "./components/ui/card";
@@ -25,3 +28,12 @@ export * from "./components/ui/tooltip";
 export * from "./components/ui/popover";
 export * from "./components/ui/dropdown-menu";
 export * from "./components/ui/sonner";
+export * from "./components/ui/section-card";
+export * from "./components/ui/save-footer";
+export * from "./components/ui/search-input";
+export * from "./components/ui/empty-state";
+export * from "./components/ui/banner";
+export * from "./components/ui/tag-input";
+export * from "./components/ui/confirm-dialog";
+export * from "./components/ui/confirm-delete";
+export * from "./components/ui/error-boundary";

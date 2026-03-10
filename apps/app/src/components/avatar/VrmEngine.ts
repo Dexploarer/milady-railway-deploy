@@ -2,8 +2,7 @@ import {
   MToonMaterialLoaderPlugin,
   type VRM,
   VRMLoaderPlugin,
-  VRMUtils,
-} from "@pixiv/three-vrm";
+  VRMUtils } from "@pixiv/three-vrm";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
@@ -11,15 +10,13 @@ import { resolveAppAssetUrl } from "../../asset-url";
 import {
   type AnimationLoaderContext,
   loadEmoteClip,
-  loadIdleClip,
-} from "./VrmAnimationLoader";
+  loadIdleClip } from "./VrmAnimationLoader";
 import { VrmBlinkController } from "./VrmBlinkController";
 import {
   type CameraAnimationConfig,
   type CameraProfile,
   type InteractionMode,
-  VrmCameraManager,
-} from "./VrmCameraManager";
+  VrmCameraManager } from "./VrmCameraManager";
 import { VrmFootShadow } from "./VrmFootShadow";
 
 export type { CameraAnimationConfig, CameraProfile, InteractionMode };
@@ -58,8 +55,7 @@ const DEFAULT_CAMERA_ANIMATION: CameraAnimationConfig = {
   swayAmplitude: 0.06,
   bobAmplitude: 0.03,
   rotationAmplitude: 0.01,
-  speed: 0.8,
-};
+  speed: 0.8 };
 const MAX_RENDERER_PIXEL_RATIO = 2;
 
 function getRendererPixelRatio(): number {
@@ -85,8 +81,7 @@ async function createRenderer(
       const renderer = new WebGPURenderer({
         canvas,
         alpha: true,
-        antialias: true,
-      }) as unknown as RendererLike & { init?: () => Promise<unknown> };
+        antialias: true }) as unknown as RendererLike & { init?: () => Promise<unknown> };
       await renderer.init?.();
       console.info("[VrmEngine] Using WebGPURenderer");
       return { backend: "webgpu", renderer };
@@ -100,8 +95,7 @@ async function createRenderer(
   const renderer = new THREE.WebGLRenderer({
     canvas,
     alpha: true,
-    antialias: true,
-  }) as unknown as RendererLike;
+    antialias: true }) as unknown as RendererLike;
   console.info("[VrmEngine] Using WebGLRenderer");
   return { backend: "webgl", renderer };
 }
@@ -127,8 +121,7 @@ export class VrmEngine {
   private readonly idleGlbUrl = resolveAppAssetUrl("animations/idle.glb");
   private forceFaceCameraFlip = false;
   private cameraAnimation: CameraAnimationConfig = {
-    ...DEFAULT_CAMERA_ANIMATION,
-  };
+    ...DEFAULT_CAMERA_ANIMATION };
   private baseCameraPosition = new THREE.Vector3();
   private elapsedTime = 0;
   private speaking = false;
@@ -357,8 +350,7 @@ export class VrmEngine {
       vrmName: this.vrmName,
       idlePlaying,
       idleTime: this.idleAction?.time ?? 0,
-      idleTracks: this.idleAction?.getClip()?.tracks.length ?? 0,
-    };
+      idleTracks: this.idleAction?.getClip()?.tracks.length ?? 0 };
   }
   setMouthOpen(value: number): void {
     this.mouthValue = Math.max(0, Math.min(1, value));
@@ -455,8 +447,7 @@ export class VrmEngine {
     loader.register((parser) => {
       if (webGpuNodes) {
         const mtoonMaterialPlugin = new MToonMaterialLoaderPlugin(parser, {
-          materialType: webGpuNodes.MToonNodeMaterial,
-        });
+          materialType: webGpuNodes.MToonNodeMaterial });
         return new VRMLoaderPlugin(parser, { mtoonMaterialPlugin });
       }
       return new VRMLoaderPlugin(parser);
@@ -533,8 +524,7 @@ export class VrmEngine {
   private get animationLoaderContext(): AnimationLoaderContext {
     return {
       isAborted: () => this.loadingAborted,
-      isCurrentVrm: (vrm: VRM) => this.vrm === vrm,
-    };
+      isCurrentVrm: (vrm: VRM) => this.vrm === vrm };
   }
   private loop(): void {
     this.animationFrameId = requestAnimationFrame(() => this.loop());

@@ -14,7 +14,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useApp } from "../AppContext";
 import type { ConversationMessage, PluginInfo } from "../api-client";
 import { client } from "../api-client";
-import { createTranslator } from "../i18n";
 import type { ConfigUiHint } from "../types";
 import type { JsonSchemaObject } from "./config-catalog";
 import { ConfigRenderer, defaultRegistry } from "./config-renderer";
@@ -216,7 +215,7 @@ export function findPatchRegions(
           start: blockStart,
           end: blockEnd,
           spec,
-          raw: rawLines.join("\n"),
+          raw: rawLines.join("\n")
         });
       }
     }
@@ -282,7 +281,7 @@ function parseSegments(text: string): Segment[] {
     regions.push({
       start: m.index,
       end: m.index + m[0].length,
-      segment: { kind: "config", pluginId: m[1] },
+      segment: { kind: "config", pluginId: m[1] }
     });
     m = CONFIG_RE.exec(cleaned);
   }
@@ -297,7 +296,7 @@ function parseSegments(text: string): Segment[] {
       regions.push({
         start: m.index,
         end: m.index + m[0].length,
-        segment: { kind: "ui-spec", spec: parsed, raw: json },
+        segment: { kind: "ui-spec", spec: parsed, raw: json }
       });
     }
     m = FENCED_JSON_RE.exec(cleaned);
@@ -313,7 +312,7 @@ function parseSegments(text: string): Segment[] {
       regions.push({
         start: patch.start,
         end: patch.end,
-        segment: { kind: "ui-spec", spec: patch.spec, raw: patch.raw },
+        segment: { kind: "ui-spec", spec: patch.spec, raw: patch.raw }
       });
     }
   }
@@ -369,8 +368,7 @@ function InlinePluginConfig({ pluginId: rawPluginId }: { pluginId: string }) {
   const [dismissed, setDismissed] = useState(false);
   const mountedRef = useRef(true);
   const refreshTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const { setActionNotice, loadPlugins, uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  const { setActionNotice, loadPlugins, t } = useApp();
 
   // Track mount state — reset to true on each mount (needed for StrictMode
   // which unmounts/remounts and would leave the ref false otherwise).
@@ -638,8 +636,8 @@ function InlinePluginConfig({ pluginId: rawPluginId }: { pluginId: string }) {
 // ── UiSpec block ────────────────────────────────────────────────────
 
 function UiSpecBlock({ spec, raw }: { spec: UiSpec; raw: string }) {
-  const { sendActionMessage, uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  const { t } = useApp();
+  const { sendActionMessage } = useApp();
   const [showRaw, setShowRaw] = useState(false);
 
   const handleAction = useCallback(

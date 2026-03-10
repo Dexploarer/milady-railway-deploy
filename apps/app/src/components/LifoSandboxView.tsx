@@ -3,8 +3,7 @@ import "../styles/xterm.css";
 import {
   client,
   type SandboxBrowserEndpoints,
-  type SandboxWindowInfo,
-} from "../api-client";
+  type SandboxWindowInfo } from "../api-client";
 import { useLifoSync } from "../hooks/useLifoSync";
 import {
   buildLifoPopoutUrl,
@@ -13,17 +12,14 @@ import {
   isLifoPopoutMode,
   isSafeEndpointUrl,
   LIFO_POPOUT_FEATURES,
-  LIFO_POPOUT_WINDOW_NAME,
-} from "../lifo-popout";
+  LIFO_POPOUT_WINDOW_NAME } from "../lifo-popout";
 import {
   createLifoRuntime,
   type LifoRuntime,
-  normalizeTerminalText,
-} from "../lifo-runtime";
+  normalizeTerminalText } from "../lifo-runtime";
 import { pathForTab } from "../navigation";
 import { LifoMonitorPanel } from "./LifoMonitorPanel";
 import { useApp } from "../AppContext";
-import { createTranslator } from "../i18n";
 
 interface TerminalOutputEvent {
   event?: unknown;
@@ -41,8 +37,8 @@ function formatError(error: unknown): string {
 }
 
 export function LifoSandboxView({ inModal }: { inModal?: boolean } = {}) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  const {
+    t } = useApp();
   const terminalRef = useRef<HTMLDivElement | null>(null);
   const explorerRef = useRef<HTMLDivElement | null>(null);
   const runtimeRef = useRef<LifoRuntime | null>(null);
@@ -109,8 +105,7 @@ export function LifoSandboxView({ inModal }: { inModal?: boolean } = {}) {
     setRunCount,
     setSessionKey,
     setControllerOnline,
-    controllerHeartbeatAtRef,
-  });
+    controllerHeartbeatAtRef });
 
   const teardown = useCallback(() => {
     try {
@@ -168,15 +163,13 @@ export function LifoSandboxView({ inModal }: { inModal?: boolean } = {}) {
               const trimmed = chunk.trimEnd();
               if (trimmed) appendOutput(`stderr: ${trimmed}`);
               broadcastSyncMessage({ type: "stderr", chunk });
-            },
-          });
+            } });
 
           runtime.terminal.writeln(`[exit ${result.exitCode}]`);
           appendOutput(`[exit ${result.exitCode}]`);
           broadcastSyncMessage({
             type: "command-exit",
-            exitCode: result.exitCode,
-          });
+            exitCode: result.exitCode });
         } catch (err) {
           const message = formatError(err);
           runtime.terminal.writeln(`error: ${message}`);
@@ -414,8 +407,7 @@ export function LifoSandboxView({ inModal }: { inModal?: boolean } = {}) {
 
     const url = buildLifoPopoutUrl({
       targetPath: pathForTab("lifo", import.meta.env.BASE_URL),
-      sessionId: lifoSessionId ?? undefined,
-    });
+      sessionId: lifoSessionId ?? undefined });
     const popup = window.open(
       url,
       LIFO_POPOUT_WINDOW_NAME,

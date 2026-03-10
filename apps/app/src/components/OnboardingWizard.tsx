@@ -9,21 +9,20 @@ import {
   Lock,
   Minus,
   XCircle,
-  Zap,
+  Zap
 } from "lucide-react";
 import {
   type ChangeEvent,
   useCallback,
   useEffect,
-  useMemo,
   useRef,
-  useState,
+  useState
 } from "react";
 import {
   getVrmPreviewUrl,
   getVrmUrl,
   type OnboardingStep,
-  useApp,
+  useApp
 } from "../AppContext";
 import {
   type CloudProviderOption,
@@ -35,10 +34,10 @@ import {
   type ProviderOption,
   type RpcProviderOption,
   type SandboxPlatformStatus,
-  type StylePreset,
+  type StylePreset
 } from "../api-client";
 import { resolveApiUrl, resolveAppAssetUrl } from "../asset-url";
-import { createTranslator, normalizeLanguage } from "../i18n";
+import { normalizeLanguage } from "../i18n";
 import { getProviderLogo } from "../provider-logos";
 import { AvatarSelector } from "./AvatarSelector";
 import { PermissionsOnboardingSection } from "./PermissionsSection";
@@ -72,7 +71,7 @@ function mapSandboxPlatform(status: SandboxPlatformStatus): {
     running: Boolean(status.dockerRunning),
     platform: status.platform ?? inferPlatform(),
     appleContainerAvailable: Boolean(status.appleContainerAvailable),
-    engineRecommendation: status.recommended ?? "docker",
+    engineRecommendation: status.recommended ?? "docker"
   };
 }
 
@@ -98,8 +97,7 @@ type OnboardingVrmAvatarProps = {
 function OnboardingVrmAvatar({
   vrmPath: _vrmPath,
   fallbackPreviewUrl: _fallbackPreviewUrl,
-  pulse = false,
-}: OnboardingVrmAvatarProps) {
+  pulse = false }: OnboardingVrmAvatarProps) {
   return (
     <div
       className={`relative w-[140px] h-[140px] rounded-full border-[3px] border-border mx-auto mb-5 overflow-hidden bg-card ${pulse ? "animate-pulse" : ""
@@ -156,8 +154,7 @@ export function OnboardingWizard() {
     setState,
     handleCloudLogin,
     mintFromDrop,
-  } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+    t } = useApp();
 
   const [_showAllProviders, _setShowAllProviders] = useState(false);
   const [openaiOAuthStarted, setOpenaiOAuthStarted] = useState(false);
@@ -345,7 +342,7 @@ export function OnboardingWizard() {
   const handleRpcSelectionChange = (chain: string, provider: string) => {
     setState("onboardingRpcSelections", {
       ...onboardingRpcSelections,
-      [chain]: provider,
+      [chain]: provider
     });
   };
 
@@ -1189,11 +1186,11 @@ export function OnboardingWizard() {
           elizacloud: { name: "Eliza Cloud" },
           "anthropic-subscription": {
             name: "Claude Subscription",
-            description: "$20-200/mo Claude Pro/Max subscription",
+            description: "$20-200/mo Claude Pro/Max subscription"
           },
           "openai-subscription": {
             name: "ChatGPT Subscription",
-            description: "$20-200/mo ChatGPT Plus/Pro subscription",
+            description: "$20-200/mo ChatGPT Plus/Pro subscription"
           },
           anthropic: { name: "Anthropic API Key" },
           openai: { name: "OpenAI API Key" },
@@ -1205,15 +1202,15 @@ export function OnboardingWizard() {
           "pi-ai": {
             name: "Pi Credentials (pi-ai)",
             description:
-              "Use pi auth (~/.pi/agent/auth.json) for API keys / OAuth",
-          },
+              "Use pi auth (~/.pi/agent/auth.json) for API keys / OAuth"
+          }
         };
 
         const getProviderDisplay = (provider: ProviderOption) => {
           const override = providerOverrides[provider.id];
           return {
             name: override?.name ?? provider.name,
-            description: override?.description ?? provider.description,
+            description: override?.description ?? provider.description
           };
         };
 
@@ -2337,7 +2334,7 @@ export function OnboardingWizard() {
       <div className="text-[11px] text-muted text-center mb-1 tracking-wide">
         {t("onboarding.stepLabel", {
           current: stepIndex,
-          total: totalSteps != null ? totalSteps : "?",
+          total: totalSteps != null ? totalSteps : "?"
         })}
       </div>
 
@@ -2376,11 +2373,10 @@ export function OnboardingWizard() {
 
 function DockerSetupStep({
   avatarVrmPath,
-  avatarFallbackPreviewUrl,
-}: {
-  avatarVrmPath: string;
-  avatarFallbackPreviewUrl: string;
-}) {
+  avatarFallbackPreviewUrl }: {
+    avatarVrmPath: string;
+    avatarFallbackPreviewUrl: string;
+  }) {
   const { t } = useApp();
   const [checking, setChecking] = useState(true);
   const [starting, setStarting] = useState(false);
@@ -2404,7 +2400,7 @@ function DockerSetupStep({
         running: false,
         platform: inferPlatform(),
         appleContainerAvailable: false,
-        engineRecommendation: "docker",
+        engineRecommendation: "docker"
       });
     }
     setChecking(false);

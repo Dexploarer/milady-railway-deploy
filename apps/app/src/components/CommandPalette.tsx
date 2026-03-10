@@ -4,8 +4,7 @@ import { COMMAND_PALETTE_EVENT } from "../events";
 import { useBugReport } from "../hooks/useBugReport";
 import {
   buildCommandPaletteCommands,
-  type CommandItem,
-} from "./command-palette-commands";
+  type CommandItem } from "./command-palette-commands";
 
 export function CommandPalette() {
   const {
@@ -24,8 +23,7 @@ export function CommandPalette() {
     handleChatClear,
     activeGameViewerUrl,
     setState,
-    t,
-  } = useApp();
+    t } = useApp();
   const { open: openBugReport } = useBugReport();
   const closeCommandPalette = useCallback(
     () => setState("commandPaletteOpen", false),
@@ -52,8 +50,7 @@ export function CommandPalette() {
       loadLogs,
       loadWorkbench,
       handleChatClear,
-      openBugReport,
-    });
+      openBugReport });
   }, [
     agentState,
     currentGameViewerUrl,

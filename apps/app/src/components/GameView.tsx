@@ -12,14 +12,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useApp } from "../AppContext";
 import { client, type LogEntry } from "../api-client";
 import { useRetakeCapture } from "../hooks/useRetakeCapture";
-import { createTranslator } from "../i18n";
 import { formatTime } from "./shared/format";
 
 const DEFAULT_VIEWER_SANDBOX = "allow-scripts allow-same-origin allow-popups";
 const READY_EVENT_BY_AUTH_TYPE: Record<string, string> = {
   HYPERSCAPE_AUTH: "HYPERSCAPE_READY",
-  RS_2004SCAPE_AUTH: "RS_2004SCAPE_READY",
-};
+  RS_2004SCAPE_AUTH: "RS_2004SCAPE_READY" };
 
 function resolvePostMessageTargetOrigin(viewerUrl: string): string {
   if (viewerUrl.startsWith("/")) return window.location.origin;
@@ -33,8 +31,7 @@ const TAG_COLORS: Record<string, { bg: string; fg: string }> = {
   hyperscape: { bg: "rgba(245, 158, 11, 0.15)", fg: "rgb(245, 158, 11)" },
   game: { bg: "rgba(34, 197, 94, 0.15)", fg: "rgb(34, 197, 94)" },
   autonomy: { bg: "rgba(245, 158, 11, 0.15)", fg: "rgb(245, 158, 11)" },
-  websocket: { bg: "rgba(20, 184, 166, 0.15)", fg: "rgb(20, 184, 166)" },
-};
+  websocket: { bg: "rgba(20, 184, 166, 0.15)", fg: "rgb(20, 184, 166)" } };
 
 export function GameView() {
   const {
@@ -50,7 +47,7 @@ export function GameView() {
     loadLogs,
     setState,
     setActionNotice,
-  } = useApp();
+    t } = useApp();
   const [stopping, setStopping] = useState(false);
   const [showLogsPanel, setShowLogsPanel] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<
@@ -64,8 +61,6 @@ export function GameView() {
   const viewerSessionRef = useRef<string>("");
   const logsIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
 
   // Stream iframe frames to retake.tv when capture is active
   useRetakeCapture(iframeRef, retakeCapture);
@@ -351,8 +346,7 @@ export function GameView() {
                       className="text-[9px] px-1 py-px rounded"
                       style={{
                         background: c ? c.bg : "var(--bg-muted)",
-                        color: c ? c.fg : "var(--muted)",
-                      }}
+                        color: c ? c.fg : "var(--muted)" }}
                     >
                       {t}
                     </span>

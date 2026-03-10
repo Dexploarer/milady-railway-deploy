@@ -2,7 +2,6 @@ import { Menu, X } from "lucide-react";
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { useApp } from "../AppContext";
-import { createTranslator } from "../i18n";
 import { getTabGroups, type TabGroup } from "../navigation";
 
 /** Map static navigation group labels to i18n keys. */
@@ -16,16 +15,15 @@ const NAV_LABEL_I18N_KEY: Record<string, string> = {
   Social: "nav.social",
   Apps: "nav.apps",
   Settings: "nav.settings",
-  Advanced: "nav.advanced",
-};
+  Advanced: "nav.advanced" };
 
 interface NavProps {
   mobileLeft?: ReactNode;
 }
 
 export function Nav({ mobileLeft }: NavProps) {
-  const { tab, setTab, plugins, uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  const { tab, setTab, plugins,
+    t } = useApp();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const streamingEnabled = useMemo(

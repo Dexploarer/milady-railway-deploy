@@ -6,8 +6,7 @@ import type React from "react";
 import { getVrmPreviewUrl } from "../../AppContext";
 import {
   avatarIndexFromConversationId,
-  formatRelativeTime,
-} from "./conversation-utils";
+  formatRelativeTime } from "./conversation-utils";
 
 
 interface ConversationListItemProps {
@@ -54,8 +53,7 @@ export function ConversationListItem({
   onDelete,
   onConfirmDelete,
   onCancelDelete,
-  onSetConfirmDelete,
-}: ConversationListItemProps) {
+  onSetConfirmDelete }: ConversationListItemProps) {
   const avatarSrc = getVrmPreviewUrl(avatarIndexFromConversationId(conv.id));
   const fallbackInitial = conv.title.trim().charAt(0).toUpperCase() || "#";
 

@@ -35,7 +35,6 @@ interface CanvasWindowViewProps {
 // ---------------------------------------------------------------------------
 
 function Spinner() {
-    const { t } = useApp();
   return (
     <svg
       className="animate-spin h-3 w-3 text-muted"
@@ -69,9 +68,8 @@ export function CanvasWindowView({
   url,
   enabled,
   title,
-  className,
-}: CanvasWindowViewProps) {
-    const { t } = useApp();
+  className }: CanvasWindowViewProps) {
+  const { t } = useApp();
   const { containerRef, isReady } = useCanvasWindow({ url, enabled, title });
 
   const showLoading = enabled && !isReady;

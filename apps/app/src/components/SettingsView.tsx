@@ -28,12 +28,11 @@ import {
   Terminal,
   Upload,
   Wallet,
-  X,
+  X
 } from "lucide-react";
 import type React from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useApp } from "../AppContext";
-import { createTranslator } from "../i18n";
 import { CodingAgentSettingsSection } from "./CodingAgentSettingsSection";
 import { ConfigPageView } from "./ConfigPageView";
 import { MediaSettingsSection } from "./MediaSettingsSection";
@@ -53,55 +52,55 @@ const SETTINGS_SECTIONS: SettingsSectionDef[] = [
     id: "appearance",
     label: "Appearance",
     icon: Palette,
-    description: "Visual preferences",
+    description: "Visual preferences"
   },
   {
     id: "ai-model",
     label: "AI Model",
     icon: Bot,
-    description: "Provider and model settings",
+    description: "Provider and model settings"
   },
   {
     id: "coding-agents",
     label: "Coding Agents",
     icon: Terminal,
-    description: "Agent preferences, models, and permissions",
+    description: "Agent preferences, models, and permissions"
   },
   {
     id: "wallet-rpc",
     label: "Wallet & RPC",
     icon: Wallet,
-    description: "Chain RPC providers and API keys",
+    description: "Chain RPC providers and API keys"
   },
   {
     id: "media",
     label: "Media",
     icon: Image,
-    description: "Image, video, and vision providers",
+    description: "Image, video, and vision providers"
   },
   {
     id: "voice",
     label: "Voice",
     icon: Mic,
-    description: "Text-to-speech and transcription",
+    description: "Text-to-speech and transcription"
   },
   {
     id: "permissions",
     label: "Permissions",
     icon: Shield,
-    description: "Capabilities and access control",
+    description: "Capabilities and access control"
   },
   {
     id: "updates",
     label: "Updates",
     icon: RefreshCw,
-    description: "Software update settings",
+    description: "Software update settings"
   },
   {
     id: "advanced",
     label: "Advanced",
     icon: Sliders,
-    description: "Export, import, and dangerous actions",
+    description: "Export, import, and dangerous actions"
   },
 ];
 
@@ -123,13 +122,12 @@ export function Modal({
   open,
   onClose,
   title,
-  children,
-}: {
-  open: boolean;
-  onClose: () => void;
-  title: string;
-  children: React.ReactNode;
-}) {
+  children }: {
+    open: boolean;
+    onClose: () => void;
+    title: string;
+    children: React.ReactNode;
+  }) {
   if (!open) return null;
   return (
     <div
@@ -171,14 +169,13 @@ function SectionCard({
   title,
   description,
   children,
-  className = "",
-}: {
-  id: string;
-  title: string;
-  description?: string;
-  children: React.ReactNode;
-  className?: string;
-}) {
+  className = "" }: {
+    id: string;
+    title: string;
+    description?: string;
+    children: React.ReactNode;
+    className?: string;
+  }) {
   return (
     <section
       id={id}
@@ -200,15 +197,13 @@ function SettingsSidebar({
   activeSection,
   onSectionChange,
   searchQuery,
-  onSearchChange,
-}: {
-  activeSection: string;
-  onSectionChange: (id: string) => void;
-  searchQuery: string;
-  onSearchChange: (query: string) => void;
-}) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  onSearchChange }: {
+    activeSection: string;
+    onSectionChange: (id: string) => void;
+    searchQuery: string;
+    onSearchChange: (query: string) => void;
+  }) {
+  const { t } = useApp();
 
   const filteredSections = SETTINGS_SECTIONS.filter((section) =>
     matchesSettingsSection(section, searchQuery),
@@ -287,9 +282,9 @@ function SettingsSidebar({
 /* ── Updates Section ─────────────────────────────────────────────────── */
 
 function UpdatesSection() {
-  const { updateStatus, updateLoading, loadUpdateStatus, uiLanguage } =
+  const { t } = useApp();
+  const { updateStatus, updateLoading, loadUpdateStatus } =
     useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
 
   useEffect(() => {
     void loadUpdateStatus();
@@ -341,9 +336,9 @@ function UpdatesSection() {
 /* ── Advanced Section ─────────────────────────────────────────────────── */
 
 function AdvancedSection() {
+  const { t } = useApp();
   const {
     handleReset,
-    uiLanguage,
     exportBusy,
     exportPassword,
     exportIncludeLogs,
@@ -356,9 +351,7 @@ function AdvancedSection() {
     importSuccess,
     handleAgentExport,
     handleAgentImport,
-    setState,
-  } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+    setState } = useApp();
   const [exportModalOpen, setExportModalOpen] = useState(false);
   const [importModalOpen, setImportModalOpen] = useState(false);
   const importFileInputRef = useRef<HTMLInputElement>(null);
@@ -638,11 +631,11 @@ function AdvancedSection() {
 
 export function SettingsView({
   inModal,
-  onClose,
-}: {
-  inModal?: boolean;
-  onClose?: () => void;
-} = {}) {
+  onClose }: {
+    inModal?: boolean;
+    onClose?: () => void;
+  } = {}) {
+  const { t } = useApp();
   const [activeSection, setActiveSection] = useState("appearance");
   const [searchQuery, setSearchQuery] = useState("");
   const contentRef = useRef<HTMLDivElement>(null);
@@ -675,9 +668,7 @@ export function SettingsView({
     handleCloudLogin,
     handleCloudDisconnect,
     setState,
-    setActionNotice,
-  } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+    setActionNotice } = useApp();
   const handleClose = useCallback(
     () => onClose?.() ?? setTab(inModal ? "companion" : "chat"),
     [inModal, onClose, setTab],

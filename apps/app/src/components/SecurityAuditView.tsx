@@ -4,11 +4,9 @@ import {
   type SecurityAuditEntry,
   type SecurityAuditEventType,
   type SecurityAuditFilter,
-  type SecurityAuditSeverity,
-} from "../api-client";
+  type SecurityAuditSeverity } from "../api-client";
 import { formatDateTime } from "./shared/format";
 import { useApp } from "../AppContext";
-import { createTranslator } from "../i18n";
 
 const EVENT_TYPES: SecurityAuditEventType[] = [
   "sandbox_mode_transition",
@@ -63,8 +61,8 @@ function formatErrorMessage(error: unknown): string {
 }
 
 export function SecurityAuditView() {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  const {
+    t } = useApp();
   const [entries, setEntries] = useState<SecurityAuditEntry[]>([]);
   const [typeFilter, setTypeFilter] = useState("");
   const [severityFilter, setSeverityFilter] = useState("");
@@ -78,8 +76,7 @@ export function SecurityAuditView() {
 
   const buildFilter = useCallback((): SecurityAuditFilter => {
     const nextFilter: SecurityAuditFilter = {
-      limit: currentLimit,
-    };
+      limit: currentLimit };
 
     const type = typeFilter.trim();
     if (type) {

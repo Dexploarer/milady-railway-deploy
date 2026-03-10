@@ -26,8 +26,7 @@ export function OverlayLayer({
   layout,
   events,
   agentMode,
-  agentName,
-}: OverlayLayerProps) {
+  agentName }: OverlayLayerProps) {
   const enabledWidgets = useMemo(
     () => layout.widgets.filter((w) => w.enabled),
     [layout.widgets],
@@ -58,8 +57,7 @@ export function OverlayLayer({
               top: `${instance.position.y}%`,
               width: `${instance.position.width}%`,
               height: `${instance.position.height}%`,
-              zIndex: instance.zIndex,
-            }}
+              zIndex: instance.zIndex }}
           >
             <Widget
               instance={instance}

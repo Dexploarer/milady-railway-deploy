@@ -69,8 +69,7 @@ export function WalletSwapPanel({
   handleSwapExecute,
   handleSwapPreset,
   handleCopyUserSignPayload,
-  t,
-}: WalletSwapPanelProps) {
+  t }: WalletSwapPanelProps) {
   return (
     <div className="anime-wallet-action-body">
       <section
@@ -84,7 +83,7 @@ export function WalletSwapPanel({
             label: swapNeedsUserSign
               ? t("wallet.flow.sign")
               : t("wallet.flow.execute"),
-            step: 3,
+            step: 3
           },
           { label: t("wallet.flow.done"), step: 4 },
         ].map((item, index, steps) => {
@@ -154,10 +153,10 @@ export function WalletSwapPanel({
           <span>
             {swapSide === "buy"
               ? t("wallet.spendSymbol", {
-                symbol: swapInputSymbol,
+                symbol: swapInputSymbol
               })
               : t("wallet.sellSymbol", {
-                symbol: swapInputSymbol,
+                symbol: swapInputSymbol
               })}
           </span>
           <input
@@ -188,7 +187,7 @@ export function WalletSwapPanel({
         {swapSide === "buy" && (
           <span>
             {t("wallet.gasReserve", {
-              amount: BSC_SWAP_GAS_RESERVE,
+              amount: BSC_SWAP_GAS_RESERVE
             })}
           </span>
         )}
@@ -263,7 +262,7 @@ export function WalletSwapPanel({
             <span>{t("wallet.route")}</span>
             <strong>
               {t("wallet.hopsCount", {
-                count: swapQuote.route.length,
+                count: swapQuote.route.length
               })}
             </strong>
           </div>

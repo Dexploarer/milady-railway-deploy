@@ -11,7 +11,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { client, type QueryResult, type TableInfo } from "../api-client";
 import { useApp } from "../AppContext";
-import { createTranslator } from "../i18n";
 
 const PAGE_SIZE = 25;
 const MAX_THREE_PIXEL_RATIO = 2;
@@ -120,7 +119,7 @@ function rowToMemory(row: Record<string, unknown>): MemoryRecord {
     createdAt: String(row.createdAt ?? row.created_at ?? row.timestamp ?? ""),
     unique: row.unique === true || row.unique === 1 || row.isUnique === true,
     embedding: parseEmbedding(embeddingVal),
-    raw: row,
+    raw: row
   };
 }
 
@@ -217,13 +216,11 @@ function projectTo3D(vectors: number[][]): [number, number, number][] {
 
 function VectorGraph({
   memories,
-  onSelect,
-}: {
-  memories: MemoryRecord[];
-  onSelect: (mem: MemoryRecord) => void;
-}) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  onSelect }: {
+    memories: MemoryRecord[];
+    onSelect: (mem: MemoryRecord) => void;
+  }) {
+  const { t } = useApp();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
@@ -490,13 +487,11 @@ function VectorGraph({
 
 function VectorGraph3D({
   memories,
-  onSelect,
-}: {
-  memories: MemoryRecord[];
-  onSelect: (mem: MemoryRecord) => void;
-}) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  onSelect }: {
+    memories: MemoryRecord[];
+    onSelect: (mem: MemoryRecord) => void;
+  }) {
+  const { t } = useApp();
   const containerRef = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
@@ -573,7 +568,7 @@ function VectorGraph3D({
           const WebGPURenderer = webgpuModule.WebGPURenderer;
           if (WebGPURenderer) {
             const webgpuRenderer = new WebGPURenderer({
-              antialias: true,
+              antialias: true
             });
             await webgpuRenderer.init?.();
             renderer = webgpuRenderer;
@@ -709,7 +704,7 @@ function VectorGraph3D({
         const material = new THREE.MeshBasicMaterial({
           color,
           transparent: true,
-          opacity: 0.85,
+          opacity: 0.85
         });
         const sphere = new THREE.Mesh(geometry, material);
         sphere.position.set(
@@ -864,7 +859,7 @@ function VectorGraph3D({
       renderer.domElement.addEventListener("mousemove", onMouseMove);
       renderer.domElement.addEventListener("click", onClick);
       renderer.domElement.addEventListener("wheel", onWheel, {
-        passive: false,
+        passive: false
       });
       renderer.domElement.addEventListener("mouseleave", onMouseLeave);
       if (cancelled) {
@@ -933,7 +928,7 @@ function VectorGraph3D({
           style={{
             left: tooltipPos.x + 15,
             top: tooltipPos.y + 15,
-            transform: tooltipPos.x > 400 ? "translateX(-100%)" : undefined,
+            transform: tooltipPos.x > 400 ? "translateX(-100%)" : undefined
           }}
         >
           <div className="font-medium mb-1 truncate">
@@ -960,7 +955,7 @@ function VectorGraph3D({
                 <div
                   className="w-3 h-3 rounded-full"
                   style={{
-                    backgroundColor: `#${color.toString(16).padStart(6, "0")}`,
+                    backgroundColor: `#${color.toString(16).padStart(6, "0")}`
                   }}
                 />
                 <span className="text-[var(--muted)]">{type}</span>
@@ -976,11 +971,10 @@ function VectorGraph3D({
 
 function MemoryDetailModal({
   memory,
-  onClose,
-}: {
-  memory: MemoryRecord;
-  onClose: () => void;
-}) {
+  onClose }: {
+    memory: MemoryRecord;
+    onClose: () => void;
+  }) {
   const { t } = useApp();
   return (
     <div
@@ -1083,8 +1077,7 @@ function MemoryDetailModal({
 // ── Main component ─────────────────────────────────────────────────────
 
 export function VectorBrowserView() {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  const { t } = useApp();
   const [tables, setTables] = useState<TableInfo[]>([]);
   const [selectedTable, setSelectedTable] = useState("");
   const [memories, setMemories] = useState<MemoryRecord[]>([]);
@@ -1231,7 +1224,7 @@ export function VectorBrowserView() {
       const joinSql = buildJoinQuery({
         where: joinWhere,
         limit: PAGE_SIZE,
-        offset,
+        offset
       });
       let result: QueryResult;
 

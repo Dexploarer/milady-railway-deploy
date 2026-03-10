@@ -2,12 +2,10 @@ import { Menu, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useApp } from "../AppContext";
 import { client } from "../api-client";
-import { createTranslator } from "../i18n";
 import {
   dispatchMiladyEvent,
   EMOTE_PICKER_EVENT,
-  STOP_EMOTE_EVENT,
-} from "../events";
+  STOP_EMOTE_EVENT } from "../events";
 
 // Types
 interface EmoteItem {
@@ -25,8 +23,7 @@ const CATEGORY_ICONS: Record<string, string> = {
   combat: "\u{2694}",
   idle: "\u{1F9D8}",
   movement: "\u{1F3C3}",
-  other: "\u{2728}",
-};
+  other: "\u{2728}" };
 
 // Emote icons
 const EMOTE_ICONS: Record<string, string> = {
@@ -58,8 +55,7 @@ const EMOTE_ICONS: Record<string, string> = {
   run: "\u{1F3C3}",
   walk: "\u{1F6B6}",
   crawling: "\u{1F40D}",
-  fall: "\u{1F4A5}",
-};
+  fall: "\u{1F4A5}" };
 
 // All emotes
 const ALL_EMOTES: EmoteItem[] = [
@@ -72,90 +68,76 @@ const ALL_EMOTES: EmoteItem[] = [
     id: "crying",
     name: "Crying",
     category: "emotion",
-    icon: EMOTE_ICONS.crying,
-  },
+    icon: EMOTE_ICONS.crying },
   {
     id: "sorrow",
     name: "Sorrow",
     category: "emotion",
-    icon: EMOTE_ICONS.sorrow,
-  },
+    icon: EMOTE_ICONS.sorrow },
   {
     id: "rude-gesture",
     name: "Rude Gesture",
     category: "emotion",
-    icon: EMOTE_ICONS["rude-gesture"],
-  },
+    icon: EMOTE_ICONS["rude-gesture"] },
   {
     id: "looking-around",
     name: "Looking Around",
     category: "emotion",
-    icon: EMOTE_ICONS["looking-around"],
-  },
+    icon: EMOTE_ICONS["looking-around"] },
 
   // Dance
   {
     id: "dance-happy",
     name: "Dance Happy",
     category: "dance",
-    icon: EMOTE_ICONS["dance-happy"],
-  },
+    icon: EMOTE_ICONS["dance-happy"] },
   {
     id: "dance-breaking",
     name: "Dance Breaking",
     category: "dance",
-    icon: EMOTE_ICONS["dance-breaking"],
-  },
+    icon: EMOTE_ICONS["dance-breaking"] },
   {
     id: "dance-hiphop",
     name: "Dance Hip Hop",
     category: "dance",
-    icon: EMOTE_ICONS["dance-hiphop"],
-  },
+    icon: EMOTE_ICONS["dance-hiphop"] },
   {
     id: "dance-popping",
     name: "Dance Popping",
     category: "dance",
-    icon: EMOTE_ICONS["dance-popping"],
-  },
+    icon: EMOTE_ICONS["dance-popping"] },
 
   // Combat
   {
     id: "hook-punch",
     name: "Hook Punch",
     category: "combat",
-    icon: EMOTE_ICONS["hook-punch"],
-  },
+    icon: EMOTE_ICONS["hook-punch"] },
   {
     id: "punching",
     name: "Punching",
     category: "combat",
-    icon: EMOTE_ICONS.punching,
-  },
+    icon: EMOTE_ICONS.punching },
   {
     id: "firing-gun",
     name: "Firing Gun",
     category: "combat",
-    icon: EMOTE_ICONS["firing-gun"],
-  },
+    icon: EMOTE_ICONS["firing-gun"] },
   {
     id: "sword-swing",
     name: "Sword Swing",
     category: "combat",
-    icon: EMOTE_ICONS["sword-swing"],
-  },
+    icon: EMOTE_ICONS["sword-swing"] },
   {
     id: "chopping",
     name: "Chopping",
     category: "combat",
-    icon: EMOTE_ICONS.chopping,
-  },
+    icon: EMOTE_ICONS.chopping },
   {
     id: "spell-cast",
     name: "Spell Cast",
     category: "combat",
-    icon: EMOTE_ICONS["spell-cast"],
-  },
+    icon: EMOTE_ICONS["spell-cast"] },
   { id: "range", name: "Range", category: "combat", icon: EMOTE_ICONS.range },
   { id: "death", name: "Death", category: "combat", icon: EMOTE_ICONS.death },
 
@@ -167,8 +149,7 @@ const ALL_EMOTES: EmoteItem[] = [
     id: "fishing",
     name: "Fishing",
     category: "idle",
-    icon: EMOTE_ICONS.fishing,
-  },
+    icon: EMOTE_ICONS.fishing },
 
   // Movement
   { id: "float", name: "Float", category: "movement", icon: EMOTE_ICONS.float },
@@ -180,8 +161,7 @@ const ALL_EMOTES: EmoteItem[] = [
     id: "crawling",
     name: "Crawling",
     category: "movement",
-    icon: EMOTE_ICONS.crawling,
-  },
+    icon: EMOTE_ICONS.crawling },
   { id: "fall", name: "Fall", category: "movement", icon: EMOTE_ICONS.fall },
 ];
 
@@ -200,12 +180,11 @@ const CATEGORY_LABELS: Record<string, string> = {
   dance: "Dance",
   combat: "Combat",
   idle: "Idle",
-  movement: "Movement",
-};
+  movement: "Movement" };
 
 export function EmotePicker() {
-  const { emotePickerOpen, openEmotePicker, closeEmotePicker, uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  const { emotePickerOpen, openEmotePicker, closeEmotePicker,
+    t } = useApp();
   const [search, setSearch] = useState("");
   const [playing, setPlaying] = useState<string | null>(null);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
@@ -242,8 +221,7 @@ export function EmotePicker() {
       dragOrigin.current = {
         startX: e.clientX,
         startY: e.clientY,
-        rect,
-      };
+        rect };
 
       const onPointerMove = (moveEvent: PointerEvent) => {
         if (!dragOrigin.current) return;

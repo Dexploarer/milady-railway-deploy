@@ -34,8 +34,7 @@ export function LifoMonitorPanel({
   refreshMonitorMeta,
   refreshScreenPreview,
   setMonitorOnline,
-  setMonitorError,
-}: LifoMonitorPanelProps) {
+  setMonitorError }: LifoMonitorPanelProps) {
     const { t } = useApp();
   return (
     <div className="grid grid-cols-1 xl:grid-cols-[2fr_1fr] gap-3">

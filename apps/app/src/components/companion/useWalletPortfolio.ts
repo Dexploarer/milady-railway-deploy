@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type {
   WalletBalancesResponse,
-  WalletNftsResponse,
-} from "../../api-client";
+  WalletNftsResponse } from "../../api-client";
 import {
   BSC_NATIVE_LOGO_URL,
   fetchBscTokenMetadata,
@@ -15,8 +14,7 @@ import {
   type TranslatorFn,
   type WalletCollectibleRow,
   type WalletPortfolioChainFilter,
-  type WalletTokenRow,
-} from "./walletUtils";
+  type WalletTokenRow } from "./walletUtils";
 
 export type UseWalletPortfolioArgs = {
   walletBalances: WalletBalancesResponse | null;
@@ -36,16 +34,14 @@ export function useWalletPortfolio(args: UseWalletPortfolioArgs) {
     walletSelectedTokenKey,
     walletPanelOpen,
     walletReady,
-    t,
-  } = args;
+    t } = args;
 
   // ---- Milady token metadata ----
 
   const [miladyTokenMeta, setMiladyTokenMeta] = useState<TokenMetadata>({
     symbol: "MILADY",
     name: "Milady",
-    logoUrl: null,
-  });
+    logoUrl: null });
   const [miladyTokenMetaLoaded, setMiladyTokenMetaLoaded] = useState(false);
 
   useEffect(() => {
@@ -79,8 +75,7 @@ export function useWalletPortfolio(args: UseWalletPortfolioArgs) {
         isNative: true,
         valueUsd: nativeValue,
         balance: chain.nativeBalance,
-        logoUrl: isBscChainName(chain.chain) ? BSC_NATIVE_LOGO_URL : null,
-      });
+        logoUrl: isBscChainName(chain.chain) ? BSC_NATIVE_LOGO_URL : null });
       for (const token of chain.tokens ?? []) {
         rows.push({
           key: `evm-token-${chain.chain}-${token.contractAddress}`,
@@ -92,8 +87,7 @@ export function useWalletPortfolio(args: UseWalletPortfolioArgs) {
           isNative: false,
           valueUsd: Number.parseFloat(token.valueUsd) || 0,
           balance: token.balance,
-          logoUrl: token.logoUrl || null,
-        });
+          logoUrl: token.logoUrl || null });
       }
     }
 
@@ -108,8 +102,7 @@ export function useWalletPortfolio(args: UseWalletPortfolioArgs) {
         isNative: true,
         valueUsd: Number.parseFloat(walletBalances.solana.solValueUsd) || 0,
         balance: walletBalances.solana.solBalance,
-        logoUrl: SOL_NATIVE_LOGO_URL,
-      });
+        logoUrl: SOL_NATIVE_LOGO_URL });
       for (const token of walletBalances.solana.tokens ?? []) {
         rows.push({
           key: `solana-token-${token.mint}`,
@@ -121,8 +114,7 @@ export function useWalletPortfolio(args: UseWalletPortfolioArgs) {
           isNative: false,
           valueUsd: Number.parseFloat(token.valueUsd) || 0,
           balance: token.balance,
-          logoUrl: token.logoUrl || null,
-        });
+          logoUrl: token.logoUrl || null });
       }
     }
 
@@ -147,8 +139,7 @@ export function useWalletPortfolio(args: UseWalletPortfolioArgs) {
           isNative: true,
           valueUsd: 0,
           balance: "0",
-          logoUrl: BSC_NATIVE_LOGO_URL,
-        },
+          logoUrl: BSC_NATIVE_LOGO_URL },
       );
     }
 
@@ -172,8 +163,7 @@ export function useWalletPortfolio(args: UseWalletPortfolioArgs) {
           isNative: false,
           valueUsd: 0,
           balance: "0",
-          logoUrl: miladyTokenMeta.logoUrl,
-        },
+          logoUrl: miladyTokenMeta.logoUrl },
       );
     }
 
@@ -198,8 +188,7 @@ export function useWalletPortfolio(args: UseWalletPortfolioArgs) {
           chainKey: resolvePortfolioChainKey(chainGroup.chain),
           name: nft.name || `#${nft.tokenId}`,
           collectionName: nft.collectionName || "EVM NFT",
-          imageUrl: nft.imageUrl || null,
-        });
+          imageUrl: nft.imageUrl || null });
       }
     }
     for (const nft of walletNfts?.solana?.nfts ?? []) {
@@ -209,8 +198,7 @@ export function useWalletPortfolio(args: UseWalletPortfolioArgs) {
         chainKey: "solana",
         name: nft.name || "Solana NFT",
         collectionName: nft.collectionName || "Solana NFT",
-        imageUrl: nft.imageUrl || null,
-      });
+        imageUrl: nft.imageUrl || null });
     }
     return rows;
   }, [walletNfts]);
@@ -294,6 +282,5 @@ export function useWalletPortfolio(args: UseWalletPortfolioArgs) {
     selectedWalletToken,
     selectedWalletTokenShare,
     selectedWalletTokenExplorerUrl,
-    walletChainOptions,
-  };
+    walletChainOptions };
 }

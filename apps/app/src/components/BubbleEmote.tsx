@@ -252,14 +252,12 @@ const moodIcons: Record<BubbleMoodTier, () => React.JSX.Element> = {
   calm: IconCalm,
   neutral: IconNeutral,
   low: IconLow,
-  burnout: IconBurnout,
-};
+  burnout: IconBurnout };
 
 const actionIcons: Record<BubbleAction, () => React.JSX.Element> = {
   feed: IconFeed,
   rest: IconRest,
-  manual_share: IconManualShare,
-};
+  manual_share: IconManualShare };
 
 /* ── BubbleEmote component ───────────────────────────────────────────── */
 
@@ -277,8 +275,7 @@ const FADE_MS = 200;
 export function BubbleEmote({
   moodTier,
   activeAction,
-  visible,
-}: BubbleEmoteProps) {
+  visible }: BubbleEmoteProps) {
   const [displayMode, setDisplayMode] = useState<DisplayMode>("mood");
   const [displayedMood, setDisplayedMood] = useState<BubbleMoodTier>(moodTier);
   const [displayedAction, setDisplayedAction] = useState<BubbleAction | null>(

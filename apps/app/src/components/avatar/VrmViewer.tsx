@@ -11,8 +11,7 @@ import {
   type CameraProfile,
   type InteractionMode,
   VrmEngine,
-  type VrmEngineState,
-} from "./VrmEngine";
+  type VrmEngineState } from "./VrmEngine";
 
 const DEFAULT_VRM_PATH = resolveAppAssetUrl("vrms/milady-1.vrm");
 
@@ -200,8 +199,7 @@ export function VrmViewer(props: VrmViewerProps) {
         width: "100%",
         height: "100%",
         background: "transparent",
-        cursor: props.interactive ? "grab" : "default",
-      }}
+        cursor: props.interactive ? "grab" : "default" }}
     />
   );
 }

@@ -14,8 +14,7 @@ import {
   loadTrackedBscTokens,
   loadTrackedTokens,
   removeTrackedBscToken,
-  saveTrackedTokens,
-} from "./inventory";
+  saveTrackedTokens } from "./inventory";
 import { InventoryToolbar } from "./inventory/InventoryToolbar";
 import { NftGrid } from "./inventory/NftGrid";
 import { PortfolioHeader } from "./inventory/PortfolioHeader";
@@ -49,8 +48,7 @@ export function InventoryView({ inModal }: { inModal?: boolean } = {}) {
     getBscTradePreflight,
     getBscTradeQuote,
     getBscTradeTxStatus,
-    t,
-  } = useApp();
+    t } = useApp();
 
   // ── Tracked tokens state ──────────────────────────────────────────
   const [trackedTokens, setTrackedTokens] = useState<TrackedToken[]>(() =>
@@ -95,8 +93,7 @@ export function InventoryView({ inModal }: { inModal?: boolean } = {}) {
     visibleChainErrors,
     bscChainError,
     bscNativeBalance,
-    bscChain,
-  } = useInventoryData({
+    bscChain } = useInventoryData({
     walletBalances,
     walletAddresses,
     walletConfig,
@@ -104,8 +101,7 @@ export function InventoryView({ inModal }: { inModal?: boolean } = {}) {
     inventorySort,
     inventoryChainFocus,
     trackedBscTokens,
-    trackedTokens,
-  });
+    trackedTokens });
 
   const bscNativeBalanceNum = Number.parseFloat(bscNativeBalance ?? "");
   const evmAddr = walletAddresses?.evmAddress ?? walletConfig?.evmAddress;

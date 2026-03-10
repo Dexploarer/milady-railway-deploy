@@ -55,8 +55,9 @@ export function AvatarSelector({
   onSelect,
   onUpload,
   showUpload = true,
-  fullWidth = false,
-}: AvatarSelectorProps) {
+  fullWidth = false }: AvatarSelectorProps) {
+  const {
+    t } = useApp();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
 
@@ -127,11 +128,10 @@ export function AvatarSelector({
         {avatarIndices.map((i) => (
           <button
             key={i}
-            className={`${avatarButtonClass} ${
-              selected === i
+            className={`${avatarButtonClass} ${selected === i
                 ? "ring-2 ring-[var(--accent)] ring-offset-2 ring-offset-[var(--card)] scale-105"
                 : "opacity-60 hover:opacity-100 hover:scale-105"
-            }`}
+              }`}
             onClick={() => onSelect(i)}
             type="button"
           >
@@ -154,13 +154,12 @@ export function AvatarSelector({
               onChange={handleFileChange}
             />
             <button
-              className={`${uploadButtonClass} ${
-                dragOver
+              className={`${uploadButtonClass} ${dragOver
                   ? "border-[var(--accent)] bg-[var(--accent)]/20 text-[var(--accent)] scale-105 border-solid"
                   : selected === 0
                     ? "border-[var(--accent)] bg-[var(--accent)] text-[var(--accent-foreground)] ring-2 ring-[var(--accent)] ring-offset-2 ring-offset-[var(--card)] scale-105 border-solid"
                     : "border-[var(--border)] text-[var(--muted)] opacity-60 hover:opacity-100 hover:border-[var(--accent)] hover:scale-105 border-dashed"
-              }`}
+                }`}
               onClick={() => fileInputRef.current?.click()}
               onDragOver={handleDragOver}
               onDragEnter={handleDragOver}

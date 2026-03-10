@@ -3,8 +3,7 @@ import type {
   BscTradeTxStatusResponse,
   WalletTradingProfileResponse,
   WalletTradingProfileSourceFilter,
-  WalletTradingProfileWindow,
-} from "../../api-client";
+  WalletTradingProfileWindow } from "../../api-client";
 import {
   getRecentTradeGroupKey,
   getWalletTxStatusLabel,
@@ -14,8 +13,7 @@ import {
   persistRecentTrades,
   type TranslatorFn,
   type WalletRecentFilter,
-  type WalletRecentTrade,
-} from "./walletUtils";
+  type WalletRecentTrade } from "./walletUtils";
 
 export type UseWalletTradeHistoryArgs = {
   walletPanelOpen: boolean;
@@ -38,8 +36,7 @@ export function useWalletTradeHistory(args: UseWalletTradeHistoryArgs) {
     getBscTradeTxStatus,
     loadWalletTradingProfile,
     setActionNotice,
-    t,
-  } = args;
+    t } = args;
 
   // ---- Recent trades state ----
 
@@ -92,8 +89,7 @@ export function useWalletTradeHistory(args: UseWalletTradeHistoryArgs) {
               confirmations: status.confirmations,
               nonce: status.nonce,
               reason: nextReason,
-              explorerUrl: nextExplorer,
-            };
+              explorerUrl: nextExplorer };
           });
           if (!changed) return prev;
           persistRecentTrades(next);
@@ -140,20 +136,16 @@ export function useWalletTradeHistory(args: UseWalletTradeHistoryArgs) {
       { key: "all" as const, label: t("wallet.recentFilterAll") },
       {
         key: "pending" as const,
-        label: getWalletTxStatusLabel("pending", t),
-      },
+        label: getWalletTxStatusLabel("pending", t) },
       {
         key: "success" as const,
-        label: getWalletTxStatusLabel("success", t),
-      },
+        label: getWalletTxStatusLabel("success", t) },
       {
         key: "reverted" as const,
-        label: getWalletTxStatusLabel("reverted", t),
-      },
+        label: getWalletTxStatusLabel("reverted", t) },
       {
         key: "not_found" as const,
-        label: getWalletTxStatusLabel("not_found", t),
-      },
+        label: getWalletTxStatusLabel("not_found", t) },
     ],
     [t],
   );
@@ -177,8 +169,7 @@ export function useWalletTradeHistory(args: UseWalletTradeHistoryArgs) {
     > = {
       today: [],
       yesterday: [],
-      earlier: [],
-    };
+      earlier: [] };
     for (const entry of visibleWalletRecentTrades) {
       grouped[getRecentTradeGroupKey(entry.createdAt)].push(entry);
     }
@@ -186,18 +177,15 @@ export function useWalletTradeHistory(args: UseWalletTradeHistoryArgs) {
       {
         key: "today",
         label: t("wallet.recentGroup.today"),
-        entries: grouped.today,
-      },
+        entries: grouped.today },
       {
         key: "yesterday",
         label: t("wallet.recentGroup.yesterday"),
-        entries: grouped.yesterday,
-      },
+        entries: grouped.yesterday },
       {
         key: "earlier",
         label: t("wallet.recentGroup.earlier"),
-        entries: grouped.earlier,
-      },
+        entries: grouped.earlier },
     ].filter((group) => group.entries.length > 0);
   }, [t, visibleWalletRecentTrades]);
 
@@ -228,8 +216,7 @@ export function useWalletTradeHistory(args: UseWalletTradeHistoryArgs) {
               confirmations: swap.confirmations,
               nonce: null,
               reason: swap.reason ?? null,
-              explorerUrl: swap.explorerUrl,
-            });
+              explorerUrl: swap.explorerUrl });
           }
           if (newEntries.length === 0) return prev;
           const merged = [...newEntries, ...prev]
@@ -261,6 +248,5 @@ export function useWalletTradeHistory(args: UseWalletTradeHistoryArgs) {
     groupedWalletRecentTrades,
     pendingRecentHashes,
     addRecentTrade,
-    refreshRecentTradeStatus,
-  };
+    refreshRecentTradeStatus };
 }

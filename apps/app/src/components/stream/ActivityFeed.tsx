@@ -5,8 +5,7 @@ import {
   CHANNEL_COLORS,
   getEventFrom,
   getEventSource,
-  getEventText,
-} from "./helpers";
+  getEventText } from "./helpers";
 import { useApp } from "../../AppContext";
 
 export function ActivityFeed({ events }: { events: StreamEventEnvelope[] }) {

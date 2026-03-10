@@ -27,8 +27,7 @@ const EMPTY_FORM: BugReportForm = {
   environment: "",
   nodeVersion: "",
   modelProvider: "",
-  logs: "",
-};
+  logs: "" };
 
 async function copyText(text: string): Promise<boolean> {
   try {
@@ -78,8 +77,7 @@ export function BugReportModal() {
                   ? "Windows"
                   : info.platform === "linux"
                     ? "Linux"
-                    : "Other",
-          }));
+                    : "Other" }));
       })
       .catch(() => { });
     setTimeout(() => descRef.current?.focus(), 50);
@@ -134,8 +132,7 @@ export function BugReportModal() {
         environment: form.environment,
         nodeVersion: form.nodeVersion,
         modelProvider: form.modelProvider,
-        logs: form.logs,
-      });
+        logs: form.logs });
       if (result.url) {
         setResultUrl(result.url);
       } else if (result.fallback) {
@@ -192,8 +189,7 @@ export function BugReportModal() {
     },
     role: "dialog" as const,
     "aria-modal": true as const,
-    tabIndex: -1,
-  };
+    tabIndex: -1 };
 
   // Success state
   if (resultUrl) {

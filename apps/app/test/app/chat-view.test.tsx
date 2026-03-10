@@ -97,6 +97,8 @@ function createContext(
     openEmotePicker: vi.fn(),
     ptySessions: [],
     ...overrides,
+      uiLanguage: "en" as const,
+    t: (k: string) => k,
   };
 }
 

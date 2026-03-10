@@ -26,8 +26,7 @@ export function ConfirmModal({
   cancelLabel = "Cancel",
   tone = "default",
   onConfirm,
-  onCancel,
-}: ConfirmModalProps) {
+  onCancel }: ConfirmModalProps) {
   const confirmRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -134,14 +133,12 @@ export function useConfirm() {
         onCancel: () => {
           state.resolve(false);
           setState(null);
-        },
-      }
+        } }
     : {
         open: false,
         message: "",
         onConfirm: () => {},
-        onCancel: () => {},
-      };
+        onCancel: () => {} };
 
   return { confirm, modalProps };
 }

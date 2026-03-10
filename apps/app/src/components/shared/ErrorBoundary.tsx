@@ -1,6 +1,4 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
-import { useApp } from "../../AppContext";
-import { createTranslator } from "../../i18n";
 
 interface Props {
   children: ReactNode;
@@ -39,16 +37,13 @@ export class ErrorBoundary extends Component<Props, State> {
   };
 
   render() {
-    const { uiLanguage } = useApp();
-    const t = createTranslator(uiLanguage);
     if (this.state.hasError) {
       return (
         <div className="flex items-center justify-center h-full w-full min-h-[200px] bg-bg text-txt">
           <div className="text-center max-w-md p-8">
-            <h2 className="text-lg font-semibold mb-2">{t("errorboundary.SomethingWentWrong")}</h2>
+            <h2 className="text-lg font-semibold mb-2">Something went wrong</h2>
             <p className="text-sm text-muted mb-1">
-
-              {t("errorboundary.AnUnexpectedError")}
+              An unexpected error occurred.
             </p>
             {this.state.error && (
               <p className="text-xs text-muted font-mono bg-card rounded px-3 py-2 mb-4 break-all">
@@ -61,16 +56,14 @@ export class ErrorBoundary extends Component<Props, State> {
                 onClick={this.handleDismiss}
                 className="px-4 py-2 text-sm font-medium border border-border rounded-md hover:bg-card cursor-pointer"
               >
-
-                {t("errorboundary.Dismiss")}
+                Dismiss
               </button>
               <button
                 type="button"
                 onClick={this.handleReload}
                 className="px-4 py-2 text-sm font-medium bg-accent text-accent-fg rounded-md hover:opacity-90 cursor-pointer"
               >
-
-                {t("errorboundary.ReloadPage")}
+                Reload Page
               </button>
             </div>
           </div>

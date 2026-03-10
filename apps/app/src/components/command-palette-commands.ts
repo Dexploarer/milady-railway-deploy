@@ -6,6 +6,5 @@
 
 export type {
   BuildCommandsArgs as BuildCommandPaletteCommandsArgs,
-  CommandItem,
-} from "../command-registry";
+  CommandItem } from "../command-registry";
 export { buildCommands as buildCommandPaletteCommands } from "../command-registry";

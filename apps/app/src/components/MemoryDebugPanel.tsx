@@ -17,7 +17,6 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { type MemorySample, useMemoryMonitor } from "../hooks/useMemoryMonitor";
 import { useApp } from "../AppContext";
-import { createTranslator } from "../i18n";
 
 interface MemoryDebugPanelProps {
   /** Force enable in production (default: false, only shows in dev) */
@@ -34,13 +33,11 @@ function formatMB(bytes: number): string {
 
 function MiniChart({
   samples,
-  maxSamples,
-}: {
+  maxSamples }: {
   samples: MemorySample[];
   maxSamples: number;
 }) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  const { t } = useApp();
   if (samples.length < 2) return null;
 
   const width = 120;
@@ -93,13 +90,11 @@ function MiniChart({
 export function MemoryDebugPanel({
   forceEnable = false,
   initialPosition = { x: 16, y: 16 },
-  initialMinimized = true,
-}: MemoryDebugPanelProps) {
+  initialMinimized = true }: MemoryDebugPanelProps) {
+  const { t } = useApp();
   // Only render in dev mode unless forced
   const shouldRender = forceEnable || import.meta.env.DEV;
 
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
 
   const [minimized, setMinimized] = useState(initialMinimized);
   const [position, setPosition] = useState(initialPosition);
@@ -120,10 +115,8 @@ export function MemoryDebugPanel({
         console.warn("[MemoryDebugPanel] Potential memory leak detected!", {
           growthRate: `${trendInfo.mbPerMinute.toFixed(2)} MB/min`,
           currentHeap: formatMB(metricsInfo.usedHeapSize),
-          samples: trendInfo.sampleCount,
-        });
-      },
-    });
+          samples: trendInfo.sampleCount });
+      } });
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
@@ -132,8 +125,7 @@ export function MemoryDebugPanel({
         x: position.x,
         y: position.y,
         startX: e.clientX,
-        startY: e.clientY,
-      };
+        startY: e.clientY };
 
       const handleMouseMove = (moveE: MouseEvent) => {
         if (!dragOrigin.current) return;
@@ -141,8 +133,7 @@ export function MemoryDebugPanel({
         const dy = moveE.clientY - dragOrigin.current.startY;
         setPosition({
           x: Math.max(0, dragOrigin.current.x + dx),
-          y: Math.max(0, dragOrigin.current.y + dy),
-        });
+          y: Math.max(0, dragOrigin.current.y + dy) });
       };
 
       const handleMouseUp = () => {
@@ -186,8 +177,7 @@ export function MemoryDebugPanel({
       style={{
         left: position.x,
         top: position.y,
-        minWidth: minimized ? 120 : 200,
-      }}
+        minWidth: minimized ? 120 : 200 }}
       onMouseDown={handleMouseDown}
     >
       {/* Header */}

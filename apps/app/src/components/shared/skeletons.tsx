@@ -4,8 +4,7 @@
 
 export function SkeletonLine({
   width = "100%",
-  className = "",
-}: {
+  className = "" }: {
   width?: string;
   className?: string;
 }) {

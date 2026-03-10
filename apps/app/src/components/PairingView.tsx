@@ -2,9 +2,8 @@
  * Pairing view component — simple pairing screen for authentication.
  */
 
-import { useMemo } from "react";
+import {} from "react";
 import { useApp } from "../AppContext";
-import { createTranslator } from "../i18n";
 
 const PAIRING_DOCS_URL =
   "https://github.com/milady-ai/milady/blob/develop/docs/api-reference.mdx#authenticate-via-pairing-code";
@@ -18,9 +17,7 @@ export function PairingView() {
     pairingBusy,
     handlePairingSubmit,
     setState,
-    uiLanguage
-  } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+    t } = useApp();
 
   const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setState("pairingCodeInput", e.target.value);

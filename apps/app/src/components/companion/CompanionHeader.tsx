@@ -10,8 +10,7 @@ function MiladyDropdown({
   lifecycleBusy,
   restartBusy,
   handleRestart,
-  t,
-}: {
+  t }: {
   name: string;
   agentState: AgentState | string;
   lifecycleBusy: boolean;
@@ -175,8 +174,7 @@ export function CompanionHeader(props: CompanionHeaderProps) {
     handleSwitchToNativeShell,
     uiLanguage,
     setUiLanguage,
-    t,
-  } = props;
+    t } = props;
 
   return (
     <header className="anime-comp-header">

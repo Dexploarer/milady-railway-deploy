@@ -12,8 +12,7 @@ export function VrmStage({
   fallbackPreviewUrl,
   needsFlip,
   chatDockOpen,
-  t,
-}: {
+  t }: {
   vrmPath: string;
   fallbackPreviewUrl: string;
   needsFlip: boolean;
@@ -79,8 +78,7 @@ export function VrmStage({
         className="absolute inset-0"
         style={{
           opacity: vrmLoaded ? 1 : 0,
-          transition: "opacity 400ms ease",
-        }}
+          transition: "opacity 400ms ease" }}
       >
         <VrmViewer
           vrmPath={vrmPath}

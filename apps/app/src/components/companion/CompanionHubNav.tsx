@@ -4,8 +4,7 @@ import type { TranslatorFn } from "./walletUtils";
 
 export function CompanionHubNav({
   setTab,
-  t,
-}: {
+  t }: {
   setTab: (tab: Tab) => void;
   t: TranslatorFn;
 }) {
@@ -19,8 +18,7 @@ export function CompanionHubNav({
         style={
           {
             "--ac-accent": "#00e1ff",
-            "--ac-accent-rgb": "0, 225, 255",
-          } as React.CSSProperties
+            "--ac-accent-rgb": "0, 225, 255" } as React.CSSProperties
         }
       >
         <div className="anime-hub-btn-icon">
@@ -49,8 +47,7 @@ export function CompanionHubNav({
         style={
           {
             "--ac-accent": "#a78bfa",
-            "--ac-accent-rgb": "167, 139, 250",
-          } as React.CSSProperties
+            "--ac-accent-rgb": "167, 139, 250" } as React.CSSProperties
         }
       >
         <div className="anime-hub-btn-icon">
@@ -79,8 +76,7 @@ export function CompanionHubNav({
         style={
           {
             "--ac-accent": "#f43f5e",
-            "--ac-accent-rgb": "244, 63, 94",
-          } as React.CSSProperties
+            "--ac-accent-rgb": "244, 63, 94" } as React.CSSProperties
         }
       >
         <div className="anime-hub-btn-icon">
@@ -109,8 +105,7 @@ export function CompanionHubNav({
         style={
           {
             "--ac-accent": "#f0b232",
-            "--ac-accent-rgb": "240, 178, 50",
-          } as React.CSSProperties
+            "--ac-accent-rgb": "240, 178, 50" } as React.CSSProperties
         }
       >
         <div className="anime-hub-btn-icon">
@@ -141,8 +136,7 @@ export function CompanionHubNav({
         style={
           {
             "--ac-accent": "#10b981",
-            "--ac-accent-rgb": "16, 185, 129",
-          } as React.CSSProperties
+            "--ac-accent-rgb": "16, 185, 129" } as React.CSSProperties
         }
       >
         <div className="anime-hub-btn-icon">
@@ -174,8 +168,7 @@ export function CompanionHubNav({
         style={
           {
             "--ac-accent": "#f0b90b",
-            "--ac-accent-rgb": "240, 185, 11",
-          } as React.CSSProperties
+            "--ac-accent-rgb": "240, 185, 11" } as React.CSSProperties
         }
       >
         <div className="anime-hub-btn-icon">
@@ -208,8 +201,7 @@ export function CompanionHubNav({
         style={
           {
             "--ac-accent": "#ef4444",
-            "--ac-accent-rgb": "239, 68, 68",
-          } as React.CSSProperties
+            "--ac-accent-rgb": "239, 68, 68" } as React.CSSProperties
         }
       >
         <div className="anime-hub-btn-icon">
@@ -241,8 +233,7 @@ export function CompanionHubNav({
         style={
           {
             "--ac-accent": "#8b5cf6",
-            "--ac-accent-rgb": "139, 92, 246",
-          } as React.CSSProperties
+            "--ac-accent-rgb": "139, 92, 246" } as React.CSSProperties
         }
       >
         <div className="anime-hub-btn-icon">
@@ -272,8 +263,7 @@ export function CompanionHubNav({
         style={
           {
             "--ac-accent": "#e2e8f0",
-            "--ac-accent-rgb": "226, 232, 240",
-          } as React.CSSProperties
+            "--ac-accent-rgb": "226, 232, 240" } as React.CSSProperties
         }
       >
         <div className="anime-hub-btn-icon">
@@ -303,8 +293,7 @@ export function CompanionHubNav({
         style={
           {
             "--ac-accent": "#38bdf8",
-            "--ac-accent-rgb": "56, 189, 248",
-          } as React.CSSProperties
+            "--ac-accent-rgb": "56, 189, 248" } as React.CSSProperties
         }
       >
         <div className="anime-hub-btn-icon">

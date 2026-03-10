@@ -77,13 +77,11 @@ import {
   Wallet,
   Webhook,
   Wrench,
-  Zap,
-} from "lucide-react";
+  Zap } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useApp } from "../AppContext";
 import type { PluginInfo, PluginParamDef } from "../api-client";
 import { client } from "../api-client";
-import { createTranslator } from "../i18n";
 import type { ConfigUiHint } from "../types";
 import type { JsonSchemaObject } from "./config-catalog";
 import { ConfigRenderer, defaultRegistry } from "./config-renderer";
@@ -119,8 +117,7 @@ const SHOWCASE_PLUGIN: PluginInfo = {
       required: true,
       sensitive: false,
       currentValue: null,
-      isSet: false,
-    },
+      isSet: false },
     // 2. password
     {
       key: "SECRET_TOKEN",
@@ -130,8 +127,7 @@ const SHOWCASE_PLUGIN: PluginInfo = {
       required: true,
       sensitive: true,
       currentValue: null,
-      isSet: false,
-    },
+      isSet: false },
     // 3. number
     {
       key: "SERVER_PORT",
@@ -141,8 +137,7 @@ const SHOWCASE_PLUGIN: PluginInfo = {
       sensitive: false,
       default: "3000",
       currentValue: null,
-      isSet: false,
-    },
+      isSet: false },
     // 4. boolean
     {
       key: "ENABLE_LOGGING",
@@ -152,8 +147,7 @@ const SHOWCASE_PLUGIN: PluginInfo = {
       sensitive: false,
       default: "true",
       currentValue: null,
-      isSet: false,
-    },
+      isSet: false },
     // 5. url
     {
       key: "WEBHOOK_URL",
@@ -163,8 +157,7 @@ const SHOWCASE_PLUGIN: PluginInfo = {
       required: false,
       sensitive: false,
       currentValue: null,
-      isSet: false,
-    },
+      isSet: false },
     // 6. select
     {
       key: "DEPLOY_REGION",
@@ -174,8 +167,7 @@ const SHOWCASE_PLUGIN: PluginInfo = {
       required: false,
       sensitive: false,
       currentValue: null,
-      isSet: false,
-    },
+      isSet: false },
     // 7. textarea
     {
       key: "SYSTEM_PROMPT",
@@ -185,8 +177,7 @@ const SHOWCASE_PLUGIN: PluginInfo = {
       required: false,
       sensitive: false,
       currentValue: null,
-      isSet: false,
-    },
+      isSet: false },
     // 8. email
     {
       key: "CONTACT_EMAIL",
@@ -195,8 +186,7 @@ const SHOWCASE_PLUGIN: PluginInfo = {
       required: false,
       sensitive: false,
       currentValue: null,
-      isSet: false,
-    },
+      isSet: false },
     // 9. color
     {
       key: "THEME_COLOR",
@@ -206,8 +196,7 @@ const SHOWCASE_PLUGIN: PluginInfo = {
       sensitive: false,
       default: "#4a90d9",
       currentValue: null,
-      isSet: false,
-    },
+      isSet: false },
     // 10. radio
     {
       key: "AUTH_MODE",
@@ -217,8 +206,7 @@ const SHOWCASE_PLUGIN: PluginInfo = {
       required: false,
       sensitive: false,
       currentValue: null,
-      isSet: false,
-    },
+      isSet: false },
     // 11. multiselect
     {
       key: "ENABLED_FEATURES",
@@ -228,8 +216,7 @@ const SHOWCASE_PLUGIN: PluginInfo = {
       required: false,
       sensitive: false,
       currentValue: null,
-      isSet: false,
-    },
+      isSet: false },
     // 12. date
     {
       key: "START_DATE",
@@ -238,8 +225,7 @@ const SHOWCASE_PLUGIN: PluginInfo = {
       required: false,
       sensitive: false,
       currentValue: null,
-      isSet: false,
-    },
+      isSet: false },
     // 13. datetime
     {
       key: "SCHEDULED_AT",
@@ -248,8 +234,7 @@ const SHOWCASE_PLUGIN: PluginInfo = {
       required: false,
       sensitive: false,
       currentValue: null,
-      isSet: false,
-    },
+      isSet: false },
     // 14. json
     {
       key: "METADATA_CONFIG",
@@ -259,8 +244,7 @@ const SHOWCASE_PLUGIN: PluginInfo = {
       required: false,
       sensitive: false,
       currentValue: null,
-      isSet: false,
-    },
+      isSet: false },
     // 15. code
     {
       key: "RESPONSE_TEMPLATE",
@@ -270,8 +254,7 @@ const SHOWCASE_PLUGIN: PluginInfo = {
       required: false,
       sensitive: false,
       currentValue: null,
-      isSet: false,
-    },
+      isSet: false },
     // 16. array
     {
       key: "ALLOWED_ORIGINS",
@@ -281,8 +264,7 @@ const SHOWCASE_PLUGIN: PluginInfo = {
       required: false,
       sensitive: false,
       currentValue: null,
-      isSet: false,
-    },
+      isSet: false },
     // 17. keyvalue
     {
       key: "CUSTOM_HEADERS",
@@ -291,8 +273,7 @@ const SHOWCASE_PLUGIN: PluginInfo = {
       required: false,
       sensitive: false,
       currentValue: null,
-      isSet: false,
-    },
+      isSet: false },
     // 18. file
     {
       key: "CERT_FILE",
@@ -301,8 +282,7 @@ const SHOWCASE_PLUGIN: PluginInfo = {
       required: false,
       sensitive: false,
       currentValue: null,
-      isSet: false,
-    },
+      isSet: false },
     // 19. custom
     {
       key: "CUSTOM_COMPONENT",
@@ -311,8 +291,7 @@ const SHOWCASE_PLUGIN: PluginInfo = {
       required: false,
       sensitive: false,
       currentValue: null,
-      isSet: false,
-    },
+      isSet: false },
     // 20. markdown
     {
       key: "RELEASE_NOTES",
@@ -322,8 +301,7 @@ const SHOWCASE_PLUGIN: PluginInfo = {
       required: false,
       sensitive: false,
       currentValue: null,
-      isSet: false,
-    },
+      isSet: false },
     // 21. checkbox-group
     {
       key: "NOTIFICATION_CHANNELS",
@@ -333,8 +311,7 @@ const SHOWCASE_PLUGIN: PluginInfo = {
       required: false,
       sensitive: false,
       currentValue: null,
-      isSet: false,
-    },
+      isSet: false },
     // 22. group
     {
       key: "CONNECTION_GROUP",
@@ -344,8 +321,7 @@ const SHOWCASE_PLUGIN: PluginInfo = {
       required: false,
       sensitive: false,
       currentValue: null,
-      isSet: false,
-    },
+      isSet: false },
     // 23. table
     {
       key: "ROUTE_TABLE",
@@ -355,22 +331,19 @@ const SHOWCASE_PLUGIN: PluginInfo = {
       required: false,
       sensitive: false,
       currentValue: null,
-      isSet: false,
-    },
+      isSet: false },
   ],
   configUiHints: {
     DISPLAY_NAME: {
       label: "Display Name",
       group: "Basic Fields",
       width: "half",
-      help: "Renderer: text — single-line text input",
-    },
+      help: "Renderer: text — single-line text input" },
     SECRET_TOKEN: {
       label: "Secret Token",
       group: "Basic Fields",
       width: "half",
-      help: "Renderer: password — masked with show/hide toggle",
-    },
+      help: "Renderer: password — masked with show/hide toggle" },
     SERVER_PORT: {
       label: "Server Port",
       group: "Basic Fields",
@@ -378,21 +351,18 @@ const SHOWCASE_PLUGIN: PluginInfo = {
       min: 1,
       max: 65535,
       unit: "port",
-      help: "Renderer: number — with min/max range and unit label",
-    },
+      help: "Renderer: number — with min/max range and unit label" },
     ENABLE_LOGGING: {
       label: "Enable Logging",
       group: "Basic Fields",
       width: "third",
-      help: "Renderer: boolean — pill-shaped toggle switch",
-    },
+      help: "Renderer: boolean — pill-shaped toggle switch" },
     WEBHOOK_URL: {
       label: "Webhook URL",
       group: "Basic Fields",
       width: "full",
       placeholder: "https://example.com/webhook",
-      help: "Renderer: url — URL input with format validation",
-    },
+      help: "Renderer: url — URL input with format validation" },
     DEPLOY_REGION: {
       label: "Deploy Region",
       group: "Selection Fields",
@@ -404,29 +374,25 @@ const SHOWCASE_PLUGIN: PluginInfo = {
         { value: "eu-west-1", label: "EU (Ireland)" },
         { value: "ap-southeast-1", label: "Asia Pacific (Singapore)" },
       ],
-      help: "Renderer: select — dropdown with enhanced option labels",
-    },
+      help: "Renderer: select — dropdown with enhanced option labels" },
     SYSTEM_PROMPT: {
       label: "System Prompt",
       group: "Text Fields",
       width: "full",
-      help: "Renderer: textarea — multi-line text input for long content",
-    },
+      help: "Renderer: textarea — multi-line text input for long content" },
     CONTACT_EMAIL: {
       label: "Contact Email",
       group: "Text Fields",
       width: "half",
       type: "email",
       placeholder: "admin@example.com",
-      help: "Renderer: email — email input with format validation",
-    },
+      help: "Renderer: email — email input with format validation" },
     THEME_COLOR: {
       label: "Theme Color",
       group: "Selection Fields",
       width: "third",
       type: "color",
-      help: "Renderer: color — color picker swatch + hex input",
-    },
+      help: "Renderer: color — color picker swatch + hex input" },
     AUTH_MODE: {
       label: "Auth Mode",
       group: "Selection Fields",
@@ -436,21 +402,17 @@ const SHOWCASE_PLUGIN: PluginInfo = {
         {
           value: "basic",
           label: "Basic Auth",
-          description: "Username and password",
-        },
+          description: "Username and password" },
         {
           value: "oauth",
           label: "OAuth 2.0",
-          description: "Token-based authentication",
-        },
+          description: "Token-based authentication" },
         {
           value: "apikey",
           label: "API Key",
-          description: "Header-based API key",
-        },
+          description: "Header-based API key" },
       ],
-      help: "Renderer: radio — radio button group with descriptions",
-    },
+      help: "Renderer: radio — radio button group with descriptions" },
     ENABLED_FEATURES: {
       label: "Enabled Features",
       group: "Selection Fields",
@@ -463,72 +425,62 @@ const SHOWCASE_PLUGIN: PluginInfo = {
         { value: "webhooks", label: "Webhooks" },
         { value: "ratelimit", label: "Rate Limiting" },
       ],
-      help: "Renderer: multiselect — checkbox group for multiple selections",
-    },
+      help: "Renderer: multiselect — checkbox group for multiple selections" },
     START_DATE: {
       label: "Start Date",
       group: "Date & Time",
       width: "half",
       type: "date",
-      help: "Renderer: date — native date picker",
-    },
+      help: "Renderer: date — native date picker" },
     SCHEDULED_AT: {
       label: "Scheduled At",
       group: "Date & Time",
       width: "half",
       type: "datetime",
-      help: "Renderer: datetime — date + time picker",
-    },
+      help: "Renderer: datetime — date + time picker" },
     METADATA_CONFIG: {
       label: "Metadata Config",
       group: "Structured Data",
       width: "full",
       type: "json",
-      help: "Renderer: json — JSON editor with inline validation",
-    },
+      help: "Renderer: json — JSON editor with inline validation" },
     RESPONSE_TEMPLATE: {
       label: "Response Template",
       group: "Structured Data",
       width: "full",
       type: "code",
-      help: "Renderer: code — monospaced code editor",
-    },
+      help: "Renderer: code — monospaced code editor" },
     ALLOWED_ORIGINS: {
       label: "Allowed Origins",
       group: "Structured Data",
       width: "full",
       type: "array",
-      help: "Renderer: array — add/remove items list",
-    },
+      help: "Renderer: array — add/remove items list" },
     CUSTOM_HEADERS: {
       label: "Custom Headers",
       group: "Structured Data",
       width: "full",
       type: "keyvalue",
-      help: "Renderer: keyvalue — key-value pair editor",
-    },
+      help: "Renderer: keyvalue — key-value pair editor" },
     CERT_FILE: {
       label: "Certificate File",
       group: "File Paths",
       width: "full",
       type: "file",
-      help: "Renderer: file — file path input",
-    },
+      help: "Renderer: file — file path input" },
     CUSTOM_COMPONENT: {
       label: "Custom Component",
       group: "File Paths",
       width: "full",
       type: "custom",
       help: "Renderer: custom — placeholder for plugin-provided React components",
-      advanced: true,
-    },
+      advanced: true },
     RELEASE_NOTES: {
       label: "Release Notes",
       group: "Text Fields",
       width: "full",
       type: "markdown",
-      help: "Renderer: markdown — textarea with Edit/Preview toggle",
-    },
+      help: "Renderer: markdown — textarea with Edit/Preview toggle" },
     NOTIFICATION_CHANNELS: {
       label: "Notification Channels",
       group: "Selection Fields",
@@ -538,38 +490,30 @@ const SHOWCASE_PLUGIN: PluginInfo = {
         {
           value: "email",
           label: "Email",
-          description: "Send notifications via email",
-        },
+          description: "Send notifications via email" },
         {
           value: "slack",
           label: "Slack",
-          description: "Post to Slack channels",
-        },
+          description: "Post to Slack channels" },
         {
           value: "webhook",
           label: "Webhook",
-          description: "HTTP POST to configured URL",
-        },
+          description: "HTTP POST to configured URL" },
         { value: "sms", label: "SMS", description: "Text message alerts" },
       ],
-      help: "Renderer: checkbox-group — vertical checkbox list with descriptions",
-    },
+      help: "Renderer: checkbox-group — vertical checkbox list with descriptions" },
     CONNECTION_GROUP: {
       label: "Connection Settings",
       group: "Structured Data",
       width: "full",
       type: "group",
-      help: "Renderer: group — fieldset container with legend",
-    },
+      help: "Renderer: group — fieldset container with legend" },
     ROUTE_TABLE: {
       label: "Route Table",
       group: "Structured Data",
       width: "full",
       type: "table",
-      help: "Renderer: table — tabular data editor with add/remove rows",
-    },
-  },
-};
+      help: "Renderer: table — tabular data editor with add/remove rows" } } };
 
 /* ── Always-on plugins (hidden from all views) ────────────────────────── */
 
@@ -815,8 +759,7 @@ export function paramsToSchema(
     const hint: ConfigUiHint = {
       label: autoLabel(p.key, pluginId),
       sensitive: p.sensitive ?? false,
-      advanced: isAdvancedParam(p),
-    };
+      advanced: isAdvancedParam(p) };
 
     // Port numbers — constrain range
     if (keyUpper.includes("PORT")) {
@@ -966,8 +909,7 @@ export function paramsToSchema(
 
   return {
     schema: { type: "object", properties, required } as JsonSchemaObject,
-    hints,
-  };
+    hints };
 }
 
 /* ── PluginConfigForm bridge ─────────────────────────────────────────── */
@@ -975,8 +917,7 @@ export function paramsToSchema(
 function PluginConfigForm({
   plugin,
   pluginConfigs,
-  onParamChange,
-}: {
+  onParamChange }: {
   plugin: PluginInfo;
   pluginConfigs: Record<string, Record<string, string>>;
   onParamChange: (pluginId: string, paramKey: string, value: string) => void;
@@ -1177,8 +1118,7 @@ const DEFAULT_ICONS: Record<string, LucideIcon> = {
   blooio: Circle,
   acp: Construction,
   elizacloud: Cloud,
-  twilio: Phone,
-};
+  twilio: Phone };
 
 /** Resolve display icon: explicit plugin.icon, fallback to default map, or null. */
 function resolveIcon(p: PluginInfo): LucideIcon | string | null {
@@ -1288,8 +1228,7 @@ const FEATURE_SUBGROUP: Record<string, string> = {
   babylon: "gaming",
   mysticism: "gaming",
   personality: "gaming",
-  moltbook: "gaming",
-};
+  moltbook: "gaming" };
 
 const SUBGROUP_DISPLAY_ORDER = [
   "ai-provider",
@@ -1322,8 +1261,7 @@ const SUBGROUP_LABELS: Record<string, string> = {
   gaming: "Gaming & Creative",
   "feature-other": "Other Features",
   streaming: "Streaming Destinations",
-  showcase: "Showcase",
-};
+  showcase: "Showcase" };
 
 function subgroupForPlugin(plugin: PluginInfo): string {
   if (plugin.id === "__ui-showcase__") return "showcase";
@@ -1360,9 +1298,7 @@ function PluginListView({ label, mode = "all", inModal }: PluginListViewProps) {
     handlePluginConfigSave,
     setActionNotice,
     setState,
-    uiLanguage
-  } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+    t } = useApp();
 
   const [pluginConfigs, setPluginConfigs] = useState<
     Record<string, Record<string, string>>
@@ -1514,8 +1450,7 @@ function PluginListView({ label, mode = "all", inModal }: PluginListViewProps) {
     () =>
       sorted.map((plugin) => ({
         plugin,
-        subgroup: subgroupForPlugin(plugin),
-      })),
+        subgroup: subgroupForPlugin(plugin) })),
     [sorted],
   );
 
@@ -1536,8 +1471,7 @@ function PluginListView({ label, mode = "all", inModal }: PluginListViewProps) {
     ).map((sg) => ({
       id: sg,
       label: SUBGROUP_LABELS[sg],
-      count: subgroupCounts[sg] ?? 0,
-    }));
+      count: subgroupCounts[sg] ?? 0 }));
     return [{ id: "all", label: "All", count: sorted.length }, ...dynamicTags];
   }, [sorted.length, subgroupCounts]);
 
@@ -1572,8 +1506,7 @@ function PluginListView({ label, mode = "all", inModal }: PluginListViewProps) {
   ) => {
     setPluginConfigs((prev) => ({
       ...prev,
-      [pluginId]: { ...prev[pluginId], [paramKey]: value },
-    }));
+      [pluginId]: { ...prev[pluginId], [paramKey]: value } }));
   };
 
   const handleConfigSave = async (pluginId: string) => {
@@ -1616,8 +1549,7 @@ function PluginListView({ label, mode = "all", inModal }: PluginListViewProps) {
           success: false,
           error: err instanceof Error ? err.message : String(err),
           loading: false,
-          durationMs: 0,
-        });
+          durationMs: 0 });
         return next;
       });
     }
@@ -1911,8 +1843,7 @@ function PluginListView({ label, mode = "all", inModal }: PluginListViewProps) {
             display: "-webkit-box",
             WebkitLineClamp: 3,
             WebkitBoxOrient: "vertical",
-            overflow: "hidden",
-          }}
+            overflow: "hidden" }}
         >
           {p.description || "No description available"}
         </p>
@@ -2707,8 +2638,7 @@ function PluginListView({ label, mode = "all", inModal }: PluginListViewProps) {
 /** Unified plugins view — tag-filtered plugin list. */
 export function PluginsView({
   mode = "all",
-  inModal,
-}: {
+  inModal }: {
   mode?: PluginsViewMode;
   inModal?: boolean;
 }) {

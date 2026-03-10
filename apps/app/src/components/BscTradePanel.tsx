@@ -13,8 +13,7 @@ import type {
   BscTradePreflightResponse,
   BscTradeQuoteRequest,
   BscTradeQuoteResponse,
-  BscTradeTxStatusResponse,
-} from "../api-client";
+  BscTradeTxStatusResponse } from "../api-client";
 import { useApp } from "../AppContext";
 
 /* ── Constants ─────────────────────────────────────────────────────── */
@@ -78,8 +77,7 @@ export function BscTradePanel({
   getBscTradePreflight,
   getBscTradeQuote,
   executeBscTrade,
-  getBscTradeTxStatus,
-}: BscTradePanelProps) {
+  getBscTradeTxStatus }: BscTradePanelProps) {
   const { t } = useApp();
   const [quickTokenAddress, setQuickTokenAddress] = useState("");
   const [quickAmount, setQuickAmount] = useState(DEFAULT_QUICK_AMOUNT);
@@ -116,8 +114,7 @@ export function BscTradePanel({
         );
         setTradeFeedback({
           tone: "error",
-          text: "Enter a valid token contract address first.",
-        });
+          text: "Enter a valid token contract address first." });
         return;
       }
       const amount = quickAmount.trim() || DEFAULT_QUICK_AMOUNT;
@@ -126,8 +123,7 @@ export function BscTradePanel({
         setActionNotice("Enter a valid BNB amount first.", "error", 3200);
         setTradeFeedback({
           tone: "error",
-          text: "Enter a valid BNB amount first.",
-        });
+          text: "Enter a valid BNB amount first." });
         return;
       }
 
@@ -147,8 +143,7 @@ export function BscTradePanel({
             );
             setTradeFeedback({
               tone: "error",
-              text: preflight.reasons[0] ?? "Preflight checks failed.",
-            });
+              text: preflight.reasons[0] ?? "Preflight checks failed." });
             return;
           }
         }
@@ -156,8 +151,7 @@ export function BscTradePanel({
         const result = await getBscTradeQuote({
           side,
           tokenAddress,
-          amount,
-        });
+          amount });
         setLatestQuote(result);
         setLatestExecution(null);
         setTxStatus(null);
@@ -169,15 +163,13 @@ export function BscTradePanel({
         );
         setTradeFeedback({
           tone: "success",
-          text: `${side === "buy" ? "Quote ready" : "Sell quote ready"}: ${result.quoteOut?.amount ?? ""} ${result.quoteOut?.symbol ?? ""}`.trim(),
-        });
+          text: `${side === "buy" ? "Quote ready" : "Sell quote ready"}: ${result.quoteOut?.amount ?? ""} ${result.quoteOut?.symbol ?? ""}`.trim() });
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
         setActionNotice(message, "error", 4600);
         setTradeFeedback({
           tone: "error",
-          text: message,
-        });
+          text: message });
       }
     },
     [
@@ -200,8 +192,7 @@ export function BscTradePanel({
       );
       setTradeFeedback({
         tone: "error",
-        text: "Enter a valid token contract address first.",
-      });
+        text: "Enter a valid token contract address first." });
       return;
     }
     try {
@@ -214,8 +205,7 @@ export function BscTradePanel({
         );
         setTradeFeedback({
           tone: "error",
-          text: result.reasons[0] ?? "Preflight checks failed.",
-        });
+          text: result.reasons[0] ?? "Preflight checks failed." });
         return;
       }
       const message = tokenAddress
@@ -224,15 +214,13 @@ export function BscTradePanel({
       setActionNotice(message, "success", 2600);
       setTradeFeedback({
         tone: "success",
-        text: message,
-      });
+        text: message });
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       setActionNotice(message, "error", 4600);
       setTradeFeedback({
         tone: "error",
-        text: message,
-      });
+        text: message });
     }
   }, [getBscTradePreflight, quickTokenAddress, setActionNotice]);
 
@@ -255,8 +243,7 @@ export function BscTradePanel({
     setPendingTrade({
       side: latestQuote.side,
       amount: quickAmount,
-      token: quickTokenAddress,
-    });
+      token: quickTokenAddress });
   }, [latestQuote, quickAmount, quickTokenAddress]);
 
   const handleConfirmExecute = useCallback(async () => {
@@ -266,8 +253,7 @@ export function BscTradePanel({
       const result = await executeBscTrade({
         side: latestQuote.side,
         tokenAddress: pendingTrade.token,
-        amount: pendingTrade.amount,
-      });
+        amount: pendingTrade.amount });
       setLatestExecution(result);
       if (result?.executed && result?.execution) {
         // Already executed on-chain
@@ -304,8 +290,7 @@ export function BscTradePanel({
     const newToken: TrackedToken = {
       address: quickTokenAddress,
       symbol: `TKN-${quickTokenAddress.slice(2, 6)}`,
-      addedAt: Date.now(),
-    };
+      addedAt: Date.now() };
     onAddToken(newToken);
     setActionNotice("Token added to watchlist.", "success", 2600);
   }, [quickTokenAddress, onAddToken, setActionNotice]);

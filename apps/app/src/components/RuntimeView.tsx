@@ -12,11 +12,9 @@ import {
   client,
   type RuntimeDebugSnapshot,
   type RuntimeOrderItem,
-  type RuntimeServiceOrderItem,
-} from "../api-client";
+  type RuntimeServiceOrderItem } from "../api-client";
 import { formatDateTime } from "./shared/format";
 import { useApp } from "../AppContext";
-import { createTranslator } from "../i18n";
 
 type RuntimeSectionKey =
   | "runtime"
@@ -86,16 +84,14 @@ function nodeEntries(
     return value.map((entry, i) => ({
       key: `[${i}]`,
       value: entry,
-      path: `${path}[${i}]`,
-    }));
+      path: `${path}[${i}]` }));
   }
   if (!value || typeof value !== "object") return [];
   return Object.entries(value as Record<string, unknown>).map(
     ([key, entry]) => ({
       key,
       value: entry,
-      path: `${path}.${key}`,
-    }),
+      path: `${path}.${key}` }),
   );
 }
 
@@ -166,8 +162,7 @@ function TreeNode(props: {
 }
 
 function OrderCard(props: { title: string; entries: RuntimeOrderItem[] }) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  const { t } = useApp();
   const { title, entries } = props;
   return (
     <div className="border border-[var(--border)] bg-[var(--card)] rounded-md p-3 min-h-[150px]">
@@ -190,8 +185,7 @@ function OrderCard(props: { title: string; entries: RuntimeOrderItem[] }) {
 }
 
 function ServicesOrderCard(props: { entries: RuntimeServiceOrderItem[] }) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  const { t } = useApp();
   const { entries } = props;
   return (
     <div className="border border-[var(--border)] bg-[var(--card)] rounded-md p-3 min-h-[150px]">
@@ -229,8 +223,7 @@ function ServicesOrderCard(props: { entries: RuntimeServiceOrderItem[] }) {
 }
 
 export function RuntimeView() {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  const { t } = useApp();
   const [snapshot, setSnapshot] = useState<RuntimeDebugSnapshot | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -252,8 +245,7 @@ export function RuntimeView() {
       const next = await client.getRuntimeSnapshot({
         depth,
         maxArrayLength,
-        maxObjectEntries,
-      });
+        maxObjectEntries });
       setSnapshot(next);
     } catch (err) {
       setError(

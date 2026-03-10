@@ -36,14 +36,13 @@ function TagEditor({
   label,
   items,
   onChange,
-  placeholder = "add item...",
-}: {
+  placeholder = "add item..." }: {
   label: string;
   items: string[];
   onChange: (items: string[]) => void;
   placeholder?: string;
 }) {
-    const { t } = useApp();
+  const { t } = useApp();
   const [inputValue, setInputValue] = useState("");
 
   const addItem = () => {
@@ -82,9 +81,9 @@ function TagEditor({
           className="text-[10px] px-1.5 py-0.5 border border-[var(--border)] bg-[var(--card)] cursor-pointer hover:border-[var(--accent)] hover:text-[var(--accent)] transition-colors"
           onClick={addItem}
         >
-          
-                            {t("characterview.Add")}
-                          </button>
+
+          {t("characterview.Add")}
+        </button>
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto border border-[var(--border)] bg-[var(--bg-muted)] p-1.5 flex flex-wrap gap-1.5 content-start">
         {items.map((item, i) => (
@@ -98,9 +97,9 @@ function TagEditor({
               className="text-[var(--muted)] hover:text-[var(--danger,#e74c3c)] cursor-pointer text-[10px] leading-none"
               onClick={() => removeItem(i)}
             >
-              
-                                  {t("characterview.Times")}
-                                </button>
+
+              {t("characterview.Times")}
+            </button>
           </span>
         ))}
       </div>
@@ -119,14 +118,12 @@ function ThemedSelect<T extends string>({
   value,
   groups,
   onChange,
-  placeholder = "select...",
-}: {
+  placeholder = "select..." }: {
   value: T | null;
   groups: SelectGroup<T>[];
   onChange: (id: T) => void;
   placeholder?: string;
 }) {
-    const { t } = useApp();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -189,11 +186,10 @@ function ThemedSelect<T extends string>({
                   <button
                     key={item.id}
                     type="button"
-                    className={`w-full text-left px-2.5 py-1.5 text-xs cursor-pointer transition-colors ${
-                      active
+                    className={`w-full text-left px-2.5 py-1.5 text-xs cursor-pointer transition-colors ${active
                         ? "bg-[var(--accent)] text-[var(--accent-foreground)]"
                         : "text-[var(--text)] hover:bg-[var(--bg-muted)]"
-                    }`}
+                      }`}
                     onClick={() => {
                       onChange(item.id);
                       setOpen(false);
@@ -250,8 +246,7 @@ function parseImportedMessage(value: unknown): CharacterMessage | null {
         : "";
   return {
     name: speaker,
-    content: { text: contentText },
-  };
+    content: { text: contentText } };
 }
 
 function parseImportedMessageExamples(
@@ -295,6 +290,7 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
     loadCharacter,
     setState,
     selectedVrmIndex,
+    t,
     // Registry / Drop
     registryStatus,
     registryLoading,
@@ -310,8 +306,7 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
     syncRegistryProfile,
     loadDropStatus,
     mintFromDrop,
-    walletConfig,
-  } = useApp();
+    walletConfig } = useApp();
 
   useEffect(() => {
     void loadCharacter();
@@ -348,21 +343,17 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
       style: {
         all: d.style?.all ?? [],
         chat: d.style?.chat ?? [],
-        post: d.style?.post ?? [],
-      },
+        post: d.style?.post ?? [] },
       adjectives: d.adjectives ?? [],
       topics: d.topics ?? [],
       messageExamples: (d.messageExamples ?? []).map((convo) =>
         (convo.examples ?? []).map((msg) => ({
           user: msg.name,
-          content: { text: msg.content?.text ?? "" },
-        })),
+          content: { text: msg.content?.text ?? "" } })),
       ),
-      postExamples: d.postExamples ?? [],
-    };
+      postExamples: d.postExamples ?? [] };
     const blob = new Blob([JSON.stringify(exportData, null, 2)], {
-      type: "application/json",
-    });
+      type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -473,8 +464,7 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
         gender: "female",
         hint: "Calm, clear",
         previewUrl:
-          "https://storage.googleapis.com/eleven-public-prod/premade/voices/21m00Tcm4TlvDq8ikWAM/df6788f9-5c96-470d-8312-aab3b3d8f50a.mp3",
-      },
+          "https://storage.googleapis.com/eleven-public-prod/premade/voices/21m00Tcm4TlvDq8ikWAM/df6788f9-5c96-470d-8312-aab3b3d8f50a.mp3" },
       {
         id: "sarah",
         name: "Sarah",
@@ -482,8 +472,7 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
         gender: "female",
         hint: "Soft, warm",
         previewUrl:
-          "https://storage.googleapis.com/eleven-public-prod/premade/voices/EXAVITQu4vr4xnSDxMaL/6851ec91-9950-471f-8586-357c52539069.mp3",
-      },
+          "https://storage.googleapis.com/eleven-public-prod/premade/voices/EXAVITQu4vr4xnSDxMaL/6851ec91-9950-471f-8586-357c52539069.mp3" },
       {
         id: "matilda",
         name: "Matilda",
@@ -491,8 +480,7 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
         gender: "female",
         hint: "Warm, friendly",
         previewUrl:
-          "https://storage.googleapis.com/eleven-public-prod/premade/voices/XrExE9yKIg1WjnnlVkGX/b930e18d-6b4d-466e-bab2-0ae97c6d8535.mp3",
-      },
+          "https://storage.googleapis.com/eleven-public-prod/premade/voices/XrExE9yKIg1WjnnlVkGX/b930e18d-6b4d-466e-bab2-0ae97c6d8535.mp3" },
       {
         id: "lily",
         name: "Lily",
@@ -500,8 +488,7 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
         gender: "female",
         hint: "British, raspy",
         previewUrl:
-          "https://storage.googleapis.com/eleven-public-prod/premade/voices/pFZP5JQG7iQjIQuC4Bku/0ab8bd74-fcd2-489d-b70a-3e1bcde8c999.mp3",
-      },
+          "https://storage.googleapis.com/eleven-public-prod/premade/voices/pFZP5JQG7iQjIQuC4Bku/0ab8bd74-fcd2-489d-b70a-3e1bcde8c999.mp3" },
       {
         id: "alice",
         name: "Alice",
@@ -509,8 +496,7 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
         gender: "female",
         hint: "British, confident",
         previewUrl:
-          "https://storage.googleapis.com/eleven-public-prod/premade/voices/Xb7hH8MSUJpSbSDYk0k2/f5409e2f-d9c3-4ac9-9e7d-916a5dbd1ef1.mp3",
-      },
+          "https://storage.googleapis.com/eleven-public-prod/premade/voices/Xb7hH8MSUJpSbSDYk0k2/f5409e2f-d9c3-4ac9-9e7d-916a5dbd1ef1.mp3" },
       // Male
       {
         id: "brian",
@@ -519,8 +505,7 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
         gender: "male",
         hint: "Deep, smooth",
         previewUrl:
-          "https://storage.googleapis.com/eleven-public-prod/premade/voices/nPczCjzI2devNBz1zQrb/f4dbda0c-aff0-45c0-93fa-f5d5ec95a2eb.mp3",
-      },
+          "https://storage.googleapis.com/eleven-public-prod/premade/voices/nPczCjzI2devNBz1zQrb/f4dbda0c-aff0-45c0-93fa-f5d5ec95a2eb.mp3" },
       {
         id: "adam",
         name: "Adam",
@@ -528,8 +513,7 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
         gender: "male",
         hint: "Deep, authoritative",
         previewUrl:
-          "https://storage.googleapis.com/eleven-public-prod/premade/voices/pNInz6obpgDQGcFmaJgB/38a69695-2ca9-4b9e-b9ec-f07ced494a58.mp3",
-      },
+          "https://storage.googleapis.com/eleven-public-prod/premade/voices/pNInz6obpgDQGcFmaJgB/38a69695-2ca9-4b9e-b9ec-f07ced494a58.mp3" },
       {
         id: "josh",
         name: "Josh",
@@ -537,8 +521,7 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
         gender: "male",
         hint: "Young, deep",
         previewUrl:
-          "https://storage.googleapis.com/eleven-public-prod/premade/voices/TxGEqnHWrfWFTfGW9XjX/3ae2fc71-d5f9-4769-bb71-2a43633cd186.mp3",
-      },
+          "https://storage.googleapis.com/eleven-public-prod/premade/voices/TxGEqnHWrfWFTfGW9XjX/3ae2fc71-d5f9-4769-bb71-2a43633cd186.mp3" },
       {
         id: "daniel",
         name: "Daniel",
@@ -546,8 +529,7 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
         gender: "male",
         hint: "British, presenter",
         previewUrl:
-          "https://storage.googleapis.com/eleven-public-prod/premade/voices/onwK4e9ZLuTAKqWW03F9/7eee0236-1a72-4b86-b303-5dcadc007ba9.mp3",
-      },
+          "https://storage.googleapis.com/eleven-public-prod/premade/voices/onwK4e9ZLuTAKqWW03F9/7eee0236-1a72-4b86-b303-5dcadc007ba9.mp3" },
       {
         id: "liam",
         name: "Liam",
@@ -555,8 +537,7 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
         gender: "male",
         hint: "Young, natural",
         previewUrl:
-          "https://storage.googleapis.com/eleven-public-prod/premade/voices/TX3LPaxmHKxFdv7VOQHJ/63148076-6363-42db-aea8-31424308b92c.mp3",
-      },
+          "https://storage.googleapis.com/eleven-public-prod/premade/voices/TX3LPaxmHKxFdv7VOQHJ/63148076-6363-42db-aea8-31424308b92c.mp3" },
       // Character / Cutesy / Game
       {
         id: "gigi",
@@ -565,8 +546,7 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
         gender: "character",
         hint: "Childish, cute",
         previewUrl:
-          "https://storage.googleapis.com/eleven-public-prod/premade/voices/jBpfuIE2acCO8z3wKNLl/3a7e4339-78fa-404e-8d10-c3ef5587935b.mp3",
-      },
+          "https://storage.googleapis.com/eleven-public-prod/premade/voices/jBpfuIE2acCO8z3wKNLl/3a7e4339-78fa-404e-8d10-c3ef5587935b.mp3" },
       {
         id: "mimi",
         name: "Mimi",
@@ -574,8 +554,7 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
         gender: "character",
         hint: "Cute, animated",
         previewUrl:
-          "https://storage.googleapis.com/eleven-public-prod/premade/voices/zrHiDhphv9ZnVXBqCLjz/decbf20b-0f57-4fac-985b-a4f0290ebfc4.mp3",
-      },
+          "https://storage.googleapis.com/eleven-public-prod/premade/voices/zrHiDhphv9ZnVXBqCLjz/decbf20b-0f57-4fac-985b-a4f0290ebfc4.mp3" },
       {
         id: "dorothy",
         name: "Dorothy",
@@ -583,8 +562,7 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
         gender: "character",
         hint: "Sweet, storybook",
         previewUrl:
-          "https://storage.googleapis.com/eleven-public-prod/premade/voices/ThT5KcBeYPX3keUQqHPh/981f0855-6598-48d2-9f8f-b6d92fbbe3fc.mp3",
-      },
+          "https://storage.googleapis.com/eleven-public-prod/premade/voices/ThT5KcBeYPX3keUQqHPh/981f0855-6598-48d2-9f8f-b6d92fbbe3fc.mp3" },
       {
         id: "glinda",
         name: "Glinda",
@@ -592,8 +570,7 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
         gender: "character",
         hint: "Magical, whimsical",
         previewUrl:
-          "https://storage.googleapis.com/eleven-public-prod/premade/voices/z9fAnlkpzviPz146aGWa/cbc60443-7b61-4ebb-b8e1-5c03237ea01d.mp3",
-      },
+          "https://storage.googleapis.com/eleven-public-prod/premade/voices/z9fAnlkpzviPz146aGWa/cbc60443-7b61-4ebb-b8e1-5c03237ea01d.mp3" },
       {
         id: "charlotte",
         name: "Charlotte",
@@ -601,8 +578,7 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
         gender: "character",
         hint: "Alluring, game NPC",
         previewUrl:
-          "https://storage.googleapis.com/eleven-public-prod/premade/voices/XB0fDUnXU5powFXDhCwa/942356dc-f10d-4d89-bda5-4f8505ee038b.mp3",
-      },
+          "https://storage.googleapis.com/eleven-public-prod/premade/voices/XB0fDUnXU5powFXDhCwa/942356dc-f10d-4d89-bda5-4f8505ee038b.mp3" },
       {
         id: "callum",
         name: "Callum",
@@ -610,8 +586,7 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
         gender: "character",
         hint: "Gruff, game hero",
         previewUrl:
-          "https://storage.googleapis.com/eleven-public-prod/premade/voices/N2lVS1w4EtoT3dr4eOWO/ac833bd8-ffda-4938-9ebc-b0f99ca25481.mp3",
-      },
+          "https://storage.googleapis.com/eleven-public-prod/premade/voices/N2lVS1w4EtoT3dr4eOWO/ac833bd8-ffda-4938-9ebc-b0f99ca25481.mp3" },
     ],
     [],
   );
@@ -646,8 +621,7 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
     (key: string, value: string | number) => {
       setVoiceConfig((prev) => ({
         ...prev,
-        elevenlabs: { ...(prev.elevenlabs ?? {}), [key]: value },
-      }));
+        elevenlabs: { ...(prev.elevenlabs ?? {}), [key]: value } }));
     },
     [],
   );
@@ -656,8 +630,7 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
     setSelectedPresetId(preset.id);
     setVoiceConfig((prev) => ({
       ...prev,
-      elevenlabs: { ...(prev.elevenlabs ?? {}), voiceId: preset.voiceId },
-    }));
+      elevenlabs: { ...(prev.elevenlabs ?? {}), voiceId: preset.voiceId } }));
   }, []);
 
   const handleTestVoice = useCallback(
@@ -691,8 +664,7 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
     try {
       const normalizedElevenlabs = {
         ...voiceConfig.elevenlabs,
-        modelId: voiceConfig.elevenlabs?.modelId ?? DEFAULT_ELEVEN_FAST_MODEL,
-      };
+        modelId: voiceConfig.elevenlabs?.modelId ?? DEFAULT_ELEVEN_FAST_MODEL };
       const sanitizedKey = sanitizeApiKey(normalizedElevenlabs?.apiKey);
       if (sanitizedKey) normalizedElevenlabs.apiKey = sanitizedKey;
       else delete normalizedElevenlabs.apiKey;
@@ -700,14 +672,11 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
       const normalizedVoiceConfig: VoiceConfig = {
         ...voiceConfig,
         provider: voiceConfig.provider ?? "elevenlabs",
-        elevenlabs: normalizedElevenlabs,
-      };
+        elevenlabs: normalizedElevenlabs };
 
       await client.updateConfig({
         messages: {
-          tts: normalizedVoiceConfig,
-        },
-      });
+          tts: normalizedVoiceConfig } });
       dispatchWindowEvent(VOICE_CONFIG_UPDATED_EVENT, normalizedVoiceConfig);
       setVoiceSaveSuccess(true);
       setTimeout(() => setVoiceSaveSuccess(false), 2500);
@@ -738,8 +707,7 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
       system: d.system ?? "",
       bio: bioText,
       style: d.style ?? { all: [], chat: [], post: [] },
-      postExamples: d.postExamples ?? [],
-    }),
+      postExamples: d.postExamples ?? [] }),
     [d, bioText],
   );
 
@@ -788,9 +756,7 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
                 ) => ({
                   examples: convo.map((msg) => ({
                     name: msg.user,
-                    content: { text: msg.content.text },
-                  })),
-                }),
+                    content: { text: msg.content.text } })) }),
               );
               handleFieldEdit("messageExamples", formatted);
             }
@@ -864,9 +830,9 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
     return (
       <div className={sectionCls}>
         <div className="text-center py-6 text-[var(--muted)] text-[13px]">
-          
-                          {t("characterview.loadingCharacterDa")}
-                        </div>
+
+          {t("characterview.loadingCharacterDa")}
+        </div>
       </div>
     );
   }
@@ -889,9 +855,9 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
           {!isRegistered && !dropLive && (
             <div className="flex flex-col gap-3">
               <div className="text-[12px] text-[var(--muted)]">
-                
-                                              {t("characterview.RegisterYourAgent")}
-                                            </div>
+
+                {t("characterview.RegisterYourAgent")}
+              </div>
               <div className="flex items-center gap-2">
                 <button
                   type="button"
@@ -914,24 +880,24 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
             <div className="flex flex-col gap-3">
               <div className="flex items-center gap-2 px-3 py-2 border border-[var(--accent)] bg-[color-mix(in_srgb,var(--accent)_8%,transparent)]">
                 <span className="text-xs font-bold text-[var(--accent)]">
-                  
-                                                    {t("characterview.MINTISLIVE")}
-                                                  </span>
+
+                  {t("characterview.MINTISLIVE")}
+                </span>
                 <span className="text-[11px] text-[var(--muted)]">
-                  
-                                                    {t("characterview.MiladyMaker")}{(dropStatus?.currentSupply ?? 0) + 1} of{" "}
+
+                  {t("characterview.MiladyMaker")}{(dropStatus?.currentSupply ?? 0) + 1} of{" "}
                   {dropStatus?.maxSupply ?? 2138}
                 </span>
               </div>
               <div className="text-[12px] text-[var(--muted)]">
-                
-                                              {t("characterview.ClaimYourLimitedE")}{" "}
+
+                {t("characterview.ClaimYourLimitedE")}{" "}
                 {dropStatus?.maxSupply ?? 2138}  {t("characterview.total")}{" "}
                 {(dropStatus?.maxSupply ?? 2138) -
                   (dropStatus?.currentSupply ?? 0)}{" "}
-                
-                                              {t("characterview.remaining")}
-                                            </div>
+
+                {t("characterview.remaining")}
+              </div>
               <div className="flex items-center gap-2">
                 <button
                   type="button"
@@ -959,9 +925,9 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
               )}
               {mintResult && (
                 <div className="text-xs text-[var(--ok,#16a34a)]">
-                  
-                                                    {t("characterview.MintedToken")}{mintResult.agentId}  {t("characterview.MiladyMaker1")}
-                                                    {mintResult.mintNumber}
+
+                  {t("characterview.MintedToken")}{mintResult.agentId}  {t("characterview.MiladyMaker1")}
+                  {mintResult.mintNumber}
                   {mintResult.isShiny && " (shiny)"}{" "}
                   <a
                     href={`https://etherscan.io/tx/${mintResult.txHash}`}
@@ -969,9 +935,9 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
                     rel="noopener noreferrer"
                     className="underline text-[var(--accent)]"
                   >
-                    
-                                                          {t("characterview.viewTx")}
-                                                        </a>
+
+                    {t("characterview.viewTx")}
+                  </a>
                 </div>
               )}
             </div>
@@ -987,9 +953,9 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-2 text-[12px]">
                     <span className="text-[var(--ok,#16a34a)] font-semibold">
-                      
-                                                    {t("characterview.Registered")}
-                                                  </span>
+
+                      {t("characterview.Registered")}
+                    </span>
                     <span className="text-[var(--muted)]">|</span>
                     <span>{t("characterview.Token")}{registryStatus.tokenId}</span>
                     <span className="text-[var(--muted)]">|</span>
@@ -998,9 +964,9 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
                   {nameOutOfSync && (
                     <div className="flex items-center gap-2">
                       <span className="text-[11px] text-[var(--warn,#f59e0b)]">
-                        
-                                                          {t("characterview.OnChainName")}{onChainName}{t("characterview.DiffersFrom")}
-                                                          {currentName}"
+
+                        {t("characterview.OnChainName")}{onChainName}{t("characterview.DiffersFrom")}
+                        {currentName}"
                       </span>
                       <button
                         type="button"
@@ -1023,18 +989,18 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
                     rel="noopener noreferrer"
                     className="text-[11px] underline text-[var(--accent)]"
                   >
-                    
-                                              {t("characterview.viewOnEtherscan")}
-                                            </a>
+
+                    {t("characterview.viewOnEtherscan")}
+                  </a>
                 </div>
               );
             })()}
 
           {hasWallet && userMinted && !isRegistered && (
             <div className="text-[12px] text-[var(--ok,#16a34a)]">
-              
-                                        {t("characterview.MintedFromCollecti")}
-                                      </div>
+
+              {t("characterview.MintedFromCollecti")}
+            </div>
           )}
         </div>
       )}
@@ -1059,18 +1025,18 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
               onClick={() => fileInputRef.current?.click()}
               title={t("characterview.importCharacterJso")}
             >
-              
-                                        {t("characterview.import")}
-                                      </button>
+
+              {t("characterview.import")}
+            </button>
             <button
               className={tinyBtnCls}
               onClick={handleExport}
               title={t("characterview.exportAsCharacter")}
               type="button"
             >
-              
-                                        {t("characterview.export")}
-                                      </button>
+
+              {t("characterview.export")}
+            </button>
           </div>
         </div>
 
@@ -1093,9 +1059,9 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
                 onClick={() => void handleRandomName()}
                 title={t("characterview.randomName")}
               >
-                
-                                              {t("characterview.random")}
-                                            </button>
+
+                {t("characterview.random")}
+              </button>
             </div>
           </div>
 
@@ -1175,9 +1141,9 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
           <div className="flex flex-col gap-1">
             <div className="flex items-center justify-between">
               <span className={labelCls}>
-                
-                                              {t("characterview.directionsAndThing")}
-                                            </span>
+
+                {t("characterview.directionsAndThing")}
+              </span>
               <button
                 type="button"
                 className={tinyBtnCls}
@@ -1205,9 +1171,9 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
           <div className="flex items-center gap-1.5">
             <div className="font-bold text-sm">{t("characterview.StyleRules")}</div>
             <span className="font-normal text-[11px] text-[var(--muted)]">
-              
-                                        {t("characterview.CommunicationGuid")}
-                                      </span>
+
+              {t("characterview.CommunicationGuid")}
+            </span>
           </div>
           <button
             type="button"
@@ -1256,12 +1222,12 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
               <span className="inline-block transition-transform group-open:rotate-90">
                 &#9654;
               </span>
-              
-                                        {t("characterview.chatExamples")}
-                                        <span className="font-normal text-[var(--muted)]">
-                
-                                              {t("characterview.HowTheAgentResp")}
-                                            </span>
+
+              {t("characterview.chatExamples")}
+              <span className="font-normal text-[var(--muted)]">
+
+                {t("characterview.HowTheAgentResp")}
+              </span>
               <button
                 type="button"
                 className={`${tinyBtnCls} ml-auto`}
@@ -1284,8 +1250,8 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
                 >
                   <div className="flex items-center justify-between mb-1.5">
                     <span className="text-[10px] text-[var(--muted)] font-semibold">
-                      
-                                                    {t("characterview.conversation")} {ci + 1}
+
+                      {t("characterview.conversation")} {ci + 1}
                     </span>
                     <button
                       type="button"
@@ -1296,9 +1262,9 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
                         handleFieldEdit("messageExamples", updated);
                       }}
                     >
-                      
-                                                    {t("characterview.remove")}
-                                                  </button>
+
+                      {t("characterview.remove")}
+                    </button>
                   </div>
                   {convo.examples.map((msg, mi) => (
                     <div
@@ -1316,12 +1282,10 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
                         onChange={(e) => {
                           const updated = [...(d.messageExamples ?? [])];
                           const convoClone = {
-                            examples: [...updated[ci].examples],
-                          };
+                            examples: [...updated[ci].examples] };
                           convoClone.examples[mi] = {
                             ...convoClone.examples[mi],
-                            content: { text: e.target.value },
-                          };
+                            content: { text: e.target.value } };
                           updated[ci] = convoClone;
                           handleFieldEdit("messageExamples", updated);
                         }}
@@ -1333,9 +1297,9 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
               ))}
               {(d.messageExamples ?? []).length === 0 && (
                 <div className={`${hintCls} py-2`}>
-                  
-                                                    {t("characterview.noChatExamplesYet")}
-                                                  </div>
+
+                  {t("characterview.noChatExamplesYet")}
+                </div>
               )}
             </div>
           </details>
@@ -1346,12 +1310,12 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
               <span className="inline-block transition-transform group-open:rotate-90">
                 &#9654;
               </span>
-              
-                                        {t("characterview.postExamples")}
-                                        <span className="font-normal text-[var(--muted)]">
-                
-                                              {t("characterview.SocialMediaVoice")}
-                                            </span>
+
+              {t("characterview.postExamples")}
+              <span className="font-normal text-[var(--muted)]">
+
+                {t("characterview.SocialMediaVoice")}
+              </span>
               <button
                 type="button"
                 className={`${tinyBtnCls} ml-auto`}
@@ -1386,16 +1350,16 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
                       handleFieldEdit("postExamples", updated);
                     }}
                   >
-                    
-                                              {t("characterview.Times")}
-                                            </button>
+
+                    {t("characterview.Times")}
+                  </button>
                 </div>
               ))}
               {(d.postExamples ?? []).length === 0 && (
                 <div className={`${hintCls} py-2`}>
-                  
-                                                    {t("characterview.noPostExamplesYet")}
-                                                  </div>
+
+                  {t("characterview.noPostExamplesYet")}
+                </div>
               )}
               <button
                 type="button"
@@ -1405,9 +1369,9 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
                   handleFieldEdit("postExamples", updated);
                 }}
               >
-                
-                                              {t("characterview.AddPost")}
-                                            </button>
+
+                {t("characterview.AddPost")}
+              </button>
             </div>
           </details>
         </div>
@@ -1419,15 +1383,15 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
 
         {voiceLoading ? (
           <div className="text-center py-4 text-[var(--muted)] text-[13px]">
-            
-                                  {t("characterview.LoadingVoiceConfig")}
-                                </div>
+
+            {t("characterview.LoadingVoiceConfig")}
+          </div>
         ) : (
           <div className="flex flex-col gap-4">
             <div className="text-xs text-[var(--muted)]">
-              
-                                            {t("characterview.ChooseTheSpeaking")}
-                                          </div>
+
+              {t("characterview.ChooseTheSpeaking")}
+            </div>
 
             <div className="flex flex-col gap-1">
               <span className={labelCls}>{t("characterview.voice")}</span>
@@ -1446,9 +1410,7 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
                       ).map((p) => ({
                         id: p.id,
                         text: p.name,
-                        hint: p.hint,
-                      })),
-                    },
+                        hint: p.hint })) },
                     {
                       label: "Male",
                       items: VOICE_PRESETS.filter(
@@ -1456,9 +1418,7 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
                       ).map((p) => ({
                         id: p.id,
                         text: p.name,
-                        hint: p.hint,
-                      })),
-                    },
+                        hint: p.hint })) },
                     {
                       label: "Character",
                       items: VOICE_PRESETS.filter(
@@ -1466,13 +1426,10 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
                       ).map((p) => ({
                         id: p.id,
                         text: p.name,
-                        hint: p.hint,
-                      })),
-                    },
+                        hint: p.hint })) },
                     {
                       label: "Other",
-                      items: [{ id: "__custom__", text: "Custom voice ID..." }],
-                    },
+                      items: [{ id: "__custom__", text: "Custom voice ID..." }] },
                   ]}
                   onChange={(id) => {
                     if (id === "__custom__") {
@@ -1495,18 +1452,18 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
                       onClick={handleStopTest}
                       type="button"
                     >
-                      
-                                                {t("characterview.stop")}
-                                              </button>
+
+                      {t("characterview.stop")}
+                    </button>
                   ) : (
                     <button
                       type="button"
                       className={tinyBtnCls}
                       onClick={() => handleTestVoice(activePreset.previewUrl)}
                     >
-                      
-                                                    {t("characterview.preview")}
-                                                  </button>
+
+                      {t("characterview.preview")}
+                    </button>
                   );
                 })()}
               </div>
@@ -1532,9 +1489,9 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
                 <span className="inline-block transition-transform group-open:rotate-90">
                   &#9654;
                 </span>
-                
-                                                  {t("characterview.advancedVoiceSetti")}
-                                                </summary>
+
+                {t("characterview.advancedVoiceSetti")}
+              </summary>
               <div className="mt-3">
                 <ConfigRenderer
                   schema={
@@ -1550,17 +1507,13 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
                             "eleven_multilingual_v2",
                             "eleven_turbo_v2",
                             "eleven_monolingual_v1",
-                          ],
-                        },
+                          ] },
                         stability: { type: "number", minimum: 0, maximum: 1 },
                         similarityBoost: {
                           type: "number",
                           minimum: 0,
-                          maximum: 1,
-                        },
-                        speed: { type: "number", minimum: 0.5, maximum: 2 },
-                      },
-                    } satisfies JsonSchemaObject
+                          maximum: 1 },
+                        speed: { type: "number", minimum: 0.5, maximum: 2 } } } satisfies JsonSchemaObject
                   }
                   hints={{
                     modelId: {
@@ -1571,49 +1524,40 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
                         { value: "", label: "Default (Flash v2.5)" },
                         {
                           value: "eleven_flash_v2_5",
-                          label: "Flash v2.5 (Fastest)",
-                        },
+                          label: "Flash v2.5 (Fastest)" },
                         { value: "eleven_turbo_v2_5", label: "Turbo v2.5" },
                         {
                           value: "eleven_multilingual_v2",
-                          label: "Multilingual v2",
-                        },
+                          label: "Multilingual v2" },
                         { value: "eleven_turbo_v2", label: "Turbo v2" },
                         {
                           value: "eleven_monolingual_v1",
-                          label: "Monolingual v1",
-                        },
-                      ],
-                    } satisfies ConfigUiHint,
+                          label: "Monolingual v1" },
+                      ] } satisfies ConfigUiHint,
                     stability: {
                       label: "Stability",
                       type: "number",
                       width: "third",
                       placeholder: "0.5",
-                      step: 0.05,
-                    } satisfies ConfigUiHint,
+                      step: 0.05 } satisfies ConfigUiHint,
                     similarityBoost: {
                       label: "Similarity",
                       type: "number",
                       width: "third",
                       placeholder: "0.75",
-                      step: 0.05,
-                    } satisfies ConfigUiHint,
+                      step: 0.05 } satisfies ConfigUiHint,
                     speed: {
                       label: "Speed",
                       type: "number",
                       width: "third",
                       placeholder: "1.0",
-                      step: 0.1,
-                    } satisfies ConfigUiHint,
-                  }}
+                      step: 0.1 } satisfies ConfigUiHint }}
                   values={{
                     modelId: voiceConfig.elevenlabs?.modelId ?? "",
                     stability: voiceConfig.elevenlabs?.stability ?? "",
                     similarityBoost:
                       voiceConfig.elevenlabs?.similarityBoost ?? "",
-                    speed: voiceConfig.elevenlabs?.speed ?? "",
-                  }}
+                    speed: voiceConfig.elevenlabs?.speed ?? "" }}
                   registry={defaultRegistry}
                   onChange={(key, value) => {
                     handleVoiceFieldChange(

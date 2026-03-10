@@ -16,8 +16,7 @@ export function NftGrid({
   t,
   walletNftsLoading,
   walletNfts,
-  allNfts,
-}: NftGridProps) {
+  allNfts }: NftGridProps) {
   if (walletNftsLoading) {
     return (
       <div className="text-center py-10 text-muted italic text-xs">

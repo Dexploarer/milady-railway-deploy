@@ -1,12 +1,10 @@
 import { ChevronDown, ChevronRight } from "lucide-react";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState} from "react";
 import {
   type CustomActionDef,
   type CustomActionHandler,
-  client,
-} from "../api-client";
+  client } from "../api-client";
 import { useApp } from "../AppContext";
-import { createTranslator } from "../i18n";
 
 interface CustomActionEditorProps {
   open: boolean;
@@ -113,8 +111,7 @@ function parseParameters(value: unknown): ParamDef[] {
       return {
         name,
         description: toNonEmptyString(candidate.description) || name,
-        required: candidate.required === true,
-      } satisfies ParamDef;
+        required: candidate.required === true } satisfies ParamDef;
     })
     .filter((param): param is ParamDef => param !== null);
 }
@@ -153,8 +150,7 @@ function parseGeneratedAction(payload: unknown): {
   if (!name) {
     return {
       ok: false,
-      errors: ["Generated action must include a name."],
-    };
+      errors: ["Generated action must include a name."] };
   }
 
   const handlerSource = raw.handler;
@@ -165,8 +161,7 @@ function parseGeneratedAction(payload: unknown): {
   ) {
     return {
       ok: false,
-      errors: ["Generated action must include a handler block."],
-    };
+      errors: ["Generated action must include a handler block."] };
   }
 
   const hTypeRaw =
@@ -181,8 +176,7 @@ function parseGeneratedAction(payload: unknown): {
   ) {
     return {
       ok: false,
-      errors: ["Generated handler type must be http, shell, or code."],
-    };
+      errors: ["Generated handler type must be http, shell, or code."] };
   }
 
   const params = parseParameters(raw.parameters);
@@ -201,8 +195,7 @@ function parseGeneratedAction(payload: unknown): {
     if (!url) {
       return {
         ok: false,
-        errors: ["HTTP action requires a URL."],
-      };
+        errors: ["HTTP action requires a URL."] };
     }
 
     const handler: CustomActionHandler = {
@@ -220,8 +213,7 @@ function parseGeneratedAction(payload: unknown): {
           {},
         )
         : undefined,
-      bodyTemplate: toNonEmptyString(rawHttp.bodyTemplate),
-    };
+      bodyTemplate: toNonEmptyString(rawHttp.bodyTemplate) };
 
     return {
       ok: true,
@@ -232,10 +224,8 @@ function parseGeneratedAction(payload: unknown): {
         handler,
         parameters: params,
         similes: parseSimiles(raw.similes),
-        enabled: raw.enabled === true,
-      },
-      errors: [],
-    };
+        enabled: raw.enabled === true },
+      errors: [] };
   }
 
   if (handlerType === "shell") {
@@ -247,8 +237,7 @@ function parseGeneratedAction(payload: unknown): {
     if (!command) {
       return {
         ok: false,
-        errors: ["Shell action requires a command template."],
-      };
+        errors: ["Shell action requires a command template."] };
     }
 
     return {
@@ -259,14 +248,11 @@ function parseGeneratedAction(payload: unknown): {
         handlerType,
         handler: {
           type: "shell",
-          command,
-        },
+          command },
         parameters: params,
         similes: parseSimiles(raw.similes),
-        enabled: raw.enabled === true,
-      },
-      errors: [],
-    };
+        enabled: raw.enabled === true },
+      errors: [] };
   }
 
   const rawCode = handlerSource as {
@@ -279,8 +265,7 @@ function parseGeneratedAction(payload: unknown): {
   if (!code) {
     return {
       ok: false,
-      errors: ["Code action requires a JavaScript code block."],
-    };
+      errors: ["Code action requires a JavaScript code block."] };
   }
 
   return {
@@ -291,14 +276,11 @@ function parseGeneratedAction(payload: unknown): {
       handlerType,
       handler: {
         type: "code",
-        code,
-      },
+        code },
       parameters: params,
       similes: parseSimiles(raw.similes),
-      enabled: raw.enabled === true,
-    },
-    errors: [],
-  };
+      enabled: raw.enabled === true },
+    errors: [] };
 }
 
 function parseSimilesInput(value: string): string[] {
@@ -312,10 +294,9 @@ export function CustomActionEditor({
   open,
   action,
   onSave,
-  onClose,
-}: CustomActionEditorProps) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  onClose }: CustomActionEditorProps) {
+  const {
+    t } = useApp();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [similesInput, setSimilesInput] = useState("");
@@ -369,8 +350,7 @@ export function CustomActionEditor({
         action.parameters?.map((p) => ({
           name: p.name,
           description: p.description || "",
-          required: p.required || false,
-        })) || [],
+          required: p.required || false })) || [],
       );
 
       const handler = action.handler;
@@ -383,8 +363,7 @@ export function CustomActionEditor({
           Object.keys(headers).length > 0
             ? Object.entries(headers).map(([key, value]) => ({
               key,
-              value,
-            }))
+              value }))
             : [{ key: "", value: "" }],
         );
         setHttpBody(handler.bodyTemplate || "");
@@ -443,8 +422,7 @@ export function CustomActionEditor({
         handler.headers
           ? Object.entries(handler.headers).map(([key, value]) => ({
             key,
-            value,
-          }))
+            value }))
           : [{ key: "", value: "" }],
       );
     } else if (parsed.handlerType === "shell") {
@@ -519,14 +497,12 @@ export function CustomActionEditor({
         if (field === "name") {
           return {
             ...parameter,
-            [field]: normalizeParamName(value as string),
-          };
+            [field]: normalizeParamName(value as string) };
         }
 
         return {
           ...parameter,
-          [field]: value,
-        };
+          [field]: value };
       }),
     );
     setFormError("");
@@ -627,8 +603,7 @@ export function CustomActionEditor({
           method: normalizeMethod(httpMethod),
           url: httpUrl,
           headers,
-          bodyTemplate: httpBody || undefined,
-        };
+          bodyTemplate: httpBody || undefined };
       } else if (handlerType === "shell") {
         if (!shellCommand.trim()) {
           setFormError("Shell command is required.");
@@ -637,8 +612,7 @@ export function CustomActionEditor({
 
         handler = {
           type: "shell",
-          command: shellCommand,
-        };
+          command: shellCommand };
       } else {
         if (!code.trim()) {
           setFormError("Code is required.");
@@ -647,8 +621,7 @@ export function CustomActionEditor({
 
         handler = {
           type: "code",
-          code,
-        };
+          code };
       }
 
       const similes = parseSimilesInput(similesInput);
@@ -659,8 +632,7 @@ export function CustomActionEditor({
         similes,
         parameters: normalizedParameters,
         handler,
-        enabled: action?.enabled ?? true,
-      };
+        enabled: action?.enabled ?? true };
 
       const saved = action?.id
         ? await client.updateCustomAction(action.id, actionDef)
@@ -693,14 +665,12 @@ export function CustomActionEditor({
       const duration = Date.now() - startTime;
       setTestResult({
         output: JSON.stringify(result, null, 2),
-        duration,
-      });
+        duration });
     } catch (err: unknown) {
       const duration = Date.now() - startTime;
       setTestResult({
         error: err instanceof Error ? err.message : String(err),
-        duration,
-      });
+        duration });
     } finally {
       setTesting(false);
     }
@@ -1055,8 +1025,7 @@ export function CustomActionEditor({
                         onChange={(e) =>
                           setTestParams({
                             ...testParams,
-                            [param.name]: e.target.value,
-                          })
+                            [param.name]: e.target.value })
                         }
                         placeholder={param.description || "value"}
                         className="bg-surface border border-border px-2 py-1.5 text-sm text-txt placeholder:text-muted/50 outline-none focus:border-accent"

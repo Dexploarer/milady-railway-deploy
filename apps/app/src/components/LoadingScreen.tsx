@@ -45,8 +45,7 @@ interface CharCell {
 const PHASE_LABELS: Record<StartupPhase, string> = {
   "starting-backend": "starting backend",
   "initializing-agent": "initializing agent",
-  ready: "ready",
-};
+  ready: "ready" };
 
 interface LoadingScreenProps {
   phase?: StartupPhase;
@@ -55,8 +54,7 @@ interface LoadingScreenProps {
 
 export function LoadingScreen({
   phase = "starting-backend",
-  elapsedSeconds,
-}: LoadingScreenProps) {
+  elapsedSeconds }: LoadingScreenProps) {
   const [runtimeElapsedSeconds, setRuntimeElapsedSeconds] = useState(0);
 
   useEffect(() => {
@@ -84,8 +82,7 @@ export function LoadingScreen({
           char,
           isLetter: char !== " ",
           delay: Math.random() * 5,
-          duration: 1.4 + Math.random() * 3,
-        })),
+          duration: 1.4 + Math.random() * 3 })),
       ),
     [],
   );
@@ -99,8 +96,7 @@ export function LoadingScreen({
           fontSize: "clamp(7px, 1.4vw, 14px)",
           lineHeight: 1.35,
           color: "var(--text)",
-          userSelect: "none",
-        }}
+          userSelect: "none" }}
       >
         {grid.map((line) => (
           <div
@@ -114,8 +110,7 @@ export function LoadingScreen({
                   className="dither-char"
                   style={{
                     animationDelay: `${c.delay.toFixed(2)}s`,
-                    animationDuration: `${c.duration.toFixed(2)}s`,
-                  }}
+                    animationDuration: `${c.duration.toFixed(2)}s` }}
                 >
                   {c.char}
                 </span>

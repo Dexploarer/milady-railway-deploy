@@ -10,8 +10,7 @@ export {
   saveTrackedTokens,
   type TokenRow,
   type TrackedBscToken,
-  toNormalizedAddress,
-} from "./constants";
+  toNormalizedAddress } from "./constants";
 export { InventoryToolbar } from "./InventoryToolbar";
 export { NftGrid } from "./NftGrid";
 export { PortfolioHeader } from "./PortfolioHeader";

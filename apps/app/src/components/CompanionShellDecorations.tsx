@@ -5,21 +5,19 @@
 import type { Tab } from "../navigation";
 import type { TabFlags } from "./companion-shell-styles";
 import { useApp } from "../AppContext";
-import { useMemo } from "react";
-import { createTranslator } from "../i18n";
+import {} from "react";
 
 /* ── Decorative elements per tab ───────────────────────────────────── */
 
 export function DecorativeElements({
   f,
-  accentColor,
-}: {
+  accentColor }: {
   tab: Tab;
   f: TabFlags;
   accentColor: string;
 }) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  const {
+    t } = useApp();
   return (
     <div
       className={`pointer-events-none absolute inset-0 overflow-hidden ${f.isPluginsLike ? "" : "rounded-[16px]"}`}
@@ -139,8 +137,7 @@ export function DecorativeElements({
 
 export function CloseButton({
   centered,
-  onClick,
-}: {
+  onClick }: {
   centered: boolean;
   onClick: () => void;
 }) {

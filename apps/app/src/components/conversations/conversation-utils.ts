@@ -114,8 +114,7 @@ export function estimateTokenCost(
     deepseek: [0.55, 2.19],
     qwen: [0.35, 1.4],
     kimi: [0.2, 0.8],
-    moonshot: [0.2, 0.8],
-  };
+    moonshot: [0.2, 0.8] };
 
   let inputCostPerMillion = 1.0;
   let outputCostPerMillion = 3.0;

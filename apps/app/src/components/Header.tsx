@@ -8,13 +8,11 @@ import {
   Play,
   RotateCcw,
   Search,
-  Wallet,
-} from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+  Wallet } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useApp } from "../AppContext";
 import { COMMAND_PALETTE_EVENT, dispatchMiladyEvent } from "../events";
 import { useBugReport } from "../hooks/useBugReport";
-import { createTranslator } from "../i18n";
 import { IconTooltip as IconButtonTooltip } from "./shared/tooltips";
 
 // Status indicator with icon
@@ -26,29 +24,25 @@ function StatusIndicator({ state }: { state: string }) {
           icon: Check,
           colorClass: "text-ok border-ok bg-ok/10",
           dotColor: "bg-ok",
-          label: "Running",
-        };
+          label: "Running" };
       case "paused":
         return {
           icon: Pause,
           colorClass: "text-warn border-warn bg-warn/10",
           dotColor: "bg-warn",
-          label: "Paused",
-        };
+          label: "Paused" };
       case "error":
         return {
           icon: AlertTriangle,
           colorClass: "text-danger border-danger bg-danger/10",
           dotColor: "bg-danger",
-          label: "Error",
-        };
+          label: "Error" };
       default:
         return {
           icon: Loader2,
           colorClass: "text-muted border-muted bg-muted/10",
           dotColor: "bg-muted",
-          label: state.replace(/_/g, " "),
-        };
+          label: state.replace(/_/g, " ") };
     }
   };
 
@@ -93,11 +87,9 @@ export function Header() {
     registryStatus,
     uiShellMode,
     setUiShellMode,
-    uiLanguage,
-  } = useApp();
+    t } = useApp();
 
   const [copied, setCopied] = useState<string | null>(null);
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
 
   useEffect(() => {
     void loadDropStatus();

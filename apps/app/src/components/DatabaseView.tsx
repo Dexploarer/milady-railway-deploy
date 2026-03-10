@@ -7,17 +7,16 @@
  */
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   type ColumnInfo,
   client,
   type DatabaseStatus,
   type QueryResult,
   type TableInfo,
-  type TableRowsResponse,
+  type TableRowsResponse
 } from "../api-client";
 import { useApp } from "../AppContext";
-import { createTranslator } from "../i18n";
 
 type DbView = "tables" | "query";
 type SortDir = "asc" | "desc" | null;
@@ -87,13 +86,11 @@ function typeBadgeColor(type: string): string {
 
 function CellPopover({
   value,
-  onClose,
-}: {
-  value: string;
-  onClose: () => void;
-}) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  onClose }: {
+    value: string;
+    onClose: () => void;
+  }) {
+  const { t } = useApp();
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -138,18 +135,16 @@ function ResultsGrid({
   sortCol,
   sortDir,
   onSort,
-  onCellClick,
-}: {
-  columns: string[];
-  rows: Record<string, unknown>[];
-  columnMeta?: Map<string, ColumnInfo>;
-  sortCol?: string;
-  sortDir?: SortDir;
-  onSort?: (col: string) => void;
-  onCellClick?: (value: string) => void;
-}) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  onCellClick }: {
+    columns: string[];
+    rows: Record<string, unknown>[];
+    columnMeta?: Map<string, ColumnInfo>;
+    sortCol?: string;
+    sortDir?: SortDir;
+    onSort?: (col: string) => void;
+    onCellClick?: (value: string) => void;
+  }) {
+  const { t } = useApp();
   return (
     <div
       className="overflow-auto border border-[var(--border)] bg-[var(--card)]"
@@ -256,16 +251,14 @@ function PaginationBar({
   offset,
   limit,
   onPrev,
-  onNext,
-}: {
-  total: number;
-  offset: number;
-  limit: number;
-  onPrev: () => void;
-  onNext: () => void;
-}) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  onNext }: {
+    total: number;
+    offset: number;
+    limit: number;
+    onPrev: () => void;
+    onNext: () => void;
+  }) {
+  const { t } = useApp();
   const start = offset + 1;
   const end = Math.min(offset + limit, total);
   const hasPrev = offset > 0;
@@ -304,8 +297,7 @@ function PaginationBar({
 // ── Main component ────────────────────────────────────────────────────
 
 export function DatabaseView() {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  const { t } = useApp();
   const [dbStatus, setDbStatus] = useState<DatabaseStatus | null>(null);
   const [tables, setTables] = useState<TableInfo[]>([]);
   const [selectedTable, setSelectedTable] = useState("");
@@ -369,7 +361,7 @@ export function DatabaseView() {
           limit: ROW_LIMIT,
           offset: opts?.offset ?? 0,
           sort: opts?.sort,
-          order: opts?.order,
+          order: opts?.order
         });
         setTableData(data);
         setSelectedTable(tableName);
@@ -408,7 +400,7 @@ export function DatabaseView() {
         loadTableData(selectedTable, {
           sort: newDir ? col : undefined,
           order: newDir ?? undefined,
-          offset: 0,
+          offset: 0
         });
       }
     },
@@ -431,7 +423,7 @@ export function DatabaseView() {
     loadTableData(selectedTable, {
       sort: sortDir ? sortCol : undefined,
       order: sortDir ?? undefined,
-      offset: newOffset,
+      offset: newOffset
     });
   }, [rowOffset, selectedTable, sortCol, sortDir, loadTableData]);
 
@@ -441,7 +433,7 @@ export function DatabaseView() {
     loadTableData(selectedTable, {
       sort: sortDir ? sortCol : undefined,
       order: sortDir ?? undefined,
-      offset: newOffset,
+      offset: newOffset
     });
   }, [rowOffset, selectedTable, sortCol, sortDir, loadTableData]);
 

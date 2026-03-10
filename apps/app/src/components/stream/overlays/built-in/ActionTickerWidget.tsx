@@ -17,8 +17,7 @@ function ActionTicker({ instance, events }: WidgetRenderProps) {
     return events.slice(-maxItems).map((e) => ({
       id: e.eventId,
       stream: e.stream ?? "action",
-      text: getEventText(e),
-    }));
+      text: getEventText(e) }));
   }, [events, maxItems]);
 
   if (items.length === 0) return null;
@@ -54,12 +53,9 @@ const definition: WidgetDefinition = {
       label: "Max visible items",
       default: 8,
       min: 3,
-      max: 20,
-    },
-  },
+      max: 20 } },
   defaultConfig: { maxItems: 8 },
-  render: ActionTicker,
-};
+  render: ActionTicker };
 
 registerWidget(definition);
 export default definition;

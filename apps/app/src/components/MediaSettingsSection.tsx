@@ -17,12 +17,10 @@ import {
   type MediaConfig,
   type MediaMode,
   type VideoProvider,
-  type VisionProvider,
-} from "../api-client";
+  type VisionProvider } from "../api-client";
 import {
   CloudConnectionStatus,
-  CloudSourceModeToggle,
-} from "./CloudSourceControls";
+  CloudSourceModeToggle } from "./CloudSourceControls";
 import { ConfigSaveFooter } from "./ConfigSaveFooter";
 
 type MediaCategory = "image" | "video" | "audio" | "vision";
@@ -66,8 +64,7 @@ const CATEGORY_LABELS: Record<MediaCategory, string> = {
   image: "Image Generation",
   video: "Video Generation",
   audio: "Audio / Music",
-  vision: "Vision (Analysis)",
-};
+  vision: "Vision (Analysis)" };
 
 function getProvidersForCategory(category: MediaCategory): ProviderOption[] {
   switch (category) {
@@ -203,9 +200,7 @@ export function MediaSettingsSection() {
         ...prev,
         [category]: {
           ...(prev[category] ?? {}),
-          ...updates,
-        },
-      }));
+          ...updates } }));
       setDirty(true);
     },
     [],
@@ -313,8 +308,7 @@ export function MediaSettingsSection() {
             if (mode === "cloud") {
               updateCategoryConfig(activeTab, {
                 mode: "cloud",
-                provider: "cloud",
-              });
+                provider: "cloud" });
               return;
             }
             updateCategoryConfig(activeTab, { mode: "own-key" });
@@ -371,8 +365,7 @@ export function MediaSettingsSection() {
                           | ImageProvider
                           | VideoProvider
                           | AudioGenProvider
-                          | VisionProvider,
-                      })
+                          | VisionProvider })
                     }
                   >
                     <div className="font-semibold">{p.label}</div>

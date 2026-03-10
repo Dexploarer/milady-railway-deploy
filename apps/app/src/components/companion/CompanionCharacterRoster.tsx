@@ -18,8 +18,7 @@ export function CompanionCharacterRoster({
   handleBgUpload,
   vrmFileInputRef,
   bgFileInputRef,
-  t,
-}: {
+  t }: {
   rosterItems: RosterItem[];
   selectedVrmIndex: number;
   safeSelectedVrmIndex: number;
@@ -87,8 +86,7 @@ export function CompanionCharacterRoster({
               style={{
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "center",
-              }}
+                justifyContent: "center" }}
             >
               <svg
                 width="24"

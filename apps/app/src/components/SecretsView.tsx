@@ -11,7 +11,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { SecretInfo } from "../api-client";
 import { client } from "../api-client";
 import { useApp } from "../AppContext";
-import { createTranslator } from "../i18n";
 
 /* ── Constants ──────────────────────────────────────────────────────── */
 
@@ -30,8 +29,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   blockchain: "Blockchain",
   connector: "Connectors",
   auth: "Authentication",
-  other: "Other",
-};
+  other: "Other" };
 
 type GroupedSecrets = {
   category: string;
@@ -54,8 +52,7 @@ function groupSecretsByCategory(secrets: SecretInfo[]): GroupedSecrets[] {
     (category) => ({
       category,
       label: CATEGORY_LABELS[category],
-      secrets: grouped.get(category) ?? [],
-    }),
+      secrets: grouped.get(category) ?? [] }),
   );
 }
 
@@ -82,8 +79,7 @@ function savePinnedKeys(keys: Set<string>) {
 /* ── Component ──────────────────────────────────────────────────────── */
 
 export function SecretsView() {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  const { t } = useApp();
   const [allSecrets, setAllSecrets] = useState<SecretInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -177,15 +173,13 @@ export function SecretsView() {
       const res = await client.updateSecrets(payload);
       setSaveResult({
         ok: true,
-        message: `Updated ${res.updated.length} secret${res.updated.length !== 1 ? "s" : ""}`,
-      });
+        message: `Updated ${res.updated.length} secret${res.updated.length !== 1 ? "s" : ""}` });
       setDraft({});
       await load();
     } catch (err) {
       setSaveResult({
         ok: false,
-        message: err instanceof Error ? err.message : "Save failed",
-      });
+        message: err instanceof Error ? err.message : "Save failed" });
     } finally {
       setSaving(false);
     }
@@ -288,8 +282,7 @@ export function SecretsView() {
               style={{
                 transform: collapsed.has(category)
                   ? "rotate(-90deg)"
-                  : "rotate(0deg)",
-              }}
+                  : "rotate(0deg)" }}
             />
             <span className="text-[14px] font-semibold text-[var(--txt)]">
               {label}
@@ -356,16 +349,14 @@ function SecretPicker({
   search,
   onSearchChange,
   onAdd,
-  onClose,
-}: {
+  onClose }: {
   available: SecretInfo[];
   search: string;
   onSearchChange: (v: string) => void;
   onAdd: (key: string) => void;
   onClose: () => void;
 }) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  const { t } = useApp();
   // Group available by category
   const grouped = useMemo(() => {
     return groupSecretsByCategory(available);
@@ -478,8 +469,7 @@ function SecretCard({
   isPinned,
   onToggleVisible,
   onDraftChange,
-  onRemove,
-}: {
+  onRemove }: {
   secret: SecretInfo;
   draftValue: string;
   isVisible: boolean;
@@ -488,8 +478,7 @@ function SecretCard({
   onDraftChange: (val: string) => void;
   onRemove: () => void;
 }) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  const { t } = useApp();
   const enabledPlugins = secret.usedBy.filter((u) => u.enabled);
   const pluginList = secret.usedBy
     .map((u) => u.pluginName || u.pluginId)
@@ -508,8 +497,7 @@ function SecretCard({
             <span
               className="w-2 h-2 rounded-full flex-shrink-0"
               style={{
-                backgroundColor: secret.isSet ? "var(--ok)" : "var(--muted)",
-              }}
+                backgroundColor: secret.isSet ? "var(--ok)" : "var(--muted)" }}
             />
             <span className="text-[13px] font-mono font-medium text-[var(--txt)] truncate">
               {secret.key}

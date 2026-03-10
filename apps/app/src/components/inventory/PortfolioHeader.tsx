@@ -41,8 +41,7 @@ export function PortfolioHeader({
   copyToClipboard,
   setActionNotice,
   loadBalances,
-  goToRpcSettings,
-}: PortfolioHeaderProps) {
+  goToRpcSettings }: PortfolioHeaderProps) {
   return (
     <div className="wt__portfolio">
       <div className="flex items-start justify-between gap-3 flex-wrap">
@@ -107,8 +106,7 @@ export function PortfolioHeader({
               ? t("wallet.status.feedLiveTitle")
               : bscChainError
                 ? t("wallet.status.feedErrorTitle", {
-                  error: bscChainError,
-                })
+                  error: bscChainError })
                 : t("wallet.status.feedOfflineTitle")
           }
         />
@@ -124,8 +122,7 @@ export function PortfolioHeader({
               ? t("wallet.status.tradeReadyTitle")
               : rpcReady
                 ? t("wallet.status.tradeNeedGasTitle", {
-                  threshold: BSC_GAS_READY_THRESHOLD,
-                })
+                  threshold: BSC_GAS_READY_THRESHOLD })
                 : t("wallet.status.tradeFeedRequired")
           }
         />

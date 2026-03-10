@@ -16,25 +16,20 @@ import {
   Monitor,
   MousePointer2,
   Settings,
-  Terminal,
-} from "lucide-react";
+  Terminal } from "lucide-react";
 import {
   type Dispatch,
   type SetStateAction,
   useCallback,
   useEffect,
-  useState,
-  useMemo
-} from "react";
+  useState} from "react";
 import { useApp } from "../AppContext";
-import { createTranslator } from "../i18n";
 import {
   type AllPermissionsState,
   client,
   type PermissionStatus,
   type PluginInfo,
-  type SystemPermissionId,
-} from "../api-client";
+  type SystemPermissionId } from "../api-client";
 import { hasRequiredOnboardingPermissions } from "../onboarding-permissions";
 import { StatusBadge } from "./shared/ui-badges";
 import { Switch } from "./shared/ui-switch";
@@ -57,40 +52,35 @@ const SYSTEM_PERMISSIONS: PermissionDef[] = [
       "Control mouse, keyboard, and interact with other applications",
     icon: "cursor",
     platforms: ["darwin"],
-    requiredForFeatures: ["computeruse", "browser"],
-  },
+    requiredForFeatures: ["computeruse", "browser"] },
   {
     id: "screen-recording",
     name: "Screen Recording",
     description: "Capture screen content for screenshots and vision",
     icon: "monitor",
     platforms: ["darwin"],
-    requiredForFeatures: ["computeruse", "vision"],
-  },
+    requiredForFeatures: ["computeruse", "vision"] },
   {
     id: "microphone",
     name: "Microphone",
     description: "Voice input for talk mode and speech recognition",
     icon: "mic",
     platforms: ["darwin", "win32", "linux"],
-    requiredForFeatures: ["talkmode", "voice"],
-  },
+    requiredForFeatures: ["talkmode", "voice"] },
   {
     id: "camera",
     name: "Camera",
     description: "Video input for vision and video capture",
     icon: "camera",
     platforms: ["darwin", "win32", "linux"],
-    requiredForFeatures: ["camera", "vision"],
-  },
+    requiredForFeatures: ["camera", "vision"] },
   {
     id: "shell",
     name: "Shell Access",
     description: "Execute terminal commands and scripts",
     icon: "terminal",
     platforms: ["darwin", "win32", "linux"],
-    requiredForFeatures: ["shell"],
-  },
+    requiredForFeatures: ["shell"] },
 ];
 
 /** Capability toggle definition. */
@@ -106,27 +96,23 @@ const CAPABILITIES: CapabilityDef[] = [
     id: "browser",
     label: "Browser Control",
     description: "Automated web browsing and interaction",
-    requiredPermissions: ["accessibility"],
-  },
+    requiredPermissions: ["accessibility"] },
   {
     id: "computeruse",
     label: "Computer Use",
     description: "Full desktop control with mouse and keyboard",
-    requiredPermissions: ["accessibility", "screen-recording"],
-  },
+    requiredPermissions: ["accessibility", "screen-recording"] },
   {
     id: "vision",
     label: "Vision",
     description: "Screen capture and visual analysis",
-    requiredPermissions: ["screen-recording"],
-  },
+    requiredPermissions: ["screen-recording"] },
   {
     id: "coding-agent",
     label: "Coding Agent Swarms",
     description:
       "Orchestrate CLI coding agents (Claude Code, Gemini, Codex, Aider, Pi)",
-    requiredPermissions: [],
-  },
+    requiredPermissions: [] },
 ];
 
 const PERMISSION_BADGE_LABELS: Record<
@@ -137,8 +123,7 @@ const PERMISSION_BADGE_LABELS: Record<
   denied: { tone: "danger", label: "Denied" },
   "not-determined": { tone: "warning", label: "Not Set" },
   restricted: { tone: "muted", label: "Restricted" },
-  "not-applicable": { tone: "muted", label: "N/A" },
-};
+  "not-applicable": { tone: "muted", label: "N/A" } };
 
 /** Icon mapping for permissions. */
 function PermissionIcon({ icon }: { icon: string }) {
@@ -147,8 +132,7 @@ function PermissionIcon({ icon }: { icon: string }) {
     monitor: <Monitor className="w-4 h-4" />,
     mic: <Mic className="w-4 h-4" />,
     camera: <Camera className="w-4 h-4" />,
-    terminal: <Terminal className="w-4 h-4" />,
-  };
+    terminal: <Terminal className="w-4 h-4" /> };
   return (
     <span className="text-base">
       {icons[icon] || <Settings className="w-4 h-4" />}
@@ -165,8 +149,7 @@ function PermissionRow({
   onOpenSettings,
   isShell,
   shellEnabled,
-  onToggleShell,
-}: {
+  onToggleShell }: {
   def: PermissionDef;
   status: PermissionStatus;
   canRequest: boolean;
@@ -176,8 +159,7 @@ function PermissionRow({
   shellEnabled: boolean;
   onToggleShell?: (enabled: boolean) => void;
 }) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  const { t } = useApp();
   const showAction = status !== "granted" && status !== "not-applicable";
 
   return (
@@ -241,15 +223,13 @@ function CapabilityToggle({
   cap,
   plugin,
   permissionsGranted,
-  onToggle,
-}: {
+  onToggle }: {
   cap: CapabilityDef;
   plugin: PluginInfo | null;
   permissionsGranted: boolean;
   onToggle: (enabled: boolean) => void;
 }) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  const { t } = useApp();
   const enabled = plugin?.enabled ?? false;
   const available = plugin !== null;
   const canEnable = permissionsGranted && available;
@@ -336,8 +316,8 @@ function usePermissionActions(
 }
 
 export function PermissionsSection() {
-  const { plugins, handlePluginToggle, uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  const { t } = useApp();
+  const { plugins, handlePluginToggle} = useApp();
   const [permissions, setPermissions] = useState<AllPermissionsState | null>(
     null,
   );
@@ -544,12 +524,10 @@ export function PermissionsSection() {
  * Shows only essential permissions with clear CTAs.
  */
 export function PermissionsOnboardingSection({
-  onContinue,
-}: {
+  onContinue }: {
   onContinue: (options?: { allowPermissionBypass?: boolean }) => void;
 }) {
-  const { uiLanguage } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+  const { t } = useApp();
   const [permissions, setPermissions] = useState<AllPermissionsState | null>(
     null,
   );
@@ -679,8 +657,7 @@ export function PermissionsOnboardingSection({
             className="btn text-xs py-2 px-6 w-full max-w-xs"
             style={{
               background: "var(--accent)",
-              borderColor: "var(--accent)",
-            }}
+              borderColor: "var(--accent)" }}
             onClick={async () => {
               for (const def of essentialPermissions) {
                 const state = permissions[def.id];
@@ -714,8 +691,7 @@ export function PermissionsOnboardingSection({
             className="btn text-xs py-2 px-6"
             style={{
               background: "var(--accent)",
-              borderColor: "var(--accent)",
-            }}
+              borderColor: "var(--accent)" }}
             onClick={() => onContinue()}
           >
 

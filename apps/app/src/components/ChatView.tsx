@@ -15,16 +15,13 @@ import {
   useEffect,
   useMemo,
   useRef,
-  useState,
-} from "react";
+  useState } from "react";
 import { getVrmPreviewUrl, useApp } from "../AppContext";
 import { client, type ImageAttachment, type VoiceConfig } from "../api-client";
 import { VOICE_CONFIG_UPDATED_EVENT } from "../events";
 import {
   useVoiceChat,
-  type VoicePlaybackStartEvent,
-} from "../hooks/useVoiceChat";
-import { createTranslator } from "../i18n";
+  type VoicePlaybackStartEvent } from "../hooks/useVoiceChat";
 import { AgentActivityBox } from "./AgentActivityBox";
 
 import { ChatEmptyState, ChatMessage, TypingIndicator } from "./ChatMessage";
@@ -85,8 +82,7 @@ export function ChatView({ variant = "default" }: ChatViewProps) {
     uiLanguage,
     openEmotePicker,
     ptySessions,
-  } = useApp();
-  const t = useMemo(() => createTranslator(uiLanguage), [uiLanguage]);
+    t } = useApp();
 
   const messagesRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -160,8 +156,7 @@ export function ChatView({ variant = "default" }: ChatViewProps) {
       const speechEndedAtMs = nowMs();
       pendingVoiceTurnRef.current = {
         speechEndedAtMs,
-        expiresAtMs: speechEndedAtMs + 15000,
-      };
+        expiresAtMs: speechEndedAtMs + 15000 };
       setVoiceLatency(null);
       setState("chatInput", text);
       setTimeout(() => void handleChatSend("VOICE_DM"), 50);
@@ -189,8 +184,7 @@ export function ChatView({ variant = "default" }: ChatViewProps) {
       setVoiceLatency((prev) => ({
         speechEndToFirstTokenMs: prev?.speechEndToFirstTokenMs ?? null,
         speechEndToVoiceStartMs: silenceMs,
-        firstSegmentCached: event.cached,
-      }));
+        firstSegmentCached: event.cached }));
     },
     [],
   );
@@ -199,8 +193,7 @@ export function ChatView({ variant = "default" }: ChatViewProps) {
     onTranscript: handleVoiceTranscript,
     onPlaybackStart: handleVoicePlaybackStart,
     lang: uiLanguage === "zh-CN" ? "zh-CN" : "en-US",
-    voiceConfig,
-  });
+    voiceConfig });
   const { queueAssistantSpeech, stopSpeaking } = voice;
 
   const agentName = agentStatus?.agentName ?? "Agent";
@@ -270,8 +263,7 @@ export function ChatView({ variant = "default" }: ChatViewProps) {
     setVoiceLatency((prev) => ({
       speechEndToFirstTokenMs: ttftMs,
       speechEndToVoiceStartMs: prev?.speechEndToVoiceStartMs ?? null,
-      firstSegmentCached: prev?.firstSegmentCached ?? null,
-    }));
+      firstSegmentCached: prev?.firstSegmentCached ?? null }));
   }, [chatFirstTokenReceived]);
 
   useEffect(() => {
@@ -298,8 +290,7 @@ export function ChatView({ variant = "default" }: ChatViewProps) {
     const nearBottom = distanceFromBottom < 150;
     el.scrollTo({
       top: el.scrollHeight,
-      behavior: nearBottom ? "instant" : "smooth",
-    });
+      behavior: nearBottom ? "instant" : "smooth" });
   }, [chatSending, visibleMsgs]);
 
   // Auto-resize textarea
