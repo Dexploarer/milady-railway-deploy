@@ -119,7 +119,7 @@ async function resolveWindowsLauncher(tempExtractDir: string): Promise<string> {
     // Make sure we have system tar.exe
     await fs.mkdir(tempExtractDir, { recursive: true });
     console.log(`Extracting ${tarballPath} to ${tempExtractDir}...`);
-    await execFileAsync("tar", ["-xf", tarballPath, "-C", tempExtractDir]);
+    await execFileAsync("tar", ["--force-local", "-xf", tarballPath, "-C", tempExtractDir]);
 
     launcher = await findLauncherExe(tempExtractDir);
     if (!launcher) {
