@@ -249,38 +249,8 @@ export class ScreenCaptureManager {
       if (!this.frameCaptureActive || skipping) return;
       skipping = true;
 
-      // Windows fallback: JS canvas (solid-color, but acceptable for non-primary platform)
-      if (platform === "win32") {
-        try {
-          const evalRpc = this.getActiveWebview()?.rpc as unknown as
-            | WebviewEvalRpc
-            | undefined;
-          const dataUrl =
-            await evalRpc?.requestProxy?.evaluateJavascriptWithResponse?.({
-              script: SIMPLE_CAPTURE_SCRIPT(quality),
-            });
-
-          if (typeof dataUrl !== "string" || !dataUrl.startsWith("data:")) {
-            return;
-          }
-
-          const base64 = dataUrl.replace(/^data:[^;]+;base64,/, "");
-          const body = Buffer.from(base64, "base64");
-          fetch(endpoint, {
-            method: "POST",
-            headers: { "Content-Type": "image/jpeg" },
-            body,
-          }).catch(() => {});
-        } catch {
-          // Skip frame on error
-        } finally {
-          skipping = false;
-        }
-        return;
-      }
-
-      // macOS / Linux: CLI screenshot → temp file → POST → delete
-      const tmpPath = `${os.tmpdir()}/milady-frame-${Date.now()}.jpg`;
+      // All platforms: CLI screenshot → temp file → POST → delete
+      const tmpPath = path.join(os.tmpdir(), `milady-frame-${Date.now()}.jpg`);
       try {
         let proc: ReturnType<typeof Bun.spawn>;
 
@@ -290,6 +260,21 @@ export class ScreenCaptureManager {
             stdout: "ignore",
             stderr: "ignore",
           });
+        } else if (platform === "win32") {
+          // Windows: use PowerShell with .NET System.Drawing to capture the screen
+          const psScript = `
+Add-Type -AssemblyName System.Drawing
+$bounds = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
+$bmp = New-Object System.Drawing.Bitmap($bounds.Width, $bounds.Height)
+$gfx = [System.Drawing.Graphics]::FromImage($bmp)
+$gfx.CopyFromScreen($bounds.Location, [System.Drawing.Point]::Empty, $bounds.Size)
+$gfx.Dispose()
+$bmp.Save('${tmpPath.replace(/\\/g, "\\\\")}', [System.Drawing.Imaging.ImageFormat]::Jpeg)
+$bmp.Dispose()`;
+          proc = Bun.spawn(
+            ["powershell", "-NoProfile", "-Command", psScript],
+            { stdout: "ignore", stderr: "ignore" },
+          );
         } else {
           // Linux: try scrot first
           try {

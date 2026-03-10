@@ -6,13 +6,13 @@
  *   node scripts/dev-win.mjs [--variant base|companion|full] [--ui-only]
  */
 import { execSync } from "node:child_process";
-import { resolve, join } from "node:path";
+import { join, resolve } from "node:path";
 
 const rootDir = resolve(import.meta.dirname, "..");
 
 const args = process.argv.slice(2);
 let variant = "full";
-let extraArgs = [];
+const extraArgs = [];
 
 for (let i = 0; i < args.length; i++) {
   if (args[i] === "--variant" && args[i + 1]) {

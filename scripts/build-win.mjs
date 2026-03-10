@@ -14,8 +14,8 @@
  *   node scripts/build-win.mjs [--variant base|companion|full] [--skip-plugins] [--skip-install]
  */
 import { execSync } from "node:child_process";
-import { writeFileSync, mkdirSync, existsSync } from "node:fs";
-import { resolve, join } from "node:path";
+import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { join, resolve } from "node:path";
 
 const rootDir = resolve(import.meta.dirname, "..");
 const appDir = join(rootDir, "apps", "app");
@@ -62,8 +62,15 @@ try {
   if (!skipPlugins) {
     console.log("\n=== Step 4/5: Build Capacitor plugins ===");
     const plugins = [
-      "gateway", "swabble", "camera", "screencapture",
-      "canvas", "desktop", "location", "talkmode", "agent",
+      "gateway",
+      "swabble",
+      "camera",
+      "screencapture",
+      "canvas",
+      "desktop",
+      "location",
+      "talkmode",
+      "agent",
     ];
     for (const plugin of plugins) {
       const pluginDir = join(appDir, "plugins", plugin);

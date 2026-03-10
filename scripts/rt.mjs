@@ -9,8 +9,6 @@
  *   node scripts/rt.mjs install [args...]
  */
 import { execSync } from "node:child_process";
-import { existsSync } from "node:fs";
-import { resolve } from "node:path";
 
 const args = process.argv.slice(2);
 if (args.length === 0) {
@@ -35,7 +33,7 @@ const first = args[0];
 
 // If first arg is a file path (ends with .ts, .js, .mjs)
 if (/\.(ts|js|mjs)$/.test(first)) {
-  const cmd = `${runner} ${args.map(a => `"${a}"`).join(" ")}`;
+  const cmd = `${runner} ${args.map((a) => `"${a}"`).join(" ")}`;
   try {
     execSync(cmd, { stdio: "inherit", shell: true });
   } catch (e) {
@@ -44,7 +42,7 @@ if (/\.(ts|js|mjs)$/.test(first)) {
 } else {
   // Package manager command (run, install, etc.)
   const pm = useBun ? "bun" : "npm";
-  const cmd = `${pm} ${args.map(a => `"${a}"`).join(" ")}`;
+  const cmd = `${pm} ${args.map((a) => `"${a}"`).join(" ")}`;
   try {
     execSync(cmd, { stdio: "inherit", shell: true });
   } catch (e) {
