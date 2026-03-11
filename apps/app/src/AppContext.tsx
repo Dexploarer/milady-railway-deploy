@@ -1335,14 +1335,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setExtensionChecking(false);
   }, []);
 
-  const pollCloudCredits = useCallback(async () => {
+  const pollCloudCredits = useCallback(async (): Promise<boolean> => {
     const cloudStatus = await client.getCloudStatus().catch(() => null);
     if (!cloudStatus) {
       setMiladyCloudConnected(false);
       setMiladyCloudCredits(null);
       setMiladyCloudCreditsLow(false);
       setMiladyCloudCreditsCritical(false);
-      return;
+      return false;
     }
     // A cached cloud API key represents a completed login and should be shared
     // across all views, even before runtime CLOUD_AUTH fully initializes.
@@ -1369,6 +1369,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setMiladyCloudCreditsLow(false);
       setMiladyCloudCreditsCritical(false);
     }
+    return isConnected;
   }, []);
 
   // ── Lifecycle actions ──────────────────────────────────────────────
@@ -4706,14 +4707,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
         }
       }
 
-      // Cloud polling
-      if (miladyCloudConnected) {
-        pollCloudCredits();
-        miladyCloudPollInterval.current = window.setInterval(
-          () => pollCloudCredits(),
-          60_000,
-        );
-      }
+      // Cloud polling — always run the initial poll unconditionally so we can
+      // discover a pre-existing API key / connection. If connected, start the
+      // recurring interval too.
+      pollCloudCredits().then((connected) => {
+        if (connected) {
+          miladyCloudPollInterval.current = window.setInterval(
+            () => pollCloudCredits(),
+            60_000,
+          );
+        }
+      });
 
       // Load tab from URL — use hash in file:// mode (Electron packaged builds)
       const navPath =
