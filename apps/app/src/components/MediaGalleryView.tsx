@@ -129,11 +129,9 @@ function extractUrlsFromValue(val: string): string[] {
   }
 
   // Relative/path-like token match
-  const tokens = val.split(/[\s"'<>]+/).map((token) =>
-    token
-      .replace(/^[([{]+/, "")
-      .replace(/[)\]},;.!?]+$/, ""),
-  );
+  const tokens = val
+    .split(/[\s"'<>]+/)
+    .map((token) => token.replace(/^[([{]+/, "").replace(/[)\]},;.!?]+$/, ""));
   for (const token of tokens) {
     if (looksLikePotentialMediaUrl(token)) urls.add(token);
   }

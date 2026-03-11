@@ -224,12 +224,12 @@ describe("core-eject", () => {
       const tsconfig = JSON.parse(tsconfigRaw) as {
         compilerOptions: { paths: Record<string, string[]> };
       };
-      expect(toPosix(tsconfig.compilerOptions.paths["@elizaos/core"][0])).toContain(
-        "state/core/eliza/packages/core/dist",
-      );
-      expect(toPosix(tsconfig.compilerOptions.paths["@elizaos/core/*"][0])).toContain(
-        "state/core/eliza/packages/core/dist",
-      );
+      expect(
+        toPosix(tsconfig.compilerOptions.paths["@elizaos/core"][0]),
+      ).toContain("state/core/eliza/packages/core/dist");
+      expect(
+        toPosix(tsconfig.compilerOptions.paths["@elizaos/core/*"][0]),
+      ).toContain("state/core/eliza/packages/core/dist");
     });
 
     it("returns already ejected when checkout exists", async () => {

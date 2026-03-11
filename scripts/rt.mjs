@@ -26,9 +26,7 @@ function which(command) {
   const pathEnv = process.env.PATH ?? "";
   const dirs = pathEnv.split(path.delimiter).filter(Boolean);
   const exts = isWindows
-    ? (process.env.PATHEXT ?? ".EXE;.CMD;.BAT;.COM")
-        .split(";")
-        .filter(Boolean)
+    ? (process.env.PATHEXT ?? ".EXE;.CMD;.BAT;.COM").split(";").filter(Boolean)
     : [""];
 
   for (const dir of dirs) {

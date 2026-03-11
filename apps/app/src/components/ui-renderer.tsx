@@ -10,6 +10,7 @@
  *   - Event bindings via on.press / on.change
  */
 
+import { resolveAppAssetUrl } from "@milady/app-core/utils";
 import React, {
   createContext,
   useCallback,
@@ -17,7 +18,6 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { resolveAppAssetUrl } from "@milady/app-core/utils";
 import { useApp } from "../AppContext";
 import { getByPath, setByPath } from "./config-catalog";
 import type {

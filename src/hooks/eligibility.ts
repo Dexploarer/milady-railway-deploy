@@ -21,7 +21,10 @@ function binaryExists(name: string): boolean {
       ? [name, ...pathExts.map((ext) => `${name}${ext}`)]
       : [name];
 
-  if (isAbsolute(name) && baseCandidates.some((candidate) => existsSync(candidate))) {
+  if (
+    isAbsolute(name) &&
+    baseCandidates.some((candidate) => existsSync(candidate))
+  ) {
     return true;
   }
 

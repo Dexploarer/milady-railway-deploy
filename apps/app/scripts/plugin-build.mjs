@@ -40,8 +40,12 @@ function run(command, args, cwd) {
   });
 }
 
-const npmCommand = process.platform === "win32" ? process.env.ComSpec || "cmd.exe" : "npm";
-const npmArgs = process.platform === "win32" ? ["/d", "/s", "/c", "npm", "run", "build"] : ["run", "build"];
+const npmCommand =
+  process.platform === "win32" ? process.env.ComSpec || "cmd.exe" : "npm";
+const npmArgs =
+  process.platform === "win32"
+    ? ["/d", "/s", "/c", "npm", "run", "build"]
+    : ["run", "build"];
 
 for (const name of pluginNames) {
   console.log(`[plugin:${name}] building...`);

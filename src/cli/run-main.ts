@@ -48,7 +48,10 @@ function shouldIgnoreUnhandledRejection(reason: unknown): boolean {
     if (statusCode === 402) return true;
 
     const responseBody = (reason as { responseBody?: unknown }).responseBody;
-    if (typeof responseBody === "string" && hasInsufficientCreditsSignal(responseBody)) {
+    if (
+      typeof responseBody === "string" &&
+      hasInsufficientCreditsSignal(responseBody)
+    ) {
       return true;
     }
   }

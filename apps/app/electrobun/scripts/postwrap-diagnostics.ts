@@ -53,7 +53,9 @@ function joinPortable(base: string, ...parts: string[]): string {
 }
 
 function dirnamePortable(value: string): string {
-  return isPosixAbsolutePath(value) ? path.posix.dirname(value) : path.dirname(value);
+  return isPosixAbsolutePath(value)
+    ? path.posix.dirname(value)
+    : path.dirname(value);
 }
 
 function execText(command: string, args: string[]): string {

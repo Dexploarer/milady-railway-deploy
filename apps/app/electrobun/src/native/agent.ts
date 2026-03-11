@@ -55,7 +55,9 @@ function resolvePortablePath(value: string): string {
 }
 
 function dirnamePortable(value: string): string {
-  return isPosixAbsolutePath(value) ? path.posix.dirname(value) : path.dirname(value);
+  return isPosixAbsolutePath(value)
+    ? path.posix.dirname(value)
+    : path.dirname(value);
 }
 
 function joinPortable(base: string, ...parts: string[]): string {
@@ -172,9 +174,7 @@ export function getMiladyDistFallbackCandidates(
 function resolveBunExecutablePath(execPath: string = process.execPath): string {
   const looksLikeMacBundleExec = execPath.includes(".app/Contents/MacOS/");
   const executableName =
-    process.platform === "win32" && !looksLikeMacBundleExec
-      ? "bun.exe"
-      : "bun";
+    process.platform === "win32" && !looksLikeMacBundleExec ? "bun.exe" : "bun";
   const execDir = execPath ? dirnamePortable(execPath) : "";
   const candidates = [
     execPath,
@@ -198,7 +198,8 @@ function resolveBunExecutablePath(execPath: string = process.execPath): string {
   // Windows: bun is not always on PATH; check well-known install locations.
   if (process.platform === "win32") {
     const localAppData =
-      process.env.LOCALAPPDATA ?? joinPortable(os.homedir(), "AppData", "Local");
+      process.env.LOCALAPPDATA ??
+      joinPortable(os.homedir(), "AppData", "Local");
     const programFiles = process.env.ProgramFiles ?? "C:\\Program Files";
     const winCandidates = [
       joinPortable(localAppData, "bun", "bun.exe"),

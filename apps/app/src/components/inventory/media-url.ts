@@ -7,7 +7,9 @@ const IPFS_GATEWAY_BASE = "https://ipfs.io/ipfs/";
 const IPNS_GATEWAY_BASE = "https://ipfs.io/ipns/";
 const ARWEAVE_GATEWAY_BASE = "https://arweave.net/";
 
-export function normalizeInventoryImageUrl(raw: string | null | undefined): string | null {
+export function normalizeInventoryImageUrl(
+  raw: string | null | undefined,
+): string | null {
   const value = raw?.trim();
   if (!value) return null;
 
