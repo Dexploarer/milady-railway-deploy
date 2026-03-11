@@ -1,9 +1,10 @@
 import fs from "node:fs/promises";
+import { createWriteStream } from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { gzip } from "node:zlib";
+import { once } from "node:events";
+import { createGzip } from "node:zlib";
 import { type IAgentRuntime, ModelType, Service } from "@elizaos/core";
-import { promisify } from "node:util";
 
 type TrajectoryStatus = "active" | "completed" | "error" | "timeout";
 
@@ -191,7 +192,6 @@ const stepWriteQueues = new WeakMap<object, Map<string, Promise<void>>>();
 const lastWritePromises = new WeakMap<object, Promise<void>>();
 
 let cachedSqlRaw: ((query: string) => { queryChunks: object[] }) | null = null;
-const gzipAsync = promisify(gzip);
 
 function asRecord(value: unknown): Record<string, unknown> | null {
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
@@ -1942,6 +1942,24 @@ function stringifyArchiveRow(row: Record<string, unknown>): string {
   );
 }
 
+async function writeCompressedJsonlRows(
+  archivePath: string,
+  rows: Record<string, unknown>[],
+): Promise<void> {
+  const gzipStream = createGzip({ level: 9 });
+  const outStream = createWriteStream(archivePath);
+  gzipStream.pipe(outStream);
+
+  for (const row of rows) {
+    if (!gzipStream.write(`${stringifyArchiveRow(row)}\n`, "utf8")) {
+      await once(gzipStream, "drain");
+    }
+  }
+
+  gzipStream.end();
+  await once(outStream, "finish");
+}
+
 async function exportRawTrajectoriesToCompressedArchive(
   runtime: IAgentRuntime,
   cutoff: string,
@@ -1969,9 +1987,7 @@ async function exportRawTrajectoriesToCompressedArchive(
   const archiveDir = await resolveTrajectoryArchiveDirectory();
   const archiveName = `trajectories-before-${toArchiveSafeTimestamp(cutoff)}-archived-${toArchiveSafeTimestamp(archivedAt)}.jsonl.gz`;
   const archivePath = path.join(archiveDir, archiveName);
-  const jsonl = `${rawRows.map(stringifyArchiveRow).join("\n")}\n`;
-  const compressed = await gzipAsync(Buffer.from(jsonl, "utf8"), { level: 9 });
-  await fs.writeFile(archivePath, compressed);
+  await writeCompressedJsonlRows(archivePath, rawRows);
 
   return { archivePath, rowCount: rawRows.length };
 }

@@ -51,6 +51,31 @@ function shellQuote(value) {
   return `'${value.replaceAll("'", "'\\''")}'`;
 }
 
+function resolveSafeVenvPath(workspace, venvDir) {
+  if (!venvDir || typeof venvDir !== "string") {
+    fail("venv-dir must be a non-empty relative path");
+  }
+  if (path.isAbsolute(venvDir)) {
+    fail("venv-dir must be relative to --workspace");
+  }
+  const normalized = path.normalize(venvDir.trim());
+  if (!normalized || normalized === "." || normalized === "..") {
+    fail("venv-dir must not be '.' or '..'");
+  }
+  if (normalized.startsWith(`..${path.sep}`)) {
+    fail("venv-dir must stay within --workspace");
+  }
+  const resolved = path.resolve(workspace, normalized);
+  const workspacePrefix = `${workspace}${path.sep}`;
+  if (resolved !== workspace && !resolved.startsWith(workspacePrefix)) {
+    fail("resolved venv-dir is outside --workspace");
+  }
+  if (resolved === workspace) {
+    fail("venv-dir must not resolve to the workspace root");
+  }
+  return resolved;
+}
+
 function printHelp() {
   console.log(`Usage:
   node scripts/benchmark-preflight.mjs --workspace <path> [options]
@@ -81,7 +106,7 @@ async function main() {
   const workspace = path.resolve(args.workspace);
   const apiDir = path.resolve(workspace, args.apiDir);
   const requirementsPath = path.resolve(apiDir, "requirements.txt");
-  const venvPath = path.resolve(workspace, args.venvDir);
+  const venvPath = resolveSafeVenvPath(workspace, args.venvDir);
   const pythonInVenv = path.resolve(
     venvPath,
     process.platform === "win32" ? "Scripts/python.exe" : "bin/python",
