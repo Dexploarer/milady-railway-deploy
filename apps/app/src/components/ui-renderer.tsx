@@ -17,6 +17,7 @@ import React, {
   useMemo,
   useState,
 } from "react";
+import { resolveAppAssetUrl } from "@milady/app-core/utils";
 import { useApp } from "../AppContext";
 import { getByPath, setByPath } from "./config-catalog";
 import type {
@@ -910,12 +911,13 @@ const AvatarComponent: ComponentFn = (props) => {
 
 const ImageComponent: ComponentFn = (props) => {
   const src = props.src as string | undefined;
+  const resolvedSrc = src ? resolveAppAssetUrl(src) : undefined;
   const alt = String(props.alt ?? "");
   const w = props.width ? `${props.width}px` : "auto";
   const h = props.height ? `${props.height}px` : "auto";
-  return src ? (
+  return resolvedSrc ? (
     <img
-      src={src}
+      src={resolvedSrc}
       alt={alt}
       style={{ width: w, height: h }}
       className="object-cover border border-[var(--border)]"
