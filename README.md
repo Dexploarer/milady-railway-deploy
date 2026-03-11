@@ -21,7 +21,7 @@ Grab from **[Releases](https://github.com/milady-ai/milady/releases/latest)**:
 | macOS (Apple Silicon) | [`Milady-arm64.dmg`](https://github.com/milady-ai/milady/releases/latest) | for your overpriced rectangle |
 | macOS (Intel) | [`Milady-x64.dmg`](https://github.com/milady-ai/milady/releases/latest) | boomer mac (why separate arm64/x64: [Build & release](docs/build-and-release.md#macos-why-two-dmgs-arm64-and-x64)) |
 | Windows | [`Milady-Setup.exe`](https://github.com/milady-ai/milady/releases/latest) | for the gamer anons |
-| Linux | [`.AppImage`](https://github.com/milady-ai/milady/releases/latest) / [`.deb`](https://github.com/milady-ai/milady/releases/latest) / [Flatpak](#flatpak) / [APT repo](#debian--ubuntu-apt) | I use arch btw |
+| Linux | [`.AppImage`](https://github.com/milady-ai/milady/releases/latest) / [`.deb`](https://github.com/milady-ai/milady/releases/latest) / [Snap](#snap) / [Flatpak](#flatpak) / [APT repo](#debian--ubuntu-apt) | I use arch btw |
 
 Signed and notarized. No Gatekeeper FUD. We're legit.
 
@@ -103,6 +103,21 @@ brew tap milady-ai/milaidy
 brew install milaidy          # CLI
 brew install --cask milaidy   # Desktop app (macOS only)
 ```
+
+### Snap
+
+```bash
+sudo snap install milady
+milady setup
+```
+
+Snap packages auto-update in the background. Available on Ubuntu, Fedora, Manjaro, and any distro with [snapd](https://snapcraft.io/docs/installing-snapd) installed.
+
+For the latest development builds:
+```bash
+sudo snap install milady --edge
+```
+
 ### Flatpak
 
 ```bash
