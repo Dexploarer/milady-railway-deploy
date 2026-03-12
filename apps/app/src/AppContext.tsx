@@ -567,9 +567,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     useState<OnboardingOptions | null>(null);
   const [onboardingName, setOnboardingName] = useState("Eliza");
   const [onboardingOwnerName, setOnboardingOwnerName] = useState("anon");
-  // const [onboardingSetupMode, setOnboardingSetupMode] = useState<
-  //   "" | "quick" | "advanced"
-  // >(""); // removed: setup mode no longer used in 6-step linear flow
+
   const [onboardingStyle, setOnboardingStyle] = useState("");
   const [onboardingRunMode, setOnboardingRunMode] = useState<
     "local-rawdog" | "local-sandbox" | "cloud" | ""
@@ -3211,6 +3209,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
       await client.submitOnboarding({
         name: onboardingName,
         runMode: apiRunMode as "local" | "cloud",
+        // Sandbox mode is unconditionally disabled: the simplified 6-step
+        // linear onboarding no longer offers run-mode choices (local-rawdog,
+        // local-sandbox, cloud). The Docker-based "local-sandbox" execution
+        // path was the only consumer of sandbox isolation; with that path
+        // removed, sandbox provides no additional protection and "off" is
+        // the correct default.
         sandboxMode: "off" as const,
         bio: style?.bio ?? ["An autonomous AI agent."],
         systemPrompt,

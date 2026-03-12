@@ -26,6 +26,7 @@ src/plugins/**/*.d.ts.map
 # Lock files (managed at repo root)
 package-lock.json
 bun.lockb
+pnpm-lock.yaml
 !deploy/cloud-agent-template/package-lock.json
 
 # Docker overrides
