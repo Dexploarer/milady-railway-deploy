@@ -614,45 +614,45 @@
 .onboarding-panel [class*="bg-\\[var\\(--card\\)\\]"] {
   background-color: rgba(255, 255, 255, 0.04);
 }
-/* biome-ignore lint/complexity/noImportantStyles: override Tailwind utilities on PermissionsSection */
+/* Override Tailwind utilities on PermissionsSection using doubled selectors for specificity */
 /* Make permission card borders translucent */
-.onboarding-panel .flex.items-center.gap-4.p-4.border {
-  background: rgba(255, 255, 255, 0.04) !important;
-  border-color: rgba(255, 255, 255, 0.08) !important;
+.onboarding-panel.onboarding-panel .flex.items-center.gap-4.p-4.border {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
   border-radius: 6px;
 }
-.onboarding-panel
+.onboarding-panel.onboarding-panel
   .flex.items-center.gap-4.p-4.border:has(.text-\[var\(--ok\)\]) {
-  background: rgba(240, 185, 11, 0.06) !important;
-  border-color: rgba(240, 185, 11, 0.25) !important;
+  background: rgba(240, 185, 11, 0.06);
+  border-color: rgba(240, 185, 11, 0.25);
 }
 /* Style buttons within permissions to match game theme */
-.onboarding-panel button[class*="bg-accent"] {
-  background: rgba(240, 185, 11, 0.1) !important;
-  border: 1px solid rgba(240, 185, 11, 0.35) !important;
-  color: #f0b90b !important;
+.onboarding-panel.onboarding-panel button[class*="bg-accent"] {
+  background: rgba(240, 185, 11, 0.1);
+  border: 1px solid rgba(240, 185, 11, 0.35);
+  color: #f0b90b;
   border-radius: 2px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   font-weight: 600;
 }
-.onboarding-panel button[class*="bg-accent"]:hover {
-  background: rgba(240, 185, 11, 0.18) !important;
+.onboarding-panel.onboarding-panel button[class*="bg-accent"]:hover {
+  background: rgba(240, 185, 11, 0.18);
 }
 /* Outline/skip buttons */
-.onboarding-panel button[class*="opacity-70"] {
-  background: transparent !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  color: rgba(240, 238, 250, 0.4) !important;
+.onboarding-panel.onboarding-panel button[class*="opacity-70"] {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(240, 238, 250, 0.4);
   border-radius: 2px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 /* Permission grant/settings buttons */
-.onboarding-panel .flex.gap-2 button {
-  background: rgba(240, 185, 11, 0.08) !important;
-  border: 1px solid rgba(240, 185, 11, 0.3) !important;
-  color: #f0b90b !important;
+.onboarding-panel.onboarding-panel .flex.gap-2 button {
+  background: rgba(240, 185, 11, 0.08);
+  border: 1px solid rgba(240, 185, 11, 0.3);
+  color: #f0b90b;
   border-radius: 2px;
   font-weight: 600;
   letter-spacing: 0.05em;

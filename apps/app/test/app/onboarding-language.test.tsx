@@ -111,7 +111,9 @@ describe("Onboarding language mode", () => {
       tree = TestRenderer.create(React.createElement(OnboardingWizard));
     });
 
-    expect(collectText(tree!.root)).toContain("Designation");
+    expect(collectText(tree?.root as TestRenderer.ReactTestInstance)).toContain(
+      "Designation",
+    );
   });
 
   it("shows chinese copy when uiLanguage is zh-CN", async () => {
@@ -123,7 +125,7 @@ describe("Onboarding language mode", () => {
       tree = TestRenderer.create(React.createElement(OnboardingWizard));
     });
 
-    const text = collectText(tree!.root);
+    const text = collectText(tree?.root as TestRenderer.ReactTestInstance);
     expect(text).toContain("Designation");
     expect(text).toContain("My name is");
   });
