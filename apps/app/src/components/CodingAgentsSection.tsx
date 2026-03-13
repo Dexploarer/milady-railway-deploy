@@ -100,7 +100,8 @@ export function CodingAgentsSection({ sessions }: CodingAgentsSectionProps) {
 
   const handleScratchPromote = async (sessionId: string) => {
     await withScratchBusy(sessionId, async () => {
-      const scratch = await client.promoteCodingAgentScratchWorkspace(sessionId);
+      const scratch =
+        await client.promoteCodingAgentScratchWorkspace(sessionId);
       if (!scratch) {
         setActionNotice("Failed to promote scratch workspace.", "error", 2600);
         return;

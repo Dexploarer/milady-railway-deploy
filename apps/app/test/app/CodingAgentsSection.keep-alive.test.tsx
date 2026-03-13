@@ -240,8 +240,10 @@ describe("CodingAgentsSection — terminal keep-alive", () => {
   });
 
   it("shows scratch controls for terminal sessions and calls keep", async () => {
-    const listScratchMock = client
-      .listCodingAgentScratchWorkspaces as unknown as ReturnType<typeof vi.fn>;
+    const listScratchMock =
+      client.listCodingAgentScratchWorkspaces as unknown as ReturnType<
+        typeof vi.fn
+      >;
     listScratchMock.mockResolvedValueOnce([
       {
         sessionId: "s-1",
