@@ -628,7 +628,7 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
       <div className={sectionCls}>
         {/* Header row: title + action buttons */}
         <div className="flex items-center justify-between mb-5 border-b border-border/40 pb-3">
-          <div className="font-bold text-sm tracking-wide text-white">
+          <div className="font-bold text-sm tracking-wide text-txt">
             {t("characterview.IdentityPersonali")}
           </div>
           <div className="flex items-center gap-2">
@@ -698,6 +698,7 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
                   if (avatarLoading) return;
                   setAvatarLoading(true);
                   setState("selectedVrmIndex", i);
+                  // TODO(PR-928): This timeout is a known approximation. Should hook into actual VRM load complete event.
                   // Allow time for VRM to load before enabling selection again
                   setTimeout(() => setAvatarLoading(false), 1500);
                 }}
@@ -722,6 +723,7 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
                       URL.revokeObjectURL(url);
                     })
                     .finally(() => {
+                      // TODO(PR-928): This timeout is a known approximation. Should hook into actual VRM load complete event.
                       setTimeout(() => setAvatarLoading(false), 1500);
                     });
                 }}

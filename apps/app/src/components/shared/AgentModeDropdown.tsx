@@ -28,6 +28,7 @@ export function AgentModeDropdown({
   const [automationSaving, setAutomationSaving] = useState(false);
   const [tradeSaving, setTradeSaving] = useState(false);
   const moreMenuRef = useRef<HTMLDivElement | null>(null);
+  const portalRef = useRef<HTMLDivElement | null>(null);
 
   const notifySelfStatusRefresh = useCallback(() => {
     dispatchWindowEvent(SELF_STATUS_SYNC_EVENT);
@@ -45,7 +46,11 @@ export function AgentModeDropdown({
     const onPointerDown = (event: MouseEvent) => {
       if (!moreMenuRef.current) return;
       const target = event.target as Node | null;
-      if (target && !moreMenuRef.current.contains(target)) {
+      if (
+        target &&
+        !moreMenuRef.current.contains(target) &&
+        (!portalRef.current || !portalRef.current.contains(target))
+      ) {
         setMoreOpen(false);
       }
     };
@@ -228,7 +233,10 @@ export function AgentModeDropdown({
   };
 
   const triggerRef = useRef<HTMLButtonElement | null>(null);
-  const [dropdownPos, setDropdownPos] = useState<{ top: number; right: number } | null>(null);
+  const [dropdownPos, setDropdownPos] = useState<{
+    top: number;
+    right: number;
+  } | null>(null);
 
   useEffect(() => {
     if (moreOpen && triggerRef.current) {
@@ -261,129 +269,167 @@ export function AgentModeDropdown({
         )}
       </button>
 
-      {moreOpen && dropdownPos && createPortal(
-        <div
-          className={`fixed w-[340px] border rounded-xl shadow-2xl overflow-hidden flex flex-col ${theme.panelBg}`}
-          style={{ top: dropdownPos.top, right: dropdownPos.right, zIndex: 99999 }}
-          role="menu"
-        >
-          <div className="p-4 space-y-4" data-testid="chat-game-agent-mode-controls">
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <Bot className={`w-4 h-4 ${theme.textAccent}`} />
-                <span className={`font-semibold text-sm ${theme.textStrong}`}>
-                  {t("chat.modal.agentMode")}
-                </span>
-              </div>
-              <p className={`text-[11px] leading-tight ${theme.textMuted}`}>
-                {modeLoading
-                  ? t("chat.modal.providerDetecting")
-                  : `${automationModeLabel} • ${tradeModeLabel} • ${chatModeLabel}`}
-              </p>
-            </div>
-
-            <div className="space-y-3">
-              <div className="space-y-2">
-                <span className={`text-xs font-medium ${isCompanion ? "text-white/80" : "text-txt"}`}>
-                  {t("chat.modal.responseMode")}
-                </span>
-                <div className={`flex p-1 rounded-lg border ${theme.cardBg}`}>
-                  <button
-                    type="button"
-                    className={`${theme.btnBase} ${chatMode === "simple" ? theme.btnActive : theme.btnInactive}`}
-                    onClick={() => setState("chatMode", "simple")}
-                    data-testid="chat-game-response-simple"
-                  >
-                    {t("chat.modal.responseModeSimple")}
-                  </button>
-                  <button
-                    type="button"
-                    className={`${theme.btnBase} ${chatMode === "power" ? theme.btnActive : theme.btnInactive}`}
-                    onClick={() => setState("chatMode", "power")}
-                    data-testid="chat-game-response-power"
-                  >
-                    {t("chat.modal.responseModePower")}
-                  </button>
+      {moreOpen &&
+        dropdownPos &&
+        createPortal(
+          <div
+            ref={portalRef}
+            className={`fixed w-[340px] border rounded-xl shadow-2xl overflow-hidden flex flex-col ${theme.panelBg}`}
+            style={{
+              top: dropdownPos.top,
+              right: dropdownPos.right,
+              zIndex: 100,
+            }}
+            role="menu"
+          >
+            <div
+              className="p-4 space-y-4"
+              data-testid="chat-game-agent-mode-controls"
+            >
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <Bot className={`w-4 h-4 ${theme.textAccent}`} />
+                  <span className={`font-semibold text-sm ${theme.textStrong}`}>
+                    {t("chat.modal.agentMode")}
+                  </span>
                 </div>
-                <p className={`text-[10px] leading-tight ${theme.textMuted}`}>
-                  {chatMode === "power"
-                    ? t("chat.modal.responseModeHintPower")
-                    : t("chat.modal.responseModeHintSimple")}
+                <p className={`text-[11px] leading-tight ${theme.textMuted}`}>
+                  {modeLoading
+                    ? t("chat.modal.providerDetecting")
+                    : `${automationModeLabel} • ${tradeModeLabel} • ${chatModeLabel}`}
                 </p>
               </div>
 
-              <div className="space-y-2">
-                <span className={`text-xs font-medium ${isCompanion ? "text-white/80" : "text-txt"}`}>
-                  {t("permissions.automationMode")}
-                </span>
-                <div className={`flex p-1 rounded-lg border gap-1 ${theme.cardBg}`}>
-                  <button
-                    type="button"
-                    className={`${theme.btnCardBase} ${automationMode === "connectors-only" ? theme.btnCardActive : theme.btnCardInactive}`}
-                    disabled={modeLoading || automationSaving}
-                    onClick={() => void handleAutomationModeChange("connectors-only")}
-                    data-testid="chat-game-automation-connectors"
+              <div className="space-y-3">
+                <div className="space-y-2">
+                  <span
+                    className={`text-xs font-medium ${isCompanion ? "text-white/80" : "text-txt"}`}
                   >
-                    <span className="mb-0.5">{t("permissions.mode.semi")}</span>
-                  </button>
-                  <button
-                    type="button"
-                    className={`${theme.btnCardBase} ${automationMode === "full" ? theme.btnCardActive : theme.btnCardInactive}`}
-                    disabled={modeLoading || automationSaving}
-                    onClick={() => void handleAutomationModeChange("full")}
-                    data-testid="chat-game-automation-full"
+                    {t("chat.modal.responseMode")}
+                  </span>
+                  <div className={`flex p-1 rounded-lg border ${theme.cardBg}`}>
+                    <button
+                      type="button"
+                      className={`${theme.btnBase} ${chatMode === "simple" ? theme.btnActive : theme.btnInactive}`}
+                      onClick={() => setState("chatMode", "simple")}
+                      data-testid="chat-game-response-simple"
+                    >
+                      {t("chat.modal.responseModeSimple")}
+                    </button>
+                    <button
+                      type="button"
+                      className={`${theme.btnBase} ${chatMode === "power" ? theme.btnActive : theme.btnInactive}`}
+                      onClick={() => setState("chatMode", "power")}
+                      data-testid="chat-game-response-power"
+                    >
+                      {t("chat.modal.responseModePower")}
+                    </button>
+                  </div>
+                  <p className={`text-[10px] leading-tight ${theme.textMuted}`}>
+                    {chatMode === "power"
+                      ? t("chat.modal.responseModeHintPower")
+                      : t("chat.modal.responseModeHintSimple")}
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <span
+                    className={`text-xs font-medium ${isCompanion ? "text-white/80" : "text-txt"}`}
                   >
-                    <span className="mb-0.5">{t("permissions.mode.full")}</span>
-                  </button>
+                    {t("permissions.automationMode")}
+                  </span>
+                  <div
+                    className={`flex p-1 rounded-lg border gap-1 ${theme.cardBg}`}
+                  >
+                    <button
+                      type="button"
+                      className={`${theme.btnCardBase} ${automationMode === "connectors-only" ? theme.btnCardActive : theme.btnCardInactive}`}
+                      disabled={modeLoading || automationSaving}
+                      onClick={() =>
+                        void handleAutomationModeChange("connectors-only")
+                      }
+                      data-testid="chat-game-automation-connectors"
+                    >
+                      <span className="mb-0.5">
+                        {t("permissions.mode.semi")}
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      className={`${theme.btnCardBase} ${automationMode === "full" ? theme.btnCardActive : theme.btnCardInactive}`}
+                      disabled={modeLoading || automationSaving}
+                      onClick={() => void handleAutomationModeChange("full")}
+                      data-testid="chat-game-automation-full"
+                    >
+                      <span className="mb-0.5">
+                        {t("permissions.mode.full")}
+                      </span>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <span
+                    className={`text-xs font-medium ${isCompanion ? "text-white/80" : "text-txt"}`}
+                  >
+                    {t("permissions.tradeMode")}
+                  </span>
+                  <div
+                    className={`flex flex-col p-1 rounded-lg border gap-1 ${theme.cardBg}`}
+                  >
+                    <button
+                      type="button"
+                      className={`${theme.listBtnBase} ${tradeMode === "user-sign-only" ? theme.btnActive : theme.btnInactive}`}
+                      disabled={modeLoading || tradeSaving}
+                      onClick={() =>
+                        void handleTradeModeChange("user-sign-only")
+                      }
+                      data-testid="chat-game-trade-user-sign"
+                    >
+                      {t("permissions.trade.userSign")}
+                      {tradeMode === "user-sign-only" && (
+                        <Check className={`w-3.5 h-3.5 ${theme.textAccent}`} />
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      className={`${theme.listBtnBase} ${tradeMode === "manual-local-key" ? theme.btnActive : theme.btnInactive}`}
+                      disabled={modeLoading || tradeSaving}
+                      onClick={() =>
+                        void handleTradeModeChange("manual-local-key")
+                      }
+                      data-testid="chat-game-trade-manual"
+                    >
+                      {t("permissions.trade.manual")}
+                      {tradeMode === "manual-local-key" && (
+                        <Check className={`w-3.5 h-3.5 ${theme.textAccent}`} />
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      className={`${theme.listBtnBase} ${tradeMode === "agent-auto" ? theme.btnCardActive : theme.btnInactive}`}
+                      disabled={modeLoading || tradeSaving}
+                      onClick={() => void handleTradeModeChange("agent-auto")}
+                      data-testid="chat-game-trade-agent"
+                    >
+                      {t("permissions.trade.agent")}
+                      {tradeMode === "agent-auto" && (
+                        <Check className={`w-3.5 h-3.5 ${theme.textAccent}`} />
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <span className={`text-xs font-medium ${isCompanion ? "text-white/80" : "text-txt"}`}>
-                  {t("permissions.tradeMode")}
-                </span>
-                <div className={`flex flex-col p-1 rounded-lg border gap-1 ${theme.cardBg}`}>
-                  <button
-                    type="button"
-                    className={`${theme.listBtnBase} ${tradeMode === "user-sign-only" ? theme.btnActive : theme.btnInactive}`}
-                    disabled={modeLoading || tradeSaving}
-                    onClick={() => void handleTradeModeChange("user-sign-only")}
-                    data-testid="chat-game-trade-user-sign"
-                  >
-                    {t("permissions.trade.userSign")}
-                    {tradeMode === "user-sign-only" && <Check className={`w-3.5 h-3.5 ${theme.textAccent}`} />}
-                  </button>
-                  <button
-                    type="button"
-                    className={`${theme.listBtnBase} ${tradeMode === "manual-local-key" ? theme.btnActive : theme.btnInactive}`}
-                    disabled={modeLoading || tradeSaving}
-                    onClick={() => void handleTradeModeChange("manual-local-key")}
-                    data-testid="chat-game-trade-manual"
-                  >
-                    {t("permissions.trade.manual")}
-                    {tradeMode === "manual-local-key" && <Check className={`w-3.5 h-3.5 ${theme.textAccent}`} />}
-                  </button>
-                  <button
-                    type="button"
-                    className={`${theme.listBtnBase} ${tradeMode === "agent-auto" ? theme.btnCardActive : theme.btnInactive}`}
-                    disabled={modeLoading || tradeSaving}
-                    onClick={() => void handleTradeModeChange("agent-auto")}
-                    data-testid="chat-game-trade-agent"
-                  >
-                    {t("permissions.trade.agent")}
-                    {tradeMode === "agent-auto" && <Check className={`w-3.5 h-3.5 ${theme.textAccent}`} />}
-                  </button>
-                </div>
-              </div>
+              <p
+                className={`text-[10px] text-center pt-2 border-t ${theme.textMuted} ${theme.divider}`}
+              >
+                {t("chat.modal.tradeModeHint")}
+              </p>
             </div>
-
-            <p className={`text-[10px] text-center pt-2 border-t ${theme.textMuted} ${theme.divider}`}>
-              {t("chat.modal.tradeModeHint")}
-            </p>
-          </div>
-        </div>,
-        document.body
-      )}
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }

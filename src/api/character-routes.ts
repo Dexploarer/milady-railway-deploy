@@ -11,7 +11,12 @@ interface CharacterGenerateContext {
   postExamples?: string[];
 }
 
-type CharacterGenerateField = "bio" | "system" | "style" | "chatExamples" | "postExamples";
+type CharacterGenerateField =
+  | "bio"
+  | "system"
+  | "style"
+  | "chatExamples"
+  | "postExamples";
 type CharacterGenerateMode = "append" | "replace";
 
 export interface CharacterRouteState {
