@@ -14,10 +14,10 @@ vi.mock("../../src/AppContext", () => ({
 describe("AvatarSelector", () => {
   it("suppresses onSelect clicks when loading is true", async () => {
     const onSelect = vi.fn();
-    let renderer: any = null;
+    let renderer!: TestRenderer.ReactTestRenderer;
     await act(async () => {
       renderer = TestRenderer.create(
-        <AvatarSelector selected={1} onSelect={onSelect} loading={true} />
+        <AvatarSelector selected={1} onSelect={onSelect} loading={true} />,
       );
     });
 
@@ -33,10 +33,10 @@ describe("AvatarSelector", () => {
 
   it("calls onSelect when loading is false", async () => {
     const onSelect = vi.fn();
-    let renderer: any = null;
+    let renderer!: TestRenderer.ReactTestRenderer;
     await act(async () => {
       renderer = TestRenderer.create(
-        <AvatarSelector selected={1} onSelect={onSelect} loading={false} />
+        <AvatarSelector selected={1} onSelect={onSelect} loading={false} />,
       );
     });
 
@@ -50,4 +50,3 @@ describe("AvatarSelector", () => {
     expect(avatarButton.props.disabled).toBe(false);
   });
 });
-
