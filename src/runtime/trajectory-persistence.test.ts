@@ -591,7 +591,7 @@ describe("observation buffer", () => {
   it("flushObservationBuffer parses valid LLM response into observations", async () => {
     const runtime = {
       useModel: vi.fn(async () =>
-        JSON.stringify(["prefers TypeScript", "works on milaidy"]),
+        JSON.stringify(["prefers TypeScript", "works on milady"]),
       ),
       adapter: {
         db: { execute: vi.fn(async () => ({ rows: [] })) },
@@ -600,14 +600,14 @@ describe("observation buffer", () => {
     } as unknown as IAgentRuntime;
 
     pushChatExchange(runtime, {
-      userPrompt: "I prefer TypeScript and I work on milaidy",
+      userPrompt: "I prefer TypeScript and I work on milady",
       response: "Got it!",
       trajectoryId: "step-obs-2",
       timestamp: Date.now(),
     });
 
     const result = await flushObservationBuffer(runtime);
-    expect(result).toEqual(["prefers TypeScript", "works on milaidy"]);
+    expect(result).toEqual(["prefers TypeScript", "works on milady"]);
   });
 
   it("flushObservationBuffer prevents concurrent flushes", async () => {

@@ -2388,7 +2388,7 @@ function summarizeComponentWrite(input: unknown): Record<string, unknown> {
   };
 }
 
-function installRuntimeMethodBindings(runtime: AgentRuntime): void {
+export function installRuntimeMethodBindings(runtime: AgentRuntime): void {
   const runtimeWithBindings = runtime as RuntimeWithMethodBindings;
   if (runtimeWithBindings.__miladyMethodBindingsInstalled) {
     return;

@@ -43,7 +43,7 @@ Preserve full training-quality trajectory data while reducing hot-path context b
 - Evidence: compressed sidecar archive with archive-path pointer implemented.
 
 ## Benchmark Direction
-- Local benchmarks clone exists: `/Users/jakobgrant/Workspaces/benchmarks`.
+- Local benchmarks clone exists: `<path-to-your-workspaces>/benchmarks`.
 - Relevant branch confirmed: `shaw/benchmark-orchestrator-viewer`.
 - This branch includes orchestrator runner, lifecycle scenarios, and viewer components that are aligned with swarm evaluation.
 

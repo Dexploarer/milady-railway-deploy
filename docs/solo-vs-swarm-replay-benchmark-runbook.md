@@ -16,21 +16,21 @@ Run before each capture so global Python packages do not skew timings.
 Cold (fresh env, recommended for apples-to-apples):
 ```bash
 bun run benchmark:preflight -- \
-  --workspace /Users/jakobgrant/.milady/workspaces/<workspace-id> \
+  --workspace ~/.milady/workspaces/<workspace-id> \
   --mode cold
 ```
 
 Warm (reuse existing benchmark venv):
 ```bash
 bun run benchmark:preflight -- \
-  --workspace /Users/jakobgrant/.milady/workspaces/<workspace-id> \
+  --workspace ~/.milady/workspaces/<workspace-id> \
   --mode warm
 ```
 
 If you want your current shell to use the benchmark venv PATH:
 ```bash
 eval "$(bun run benchmark:preflight -- \
-  --workspace /Users/jakobgrant/.milady/workspaces/<workspace-id> \
+  --workspace ~/.milady/workspaces/<workspace-id> \
   --mode cold \
   --shell-export)"
 ```
@@ -56,26 +56,26 @@ bun run benchmark:normalize-capture -- --input captures/swarm-reflection --outpu
 Each normalized file is emitted as `*.replay.json`.
 
 ## 3. Score replay sets in benchmarks orchestrator
-From `/Users/jakobgrant/Workspaces/benchmarks` on branch `shaw/benchmark-orchestrator-viewer`:
+From `<path-to-your-workspaces>/benchmarks` on branch `shaw/benchmark-orchestrator-viewer`:
 
 ```bash
 python -m benchmarks.orchestrator run \
-  --benchmarks milaidy_replay \
+  --benchmarks milady_replay \
   --provider openai \
   --model gpt-4o-mini \
-  --extra '{"per_benchmark":{"milaidy_replay":{"capture_path":"/Users/jakobgrant/Workspaces/milaidy/replays/solo","capture_glob":"*.replay.json"}}}'
+  --extra '{"per_benchmark":{"milady_replay":{"capture_path":"<path-to-your-workspaces>/milaidy/replays/solo","capture_glob":"*.replay.json"}}}'
 
 python -m benchmarks.orchestrator run \
-  --benchmarks milaidy_replay \
+  --benchmarks milady_replay \
   --provider openai \
   --model gpt-4o-mini \
-  --extra '{"per_benchmark":{"milaidy_replay":{"capture_path":"/Users/jakobgrant/Workspaces/milaidy/replays/swarm-baseline","capture_glob":"*.replay.json"}}}'
+  --extra '{"per_benchmark":{"milady_replay":{"capture_path":"<path-to-your-workspaces>/milaidy/replays/swarm-baseline","capture_glob":"*.replay.json"}}}'
 
 python -m benchmarks.orchestrator run \
-  --benchmarks milaidy_replay \
+  --benchmarks milady_replay \
   --provider openai \
   --model gpt-4o-mini \
-  --extra '{"per_benchmark":{"milaidy_replay":{"capture_path":"/Users/jakobgrant/Workspaces/milaidy/replays/swarm-reflection","capture_glob":"*.replay.json"}}}'
+  --extra '{"per_benchmark":{"milady_replay":{"capture_path":"<path-to-your-workspaces>/milaidy/replays/swarm-reflection","capture_glob":"*.replay.json"}}}'
 ```
 
 ## 4. Compare metrics
