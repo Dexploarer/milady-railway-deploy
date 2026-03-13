@@ -877,6 +877,11 @@ export type MiladyRPCSchema = {
         text: string;
         segments: Array<{ text: string; start: number; end: number }>;
       };
+      talkmodeError: {
+        code: string;
+        message: string;
+        recoverable: boolean;
+      };
 
       // Swabble: Wake word detection
       swabbleWakeWord: {
@@ -885,6 +890,22 @@ export type MiladyRPCSchema = {
         transcript: string;
       };
       swabbleStateChanged: { listening: boolean };
+      swabbleTranscript: {
+        transcript: string;
+        segments: Array<{
+          text: string;
+          start: number;
+          duration: number;
+          isFinal: boolean;
+        }>;
+        isFinal: boolean;
+        confidence?: number;
+      };
+      swabbleError: {
+        code: string;
+        message: string;
+        recoverable: boolean;
+      };
       // Swabble: audio chunk fallback (whisper.cpp binary missing)
       swabbleAudioChunkPush: { data: string };
 
@@ -1150,8 +1171,11 @@ export const PUSH_CHANNEL_TO_RPC_MESSAGE: Record<string, string> = {
   "talkmode:stateChanged": "talkmodeStateChanged",
   "talkmode:speakComplete": "talkmodeSpeakComplete",
   "talkmode:transcript": "talkmodeTranscript",
+  "talkmode:error": "talkmodeError",
   "swabble:wakeWord": "swabbleWakeWord",
   "swabble:stateChange": "swabbleStateChanged",
+  "swabble:transcript": "swabbleTranscript",
+  "swabble:error": "swabbleError",
   "swabble:audioChunkPush": "swabbleAudioChunkPush",
   "contextMenu:askAgent": "contextMenuAskAgent",
   "contextMenu:createSkill": "contextMenuCreateSkill",
