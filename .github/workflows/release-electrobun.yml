@@ -405,6 +405,7 @@ jobs:
         run: |
           ELECTROBUN_VERSION="$(node -p "require('./apps/app/electrobun/package.json').dependencies.electrobun.replace(/^[^0-9]*/, '')")"
           echo "Installing electrobun@$ELECTROBUN_VERSION"
+          echo "ELECTROBUN_VERSION=$ELECTROBUN_VERSION" >> "$GITHUB_ENV"
           if [ "${{ matrix.platform.os }}" = "macos" ] && [ "${{ matrix.platform.artifact-name }}" = "macos-x64" ]; then
             arch -x86_64 bun install -g "electrobun@$ELECTROBUN_VERSION"
           else
