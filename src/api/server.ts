@@ -6220,33 +6220,157 @@ async function handleCodingAgentsFallback(
   runtime: AgentRuntime,
   pathname: string,
   method: string,
-  _req: http.IncomingMessage,
+  req: http.IncomingMessage,
   res: http.ServerResponse,
 ): Promise<boolean> {
+  type ScratchStatus = "pending_decision" | "kept" | "promoted";
+  type ScratchTerminalEvent = "stopped" | "task_complete" | "error";
+  type ScratchRecord = {
+    sessionId: string;
+    label: string;
+    path: string;
+    status: ScratchStatus;
+    createdAt: number;
+    terminalAt: number;
+    terminalEvent: ScratchTerminalEvent;
+    expiresAt?: number;
+  };
+  type AgentPreflightRecord = {
+    adapter?: string;
+    installed?: boolean;
+    installCommand?: string;
+    docsUrl?: string;
+  };
+  type CodeTaskService = {
+    getTasks?: () => Promise<
+      Array<{
+        id?: string;
+        name?: string;
+        description?: string;
+        metadata?: {
+          status?: string;
+          providerId?: string;
+          providerLabel?: string;
+          workingDirectory?: string;
+          progress?: number;
+          steps?: Array<{ status?: string }>;
+        };
+      }>
+    >;
+    getAgentPreflight?: () => Promise<unknown>;
+    listAgentPreflight?: () => Promise<unknown>;
+    preflightCodingAgents?: () => Promise<unknown>;
+    preflight?: () => Promise<unknown>;
+    listScratchWorkspaces?: () => Promise<unknown>;
+    getScratchWorkspaces?: () => Promise<unknown>;
+    listScratch?: () => Promise<unknown>;
+    keepScratchWorkspace?: (sessionId: string) => Promise<unknown>;
+    keepScratch?: (sessionId: string) => Promise<unknown>;
+    deleteScratchWorkspace?: (sessionId: string) => Promise<unknown>;
+    deleteScratch?: (sessionId: string) => Promise<unknown>;
+    promoteScratchWorkspace?: (
+      sessionId: string,
+      name?: string,
+    ) => Promise<unknown>;
+    promoteScratch?: (sessionId: string, name?: string) => Promise<unknown>;
+  };
+
+  const codeTaskService = runtime.getService(
+    "CODE_TASK",
+  ) as CodeTaskService | null;
+
+  const toNumber = (value: unknown, fallback = 0): number => {
+    const parsed =
+      typeof value === "number"
+        ? value
+        : typeof value === "string"
+          ? Number(value)
+          : Number.NaN;
+    return Number.isFinite(parsed) ? parsed : fallback;
+  };
+  const toScratchStatus = (value: unknown): ScratchStatus => {
+    if (value === "kept" || value === "promoted") return value;
+    return "pending_decision";
+  };
+  const toTerminalEvent = (value: unknown): ScratchTerminalEvent => {
+    if (value === "stopped" || value === "error") return value;
+    return "task_complete";
+  };
+  const normalizeScratchRecord = (value: unknown): ScratchRecord | null => {
+    if (!value || typeof value !== "object") return null;
+    const raw = value as Record<string, unknown>;
+    const sessionId =
+      typeof raw.sessionId === "string" ? raw.sessionId.trim() : "";
+    const pathValue = typeof raw.path === "string" ? raw.path.trim() : "";
+    if (!sessionId || !pathValue) return null;
+    const createdAt = toNumber(raw.createdAt, Date.now());
+    const terminalAt = toNumber(raw.terminalAt, createdAt);
+    const expiresAt = toNumber(raw.expiresAt, 0);
+    return {
+      sessionId,
+      label:
+        typeof raw.label === "string" && raw.label.trim().length > 0
+          ? raw.label
+          : sessionId,
+      path: pathValue,
+      status: toScratchStatus(raw.status),
+      createdAt,
+      terminalAt,
+      terminalEvent: toTerminalEvent(raw.terminalEvent),
+      ...(expiresAt > 0 ? { expiresAt } : {}),
+    };
+  };
+
+  // GET /api/coding-agents/preflight
+  if (method === "GET" && pathname === "/api/coding-agents/preflight") {
+    try {
+      const loaders: Array<(() => Promise<unknown>) | undefined> = [
+        codeTaskService?.getAgentPreflight,
+        codeTaskService?.listAgentPreflight,
+        codeTaskService?.preflightCodingAgents,
+        codeTaskService?.preflight,
+      ];
+      let rows: unknown[] = [];
+      for (const loader of loaders) {
+        if (!loader) continue;
+        const maybeRows = await loader.call(codeTaskService);
+        if (Array.isArray(maybeRows)) {
+          rows = maybeRows;
+          break;
+        }
+      }
+      const normalized = rows.flatMap((item): AgentPreflightRecord[] => {
+        if (!item || typeof item !== "object") return [];
+        const raw = item as Record<string, unknown>;
+        const adapter =
+          typeof raw.adapter === "string" ? raw.adapter.trim() : "";
+        if (!adapter) return [];
+        return [
+          {
+            adapter,
+            installed: Boolean(raw.installed),
+            installCommand:
+              typeof raw.installCommand === "string"
+                ? raw.installCommand
+                : undefined,
+            docsUrl: typeof raw.docsUrl === "string" ? raw.docsUrl : undefined,
+          },
+        ];
+      });
+      json(res, normalized);
+      return true;
+    } catch (e) {
+      error(res, `Failed to get coding agent preflight: ${e}`, 500);
+      return true;
+    }
+  }
+
   // GET /api/coding-agents/coordinator/status
   if (
     method === "GET" &&
     pathname === "/api/coding-agents/coordinator/status"
   ) {
-    const orchestratorService = runtime.getService("CODE_TASK") as {
-      getTasks?: () => Promise<
-        Array<{
-          id?: string;
-          name?: string;
-          description?: string;
-          metadata?: {
-            status?: string;
-            providerId?: string;
-            providerLabel?: string;
-            workingDirectory?: string;
-            progress?: number;
-            steps?: Array<{ status?: string }>;
-          };
-        }>
-      >;
-    } | null;
-
-    if (!orchestratorService?.getTasks) {
+    if (!codeTaskService?.getTasks) {
       // Return empty status if service not available
       json(res, {
         supervisionLevel: "autonomous",
@@ -6258,7 +6382,7 @@ async function handleCodingAgentsFallback(
     }
 
     try {
-      const tasks = await orchestratorService.getTasks();
+      const tasks = await codeTaskService.getTasks();
 
       // Map tasks to the CodingAgentSession format expected by frontend
       const mappedTasks = tasks.map((task) => {
@@ -6332,6 +6456,105 @@ async function handleCodingAgentsFallback(
       return true;
     } catch (e) {
       error(res, `Failed to stop session: ${e}`, 500);
+      return true;
+    }
+  }
+
+  // GET /api/coding-agents/scratch
+  if (method === "GET" && pathname === "/api/coding-agents/scratch") {
+    try {
+      const loaders: Array<(() => Promise<unknown>) | undefined> = [
+        codeTaskService?.listScratchWorkspaces,
+        codeTaskService?.getScratchWorkspaces,
+        codeTaskService?.listScratch,
+      ];
+      let rows: unknown[] = [];
+      for (const loader of loaders) {
+        if (!loader) continue;
+        const maybeRows = await loader.call(codeTaskService);
+        if (Array.isArray(maybeRows)) {
+          rows = maybeRows;
+          break;
+        }
+      }
+      const normalized = rows
+        .map((item) => normalizeScratchRecord(item))
+        .filter((item): item is ScratchRecord => item !== null);
+      json(res, normalized);
+      return true;
+    } catch (e) {
+      error(res, `Failed to list scratch workspaces: ${e}`, 500);
+      return true;
+    }
+  }
+
+  const keepMatch = pathname.match(
+    /^\/api\/coding-agents\/([^/]+)\/scratch\/keep$/,
+  );
+  if (method === "POST" && keepMatch) {
+    const sessionId = decodeURIComponent(keepMatch[1]);
+    const keeper =
+      codeTaskService?.keepScratchWorkspace ?? codeTaskService?.keepScratch;
+    if (!keeper) {
+      error(res, "Scratch keep is not available", 503);
+      return true;
+    }
+    try {
+      await keeper.call(codeTaskService, sessionId);
+      json(res, { ok: true });
+      return true;
+    } catch (e) {
+      error(res, `Failed to keep scratch workspace: ${e}`, 500);
+      return true;
+    }
+  }
+
+  const deleteMatch = pathname.match(
+    /^\/api\/coding-agents\/([^/]+)\/scratch\/delete$/,
+  );
+  if (method === "POST" && deleteMatch) {
+    const sessionId = decodeURIComponent(deleteMatch[1]);
+    const deleter =
+      codeTaskService?.deleteScratchWorkspace ?? codeTaskService?.deleteScratch;
+    if (!deleter) {
+      error(res, "Scratch delete is not available", 503);
+      return true;
+    }
+    try {
+      await deleter.call(codeTaskService, sessionId);
+      json(res, { ok: true });
+      return true;
+    } catch (e) {
+      error(res, `Failed to delete scratch workspace: ${e}`, 500);
+      return true;
+    }
+  }
+
+  const promoteMatch = pathname.match(
+    /^\/api\/coding-agents\/([^/]+)\/scratch\/promote$/,
+  );
+  if (method === "POST" && promoteMatch) {
+    const sessionId = decodeURIComponent(promoteMatch[1]);
+    const promoter =
+      codeTaskService?.promoteScratchWorkspace ??
+      codeTaskService?.promoteScratch;
+    if (!promoter) {
+      error(res, "Scratch promote is not available", 503);
+      return true;
+    }
+    const body = await readJsonBody<{ name?: string }>(req, res);
+    if (body === null) return true;
+    const name =
+      typeof body.name === "string" && body.name.trim().length > 0
+        ? body.name.trim()
+        : undefined;
+    try {
+      const promoted = await promoter.call(codeTaskService, sessionId, name);
+      const scratch = normalizeScratchRecord(promoted);
+      json(res, { success: true, ...(scratch ? { scratch } : {}) });
+      return true;
+    } catch (e) {
+      error(res, `Failed to promote scratch workspace: ${e}`, 500);
       return true;
     }
   }

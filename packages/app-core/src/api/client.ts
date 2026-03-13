@@ -4995,6 +4995,7 @@ export class MiladyClient {
 
   async deleteCodingAgentScratchWorkspace(sessionId: string): Promise<boolean> {
     try {
+      // Keep POST for compatibility with plugin route handlers.
       await this.fetch(
         `/api/coding-agents/${encodeURIComponent(sessionId)}/scratch/delete`,
         { method: "POST" },
@@ -5013,10 +5014,13 @@ export class MiladyClient {
       const response = await this.fetch<{
         success: boolean;
         scratch?: CodingAgentScratchWorkspace;
-      }>(`/api/coding-agents/${encodeURIComponent(sessionId)}/scratch/promote`, {
-        method: "POST",
-        body: JSON.stringify(name ? { name } : {}),
-      });
+      }>(
+        `/api/coding-agents/${encodeURIComponent(sessionId)}/scratch/promote`,
+        {
+          method: "POST",
+          body: JSON.stringify(name ? { name } : {}),
+        },
+      );
       return response.scratch ?? null;
     } catch {
       return null;

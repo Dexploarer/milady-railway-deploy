@@ -24,6 +24,15 @@ vi.mock("@milady/app-core/api", () => ({
   },
 }));
 
+const setActionNoticeMock = vi.fn();
+
+vi.mock("../../src/AppContext", () => ({
+  useApp: () => ({
+    t: (key: string) => key,
+    setActionNotice: setActionNoticeMock,
+  }),
+}));
+
 // Mock XTerminal as a simple div so we can detect mount/unmount
 vi.mock("../../src/components/XTerminal", () => ({
   XTerminal: (props: { sessionId: string; active?: boolean }) =>
@@ -113,6 +122,7 @@ async function flush(): Promise<void> {
 describe("CodingAgentsSection — terminal keep-alive", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    setActionNoticeMock.mockReset();
   });
 
   it("mountedSessions grows when terminal is toggled open", async () => {
@@ -274,5 +284,210 @@ describe("CodingAgentsSection — terminal keep-alive", () => {
     });
 
     expect(client.keepCodingAgentScratchWorkspace).toHaveBeenCalledWith("s-1");
+  });
+
+  it("removes scratch controls when delete succeeds", async () => {
+    const listScratchMock =
+      client.listCodingAgentScratchWorkspaces as unknown as ReturnType<
+        typeof vi.fn
+      >;
+    listScratchMock.mockResolvedValueOnce([
+      {
+        sessionId: "s-1",
+        label: "Scratch s-1",
+        path: "/tmp/s-1",
+        status: "pending_decision",
+        createdAt: Date.now(),
+        terminalAt: Date.now(),
+        terminalEvent: "task_complete",
+      },
+    ]);
+    (
+      client.deleteCodingAgentScratchWorkspace as unknown as ReturnType<
+        typeof vi.fn
+      >
+    ).mockResolvedValueOnce(true);
+
+    let tree: TestRenderer.ReactTestRenderer;
+    await act(async () => {
+      tree = TestRenderer.create(
+        React.createElement(CodingAgentsSection, {
+          sessions: [createSession("s-1", { status: "completed" })],
+        }),
+      );
+    });
+    await flush();
+
+    const deleteButton = findButtonByLabel(tree?.root, "Delete");
+    expect(deleteButton).not.toBeNull();
+
+    await act(async () => {
+      deleteButton?.props.onClick({ stopPropagation() {} });
+    });
+    await flush();
+
+    expect(client.deleteCodingAgentScratchWorkspace).toHaveBeenCalledWith(
+      "s-1",
+    );
+    expect(findButtonByLabel(tree?.root, "Delete")).toBeNull();
+    expect(setActionNoticeMock).toHaveBeenCalledWith(
+      "Scratch workspace deleted.",
+      "success",
+      2200,
+    );
+  });
+
+  it("keeps scratch controls when delete fails", async () => {
+    const listScratchMock =
+      client.listCodingAgentScratchWorkspaces as unknown as ReturnType<
+        typeof vi.fn
+      >;
+    listScratchMock.mockResolvedValueOnce([
+      {
+        sessionId: "s-1",
+        label: "Scratch s-1",
+        path: "/tmp/s-1",
+        status: "pending_decision",
+        createdAt: Date.now(),
+        terminalAt: Date.now(),
+        terminalEvent: "task_complete",
+      },
+    ]);
+    (
+      client.deleteCodingAgentScratchWorkspace as unknown as ReturnType<
+        typeof vi.fn
+      >
+    ).mockResolvedValueOnce(false);
+
+    let tree: TestRenderer.ReactTestRenderer;
+    await act(async () => {
+      tree = TestRenderer.create(
+        React.createElement(CodingAgentsSection, {
+          sessions: [createSession("s-1", { status: "completed" })],
+        }),
+      );
+    });
+    await flush();
+
+    const deleteButton = findButtonByLabel(tree?.root, "Delete");
+    expect(deleteButton).not.toBeNull();
+
+    await act(async () => {
+      deleteButton?.props.onClick({ stopPropagation() {} });
+    });
+    await flush();
+
+    expect(client.deleteCodingAgentScratchWorkspace).toHaveBeenCalledWith(
+      "s-1",
+    );
+    expect(findButtonByLabel(tree?.root, "Delete")).not.toBeNull();
+    expect(setActionNoticeMock).toHaveBeenCalledWith(
+      "Failed to delete scratch workspace.",
+      "error",
+      2600,
+    );
+  });
+
+  it("handles promote success and failure paths", async () => {
+    const listScratchMock =
+      client.listCodingAgentScratchWorkspaces as unknown as ReturnType<
+        typeof vi.fn
+      >;
+
+    // success case
+    listScratchMock.mockResolvedValueOnce([
+      {
+        sessionId: "s-1",
+        label: "Scratch s-1",
+        path: "/tmp/s-1",
+        status: "pending_decision",
+        createdAt: Date.now(),
+        terminalAt: Date.now(),
+        terminalEvent: "task_complete",
+      },
+    ]);
+    (
+      client.promoteCodingAgentScratchWorkspace as unknown as ReturnType<
+        typeof vi.fn
+      >
+    ).mockResolvedValueOnce({
+      sessionId: "s-1",
+      label: "Promoted s-1",
+      path: "/tmp/s-1",
+      status: "promoted",
+      createdAt: Date.now(),
+      terminalAt: Date.now(),
+      terminalEvent: "task_complete",
+    });
+
+    let tree: TestRenderer.ReactTestRenderer;
+    await act(async () => {
+      tree = TestRenderer.create(
+        React.createElement(CodingAgentsSection, {
+          sessions: [createSession("s-1", { status: "completed" })],
+        }),
+      );
+    });
+    await flush();
+
+    const promoteButton = findButtonByLabel(tree?.root, "Promote");
+    expect(promoteButton).not.toBeNull();
+
+    await act(async () => {
+      promoteButton?.props.onClick({ stopPropagation() {} });
+    });
+    await flush();
+
+    expect(client.promoteCodingAgentScratchWorkspace).toHaveBeenCalledWith(
+      "s-1",
+    );
+    expect(setActionNoticeMock).toHaveBeenCalledWith(
+      "Scratch workspace promoted.",
+      "success",
+      2200,
+    );
+
+    // failure case
+    listScratchMock.mockResolvedValueOnce([
+      {
+        sessionId: "s-2",
+        label: "Scratch s-2",
+        path: "/tmp/s-2",
+        status: "pending_decision",
+        createdAt: Date.now(),
+        terminalAt: Date.now(),
+        terminalEvent: "task_complete",
+      },
+    ]);
+    (
+      client.promoteCodingAgentScratchWorkspace as unknown as ReturnType<
+        typeof vi.fn
+      >
+    ).mockResolvedValueOnce(null);
+
+    await act(async () => {
+      tree.update(
+        React.createElement(CodingAgentsSection, {
+          sessions: [createSession("s-2", { status: "completed" })],
+        }),
+      );
+    });
+    await flush();
+
+    const promoteButtonFail = findButtonByLabel(tree?.root, "Promote");
+    expect(promoteButtonFail).not.toBeNull();
+    await act(async () => {
+      promoteButtonFail?.props.onClick({ stopPropagation() {} });
+    });
+    await flush();
+
+    expect(client.promoteCodingAgentScratchWorkspace).toHaveBeenCalledWith(
+      "s-2",
+    );
+    expect(setActionNoticeMock).toHaveBeenCalledWith(
+      "Failed to promote scratch workspace.",
+      "error",
+      2600,
+    );
   });
 });

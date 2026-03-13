@@ -81,6 +81,13 @@ const AGENT_LABELS: Record<AgentTab, string> = {
   aider: "Aider",
 };
 
+const PREFLIGHT_ADAPTER_MAP: Record<string, AgentTab> = {
+  claude: "claude",
+  gemini: "gemini",
+  codex: "codex",
+  aider: "aider",
+};
+
 const ENV_PREFIX: Record<AgentTab, string> = {
   claude: "PARALLAX_CLAUDE",
   gemini: "PARALLAX_GEMINI",
@@ -181,16 +188,7 @@ export function CodingAgentSettingsSection() {
           const mapped: Partial<Record<AgentTab, AgentPreflightResult>> = {};
           for (const item of preflightRes as AgentPreflightResult[]) {
             const raw = item.adapter?.toLowerCase();
-            const key =
-              raw === "claude"
-                ? "claude"
-                : raw === "gemini"
-                  ? "gemini"
-                  : raw === "codex"
-                    ? "codex"
-                    : raw === "aider"
-                      ? "aider"
-                      : null;
+            const key = raw ? PREFLIGHT_ADAPTER_MAP[raw] : undefined;
             if (key) mapped[key] = item;
           }
           setPreflightByAgent(mapped);

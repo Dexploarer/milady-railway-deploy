@@ -162,7 +162,7 @@ For replay benchmark workflows, keep captures and normalized artifacts separate:
 
 Reference runbook (kept as the benchmark example):
 
-- [solo-vs-swarm-replay-benchmark-runbook.md](/Users/jakobgrant/Workspaces/milaidy/docs/solo-vs-swarm-replay-benchmark-runbook.md)
+- [solo-vs-swarm-replay-benchmark-runbook.md](../solo-vs-swarm-replay-benchmark-runbook.md)
 
 Useful benchmark env vars:
 
