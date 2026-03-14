@@ -108,20 +108,17 @@ export async function handleWalletRoutes(
         operation: "fetch_evm_balances",
       });
       try {
-        const chains = await deps.fetchEvmBalances(
-          addresses.evmAddress,
-          {
-            alchemyKey,
-            ankrKey,
-            cloudManagedAccess: rpcReadiness.cloudManagedAccess,
-            nodeRealBscRpcUrl: process.env.NODEREAL_BSC_RPC_URL,
-            quickNodeBscRpcUrl: process.env.QUICKNODE_BSC_RPC_URL,
-            bscRpcUrl: process.env.BSC_RPC_URL,
-            ethereumRpcUrl: process.env.ETHEREUM_RPC_URL,
-            baseRpcUrl: process.env.BASE_RPC_URL,
-            avaxRpcUrl: process.env.AVALANCHE_RPC_URL,
-          },
-        );
+        const chains = await deps.fetchEvmBalances(addresses.evmAddress, {
+          alchemyKey,
+          ankrKey,
+          cloudManagedAccess: rpcReadiness.cloudManagedAccess,
+          nodeRealBscRpcUrl: process.env.NODEREAL_BSC_RPC_URL,
+          quickNodeBscRpcUrl: process.env.QUICKNODE_BSC_RPC_URL,
+          bscRpcUrl: process.env.BSC_RPC_URL,
+          ethereumRpcUrl: process.env.ETHEREUM_RPC_URL,
+          baseRpcUrl: process.env.BASE_RPC_URL,
+          avaxRpcUrl: process.env.AVALANCHE_RPC_URL,
+        });
         result.evm = { address: addresses.evmAddress, chains };
         evmBalancesSpan.success();
       } catch (err) {

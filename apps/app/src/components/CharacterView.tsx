@@ -74,9 +74,7 @@ type CharacterRosterEntry = {
 };
 
 function replaceCharacterToken(value: string, name: string) {
-  return value
-    .replaceAll("{{name}}", name)
-    .replaceAll("{{agentName}}", name);
+  return value.replaceAll("{{name}}", name).replaceAll("{{agentName}}", name);
 }
 
 function buildCharacterFromPreset(
@@ -98,7 +96,9 @@ function buildCharacterFromPreset(
     messageExamples: preset.messageExamples.map((conversation) => ({
       examples: conversation.map((message) => ({
         name:
-          message.user === "{{agentName}}" ? name : replaceCharacterToken(message.user, name),
+          message.user === "{{agentName}}"
+            ? name
+            : replaceCharacterToken(message.user, name),
         content: {
           text: replaceCharacterToken(message.content.text, name),
         },
@@ -116,14 +116,16 @@ function truncateCopy(value: string, max = 170) {
   return `${normalized.slice(0, max - 1).trimEnd()}…`;
 }
 
-function resolveRosterEntries(styles: readonly StylePreset[]): CharacterRosterEntry[] {
+function resolveRosterEntries(
+  styles: readonly StylePreset[],
+): CharacterRosterEntry[] {
   return styles.map((preset, index) => {
     const meta = CHARACTER_PRESET_META[preset.catchphrase];
     const fallbackName = `Character ${index + 1}`;
     return {
       id: preset.catchphrase,
       name: meta?.name ?? fallbackName,
-      avatarIndex: meta?.avatarIndex ?? ((index % 4) + 1),
+      avatarIndex: meta?.avatarIndex ?? (index % 4) + 1,
       voicePresetId: meta?.voicePresetId,
       preset,
     };
@@ -136,7 +138,8 @@ function findMatchingRosterEntry(
   roster: CharacterRosterEntry[],
 ) {
   if (!character) return null;
-  const currentName = typeof character.name === "string" ? character.name.trim() : "";
+  const currentName =
+    typeof character.name === "string" ? character.name.trim() : "";
   const exactNameMatch = roster.find((entry) => entry.name === currentName);
   if (exactNameMatch) return exactNameMatch.id;
 
@@ -753,7 +756,10 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
       handleFieldEdit("system", nextCharacter.system ?? "");
       handleFieldEdit("adjectives", nextCharacter.adjectives ?? []);
       handleFieldEdit("topics", nextCharacter.topics ?? []);
-      handleFieldEdit("style", nextCharacter.style ?? { all: [], chat: [], post: [] });
+      handleFieldEdit(
+        "style",
+        nextCharacter.style ?? { all: [], chat: [], post: [] },
+      );
       handleFieldEdit("messageExamples", nextCharacter.messageExamples ?? []);
       handleFieldEdit("postExamples", nextCharacter.postExamples ?? []);
       setState("selectedVrmIndex", entry.avatarIndex);
@@ -779,9 +785,7 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
       await persistVoiceConfig();
     } catch (err) {
       setVoiceSaveError(
-        err instanceof Error
-          ? err.message
-          : "Failed to save voice settings.",
+        err instanceof Error ? err.message : "Failed to save voice settings.",
       );
       setVoiceSaving(false);
       return;
@@ -1049,7 +1053,10 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
                 characterRoster.map((entry) => {
                   const isSelected = selectedCharacterId === entry.id;
                   const rosterBio = truncateCopy(
-                    replaceCharacterToken(entry.preset.bio[0] ?? "", entry.name),
+                    replaceCharacterToken(
+                      entry.preset.bio[0] ?? "",
+                      entry.name,
+                    ),
                     120,
                   );
                   const rosterDirections = truncateCopy(
@@ -1104,14 +1111,16 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
                           Adjectives
                         </div>
                         <div className="mt-2 flex flex-wrap gap-1.5">
-                          {entry.preset.adjectives.slice(0, 4).map((adjective) => (
-                            <span
-                              key={adjective}
-                              className="rounded-full border border-border/40 bg-bg/50 px-2 py-1 text-[11px] text-txt"
-                            >
-                              {adjective}
-                            </span>
-                          ))}
+                          {entry.preset.adjectives
+                            .slice(0, 4)
+                            .map((adjective) => (
+                              <span
+                                key={adjective}
+                                className="rounded-full border border-border/40 bg-bg/50 px-2 py-1 text-[11px] text-txt"
+                              >
+                                {adjective}
+                              </span>
+                            ))}
                         </div>
                       </div>
 
@@ -1232,7 +1241,9 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                      <span className={labelCls}>{t("characterview.voice")}</span>
+                      <span className={labelCls}>
+                        {t("characterview.voice")}
+                      </span>
                       <div className="flex items-center gap-3">
                         <ThemedSelect
                           value={
@@ -1274,7 +1285,10 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
                             {
                               label: "Other",
                               items: [
-                                { id: "__custom__", text: "Custom voice ID..." },
+                                {
+                                  id: "__custom__",
+                                  text: "Custom voice ID...",
+                                },
                               ],
                             },
                           ]}
@@ -1317,7 +1331,9 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
 
                     {selectedVoicePresetId === "custom" && (
                       <div className="flex flex-col gap-2">
-                        <span className={labelCls}>{t("characterview.voiceID")}</span>
+                        <span className={labelCls}>
+                          {t("characterview.voiceID")}
+                        </span>
                         <Input
                           type="text"
                           value={voiceConfig.elevenlabs?.voiceId ?? ""}
@@ -1384,7 +1400,10 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
                                   value: "eleven_flash_v2_5",
                                   label: "Flash v2.5 (Fastest)",
                                 },
-                                { value: "eleven_turbo_v2_5", label: "Turbo v2.5" },
+                                {
+                                  value: "eleven_turbo_v2_5",
+                                  label: "Turbo v2.5",
+                                },
                                 {
                                   value: "eleven_multilingual_v2",
                                   label: "Multilingual v2",
@@ -1550,7 +1569,9 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
                                       e.target.value,
                                     )
                                   }
-                                  onBlur={() => handleCommitStyleEntry(key, index)}
+                                  onBlur={() =>
+                                    handleCommitStyleEntry(key, index)
+                                  }
                                   className="min-h-[72px] min-w-0 flex-1 resize-none rounded-lg border-border/50 bg-bg/50 p-2 text-xs leading-relaxed text-txt shadow-inner backdrop-blur-md transition-all focus-visible:border-accent/50 focus-visible:ring-accent/50"
                                   data-testid={`style-entry-editor-${key}-${index}`}
                                 />
@@ -1558,7 +1579,9 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
                                   variant="ghost"
                                   size="icon"
                                   className="h-7 w-7 shrink-0 text-muted hover:bg-danger/10 hover:text-danger"
-                                  onClick={() => handleRemoveStyleEntry(key, index)}
+                                  onClick={() =>
+                                    handleRemoveStyleEntry(key, index)
+                                  }
                                   title={t("characterview.remove")}
                                 >
                                   ×
@@ -1608,182 +1631,190 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
               </div>
             </div>
 
-            <div className={`${cardCls} flex min-h-0 max-h-none flex-col overflow-hidden lg:max-h-[560px]`}>
+            <div
+              className={`${cardCls} flex min-h-0 max-h-none flex-col overflow-hidden lg:max-h-[560px]`}
+            >
               <div className="mb-4 border-b border-border/40 pb-3 text-sm font-bold tracking-wide text-txt">
                 {t("characterview.Examples")}
               </div>
 
               <div className="min-h-0 flex-1 overflow-y-auto pr-1 custom-scrollbar">
                 <div className="flex flex-col gap-5">
-              {/* Chat Examples */}
-              <details className="group">
-                <summary className="flex cursor-pointer list-none select-none items-center gap-2 text-xs font-bold [&::-webkit-details-marker]:hidden">
-                  <span className="inline-block transition-transform group-open:rotate-90 text-accent">
-                    &#9654;
-                  </span>
+                  {/* Chat Examples */}
+                  <details className="group">
+                    <summary className="flex cursor-pointer list-none select-none items-center gap-2 text-xs font-bold [&::-webkit-details-marker]:hidden">
+                      <span className="inline-block transition-transform group-open:rotate-90 text-accent">
+                        &#9654;
+                      </span>
 
-                  {t("characterview.chatExamples")}
-                  <span className="ml-1 rounded-full border border-white/5 bg-black/10 px-2 py-0.5 text-[11px] font-medium text-muted">
-                    {t("characterview.HowTheAgentResp")}
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="ml-auto h-7 border-border/50 bg-bg/50 text-[11px] font-bold text-accent shadow-inner transition-all hover:border-accent/40 hover:text-accent"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      void handleGenerate("chatExamples", "replace");
-                    }}
-                    disabled={generating === "chatExamples"}
-                  >
-                    {generating === "chatExamples"
-                      ? "generating..."
-                      : "generate"}
-                  </Button>
-                </summary>
-                <div className="mt-4 flex flex-col gap-3">
-                  {(d.messageExamples ?? []).map((convo, ci) => (
-                    <div
-                      key={convo.examples
-                        .map((msg) => `${msg.name}:${msg.content?.text ?? ""}`)
-                        .join("|")}
-                      className="rounded-xl border border-border/40 bg-black/10 p-4 shadow-inner backdrop-blur-sm"
-                    >
-                      <div className="mb-3 flex items-center justify-between border-b border-border/30 pb-2">
-                        <span className="text-[11px] font-bold uppercase tracking-widest text-muted">
-                          {t("characterview.conversation")} {ci + 1}
-                        </span>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-6 px-2 text-[10px] font-bold text-muted transition-all hover:bg-danger/10 hover:text-danger"
-                          onClick={() => {
-                            const updated = [...(d.messageExamples ?? [])];
-                            updated.splice(ci, 1);
-                            handleFieldEdit("messageExamples", updated);
-                          }}
+                      {t("characterview.chatExamples")}
+                      <span className="ml-1 rounded-full border border-white/5 bg-black/10 px-2 py-0.5 text-[11px] font-medium text-muted">
+                        {t("characterview.HowTheAgentResp")}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="ml-auto h-7 border-border/50 bg-bg/50 text-[11px] font-bold text-accent shadow-inner transition-all hover:border-accent/40 hover:text-accent"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          void handleGenerate("chatExamples", "replace");
+                        }}
+                        disabled={generating === "chatExamples"}
+                      >
+                        {generating === "chatExamples"
+                          ? "generating..."
+                          : "generate"}
+                      </Button>
+                    </summary>
+                    <div className="mt-4 flex flex-col gap-3">
+                      {(d.messageExamples ?? []).map((convo, ci) => (
+                        <div
+                          key={convo.examples
+                            .map(
+                              (msg) => `${msg.name}:${msg.content?.text ?? ""}`,
+                            )
+                            .join("|")}
+                          className="rounded-xl border border-border/40 bg-black/10 p-4 shadow-inner backdrop-blur-sm"
                         >
-                          {t("characterview.remove")}
-                        </Button>
-                      </div>
-                      <div className="flex flex-col gap-2">
-                        {convo.examples.map((msg, mi) => (
-                          <div
-                            key={`${msg.name}:${msg.content?.text ?? ""}`}
-                            className="flex items-center gap-3"
-                          >
-                            <span
-                              className={`w-12 shrink-0 text-right text-[11px] font-bold uppercase tracking-wider ${msg.name === "{{user1}}" ? "text-muted" : "text-accent"}`}
-                            >
-                              {msg.name === "{{user1}}" ? "user" : "agent"}
+                          <div className="mb-3 flex items-center justify-between border-b border-border/30 pb-2">
+                            <span className="text-[11px] font-bold uppercase tracking-widest text-muted">
+                              {t("characterview.conversation")} {ci + 1}
                             </span>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-6 px-2 text-[10px] font-bold text-muted transition-all hover:bg-danger/10 hover:text-danger"
+                              onClick={() => {
+                                const updated = [...(d.messageExamples ?? [])];
+                                updated.splice(ci, 1);
+                                handleFieldEdit("messageExamples", updated);
+                              }}
+                            >
+                              {t("characterview.remove")}
+                            </Button>
+                          </div>
+                          <div className="flex flex-col gap-2">
+                            {convo.examples.map((msg, mi) => (
+                              <div
+                                key={`${msg.name}:${msg.content?.text ?? ""}`}
+                                className="flex items-center gap-3"
+                              >
+                                <span
+                                  className={`w-12 shrink-0 text-right text-[11px] font-bold uppercase tracking-wider ${msg.name === "{{user1}}" ? "text-muted" : "text-accent"}`}
+                                >
+                                  {msg.name === "{{user1}}" ? "user" : "agent"}
+                                </span>
+                                <Input
+                                  type="text"
+                                  value={msg.content?.text ?? ""}
+                                  onChange={(e) => {
+                                    const updated = [
+                                      ...(d.messageExamples ?? []),
+                                    ];
+                                    const convoClone = {
+                                      examples: [...updated[ci].examples],
+                                    };
+                                    convoClone.examples[mi] = {
+                                      ...convoClone.examples[mi],
+                                      content: { text: e.target.value },
+                                    };
+                                    updated[ci] = convoClone;
+                                    handleFieldEdit("messageExamples", updated);
+                                  }}
+                                  className="h-9 flex-1 rounded-lg border-border/50 bg-bg/50 text-xs shadow-inner backdrop-blur-md transition-all focus-visible:border-accent/50 focus-visible:ring-accent/50"
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                      {(d.messageExamples ?? []).length === 0 && (
+                        <div
+                          className={`${hintCls} rounded-xl border border-white/5 bg-black/5 py-3 text-center`}
+                        >
+                          {t("characterview.noChatExamplesYet")}
+                        </div>
+                      )}
+                    </div>
+                  </details>
+
+                  {/* Post Examples */}
+                  <details className="group">
+                    <summary className="flex cursor-pointer list-none select-none items-center gap-2 text-xs font-bold [&::-webkit-details-marker]:hidden">
+                      <span className="inline-block transition-transform group-open:rotate-90 text-accent">
+                        &#9654;
+                      </span>
+
+                      {t("characterview.postExamples")}
+                      <span className="ml-1 rounded-full border border-white/5 bg-black/10 px-2 py-0.5 text-[11px] font-medium text-muted">
+                        {t("characterview.SocialMediaVoice")}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="ml-auto h-7 border-border/50 bg-bg/50 text-[11px] font-bold text-accent shadow-inner transition-all hover:border-accent/40 hover:text-accent"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          void handleGenerate("postExamples", "replace");
+                        }}
+                        disabled={generating === "postExamples"}
+                      >
+                        {generating === "postExamples"
+                          ? "generating..."
+                          : "generate"}
+                      </Button>
+                    </summary>
+                    <div className="mt-4 flex flex-col gap-2">
+                      {(d.postExamples ?? []).map(
+                        (post: string, pi: number) => (
+                          <div key={post} className="flex items-center gap-2">
                             <Input
                               type="text"
-                              value={msg.content?.text ?? ""}
+                              value={post}
                               onChange={(e) => {
-                                const updated = [...(d.messageExamples ?? [])];
-                                const convoClone = {
-                                  examples: [...updated[ci].examples],
-                                };
-                                convoClone.examples[mi] = {
-                                  ...convoClone.examples[mi],
-                                  content: { text: e.target.value },
-                                };
-                                updated[ci] = convoClone;
-                                handleFieldEdit("messageExamples", updated);
+                                const updated = [...(d.postExamples ?? [])];
+                                updated[pi] = e.target.value;
+                                handleFieldEdit("postExamples", updated);
                               }}
                               className="h-9 flex-1 rounded-lg border-border/50 bg-bg/50 text-xs shadow-inner backdrop-blur-md transition-all focus-visible:border-accent/50 focus-visible:ring-accent/50"
                             />
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-muted hover:bg-danger/10 hover:text-danger"
+                              onClick={() => {
+                                const updated = [...(d.postExamples ?? [])];
+                                updated.splice(pi, 1);
+                                handleFieldEdit("postExamples", updated);
+                              }}
+                            >
+                              ×
+                            </Button>
                           </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                  {(d.messageExamples ?? []).length === 0 && (
-                    <div
-                      className={`${hintCls} rounded-xl border border-white/5 bg-black/5 py-3 text-center`}
-                    >
-                      {t("characterview.noChatExamplesYet")}
-                    </div>
-                  )}
-                </div>
-              </details>
-
-              {/* Post Examples */}
-              <details className="group">
-                <summary className="flex cursor-pointer list-none select-none items-center gap-2 text-xs font-bold [&::-webkit-details-marker]:hidden">
-                  <span className="inline-block transition-transform group-open:rotate-90 text-accent">
-                    &#9654;
-                  </span>
-
-                  {t("characterview.postExamples")}
-                  <span className="ml-1 rounded-full border border-white/5 bg-black/10 px-2 py-0.5 text-[11px] font-medium text-muted">
-                    {t("characterview.SocialMediaVoice")}
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="ml-auto h-7 border-border/50 bg-bg/50 text-[11px] font-bold text-accent shadow-inner transition-all hover:border-accent/40 hover:text-accent"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      void handleGenerate("postExamples", "replace");
-                    }}
-                    disabled={generating === "postExamples"}
-                  >
-                    {generating === "postExamples"
-                      ? "generating..."
-                      : "generate"}
-                  </Button>
-                </summary>
-                <div className="mt-4 flex flex-col gap-2">
-                  {(d.postExamples ?? []).map((post: string, pi: number) => (
-                    <div key={post} className="flex items-center gap-2">
-                      <Input
-                        type="text"
-                        value={post}
-                        onChange={(e) => {
-                          const updated = [...(d.postExamples ?? [])];
-                          updated[pi] = e.target.value;
-                          handleFieldEdit("postExamples", updated);
-                        }}
-                        className="h-9 flex-1 rounded-lg border-border/50 bg-bg/50 text-xs shadow-inner backdrop-blur-md transition-all focus-visible:border-accent/50 focus-visible:ring-accent/50"
-                      />
+                        ),
+                      )}
+                      {(d.postExamples ?? []).length === 0 && (
+                        <div
+                          className={`${hintCls} rounded-xl border border-white/5 bg-black/5 py-3 text-center`}
+                        >
+                          {t("characterview.noPostExamplesYet")}
+                        </div>
+                      )}
                       <Button
                         variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-muted hover:bg-danger/10 hover:text-danger"
+                        size="sm"
+                        className="mt-1 self-start rounded-md border border-transparent text-[11px] font-bold text-accent transition-all hover:border-accent/30 hover:bg-accent/10"
                         onClick={() => {
-                          const updated = [...(d.postExamples ?? [])];
-                          updated.splice(pi, 1);
+                          const updated = [...(d.postExamples ?? []), ""];
                           handleFieldEdit("postExamples", updated);
                         }}
                       >
-                        ×
+                        {t("characterview.AddPost")}
                       </Button>
                     </div>
-                  ))}
-                  {(d.postExamples ?? []).length === 0 && (
-                    <div
-                      className={`${hintCls} rounded-xl border border-white/5 bg-black/5 py-3 text-center`}
-                    >
-                      {t("characterview.noPostExamplesYet")}
-                    </div>
-                  )}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="mt-1 self-start rounded-md border border-transparent text-[11px] font-bold text-accent transition-all hover:border-accent/30 hover:bg-accent/10"
-                    onClick={() => {
-                      const updated = [...(d.postExamples ?? []), ""];
-                      handleFieldEdit("postExamples", updated);
-                    }}
-                  >
-                    {t("characterview.AddPost")}
-                  </Button>
+                  </details>
                 </div>
-              </details>
-            </div>
-          </div>
+              </div>
             </div>
           </div>
         </>

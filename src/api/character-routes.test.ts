@@ -14,6 +14,14 @@ function createRuntimeStub(): AgentRuntime {
     adjectives: ["curious"],
     topics: ["ai"],
     style: { all: ["be concise"], chat: [], post: [] },
+    messageExamples: [
+      {
+        examples: [
+          { name: "{{user1}}", content: { text: "hello" } },
+          { name: "Milady", content: { text: "hi" } },
+        ],
+      },
+    ],
     postExamples: ["post one"],
   };
 
@@ -76,6 +84,7 @@ describe("character routes", () => {
       character: {
         name: "Milady",
         bio: ["Initial bio"],
+        messageExamples: expect.any(Array),
       },
     });
   });
@@ -101,6 +110,31 @@ describe("character routes", () => {
       ok: true,
       agentName: "Sakuya",
     });
+  });
+
+  test("updates message examples", async () => {
+    const messageExamples = [
+      {
+        examples: [
+          { name: "{{user1}}", content: { text: "question" } },
+          { name: "Sakuya", content: { text: "answer" } },
+        ],
+      },
+    ];
+
+    const result = await invoke({
+      method: "PUT",
+      pathname: "/api/character",
+      body: {
+        messageExamples,
+      },
+    });
+
+    expect(result.status).toBe(200);
+    expect(
+      (state.runtime as unknown as { character: Record<string, unknown> })
+        .character.messageExamples,
+    ).toEqual(messageExamples);
   });
 
   test("returns 422 for invalid character payload", async () => {

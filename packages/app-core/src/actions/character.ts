@@ -41,6 +41,7 @@ export async function loadCharacter(
         chat: character.style?.chat ?? [],
         post: character.style?.post ?? [],
       },
+      messageExamples: character.messageExamples ?? [],
       postExamples: character.postExamples ?? [],
     });
   } catch {

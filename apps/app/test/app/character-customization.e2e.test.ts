@@ -291,6 +291,18 @@ vi.mock("@milady/app-core/api", () => ({
       topics: ["tech"],
       style: { all: [], chat: [], post: [] },
     }),
+    getConfig: vi.fn().mockResolvedValue({
+      messages: {
+        tts: {
+          provider: "elevenlabs",
+          elevenlabs: { voiceId: "EXAVITQu4vr4xnSDxMaL" },
+        },
+      },
+    }),
+    updateConfig: vi.fn().mockResolvedValue({ ok: true }),
+    getOnboardingOptions: vi.fn().mockResolvedValue({
+      styles: [],
+    }),
     updateCharacter: vi.fn().mockResolvedValue({ ok: true }),
   },
 }));
@@ -328,6 +340,9 @@ type CharacterData = {
   adjectives: string[];
   topics: string[];
   style: { all: string[]; chat: string[]; post: string[] };
+  messageExamples?: Array<{
+    examples: Array<{ name: string; content: { text: string } }>;
+  }>;
   postExamples?: string[];
 };
 
@@ -337,9 +352,24 @@ type CharacterState = {
   characterDraft: CharacterData | null;
   characterSaving: boolean;
   characterDirty: boolean;
-  characterSaveSuccess: boolean;
+  characterSaveSuccess: string | null;
   characterSaveError: string | null;
   selectedVrmIndex: number;
+  onboardingOptions: {
+    styles: Array<{
+      catchphrase: string;
+      hint: string;
+      bio: string[];
+      system: string;
+      adjectives: string[];
+      topics: string[];
+      style: { all: string[]; chat: string[]; post: string[] };
+      postExamples: string[];
+      messageExamples: Array<
+        Array<{ user: string; content: { text: string } }>
+      >;
+    }>;
+  } | null;
   registryStatus: null;
   registryLoading: boolean;
   registryRegistering: boolean;
@@ -357,6 +387,14 @@ function createCharacterUIState(): CharacterState {
     adjectives: ["friendly", "helpful"],
     topics: ["technology"],
     style: { all: ["Rule 1"], chat: ["Chat rule"], post: ["Post rule"] },
+    messageExamples: [
+      {
+        examples: [
+          { name: "{{user1}}", content: { text: "hello" } },
+          { name: "TestAgent", content: { text: "hi" } },
+        ],
+      },
+    ],
     postExamples: [],
   };
 
@@ -366,9 +404,45 @@ function createCharacterUIState(): CharacterState {
     characterDraft: { ...charData },
     characterSaving: false,
     characterDirty: false,
-    characterSaveSuccess: false,
+    characterSaveSuccess: null,
     characterSaveError: null,
-    selectedVrmIndex: 0,
+    selectedVrmIndex: 1,
+    onboardingOptions: {
+      styles: [
+        {
+          catchphrase: "uwu~",
+          hint: "soft & sweet",
+          bio: ["{{name}} is soft and friendly"],
+          system: "You are {{name}}",
+          adjectives: ["friendly", "helpful"],
+          topics: ["technology", "art"],
+          style: { all: ["Rule 1"], chat: ["Chat rule"], post: ["Post rule"] },
+          postExamples: [],
+          messageExamples: [
+            [
+              { user: "{{user1}}", content: { text: "hi" } },
+              { user: "{{agentName}}", content: { text: "hey" } },
+            ],
+          ],
+        },
+        {
+          catchphrase: "Noted.",
+          hint: "composed & precise",
+          bio: ["{{name}} is precise"],
+          system: "You are {{name}}, exact and calm.",
+          adjectives: ["precise", "calm"],
+          topics: ["systems", "writing"],
+          style: { all: ["Be exact"], chat: ["Stay calm"], post: ["Be clear"] },
+          postExamples: [],
+          messageExamples: [
+            [
+              { user: "{{user1}}", content: { text: "status?" } },
+              { user: "{{agentName}}", content: { text: "On track." } },
+            ],
+          ],
+        },
+      ],
+    },
     registryStatus: null,
     registryLoading: false,
     registryRegistering: false,
@@ -424,38 +498,65 @@ describe("CharacterView UI", () => {
     expect(json).not.toBeNull();
   });
 
-  it("renders identity section with name input", async () => {
+  it("renders the character roster and current character card", async () => {
     let tree: TestRenderer.ReactTestRenderer | null = null;
 
     await act(async () => {
       tree = TestRenderer.create(React.createElement(CharacterView));
     });
 
-    const nameInputs = tree?.root.findAll(
-      (node) =>
-        node.type === "input" &&
-        (node.props.value === "TestAgent" ||
-          node.props.placeholder?.includes("name")),
+    const roster = tree?.root.find(
+      (node) => node.props["data-testid"] === "character-roster-grid",
     );
-    expect(nameInputs.length).toBeGreaterThanOrEqual(0); // May be rendered differently
+    expect(roster).toBeDefined();
+
+    const currentName = tree?.root.find(
+      (node) => node.props["data-testid"] === "character-current-name",
+    );
+    expect(currentName?.children).toContain("TestAgent");
   });
 
-  it("renders bio textarea", async () => {
+  it("keeps customize sections hidden until customize is opened", async () => {
     let tree: TestRenderer.ReactTestRenderer | null = null;
 
     await act(async () => {
       tree = TestRenderer.create(React.createElement(CharacterView));
     });
 
-    const textareas = tree?.root.findAll((node) => node.type === "textarea");
-    expect(textareas.length).toBeGreaterThanOrEqual(0);
+    expect(
+      tree?.root.findAll(
+        (node) => node.props["data-testid"] === "character-customize-grid",
+      ) ?? [],
+    ).toHaveLength(0);
+
+    const customizeButton = tree?.root.find(
+      (node) => node.props["data-testid"] === "character-customize-toggle",
+    );
+
+    await act(async () => {
+      customizeButton?.props.onClick();
+    });
+
+    expect(
+      tree?.root.findAll(
+        (node) => node.props["data-testid"] === "character-customize-grid",
+      ) ?? [],
+    ).toHaveLength(1);
   });
 
-  it("renders the style editor in the left grid column with overflow and individual entries", async () => {
+  it("renders style and examples editors after customize is opened", async () => {
     let tree: TestRenderer.ReactTestRenderer | null = null;
 
     await act(async () => {
       tree = TestRenderer.create(React.createElement(CharacterView));
+    });
+
+    const customizeButton = tree?.root.find(
+      (node) => node.props["data-testid"] === "character-customize-toggle",
+    );
+
+    await act(async () => {
+      customizeButton?.props.onClick();
     });
 
     const styleGrid = tree?.root.find(
@@ -491,37 +592,6 @@ describe("CharacterView UI", () => {
           ),
       ) ?? [];
     expect(styleEditors).toHaveLength(3);
-  });
-
-  it("renders adjectives tag editor", async () => {
-    let tree: TestRenderer.ReactTestRenderer | null = null;
-
-    await act(async () => {
-      tree = TestRenderer.create(React.createElement(CharacterView));
-    });
-
-    // Look for adjective tags
-    const spans = tree?.root.findAll(
-      (node) =>
-        node.type === "span" &&
-        node.children.some((c) => typeof c === "string" && c === "friendly"),
-    );
-    expect(spans.length).toBeGreaterThanOrEqual(0);
-  });
-
-  it("renders topics tag editor", async () => {
-    let tree: TestRenderer.ReactTestRenderer | null = null;
-
-    await act(async () => {
-      tree = TestRenderer.create(React.createElement(CharacterView));
-    });
-
-    const spans = tree?.root.findAll(
-      (node) =>
-        node.type === "span" &&
-        node.children.some((c) => typeof c === "string" && c === "technology"),
-    );
-    expect(spans.length).toBeGreaterThanOrEqual(0);
   });
 
   it("renders save button", async () => {

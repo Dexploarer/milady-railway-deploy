@@ -1348,6 +1348,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
           chat: character.style?.chat ?? [],
           post: character.style?.post ?? [],
         },
+        messageExamples: character.messageExamples ?? [],
         postExamples: character.postExamples ?? [],
       });
     } catch {

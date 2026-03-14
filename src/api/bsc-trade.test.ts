@@ -133,35 +133,37 @@ describe("bsc-trade preflight", () => {
   });
 
   it("uses cloud-managed fallback RPCs when no explicit BSC RPC is configured", async () => {
-    const fetchMock = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
-      const { method } = decodeMethod(init);
-      if (method === "eth_chainId") {
+    const fetchMock = vi.fn(
+      async (_input: RequestInfo | URL, init?: RequestInit) => {
+        const { method } = decodeMethod(init);
+        if (method === "eth_chainId") {
+          return new Response(
+            JSON.stringify({ jsonrpc: "2.0", id: 1, result: "0x38" }),
+          );
+        }
+        if (method === "eth_getBalance") {
+          return new Response(
+            JSON.stringify({
+              jsonrpc: "2.0",
+              id: 1,
+              result: `0x${ethers.parseEther("0.02").toString(16)}`,
+            }),
+          );
+        }
+        if (method === "eth_getCode") {
+          return new Response(
+            JSON.stringify({
+              jsonrpc: "2.0",
+              id: 1,
+              result: "0x60006000",
+            }),
+          );
+        }
         return new Response(
-          JSON.stringify({ jsonrpc: "2.0", id: 1, result: "0x38" }),
+          JSON.stringify({ jsonrpc: "2.0", id: 1, result: "0x1" }),
         );
-      }
-      if (method === "eth_getBalance") {
-        return new Response(
-          JSON.stringify({
-            jsonrpc: "2.0",
-            id: 1,
-            result: `0x${ethers.parseEther("0.02").toString(16)}`,
-          }),
-        );
-      }
-      if (method === "eth_getCode") {
-        return new Response(
-          JSON.stringify({
-            jsonrpc: "2.0",
-            id: 1,
-            result: "0x60006000",
-          }),
-        );
-      }
-      return new Response(
-        JSON.stringify({ jsonrpc: "2.0", id: 1, result: "0x1" }),
-      );
-    });
+      },
+    );
     globalThis.fetch = fetchMock as typeof fetch;
 
     const result = await buildBscTradePreflight({

@@ -189,6 +189,8 @@ export async function handleCharacterRoutes(
       if (character.adjectives) merged.adjectives = character.adjectives;
       if (character.topics) merged.topics = character.topics;
       if (character.style) merged.style = character.style;
+      if (character.messageExamples)
+        merged.messageExamples = character.messageExamples;
       if (character.postExamples) merged.postExamples = character.postExamples;
     }
 
@@ -226,6 +228,10 @@ export async function handleCharacterRoutes(
       if (body.topics != null) character.topics = body.topics as string[];
       if (body.style != null)
         character.style = body.style as NonNullable<typeof character.style>;
+      if (body.messageExamples != null)
+        character.messageExamples = body.messageExamples as NonNullable<
+          typeof character.messageExamples
+        >;
       if (body.postExamples != null)
         character.postExamples = body.postExamples as string[];
     }

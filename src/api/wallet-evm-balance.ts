@@ -11,17 +11,17 @@ import type {
   EvmTokenBalance,
 } from "../contracts/wallet";
 import {
-  resolveAvalancheRpcUrls,
-  resolveBaseRpcUrls,
-  resolveBscRpcUrls,
-  resolveEthereumRpcUrls,
-} from "./wallet-rpc";
-import {
   computeValueUsd,
   type DexTokenMeta,
   fetchDexPrices,
   WRAPPED_NATIVE,
 } from "./wallet-dex-prices";
+import {
+  resolveAvalancheRpcUrls,
+  resolveBaseRpcUrls,
+  resolveBscRpcUrls,
+  resolveEthereumRpcUrls,
+} from "./wallet-rpc";
 
 // ── Constants ─────────────────────────────────────────────────────────
 
