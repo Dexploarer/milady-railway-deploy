@@ -6833,6 +6833,7 @@ async function handleRequest(
     // P1 §7 — explicit provider allowlist
     const VALID_PROVIDERS = new Set([
       "miladycloud",
+      "elizacloud",
       "pi-ai",
       "openai-codex",
       "openai-subscription",
@@ -6849,6 +6850,10 @@ async function handleRequest(
       error(res, "Invalid provider", 400);
       return;
     }
+
+    // Normalize legacy alias — "elizacloud" → "miladycloud"
+    const normalizedProvider =
+      provider === "elizacloud" ? "miladycloud" : provider;
 
     // P0 §3 — race guard: reject concurrent provider switch requests
     if (providerSwitchInProgress) {
@@ -6953,7 +6958,7 @@ async function handleRequest(
 
     try {
       // P0 §4 — input validation for direct API key providers
-      if (PROVIDER_ENV_KEYS[provider]) {
+      if (PROVIDER_ENV_KEYS[normalizedProvider]) {
         const trimmedKey =
           typeof body.apiKey === "string" ? body.apiKey.trim() : "";
         if (!trimmedKey) {
@@ -6970,7 +6975,7 @@ async function handleRequest(
         body.apiKey = trimmedKey;
       }
 
-      if (provider === "miladycloud") {
+      if (normalizedProvider === "miladycloud") {
         // Switching TO miladycloud for inference
         clearPiAi();
         await clearSubscriptions();
@@ -6984,7 +6989,7 @@ async function handleRequest(
           process.env.ELIZAOS_CLOUD_API_KEY = config.cloud.apiKey;
           process.env.ELIZAOS_CLOUD_ENABLED = "true";
         }
-      } else if (provider === "pi-ai") {
+      } else if (normalizedProvider === "pi-ai") {
         // Switching TO pi-ai credentials mode
         disableCloudInference();
         await clearSubscriptions();
@@ -7002,8 +7007,8 @@ async function handleRequest(
         vars.MILADY_USE_PI_AI = "1";
         envRoot.vars = vars;
       } else if (
-        provider === "openai-codex" ||
-        provider === "openai-subscription"
+        normalizedProvider === "openai-codex" ||
+        normalizedProvider === "openai-subscription"
       ) {
         // Switching TO OpenAI subscription — keep cloud for RPC
         clearPiAi();
@@ -7030,7 +7035,7 @@ async function handleRequest(
             `[api] Failed to apply OpenAI subscription creds: ${err instanceof Error ? err.message : err}`,
           );
         }
-      } else if (provider === "anthropic-subscription") {
+      } else if (normalizedProvider === "anthropic-subscription") {
         // Switching TO Anthropic subscription — keep cloud for RPC
         clearPiAi();
         disableCloudInference();
@@ -7056,13 +7061,13 @@ async function handleRequest(
             `[api] Failed to apply Anthropic subscription creds: ${err instanceof Error ? err.message : err}`,
           );
         }
-      } else if (PROVIDER_ENV_KEYS[provider]) {
+      } else if (PROVIDER_ENV_KEYS[normalizedProvider]) {
         // Switching TO a direct API key provider — keep cloud for RPC
         clearPiAi();
         disableCloudInference();
         await clearSubscriptions();
         clearSubscriptionProviderConfig(config);
-        const envKey = PROVIDER_ENV_KEYS[provider];
+        const envKey = PROVIDER_ENV_KEYS[normalizedProvider];
         clearOtherApiKeys(envKey);
         const apiKey = body.apiKey;
         if (!apiKey) {
@@ -7077,7 +7082,7 @@ async function handleRequest(
       saveMiladyConfig(config);
 
       // Schedule runtime restart so the new provider takes effect.
-      scheduleRuntimeRestart(`provider switch to ${provider}`);
+      scheduleRuntimeRestart(`provider switch to ${normalizedProvider}`);
       // Keep the lock briefly in restart-capable environments to prevent
       // double-submits from racing with restart-required propagation.
       if (ctx?.onRestart) {

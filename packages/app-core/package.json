@@ -18,7 +18,13 @@
     "./state": "./src/state/index.ts",
     "./components": "./src/components/index.ts",
     "./utils": "./src/utils/index.ts",
-    "./voice": "./src/voice/index.ts"
+    "./voice": "./src/voice/index.ts",
+    "./autonomy": "./src/autonomy/index.ts",
+    "./chat": "./src/chat/index.ts",
+    "./platform": "./src/platform/index.ts",
+    "./coding": "./src/coding/index.ts",
+    "./providers": "./src/providers/index.ts",
+    "./actions": "./src/actions/index.ts"
   },
   "peerDependencies": {
     "react": "^19.0.0",
