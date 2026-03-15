@@ -596,7 +596,7 @@ describe("CharacterView UI", () => {
 
     expect(
       tree?.root.findAll(
-        (node) => node.props["data-testid"] === "character-customize-grid",
+        (node) => node.props["data-testid"] === "character-notebook",
       ) ?? [],
     ).toHaveLength(0);
     expect(state.characterDraft?.name).toBe("Reimu");
@@ -616,7 +616,7 @@ describe("CharacterView UI", () => {
 
     expect(
       tree?.root.findAll(
-        (node) => node.props["data-testid"] === "character-customize-grid",
+        (node) => node.props["data-testid"] === "character-notebook",
       ) ?? [],
     ).toHaveLength(1);
     expect(
@@ -674,20 +674,12 @@ describe("CharacterView UI", () => {
       tree?.root.findAll(
         (node) => node.props["data-testid"] === "character-voice-picker",
       ) ?? [],
-    ).toHaveLength(0);
-    expect(
-      tree?.root.findAll(
-        (node) => node.props["data-testid"] === "character-customize-grid",
-      ) ?? [],
     ).toHaveLength(1);
     expect(
       tree?.root.findAll(
-        (node) =>
-          node.props["data-testid"] === "style-section-all" ||
-          node.props["data-testid"] === "style-section-chat" ||
-          node.props["data-testid"] === "style-section-post",
-      ),
-    ).toHaveLength(3);
+        (node) => node.props["data-testid"] === "character-notebook",
+      ) ?? [],
+    ).toHaveLength(1);
   });
 
   it("turning custom off applies the selected character defaults and hides the editors", async () => {
@@ -719,7 +711,7 @@ describe("CharacterView UI", () => {
     expect(state.selectedVrmIndex).toBe(1);
     expect(
       tree?.root.findAll(
-        (node) => node.props["data-testid"] === "character-customize-grid",
+        (node) => node.props["data-testid"] === "character-notebook",
       ) ?? [],
     ).toHaveLength(0);
     expect(
@@ -906,7 +898,7 @@ describe("CharacterView UI", () => {
 
     expect(
       tree?.root.findAll(
-        (node) => node.props["data-testid"] === "character-customize-grid",
+        (node) => node.props["data-testid"] === "character-notebook",
       ) ?? [],
     ).toHaveLength(0);
     expect(
