@@ -43,6 +43,7 @@ vi.mock("@milady/ui", () => ({
 
 vi.mock("lucide-react", () => ({
   AlertTriangle: () => React.createElement("span", null, "⚠"),
+  CircleUserRound: () => React.createElement("span", null, "👤"),
   Bug: () => React.createElement("span", null, "🐛"),
   CircleDollarSign: () => React.createElement("span", null, "💰"),
   Menu: () => React.createElement("span", null, "☰"),
@@ -83,6 +84,7 @@ describe("header status", () => {
       copyToClipboard: vi.fn(),
       tab: "chat",
       setTab: vi.fn(),
+      setState: vi.fn(),
       dropStatus: null,
       loadDropStatus: vi.fn().mockResolvedValue(undefined),
       registryStatus: null,
@@ -107,6 +109,7 @@ describe("header status", () => {
       "data-testid": "ui-shell-toggle",
     });
     expect(shellToggle).toBeDefined();
+    expect(baseAppState.setState).toHaveBeenCalledWith("chatMode", "power");
   });
 
   it("renders language and theme controls", async () => {
@@ -122,5 +125,27 @@ describe("header status", () => {
           node.children[0] === "ThemeToggle"),
     );
     expect(controls?.length).toBeGreaterThan(0);
+  });
+
+  it("uses dark-mode readable classes for the active native tab", async () => {
+    let tree: TestRenderer.ReactTestRenderer | undefined;
+    await act(async () => {
+      tree = TestRenderer.create(React.createElement(Header));
+    });
+    expect(tree).toBeDefined();
+
+    const activeTabButton = tree?.root.find(
+      (node) =>
+        node.type === "button" &&
+        node.props.title === "Chat" &&
+        typeof node.props.className === "string",
+    );
+
+    expect(String(activeTabButton?.props.className)).toContain(
+      "dark:text-txt-strong",
+    );
+    expect(String(activeTabButton?.props.className)).toContain(
+      "dark:bg-accent/15",
+    );
   });
 });

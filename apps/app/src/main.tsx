@@ -24,7 +24,6 @@ import {
   COMMAND_PALETTE_EVENT,
   CONNECT_EVENT,
   dispatchMiladyEvent,
-  EMOTE_PICKER_EVENT,
   SHARE_TARGET_EVENT,
   TRAY_ACTION_EVENT,
 } from "@milady/app-core/events";
@@ -313,18 +312,9 @@ async function initializeElectron(): Promise<void> {
       accelerator: "CommandOrControl+K",
     });
 
-    // Emote picker shortcut
-    await Desktop.registerShortcut({
-      id: "emote-picker",
-      accelerator: "CommandOrControl+E",
-    });
-
     await Desktop.addListener("shortcutPressed", (event: { id: string }) => {
       if (event.id === "command-palette") {
         dispatchMiladyEvent(COMMAND_PALETTE_EVENT);
-      }
-      if (event.id === "emote-picker") {
-        dispatchMiladyEvent(EMOTE_PICKER_EVENT);
       }
     });
 

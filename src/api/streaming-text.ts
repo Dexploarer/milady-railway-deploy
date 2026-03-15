@@ -1,7 +1,11 @@
-/**
- * Merge streaming text updates that may arrive as pure deltas, cumulative
- * snapshots, or overlapping suffix/prefix fragments.
- */
+export type StreamingUpdateKind = "noop" | "append" | "replace";
+
+export interface StreamingUpdate {
+  kind: StreamingUpdateKind;
+  nextText: string;
+  emittedText: string;
+}
+
 function commonPrefixLength(left: string, right: string): number {
   const maxLength = Math.min(left.length, right.length);
   let index = 0;
@@ -58,17 +62,14 @@ export function mergeStreamingText(existing: string, incoming: string): string {
   if (!existing) return incoming;
   if (incoming === existing) return existing;
 
-  // Common case: the stream sends the full text-so-far.
   if (incoming.startsWith(existing)) {
     return incoming;
   }
 
-  // Some providers resend the full text with a revised prefix or wrapper.
   if (incoming.includes(existing)) {
     return incoming;
   }
 
-  // Ignore clearly regressive snapshots.
   if (existing.startsWith(incoming)) {
     return existing;
   }
@@ -90,16 +91,12 @@ export function mergeStreamingText(existing: string, incoming: string): string {
     if (!match) continue;
 
     if (overlap === incoming.length) {
-      // Preserve repeated single-character deltas like "l" + "l", but avoid
-      // replaying larger suffix fragments already present in the buffer.
       return incoming.length === 1 ? `${existing}${incoming}` : existing;
     }
 
     return `${existing}${incoming.slice(overlap)}`;
   }
 
-  // Some providers revise earlier words in-place while still sending the full
-  // text-so-far. Treat those as snapshot replacements instead of appends.
   if (isLikelySnapshotReplacement(existing, incoming)) {
     return incoming;
   }
@@ -107,14 +104,26 @@ export function mergeStreamingText(existing: string, incoming: string): string {
   return `${existing}${incoming}`;
 }
 
-export function computeStreamingDelta(
+export function resolveStreamingUpdate(
   existing: string,
   incoming: string,
-): string {
-  const merged = mergeStreamingText(existing, incoming);
-  if (merged === existing) return "";
-  if (merged.startsWith(existing)) {
-    return merged.slice(existing.length);
+): StreamingUpdate {
+  const nextText = mergeStreamingText(existing, incoming);
+  if (nextText === existing) {
+    return { kind: "noop", nextText: existing, emittedText: "" };
   }
-  return incoming;
+
+  if (nextText.startsWith(existing)) {
+    return {
+      kind: "append",
+      nextText,
+      emittedText: nextText.slice(existing.length),
+    };
+  }
+
+  return {
+    kind: "replace",
+    nextText,
+    emittedText: nextText,
+  };
 }

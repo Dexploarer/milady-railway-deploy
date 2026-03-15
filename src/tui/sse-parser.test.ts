@@ -50,4 +50,8 @@ describe("sse-parser", () => {
   it("replaces the accumulated text when a later chunk is a full snapshot", () => {
     expect(mergeStreamingText("world", "Hello world")).toBe("Hello world");
   });
+
+  it("replaces corrected snapshots that revise earlier words", () => {
+    expect(mergeStreamingText("Hello wrld", "Hello world")).toBe("Hello world");
+  });
 });

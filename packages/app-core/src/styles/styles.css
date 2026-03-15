@@ -389,6 +389,40 @@
   display: none;
 }
 
+.chat-native-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(240, 178, 50, 0.55) transparent;
+}
+
+.chat-native-scrollbar::-webkit-scrollbar {
+  width: 10px;
+}
+
+.chat-native-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-native-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 225, 150, 0.9) 0%,
+    rgba(240, 178, 50, 0.72) 55%,
+    rgba(201, 128, 24, 0.78) 100%
+  );
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.chat-native-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 232, 170, 0.95) 0%,
+    rgba(240, 178, 50, 0.82) 55%,
+    rgba(201, 128, 24, 0.88) 100%
+  );
+}
+
 /* Focus trap for modals */
 .focus-trap {
   outline: none;

@@ -43,6 +43,7 @@ vi.mock("@milady/ui", () => ({
 
 vi.mock("lucide-react", () => ({
   AlertTriangle: () => React.createElement("span", null, "⚠"),
+  CircleUserRound: () => React.createElement("span", null, "👤"),
   Bug: () => React.createElement("span", null, "🐛"),
   CircleDollarSign: () => React.createElement("span", null, "💰"),
   Menu: () => React.createElement("span", null, "☰"),
@@ -70,6 +71,7 @@ describe("Header", () => {
       loadDropStatus: vi.fn().mockResolvedValue(undefined),
       tab: "chat",
       setTab: vi.fn(),
+      setState: vi.fn(),
       plugins: [],
       uiLanguage: "en",
       setUiLanguage: vi.fn(),
@@ -94,5 +96,6 @@ describe("Header", () => {
     // Check shell toggle button
     const shellToggle = root.findByProps({ "data-testid": "ui-shell-toggle" });
     expect(shellToggle).toBeDefined();
+    expect(mockUseApp.setState).toHaveBeenCalledWith("chatMode", "power");
   });
 });

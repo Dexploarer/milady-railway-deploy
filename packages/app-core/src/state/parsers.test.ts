@@ -57,6 +57,12 @@ describe("computeStreamingDelta", () => {
       incoming: "Hello world",
       expected: "Hello world",
     },
+    {
+      name: "surfaces corrected full snapshots that revise earlier words",
+      existing: "Hello wrld",
+      incoming: "Hello world",
+      expected: "Hello world",
+    },
   ])("$name", ({ existing, incoming, expected }) => {
     expect(computeStreamingDelta(existing, incoming)).toBe(expected);
   });
@@ -89,6 +95,12 @@ describe("mergeStreamingText", () => {
       expected: "Hello world",
     },
     {
+      name: "replaces corrected snapshots that share a long prefix",
+      existing: "Hello wrld",
+      incoming: "Hello world",
+      expected: "Hello world",
+    },
+    {
       name: "preserves repeated single-character chunks",
       existing: "Hel",
       incoming: "l",
@@ -99,6 +111,12 @@ describe("mergeStreamingText", () => {
       existing: "He",
       incoming: "llo",
       expected: "Hello",
+    },
+    {
+      name: "drops repeated short suffix fragments already present",
+      existing: "abc",
+      incoming: "bc",
+      expected: "abc",
     },
   ])("$name", ({ existing, incoming, expected }) => {
     expect(mergeStreamingText(existing, incoming)).toBe(expected);

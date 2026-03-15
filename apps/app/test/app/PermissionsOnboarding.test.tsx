@@ -85,6 +85,7 @@ vi.mock("@milady/ui", () => ({
 vi.mock("lucide-react", () => ({
   Camera: () => React.createElement("span", null, "📷"),
   Check: () => React.createElement("span", null, "✓"),
+  CircleUserRound: () => React.createElement("span", null, "👤"),
   Cloud: () => React.createElement("span", null, "☁"),
   Mic: () => React.createElement("span", null, "🎤"),
   Monitor: () => React.createElement("span", null, "🖥"),

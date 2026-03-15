@@ -28,8 +28,8 @@ function createMockAction() {
   };
 }
 
-const mockAction = createMockAction();
-const hoisted = (() => {
+const hoisted = vi.hoisted(() => {
+  const mockAction = createMockAction();
   const mockMixerInstance = {
     update: vi.fn(),
     clipAction: vi.fn(() => mockAction),
@@ -110,7 +110,7 @@ const hoisted = (() => {
     mockWebGpuRendererInstance,
     navigatorMock,
   };
-})();
+});
 
 const mockCameraInstance = {
   position: {
@@ -212,6 +212,7 @@ vi.mock("three", () => {
     copy = vi.fn().mockReturnThis();
     sub = vi.fn().mockReturnThis();
     subVectors = vi.fn().mockReturnThis();
+    cross = vi.fn().mockReturnThis();
     normalize = vi.fn().mockReturnThis();
     dot = vi.fn(() => 1);
     getWorldPosition = vi.fn().mockReturnThis();
@@ -219,6 +220,7 @@ vi.mock("three", () => {
     lengthSq = vi.fn(() => 1);
     length = vi.fn(() => 1);
     multiplyScalar = vi.fn().mockReturnThis();
+    setFromSpherical = vi.fn().mockReturnThis();
   }
 
   class MockVector2 {
@@ -259,6 +261,13 @@ vi.mock("three", () => {
     });
   }
 
+  class MockSpherical {
+    radius = 1;
+    phi = Math.PI / 2;
+    theta = 0;
+    setFromVector3 = vi.fn().mockReturnThis();
+  }
+
   return {
     WebGLRenderer: MockWebGLRenderer,
     Scene: MockScene,
@@ -271,6 +280,7 @@ vi.mock("three", () => {
     Vector2: MockVector2,
     Vector3: MockVector3,
     Box3: MockBox3,
+    Spherical: MockSpherical,
     LoopRepeat,
     LoopOnce,
     PCFSoftShadowMap: 2,
@@ -753,6 +763,71 @@ describe("VrmEngine", () => {
 
       engine.setCompanionZoomNormalized(1.4);
       expect(engineAny.companionZoomTarget).toBe(1);
+    });
+
+    it("compacts companion world splats to the current camera-facing half", () => {
+      const engineAny = engine as unknown as {
+        camera: { position: { x: number; y: number; z: number } };
+        lookAtTarget: { x: number; y: number; z: number };
+        compactWorldSplatsToCameraFront: (
+          packedSplats: {
+            packedArray: Uint32Array;
+            extra: Record<string, unknown>;
+            numSplats: number;
+            needsUpdate: boolean;
+            forEachSplat: (
+              callback: (
+                index: number,
+                center: { x: number; y: number; z: number },
+              ) => void,
+            ) => void;
+          },
+          url: string,
+          worldAnchor: { x: number; y: number; z: number },
+        ) => number;
+      };
+      engineAny.camera = { position: { x: 0, y: 0, z: 0 } };
+      engineAny.lookAtTarget = { x: 0, y: 0, z: -1 };
+
+      const packedArray = new Uint32Array([
+        11, 12, 13, 14, 21, 22, 23, 24, 31, 32, 33, 34,
+      ]);
+      const sh1 = new Uint32Array([101, 102, 201, 202, 301, 302]);
+      const centers = [
+        { x: 0, y: 0, z: 0.8 },
+        { x: 0, y: 0, z: -1.0 },
+        { x: 0, y: 0, z: -0.1 },
+      ];
+      const packedSplats = {
+        packedArray,
+        extra: { sh1 },
+        numSplats: 3,
+        needsUpdate: false,
+        forEachSplat: (
+          callback: (
+            index: number,
+            center: { x: number; y: number; z: number },
+          ) => void,
+        ) => {
+          centers.forEach((center, index) => {
+            callback(index, center);
+          });
+        },
+      };
+
+      const kept = engineAny.compactWorldSplatsToCameraFront(
+        packedSplats,
+        "/worlds/companion-day.spz",
+        { x: 0, y: 0, z: 0 },
+      );
+
+      expect(kept).toBe(2);
+      expect(packedSplats.numSplats).toBe(2);
+      expect(packedSplats.needsUpdate).toBe(true);
+      expect(Array.from(packedSplats.packedArray.slice(0, 8))).toEqual([
+        21, 22, 23, 24, 31, 32, 33, 34,
+      ]);
+      expect(Array.from(sh1.slice(0, 4))).toEqual([201, 202, 301, 302]);
     });
 
     it("resize() handles zero or negative dimensions gracefully", async () => {

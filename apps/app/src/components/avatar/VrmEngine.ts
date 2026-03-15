@@ -6,6 +6,7 @@ import {
   VRMUtils,
 } from "@pixiv/three-vrm";
 import type {
+  PackedSplats as SparkPackedSplats,
   SparkRenderer as SparkRendererType,
   SplatMesh as SparkSplatMesh,
 } from "@sparkjsdev/spark";
@@ -133,6 +134,7 @@ const COMPANION_DARK_WORLD_FLOOR_OFFSET_Y = -0.95;
 const COMPANION_LIGHT_WORLD_FLOOR_OFFSET_Y = -0.35;
 const COMPANION_DOF_APERTURE_SIZE = 0.04;
 const COMPANION_WORLD_MAX_SPLATS = 1_000_000;
+const COMPANION_WORLD_BEHIND_CAMERA_PADDING = 0.75;
 const COMPANION_ZOOM_NEAR_FACTOR = 0.25;
 const COMPANION_ZOOM_MIN_RADIUS = 1.2;
 const SPARK_CLIP_XY = 1.08;
@@ -238,24 +240,21 @@ function quantileSorted(values: number[], percentile: number): number {
   return values[index] ?? 0;
 }
 
-function getRobustSplatAnchor(splat: SparkSplatMesh): THREE.Vector3 {
+function getRobustPackedSplatAnchor(splatSource: {
+  numSplats?: number;
+  forEachSplat: SparkSplatMesh["forEachSplat"];
+}): THREE.Vector3 {
   const maxSamples = 4096;
   const xSamples: number[] = [];
   const ySamples: number[] = [];
   const zSamples: number[] = [];
-  const packedSplats = (
-    splat as unknown as {
-      packedSplats?: { count?: number; numSplats?: number };
-    }
-  ).packedSplats;
-  const splatCount =
-    packedSplats?.numSplats ?? packedSplats?.count ?? maxSamples;
+  const splatCount = splatSource.numSplats ?? maxSamples;
   const sampleStep =
     splatCount > maxSamples
       ? Math.max(1, Math.floor(splatCount / maxSamples))
       : 1;
 
-  splat.forEachSplat((index, center) => {
+  splatSource.forEachSplat((index, center) => {
     if (sampleStep > 1 && index % sampleStep !== 0) return;
     xSamples.push(center.x);
     ySamples.push(center.y);
@@ -263,9 +262,7 @@ function getRobustSplatAnchor(splat: SparkSplatMesh): THREE.Vector3 {
   });
 
   if (xSamples.length === 0) {
-    const bounds = splat.getBoundingBox(true);
-    const center = bounds.getCenter(new THREE.Vector3());
-    return new THREE.Vector3(center.x, bounds.min.y, center.z);
+    return new THREE.Vector3(0, 0, 0);
   }
 
   xSamples.sort((a, b) => a - b);
@@ -277,6 +274,17 @@ function getRobustSplatAnchor(splat: SparkSplatMesh): THREE.Vector3 {
     quantileSorted(ySamples, 0.05),
     quantileSorted(zSamples, 0.5),
   );
+}
+
+function getRobustSplatAnchor(splat: SparkSplatMesh): THREE.Vector3 {
+  return getRobustPackedSplatAnchor({
+    numSplats: (
+      splat as unknown as {
+        packedSplats?: { numSplats?: number };
+      }
+    ).packedSplats?.numSplats,
+    forEachSplat: splat.forEachSplat.bind(splat),
+  });
 }
 
 function getCompanionWorldFloorOffsetY(url: string): number {
@@ -443,16 +451,10 @@ export class VrmEngine {
     headBone: THREE.Object3D | null;
     neckBone: THREE.Object3D | null;
     spineBone: THREE.Object3D | null;
-    headRestQuaternion: THREE.Quaternion | null;
-    neckRestQuaternion: THREE.Quaternion | null;
-    spineRestQuaternion: THREE.Quaternion | null;
   } = {
     headBone: null,
     neckBone: null,
     spineBone: null,
-    headRestQuaternion: null,
-    neckRestQuaternion: null,
-    spineRestQuaternion: null,
   };
   private readonly tempCameraOrbitOffset = new THREE.Vector3();
   private readonly tempCameraSpherical = new THREE.Spherical();
@@ -591,31 +593,18 @@ export class VrmEngine {
       vrm.lookAt.target = target;
     }
 
-    const headBone = vrm.humanoid?.getNormalizedBoneNode("head") ?? null;
-    const neckBone = vrm.humanoid?.getNormalizedBoneNode("neck") ?? null;
+    const headBone = vrm.humanoid?.getRawBoneNode("head") ?? null;
+    const neckBone = vrm.humanoid?.getRawBoneNode("neck") ?? null;
     const spineBone =
-      vrm.humanoid?.getNormalizedBoneNode("upperChest") ??
-      vrm.humanoid?.getNormalizedBoneNode("chest") ??
-      vrm.humanoid?.getNormalizedBoneNode("spine") ??
+      vrm.humanoid?.getRawBoneNode("upperChest") ??
+      vrm.humanoid?.getRawBoneNode("chest") ??
+      vrm.humanoid?.getRawBoneNode("spine") ??
       null;
 
     this.avatarLookRig = {
       headBone,
       neckBone,
       spineBone,
-      headRestQuaternion:
-        headBone?.quaternion && typeof headBone.quaternion.clone === "function"
-          ? headBone.quaternion.clone()
-          : null,
-      neckRestQuaternion:
-        neckBone?.quaternion && typeof neckBone.quaternion.clone === "function"
-          ? neckBone.quaternion.clone()
-          : null,
-      spineRestQuaternion:
-        spineBone?.quaternion &&
-        typeof spineBone.quaternion.clone === "function"
-          ? spineBone.quaternion.clone()
-          : null,
     };
     this.headLookTarget.set(0, 0);
     this.headLookCurrent.set(0, 0);
@@ -641,42 +630,68 @@ export class VrmEngine {
     const vrm = this.vrm;
     const { headBone, neckBone, spineBone } = this.avatarLookRig;
     if (!vrm || !headBone) return;
-    if (typeof vrm.scene.worldToLocal !== "function") return;
+    const headParent = headBone.parent;
+    if (!headParent || typeof headParent.worldToLocal !== "function") return;
     if (
       typeof THREE.Euler !== "function" ||
-      typeof THREE.Quaternion !== "function"
+      typeof THREE.Quaternion !== "function" ||
+      typeof headBone.quaternion.clone !== "function"
     ) {
       return;
     }
+    const lookAtState = vrm.lookAt as
+      | ({ _yaw?: number; _pitch?: number } & object)
+      | null
+      | undefined;
+    const lookAtYawDegrees = lookAtState?._yaw;
+    const lookAtPitchDegrees = lookAtState?._pitch;
 
-    headBone.getWorldPosition(this.tempAvatarHeadWorld);
-    this.tempAvatarLocalTarget.copy(camera.position);
-    this.tempAvatarLocalTarget.y -= 0.06;
-    vrm.scene.worldToLocal(this.tempAvatarLocalTarget);
-    vrm.scene.worldToLocal(
-      this.tempAvatarLocalAnchor.copy(this.tempAvatarHeadWorld),
-    );
-    this.tempAvatarLocalTarget.sub(this.tempAvatarLocalAnchor);
-
-    const planarDistance = Math.max(
-      1e-4,
-      Math.hypot(this.tempAvatarLocalTarget.x, this.tempAvatarLocalTarget.z),
-    );
-    this.headLookTarget.set(
-      THREE.MathUtils.clamp(
-        Math.atan2(
-          this.tempAvatarLocalTarget.x,
-          Math.max(this.tempAvatarLocalTarget.z, 1e-4),
+    if (
+      Number.isFinite(lookAtYawDegrees) &&
+      Number.isFinite(lookAtPitchDegrees)
+    ) {
+      this.headLookTarget.set(
+        THREE.MathUtils.clamp(
+          THREE.MathUtils.degToRad(lookAtYawDegrees),
+          -0.55,
+          0.55,
         ),
-        -0.55,
-        0.55,
-      ),
-      THREE.MathUtils.clamp(
-        Math.atan2(this.tempAvatarLocalTarget.y, planarDistance),
-        -0.3,
-        0.24,
-      ),
-    );
+        THREE.MathUtils.clamp(
+          THREE.MathUtils.degToRad(lookAtPitchDegrees),
+          -0.3,
+          0.24,
+        ),
+      );
+    } else {
+      headBone.getWorldPosition(this.tempAvatarHeadWorld);
+      this.tempAvatarLocalTarget.copy(camera.position);
+      this.tempAvatarLocalTarget.y -= 0.06;
+      headParent.worldToLocal(this.tempAvatarLocalTarget);
+      headParent.worldToLocal(
+        this.tempAvatarLocalAnchor.copy(this.tempAvatarHeadWorld),
+      );
+      this.tempAvatarLocalTarget.sub(this.tempAvatarLocalAnchor);
+
+      const planarDistance = Math.max(
+        1e-4,
+        Math.hypot(this.tempAvatarLocalTarget.x, this.tempAvatarLocalTarget.z),
+      );
+      this.headLookTarget.set(
+        THREE.MathUtils.clamp(
+          Math.atan2(
+            -this.tempAvatarLocalTarget.x,
+            Math.max(-this.tempAvatarLocalTarget.z, 1e-4),
+          ),
+          -0.55,
+          0.55,
+        ),
+        THREE.MathUtils.clamp(
+          Math.atan2(this.tempAvatarLocalTarget.y, planarDistance),
+          -0.3,
+          0.24,
+        ),
+      );
+    }
     this.headLookCurrent.lerp(
       this.headLookTarget,
       Math.min(1, stableDelta * 4.5),
@@ -684,39 +699,30 @@ export class VrmEngine {
 
     const applyTrackedBone = (
       bone: THREE.Object3D | null,
-      restQuaternion: THREE.Quaternion | null,
       yawWeight: number,
       pitchWeight: number,
     ) => {
-      if (!bone || !restQuaternion || !bone.quaternion) return;
+      if (
+        !bone ||
+        !bone.quaternion ||
+        typeof bone.quaternion.clone !== "function"
+      ) {
+        return;
+      }
       const offsetEuler = new THREE.Euler(
-        -this.headLookCurrent.y * pitchWeight,
+        this.headLookCurrent.y * pitchWeight,
         this.headLookCurrent.x * yawWeight,
         0,
         "YXZ",
       );
       const offsetQuaternion = new THREE.Quaternion().setFromEuler(offsetEuler);
-      bone.quaternion.copy(restQuaternion).multiply(offsetQuaternion);
+      const animatedPose = bone.quaternion.clone();
+      bone.quaternion.copy(animatedPose).multiply(offsetQuaternion);
     };
 
-    applyTrackedBone(
-      spineBone,
-      this.avatarLookRig.spineRestQuaternion,
-      0.12,
-      0.06,
-    );
-    applyTrackedBone(
-      neckBone,
-      this.avatarLookRig.neckRestQuaternion,
-      0.26,
-      0.16,
-    );
-    applyTrackedBone(
-      headBone,
-      this.avatarLookRig.headRestQuaternion,
-      0.38,
-      0.24,
-    );
+    applyTrackedBone(spineBone, 0.12, 0.06);
+    applyTrackedBone(neckBone, 0.3, 0.18);
+    applyTrackedBone(headBone, 0.52, 0.28);
   }
 
   private toDebugVector3(vector: THREE.Vector3 | null): DebugVector3 | null {
@@ -1008,9 +1014,6 @@ export class VrmEngine {
       headBone: null,
       neckBone: null,
       spineBone: null,
-      headRestQuaternion: null,
-      neckRestQuaternion: null,
-      spineRestQuaternion: null,
     };
     this.headLookTarget.set(0, 0);
     this.headLookCurrent.set(0, 0);
@@ -1151,6 +1154,84 @@ export class VrmEngine {
   setCompanionZoomNormalized(value: number): void {
     this.companionZoomTarget = THREE.MathUtils.clamp(value, 0, 1);
   }
+
+  private compactWorldSplatsToCameraFront(
+    packedSplats: SparkPackedSplats,
+    url: string,
+    worldAnchor: THREE.Vector3,
+  ): number {
+    const packedArray = packedSplats.packedArray;
+    const totalSplats = packedSplats.numSplats;
+    if (!packedArray || totalSplats === 0) return 0;
+    if (!this.camera) return totalSplats;
+
+    const cameraPosition = this.camera.position;
+    const forwardX = this.lookAtTarget.x - cameraPosition.x;
+    const forwardY = this.lookAtTarget.y - cameraPosition.y;
+    const forwardZ = this.lookAtTarget.z - cameraPosition.z;
+    const forwardLength = Math.hypot(forwardX, forwardY, forwardZ);
+    if (!Number.isFinite(forwardLength) || forwardLength < 1e-4) {
+      return totalSplats;
+    }
+
+    const worldPositionX = -worldAnchor.x * COMPANION_WORLD_SCALE;
+    const worldPositionY =
+      -worldAnchor.y * COMPANION_WORLD_SCALE +
+      getCompanionWorldFloorOffsetY(url);
+    const worldPositionZ = -worldAnchor.z * COMPANION_WORLD_SCALE;
+    const localCameraX =
+      (cameraPosition.x - worldPositionX) / COMPANION_WORLD_SCALE;
+    const localCameraY =
+      (cameraPosition.y - worldPositionY) / COMPANION_WORLD_SCALE;
+    const localCameraZ =
+      (cameraPosition.z - worldPositionZ) / COMPANION_WORLD_SCALE;
+    const localPadding =
+      COMPANION_WORLD_BEHIND_CAMERA_PADDING / COMPANION_WORLD_SCALE;
+    const forwardNormX = forwardX / forwardLength;
+    const forwardNormY = forwardY / forwardLength;
+    const forwardNormZ = forwardZ / forwardLength;
+
+    const sh1 =
+      packedSplats.extra.sh1 instanceof Uint32Array
+        ? packedSplats.extra.sh1
+        : null;
+    const sh2 =
+      packedSplats.extra.sh2 instanceof Uint32Array
+        ? packedSplats.extra.sh2
+        : null;
+    const sh3 =
+      packedSplats.extra.sh3 instanceof Uint32Array
+        ? packedSplats.extra.sh3
+        : null;
+
+    let writeIndex = 0;
+    packedSplats.forEachSplat((index, center) => {
+      const depth =
+        (center.x - localCameraX) * forwardNormX +
+        (center.y - localCameraY) * forwardNormY +
+        (center.z - localCameraZ) * forwardNormZ;
+      if (depth < -localPadding) return;
+
+      if (writeIndex !== index) {
+        packedArray.copyWithin(writeIndex * 4, index * 4, index * 4 + 4);
+        sh1?.copyWithin(writeIndex * 2, index * 2, index * 2 + 2);
+        sh2?.copyWithin(writeIndex * 4, index * 4, index * 4 + 4);
+        sh3?.copyWithin(writeIndex * 4, index * 4, index * 4 + 4);
+      }
+      writeIndex += 1;
+    });
+
+    if (writeIndex === 0) return totalSplats;
+    packedSplats.numSplats = writeIndex;
+    packedSplats.needsUpdate = true;
+    if (writeIndex !== totalSplats) {
+      console.info(
+        `[VrmEngine] Culled companion world splats behind camera: kept ${writeIndex}/${totalSplats}`,
+      );
+    }
+    return writeIndex;
+  }
+
   async setWorldUrl(url: string | null): Promise<void> {
     await this.whenReady();
     if (!this.scene) return;
@@ -1164,9 +1245,18 @@ export class VrmEngine {
 
     await this.ensureSparkRenderer();
     const { SplatMesh } = await this.loadSparkModule();
+    let worldAnchor = new THREE.Vector3(0, 0, 0);
     const splat = new SplatMesh({
       url: normalizedUrl,
       maxSplats: COMPANION_WORLD_MAX_SPLATS,
+      constructSplats: (packedSplats) => {
+        worldAnchor = getRobustPackedSplatAnchor(packedSplats);
+        this.compactWorldSplatsToCameraFront(
+          packedSplats,
+          normalizedUrl,
+          worldAnchor,
+        );
+      },
     });
     splat.frustumCulled = false;
     splat.quaternion.identity();
@@ -1186,7 +1276,8 @@ export class VrmEngine {
       return;
     }
 
-    const worldCenterBottom = getRobustSplatAnchor(splat);
+    const worldCenterBottom =
+      worldAnchor.lengthSq() > 0 ? worldAnchor : getRobustSplatAnchor(splat);
     const worldFloorOffsetY = getCompanionWorldFloorOffsetY(normalizedUrl);
     splat.position.set(
       -worldCenterBottom.x * COMPANION_WORLD_SCALE,

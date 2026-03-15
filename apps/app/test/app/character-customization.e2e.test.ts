@@ -554,7 +554,7 @@ describe("CharacterView UI", () => {
     expect(json).not.toBeNull();
   });
 
-  it("renders the character roster as a single strip without a separate current character card", async () => {
+  it("renders the character roster as a single full-width row without a separate current character card", async () => {
     let tree: TestRenderer.ReactTestRenderer | null = null;
 
     await act(async () => {
@@ -565,7 +565,7 @@ describe("CharacterView UI", () => {
       (node) => node.props["data-testid"] === "character-roster-grid",
     );
     expect(roster).toBeDefined();
-    expect(roster?.props.className).toContain("overflow-x-auto");
+    expect(roster?.props.className).toContain("overflow-hidden");
 
     expect(
       tree?.root.findAll(
@@ -721,7 +721,11 @@ describe("CharacterView UI", () => {
       loadDropStatus: vi.fn(),
       handleSaveCharacter: async () => {
         _saveCharacterCalled = true;
-        const prepared = prepareCharacterDraftForSave(state.characterDraft!);
+        const characterDraft = state.characterDraft;
+        if (!characterDraft) {
+          throw new Error("Character draft is required before saving");
+        }
+        const prepared = prepareCharacterDraftForSave(characterDraft);
         const { agentName } = await client.updateCharacter(
           prepared as unknown as CharacterData,
         );
@@ -732,8 +736,13 @@ describe("CharacterView UI", () => {
         state.characterDirty = false;
         state.characterSaveSuccess = "Character saved successfully.";
         if (agentName) {
+          const fallbackCharacterData =
+            state.characterData ?? createCharacterUIState().characterData;
+          if (!fallbackCharacterData) {
+            throw new Error("Character data is required after saving");
+          }
           state.characterData = {
-            ...(state.characterData ?? createCharacterUIState().characterData!),
+            ...fallbackCharacterData,
             ...(prepared as CharacterData),
             name: agentName,
           };

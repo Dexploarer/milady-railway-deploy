@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -291,7 +292,7 @@ describe("ChatView", () => {
     );
   });
 
-  it("keeps message text inset from the scrollbar gutter", async () => {
+  it("pins the native scrollbar to the edge while keeping message text inset", async () => {
     mockUseApp.mockReturnValue(
       createContext({
         conversationMessages: [
@@ -309,8 +310,8 @@ describe("ChatView", () => {
     const scroller = tree?.root.findByProps({
       "data-testid": "chat-messages-scroll",
     });
-    expect(String(scroller.props.className)).toContain("pr-3");
-    expect(scroller.props.style?.scrollbarGutter).toBe("stable both-edges");
+    expect(String(scroller.props.className)).toContain("chat-native-scrollbar");
+    expect(scroller.props.style?.scrollbarGutter).toBeUndefined();
   });
 
   it("auto-scrolls again when conversation messages update", async () => {
@@ -557,14 +558,8 @@ describe("ChatView", () => {
     expect(micButton?.props["aria-pressed"]).toBe(false);
   });
 
-  it("renders the native fast/pro toggle and updates chatMode", async () => {
-    const setState = vi.fn();
-    mockUseApp.mockReturnValue(
-      createContext({
-        chatMode: "power",
-        setState,
-      }),
-    );
+  it("does not render the native fast/pro toggle", async () => {
+    mockUseApp.mockReturnValue(createContext({ chatMode: "power" }));
 
     let tree: TestRenderer.ReactTestRenderer | undefined;
     await act(async () => {
@@ -572,21 +567,9 @@ describe("ChatView", () => {
     });
     await flush();
 
-    const proButton = tree?.root.findByProps({
-      "data-testid": "chat-mode-pro-native",
-    });
-    const fastButton = tree?.root.findByProps({
-      "data-testid": "chat-mode-fast-native",
-    });
-
-    expect(proButton?.props["aria-pressed"]).toBe(true);
-    expect(fastButton?.props["aria-pressed"]).toBe(false);
-
-    await act(async () => {
-      fastButton?.props.onClick?.();
-    });
-
-    expect(setState).toHaveBeenCalledWith("chatMode", "simple");
+    expect(
+      tree?.root.findAllByProps({ "data-testid": "chat-mode-toggle-native" }),
+    ).toHaveLength(0);
   });
 
   it("disables send when chat input is empty or whitespace", async () => {

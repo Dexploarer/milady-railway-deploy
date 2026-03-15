@@ -471,7 +471,7 @@ describe("app startup onboarding flow (e2e)", () => {
 
     const renderedText = textOf(renderedTree.root);
 
-    expect(renderedText).toContain("CompanionShell:companion");
+    expect(renderedText).toContain("ChatView");
     expect(renderedText).not.toContain("OnboardingWizard");
   });
 });

@@ -159,6 +159,29 @@ describe("MiladyClient streaming chat endpoints", () => {
     });
   });
 
+  test("handles corrected full snapshots followed by more streamed suffix text", async () => {
+    fetchMock.mockResolvedValue(
+      buildSseResponse([
+        'data: {"type":"token","text":"Hello wrld"}\n\n',
+        'data: {"type":"token","text":"Hello world"}\n\n',
+        'data: {"type":"token","text":"!"}\n\n',
+      ]),
+    );
+
+    const client = new MiladyClient("http://localhost:2138");
+    const tokens: string[] = [];
+    const result = await client.sendChatStream("legacy", (token) => {
+      tokens.push(token);
+    });
+
+    expect(tokens).toEqual(["Hello wrld", "Hello world", "!"]);
+    expect(result).toEqual({
+      text: "Hello world!",
+      agentName: "Milady",
+      completed: false,
+    });
+  });
+
   test("streams CRLF-delimited SSE events before stream completion", async () => {
     const controlled = buildControlledSseResponse(
       'data: {"type":"token","text":"Hello"}\r\n\r\n',

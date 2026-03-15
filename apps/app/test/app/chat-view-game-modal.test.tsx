@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -151,10 +152,10 @@ describe("ChatView game-modal variant", () => {
     const text = textOf(tree?.root).toLowerCase();
     expect(text).toContain("acknowledged");
     expect(text).not.toContain("via discord");
-    expect(text).toContain("milady");
+    expect(text).not.toContain("milady");
   });
 
-  it("shows only the most recent companion messages", async () => {
+  it("shows only the last two companion messages", async () => {
     mockUseApp.mockReturnValue(
       createContext({
         conversationMessages: [
@@ -163,6 +164,8 @@ describe("ChatView game-modal variant", () => {
           { id: "m3", role: "assistant", text: "three", timestamp: 3 },
           { id: "m4", role: "user", text: "four", timestamp: 4 },
           { id: "m5", role: "assistant", text: "five", timestamp: 5 },
+          { id: "m6", role: "user", text: "six", timestamp: 6 },
+          { id: "m7", role: "assistant", text: "seven", timestamp: 7 },
         ],
       }),
     );
@@ -176,10 +179,12 @@ describe("ChatView game-modal variant", () => {
 
     const text = textOf(tree?.root).toLowerCase();
     expect(text).not.toContain("one");
-    expect(text).toContain("two");
-    expect(text).toContain("three");
-    expect(text).toContain("four");
-    expect(text).toContain("five");
+    expect(text).not.toContain("two");
+    expect(text).toContain("six");
+    expect(text).toContain("seven");
+    expect(text).not.toContain("three");
+    expect(text).not.toContain("four");
+    expect(text).not.toContain("five");
   });
 
   it("shows avatar typing instead of starter prompts when companion chat is empty", async () => {
@@ -347,10 +352,76 @@ describe("ChatView game-modal variant", () => {
 
     const textarea = tree?.root.findByType("textarea");
     expect(focus).not.toHaveBeenCalled();
-    expect(String(textarea.props.className)).toContain("min-h-[52px]");
-    expect(String(textarea.props.className)).toContain("pt-2.5");
-    expect(String(textarea.props.className)).toContain(
-      "focus-visible:ring-offset-0",
+    expect(String(textarea.props.className)).toContain("h-[38px]");
+    expect(String(textarea.props.className)).toContain("py-2");
+    expect(String(textarea.props.className)).toContain("focus:ring-0");
+  });
+
+  it("keeps only the latest two rendered companion rows", async () => {
+    mockUseApp.mockReturnValue(
+      createContext({
+        conversationMessages: [
+          { id: "assistant-1", role: "assistant", text: "one", timestamp: 1 },
+          { id: "user-1", role: "user", text: "two", timestamp: 2 },
+          { id: "assistant-2", role: "assistant", text: "three", timestamp: 3 },
+          { id: "user-2", role: "user", text: "four", timestamp: 4 },
+          { id: "assistant-3", role: "assistant", text: "five", timestamp: 5 },
+        ],
+      }),
     );
+
+    let tree: TestRenderer.ReactTestRenderer;
+    await act(async () => {
+      tree = TestRenderer.create(
+        React.createElement(ChatView, { variant: "game-modal" }),
+      );
+    });
+
+    const rows = tree?.root.findAllByProps({
+      "data-testid": "companion-message-row",
+    });
+
+    expect(rows).toHaveLength(2);
+    const firstRow = rows[0];
+    const secondRow = rows[1];
+    expect(firstRow).toBeDefined();
+    expect(secondRow).toBeDefined();
+    expect(textOf(firstRow).toLowerCase()).toContain("four");
+    expect(textOf(secondRow).toLowerCase()).toContain("five");
+  });
+
+  it("routes transcript drags to companion camera while keeping the composer interactive", async () => {
+    mockUseApp.mockReturnValue(
+      createContext({
+        conversationMessages: [
+          {
+            id: "assistant-1",
+            role: "assistant",
+            text: "Acknowledged",
+            timestamp: Date.now(),
+          },
+        ],
+      }),
+    );
+
+    let tree: TestRenderer.ReactTestRenderer;
+    await act(async () => {
+      tree = TestRenderer.create(
+        React.createElement(ChatView, { variant: "game-modal" }),
+      );
+    });
+
+    const messages = tree?.root.findByProps({
+      "data-testid": "chat-messages-scroll",
+    });
+    const composer = tree?.root.findByProps({
+      "data-no-camera-drag": "true",
+    });
+
+    expect(String(messages.props.className)).toContain("pointer-events-none");
+    expect(String(messages.props.className)).toContain("select-none");
+    expect(String(messages.props.className)).toContain("overflow-hidden");
+    expect(messages.props.style.maskImage).toContain("linear-gradient");
+    expect(composer).toBeTruthy();
   });
 });

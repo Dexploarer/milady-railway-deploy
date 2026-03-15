@@ -2,10 +2,9 @@
 
 import React, { useEffect } from "react";
 import TestRenderer, { act } from "react-test-renderer";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { fetchMock, mockClient } = vi.hoisted(() => ({
-  fetchMock: vi.fn(),
+const { mockClient } = vi.hoisted(() => ({
   mockClient: {
     hasToken: vi.fn(() => false),
     getCodingAgentStatus: vi.fn(async () => null),
@@ -17,14 +16,16 @@ const { fetchMock, mockClient } = vi.hoisted(() => ({
     })),
     getOnboardingStatus: vi.fn(async () => ({ complete: true })),
     getStatus: vi.fn(async () => ({
-      state: "running",
-      startup: undefined,
+      state: "error",
+      startup: {
+        phase: "initializing-agent",
+        attempt: 1,
+        lastError: "Bundled avatar MILADY-01 could not be loaded.",
+      },
       pendingRestart: false,
       pendingRestartReasons: [],
     })),
     getConfig: vi.fn(async () => ({ ui: { avatarIndex: 1 } })),
-    hasCustomVrm: vi.fn(async () => false),
-    hasCustomBackground: vi.fn(async () => false),
     disconnectWs: vi.fn(),
   },
 }));
@@ -34,7 +35,7 @@ vi.mock("@milady/app-core/api", () => ({
   SkillScanReportSummary: {},
 }));
 
-import { AppProvider, useApp } from "../../src/AppContext";
+import { AppProvider, useApp } from "@milady/app-core/state";
 
 interface StartupSnapshot {
   onboardingLoading: boolean;
@@ -60,21 +61,8 @@ function Probe(props: { onChange: (snapshot: StartupSnapshot) => void }) {
 }
 
 describe("startup failure: bundled assets missing", () => {
-  const originalFetch = globalThis.fetch;
-
   beforeEach(() => {
     Object.assign(document.documentElement, { setAttribute: vi.fn() });
-    fetchMock.mockReset();
-    Object.defineProperty(globalThis, "fetch", {
-      value: fetchMock,
-      writable: true,
-      configurable: true,
-    });
-    fetchMock.mockResolvedValue({
-      ok: false,
-      status: 404,
-      statusText: "Not Found",
-    });
     mockClient.hasToken.mockReturnValue(false);
     mockClient.disconnectWs.mockImplementation(() => {});
     mockClient.getAuthStatus.mockResolvedValue({
@@ -84,22 +72,17 @@ describe("startup failure: bundled assets missing", () => {
     });
     mockClient.getOnboardingStatus.mockResolvedValue({ complete: true });
     mockClient.getStatus.mockResolvedValue({
-      state: "running",
-      startup: undefined,
+      state: "error",
+      startup: {
+        phase: "initializing-agent",
+        attempt: 1,
+        lastError: "Bundled avatar MILADY-01 could not be loaded.",
+      },
       pendingRestart: false,
       pendingRestartReasons: [],
     });
     mockClient.getConfig.mockResolvedValue({ ui: { avatarIndex: 1 } });
   });
-
-  afterEach(() => {
-    Object.defineProperty(globalThis, "fetch", {
-      value: originalFetch,
-      writable: true,
-      configurable: true,
-    });
-  });
-
   it("surfaces asset-missing before startup reaches ready", async () => {
     let latest: StartupSnapshot | null = null;
     let tree: TestRenderer.ReactTestRenderer | null = null;
@@ -135,7 +118,6 @@ describe("startup failure: bundled assets missing", () => {
     expect(latest?.startupError?.detail).toContain(
       "Bundled avatar MILADY-01 could not be loaded",
     );
-    expect(fetchMock).toHaveBeenCalled();
 
     await act(async () => {
       tree?.unmount();

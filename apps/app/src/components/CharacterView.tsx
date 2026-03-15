@@ -27,8 +27,8 @@ import {
 } from "@milady/app-core/voice";
 import {
   Button,
+  Checkbox,
   Input,
-  Switch,
   TagEditor,
   Textarea,
   ThemedSelect,
@@ -538,6 +538,7 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
   }, [onboardingOptions?.styles]);
 
   const characterRoster = resolveRosterEntries(rosterStyles);
+  const visibleCharacterRoster = characterRoster.slice(0, 4);
 
   /* Load voice config on mount */
   useEffect(() => {
@@ -1054,14 +1055,8 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
 
       <div className={sectionCls}>
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-border/40 pb-3">
-          <div>
-            <div className="font-bold text-sm tracking-wide text-txt">
-              Character Select
-            </div>
-            <div className="mt-1 text-xs text-muted">
-              Pick a character base. Turn custom on below if you want the editor
-              fields to override that base.
-            </div>
+          <div className="font-bold text-sm tracking-wide text-txt">
+            Character Select
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <Button
@@ -1097,18 +1092,13 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
             </Button>
           </div>
         </div>
-
-        <div className="text-xs text-muted">
-          Each character card sets the default avatar, voice, personality,
-          adjectives, topics, and directions.
-        </div>
         <div
-          className="mt-4 overflow-x-auto pb-2"
+          className="mt-4 overflow-hidden"
           data-testid="character-roster-grid"
         >
-          <div className="flex min-w-max gap-4 pr-1">
-            {characterRoster.length > 0 ? (
-              characterRoster.map((entry) => {
+          <div className="grid grid-cols-4 gap-4">
+            {visibleCharacterRoster.length > 0 ? (
+              visibleCharacterRoster.map((entry) => {
                 const isSelected = selectedCharacterId === entry.id;
                 const rosterBio = truncateCopy(
                   replaceCharacterToken(entry.preset.bio[0] ?? "", entry.name),
@@ -1123,7 +1113,7 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
                   <button
                     key={entry.id}
                     type="button"
-                    className={`flex w-[280px] shrink-0 flex-col rounded-2xl border p-4 text-left transition-all ${
+                    className={`flex min-w-0 w-full flex-col rounded-2xl border p-4 text-left transition-all ${
                       isSelected
                         ? "border-accent bg-accent/5 shadow-[0_0_0_1px_rgba(var(--accent),0.25)]"
                         : "border-border/40 bg-black/10 hover:border-accent/30 hover:bg-accent/5"
@@ -1226,16 +1216,20 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
                 custom off to use the selected character defaults.
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted">
-                {customOverridesEnabled ? "custom on" : "custom off"}
-              </span>
-              <Switch
+            <label
+              htmlFor="character-customize-toggle"
+              className="flex items-center gap-3 rounded-xl border border-border/40 bg-bg/40 px-3 py-2 text-sm text-txt cursor-pointer"
+            >
+              <Checkbox
+                id="character-customize-toggle"
                 checked={customOverridesEnabled}
-                onCheckedChange={handleCustomOverridesChange}
+                onCheckedChange={(checked) =>
+                  handleCustomOverridesChange(checked === true)
+                }
                 data-testid="character-customize-toggle"
               />
-            </div>
+              <span className="font-medium">Enable custom overrides</span>
+            </label>
           </div>
           {!customOverridesEnabled && (
             <div className="mt-4 rounded-xl border border-border/30 bg-bg/40 px-3 py-2 text-xs text-muted">

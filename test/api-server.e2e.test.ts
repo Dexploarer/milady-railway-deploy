@@ -1431,6 +1431,43 @@ describe("API Server E2E (no runtime)", () => {
       }
     });
 
+    it("POST /api/chat/stream emits replacement snapshots for corrected callback text", async () => {
+      const runtime = createRuntimeForChatSseTests({
+        handleMessage: async (_runtime, _message, onResponse) => {
+          await onResponse({ text: "Hello wrld" } as Content);
+          await onResponse({ text: "Hello world" } as Content);
+          await onResponse({ text: "Hello world!" } as Content);
+          return {
+            responseContent: {
+              text: "Hello world!",
+            },
+          };
+        },
+      });
+      const streamServer = await startApiServer({ port: 0, runtime });
+      try {
+        const { status, events } = await reqSse(
+          streamServer.port,
+          "/api/chat/stream",
+          { text: "hello", mode: "power" },
+        );
+
+        expect(status).toBe(200);
+        const tokenEvents = events.filter((event) => event.type === "token");
+        expect(tokenEvents.map((event) => event.text)).toEqual([
+          "Hello wrld",
+          "Hello world",
+          "!",
+        ]);
+
+        const doneEvent = events.find((event) => event.type === "done");
+        expect(doneEvent?.fullText).toBe("Hello world!");
+        expect(doneEvent?.agentName).toBe("ChatStreamAgent");
+      } finally {
+        await streamServer.close();
+      }
+    });
+
     it("POST /api/chat/stream preserves repeated characters in incremental callback tokens", async () => {
       const runtime = createRuntimeForChatSseTests({
         handleMessage: async (_runtime, _message, onResponse) => {
@@ -1663,6 +1700,56 @@ describe("API Server E2E (no runtime)", () => {
         ]);
         const doneEvent = events.find((event) => event.type === "done");
         expect(doneEvent?.fullText).toBe("Hello world");
+        expect(doneEvent?.agentName).toBe("ChatStreamAgent");
+      } finally {
+        await streamServer.close();
+      }
+    });
+
+    it("POST /api/conversations/:id/messages/stream emits replacement snapshots for corrected callback text", async () => {
+      const runtime = createRuntimeForChatSseTests({
+        handleMessage: async (_runtime, _message, onResponse) => {
+          await onResponse({ text: "Hello wrld" } as Content);
+          await onResponse({ text: "Hello world" } as Content);
+          await onResponse({ text: "Hello world!" } as Content);
+          return {
+            responseContent: {
+              text: "Hello world!",
+            },
+          };
+        },
+      });
+      const streamServer = await startApiServer({ port: 0, runtime });
+      try {
+        const create = await req(
+          streamServer.port,
+          "POST",
+          "/api/conversations",
+          {
+            title: "Corrected snapshot conversation",
+          },
+        );
+        expect(create.status).toBe(200);
+        const conversation = create.data.conversation as { id?: string };
+        const conversationId = conversation.id ?? "";
+        expect(conversationId.length).toBeGreaterThan(0);
+
+        const { status, events } = await reqSse(
+          streamServer.port,
+          `/api/conversations/${conversationId}/messages/stream`,
+          { text: "hello", mode: "power" },
+        );
+
+        expect(status).toBe(200);
+        const tokenEvents = events.filter((event) => event.type === "token");
+        expect(tokenEvents.map((event) => event.text)).toEqual([
+          "Hello wrld",
+          "Hello world",
+          "!",
+        ]);
+
+        const doneEvent = events.find((event) => event.type === "done");
+        expect(doneEvent?.fullText).toBe("Hello world!");
         expect(doneEvent?.agentName).toBe("ChatStreamAgent");
       } finally {
         await streamServer.close();

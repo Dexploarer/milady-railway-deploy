@@ -1,7 +1,7 @@
 /**
  * Shared overlay layer rendered once regardless of shell mode.
  *
- * Extracts CommandPalette, EmotePicker, RestartBanner,
+ * Extracts CommandPalette, RestartBanner,
  * BugReportModal, and the ActionNotice toast that were previously duplicated
  * in both the companion-shell and native-shell branches of App.tsx.
  */
@@ -9,7 +9,6 @@
 import {
   BugReportModal,
   CommandPalette,
-  EmotePicker,
   RestartBanner,
   ShortcutsOverlay,
 } from "@milady/app-core/components";
@@ -27,7 +26,6 @@ export function ShellOverlays({
   return (
     <>
       <CommandPalette />
-      <EmotePicker />
       <RestartBanner />
       <BugReportModal />
       <ShortcutsOverlay />

@@ -244,7 +244,7 @@ describe("CompanionView", () => {
     expect(content).toContain("ChatModalView");
   });
 
-  it("renders the companion fast/pro toggle and updates chatMode", async () => {
+  it("pins companion mode to fast and hides the fast/pro toggle", async () => {
     const context = createContext();
     mockUseApp.mockReturnValue(context);
 
@@ -254,21 +254,14 @@ describe("CompanionView", () => {
     });
 
     expect(
-      tree?.root.findByProps({ "data-testid": "chat-mode-toggle-companion" }),
-    ).toBeDefined();
-
-    const proButton = tree?.root.findByProps({
-      "data-testid": "chat-mode-pro-companion",
-    });
-
-    await act(async () => {
-      proButton?.props.onClick?.();
-    });
-
-    expect(context.setState).toHaveBeenCalledWith("chatMode", "power");
+      tree?.root.findAllByProps({
+        "data-testid": "chat-mode-toggle-companion",
+      }),
+    ).toHaveLength(0);
+    expect(context.setState).toHaveBeenCalledWith("chatMode", "simple");
   });
 
-  it("orbits the companion camera from shell drag and resets on release", async () => {
+  it("orbits the companion camera from transcript drag and resets on release", async () => {
     mockUseApp.mockReturnValue(createContext());
 
     let tree: TestRenderer.ReactTestRenderer | null = null;
@@ -293,8 +286,8 @@ describe("CompanionView", () => {
     });
 
     expect(tree).not.toBeNull();
-    const dragLayer = tree?.root.findByProps({
-      "data-testid": "companion-camera-drag-surface",
+    const root = tree?.root.findByProps({
+      "data-testid": "companion-root",
     });
     const currentTarget = {
       setPointerCapture: vi.fn(),
@@ -306,14 +299,14 @@ describe("CompanionView", () => {
     const preventDefault = vi.fn();
 
     await act(async () => {
-      dragLayer.props.onPointerDownCapture({
+      root?.props.onPointerDownCapture({
         target: document.createElement("div"),
         currentTarget,
         pointerId: 7,
         clientX: 200,
         clientY: 300,
       });
-      dragLayer.props.onPointerMoveCapture({
+      root?.props.onPointerMoveCapture({
         target: document.createElement("div"),
         currentTarget,
         pointerId: 7,
@@ -321,7 +314,7 @@ describe("CompanionView", () => {
         clientY: 120,
         preventDefault,
       });
-      dragLayer.props.onPointerUpCapture({
+      root?.props.onPointerUpCapture({
         target: document.createElement("div"),
         currentTarget,
         pointerId: 7,
@@ -336,6 +329,63 @@ describe("CompanionView", () => {
     expect(preventDefault).toHaveBeenCalledTimes(1);
     expect(resetDragOrbit).toHaveBeenCalledTimes(1);
     expect(currentTarget.releasePointerCapture).toHaveBeenCalledWith(7);
+  });
+
+  it("ignores drag capture inside marked no-camera-drag controls", async () => {
+    mockUseApp.mockReturnValue(createContext());
+
+    let tree: TestRenderer.ReactTestRenderer | null = null;
+    await act(async () => {
+      tree = TestRenderer.create(React.createElement(CompanionView));
+    });
+
+    const setDragOrbitTarget = vi.fn();
+    await act(async () => {
+      const ready = viewerPropsRef.current?.onEngineReady as
+        | ((value: unknown) => void)
+        | undefined;
+      ready?.({
+        setCameraAnimation: vi.fn(),
+        setPointerParallaxEnabled: vi.fn(),
+        setDragOrbitTarget,
+        resetDragOrbit: vi.fn(),
+        setCompanionZoomNormalized: vi.fn(),
+      });
+    });
+
+    const root = tree?.root.findByProps({
+      "data-testid": "companion-root",
+    });
+    const currentTarget = {
+      setPointerCapture: vi.fn(),
+      releasePointerCapture: vi.fn(),
+      hasPointerCapture: vi.fn(() => false),
+      clientWidth: 1440,
+      clientHeight: 900,
+    };
+    const composerControl = document.createElement("div");
+    composerControl.setAttribute("data-no-camera-drag", "true");
+
+    await act(async () => {
+      root?.props.onPointerDownCapture({
+        target: composerControl,
+        currentTarget,
+        pointerId: 7,
+        clientX: 200,
+        clientY: 300,
+      });
+      root?.props.onPointerMoveCapture({
+        target: composerControl,
+        currentTarget,
+        pointerId: 7,
+        clientX: 560,
+        clientY: 120,
+        preventDefault: vi.fn(),
+      });
+    });
+
+    expect(currentTarget.setPointerCapture).not.toHaveBeenCalled();
+    expect(setDragOrbitTarget).not.toHaveBeenCalled();
   });
 
   it("zooms the companion camera from root wheel input, including over overlay UI", async () => {
@@ -458,12 +508,12 @@ describe("CompanionView", () => {
       });
     });
 
-    const dragLayer = tree?.root.findByProps({
-      "data-testid": "companion-camera-drag-surface",
+    const root = tree?.root.findByProps({
+      "data-testid": "companion-root",
     });
 
     await act(async () => {
-      dragLayer.props.onPointerDownCapture({
+      root?.props.onPointerDownCapture({
         currentTarget,
         pointerType: "touch",
         pointerId: 11,
@@ -471,7 +521,7 @@ describe("CompanionView", () => {
         clientY: 300,
         preventDefault: vi.fn(),
       });
-      dragLayer.props.onPointerDownCapture({
+      root?.props.onPointerDownCapture({
         currentTarget,
         pointerType: "touch",
         pointerId: 12,
@@ -479,7 +529,7 @@ describe("CompanionView", () => {
         clientY: 300,
         preventDefault: vi.fn(),
       });
-      dragLayer.props.onPointerMoveCapture({
+      root?.props.onPointerMoveCapture({
         currentTarget,
         pointerType: "touch",
         pointerId: 12,

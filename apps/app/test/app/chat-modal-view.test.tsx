@@ -139,6 +139,15 @@ describe("ChatModalView", () => {
       (node) => node.props["data-chat-game-overlay"] === true,
     );
     expect(overlays.length).toBe(0);
+
+    const shell = tree?.root.find(
+      (node) => node.props["data-chat-game-shell"] === true,
+    );
+    const thread = tree?.root.find(
+      (node) => node.props["data-chat-game-thread"] === true,
+    );
+    expect(String(shell.props.className)).toContain("overflow-visible");
+    expect(String(thread.props.className)).toContain("overflow-visible");
   });
 
   it("does not boot a new conversation in companion dock when none is active", async () => {

@@ -16,6 +16,8 @@ import { VrmStage } from "./companion/VrmStage";
 
 const COMPANION_ZOOM_WHEEL_SENSITIVITY = 1 / 720;
 const COMPANION_ZOOM_PINCH_SENSITIVITY = 2.35;
+const CAMERA_DRAG_IGNORE_SELECTOR =
+  'button, input, textarea, select, option, [contenteditable="true"], [data-no-camera-drag="true"]';
 const NON_TEXT_INPUT_TYPES = new Set([
   "button",
   "checkbox",
@@ -64,6 +66,12 @@ function hasFocusedTextEntry(): boolean {
     : false;
 }
 
+function shouldIgnoreCameraDrag(target: EventTarget | null): boolean {
+  return target instanceof Element
+    ? Boolean(target.closest(CAMERA_DRAG_IGNORE_SELECTOR))
+    : false;
+}
+
 export const CompanionView = memo(function CompanionView() {
   useRenderGuard("CompanionView");
   const {
@@ -74,50 +82,10 @@ export const CompanionView = memo(function CompanionView() {
     uiTheme,
     setUiTheme,
     setTab,
+    setState,
     setUiShellMode,
-    // Header properties
-    agentStatus,
-    miladyCloudEnabled,
-    miladyCloudConnected,
-    miladyCloudCredits,
-    miladyCloudCreditsCritical,
-    miladyCloudCreditsLow,
-    miladyCloudTopUpUrl,
-    walletAddresses,
-    lifecycleBusy,
-    lifecycleAction,
-
-    handleRestart,
     t,
   } = useApp();
-
-  // Compute Header properties
-  const name = agentStatus?.agentName ?? "Milady";
-  const agentState = agentStatus?.state ?? "not_started";
-
-  const stateColor =
-    agentState === "running"
-      ? "text-ok border-ok"
-      : agentState === "restarting" || agentState === "starting"
-        ? "text-warn border-warn"
-        : agentState === "error"
-          ? "text-danger border-danger"
-          : "text-muted border-muted";
-
-  const restartBusy = lifecycleBusy && lifecycleAction === "restart";
-
-  const creditColor = miladyCloudCreditsCritical
-    ? "border-danger text-danger"
-    : miladyCloudCreditsLow
-      ? "border-warn text-warn"
-      : "border-ok text-ok";
-
-  const evmShort = walletAddresses?.evmAddress
-    ? `${walletAddresses.evmAddress.slice(0, 4)}...${walletAddresses.evmAddress.slice(-4)}`
-    : null;
-  const solShort = walletAddresses?.solanaAddress
-    ? `${walletAddresses.solanaAddress.slice(0, 4)}...${walletAddresses.solanaAddress.slice(-4)}`
-    : null;
   const rootRef = useRef<HTMLDivElement | null>(null);
   const vrmEngineRef = useRef<VrmEngine | null>(null);
   const companionZoomRef = useRef(0);
@@ -143,10 +111,17 @@ export const CompanionView = memo(function CompanionView() {
     startZoom: 0,
   });
 
-  const handleSwitchToNativeShell = useCallback(() => {
-    setUiShellMode("native");
-    setTab("chat");
-  }, [setTab, setUiShellMode]);
+  const handleShellModeChange = useCallback(
+    (mode: "companion" | "native") => {
+      setUiShellMode(mode);
+      setTab(mode === "native" ? "chat" : "companion");
+    },
+    [setTab, setUiShellMode],
+  );
+
+  useEffect(() => {
+    setState("chatMode", "simple");
+  }, [setState]);
   const setCompanionZoom = useCallback((value: number) => {
     const nextZoom = Math.max(0, Math.min(1, value));
     companionZoomRef.current = nextZoom;
@@ -158,6 +133,9 @@ export const CompanionView = memo(function CompanionView() {
   }, []);
   const handlePointerDownCapture = useCallback(
     (event: ReactPointerEvent<HTMLDivElement>) => {
+      if (shouldIgnoreCameraDrag(event.target)) {
+        return;
+      }
       if (typeof window.getSelection === "function") {
         window.getSelection()?.removeAllRanges();
       }
@@ -339,6 +317,11 @@ export const CompanionView = memo(function CompanionView() {
       data-testid="companion-root"
       className="absolute inset-0 overflow-hidden text-white font-display rounded-2xl bg-[radial-gradient(circle_at_50%_120%,#212942_0%,#12151e_80%)] animate-in fade-in zoom-in-95 duration-500"
       onWheelCapture={handleRootWheelCapture}
+      onPointerDownCapture={handlePointerDownCapture}
+      onPointerMoveCapture={handlePointerMoveCapture}
+      onPointerUpCapture={releaseCameraDrag}
+      onPointerCancelCapture={releaseCameraDrag}
+      onLostPointerCaptureCapture={releaseCameraDrag}
       style={{ overscrollBehavior: "none" }}
     >
       <div className="absolute inset-0 z-0 bg-cover opacity-60 bg-[radial-gradient(circle_at_10%_20%,rgba(255,255,255,0.03)_0%,transparent_40%),radial-gradient(circle_at_80%_80%,rgba(0,225,255,0.05)_0%,transparent_40%)] pointer-events-none" />
@@ -357,11 +340,6 @@ export const CompanionView = memo(function CompanionView() {
         aria-hidden="true"
         data-testid="companion-camera-drag-surface"
         className="absolute inset-0 z-[1] cursor-grab select-none"
-        onPointerDownCapture={handlePointerDownCapture}
-        onPointerMoveCapture={handlePointerMoveCapture}
-        onPointerUpCapture={releaseCameraDrag}
-        onPointerCancelCapture={releaseCameraDrag}
-        onLostPointerCaptureCapture={releaseCameraDrag}
         style={{
           touchAction: "none",
           userSelect: "none",
@@ -370,22 +348,10 @@ export const CompanionView = memo(function CompanionView() {
       />
 
       {/* UI Overlay */}
-      <div className="absolute inset-0 z-10 flex flex-col px-8 py-6 pointer-events-none">
+      <div className="absolute inset-0 z-10 flex flex-col pointer-events-none">
         <CompanionHeader
-          name={name}
-          agentState={agentState}
-          stateColor={stateColor}
-          lifecycleBusy={lifecycleBusy}
-          restartBusy={restartBusy}
-          handleRestart={handleRestart}
-          miladyCloudEnabled={miladyCloudEnabled}
-          miladyCloudConnected={miladyCloudConnected}
-          miladyCloudCredits={miladyCloudCredits}
-          creditColor={creditColor}
-          miladyCloudTopUpUrl={miladyCloudTopUpUrl}
-          evmShort={evmShort}
-          solShort={solShort}
-          handleSwitchToNativeShell={handleSwitchToNativeShell}
+          shellMode="companion"
+          onShellModeChange={handleShellModeChange}
           uiLanguage={uiLanguage}
           setUiLanguage={setUiLanguage}
           uiTheme={uiTheme}

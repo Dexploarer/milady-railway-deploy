@@ -4017,6 +4017,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
         diagnostics?.lastError ||
         formatStartupErrorDetail(err) ||
         "Agent runtime did not report a reason.";
+      const isAssetMissing =
+        /required companion assets could not be loaded|bundled avatar .* could not be loaded/i.test(
+          detail,
+        );
+      if (!timedOut && isAssetMissing) {
+        return {
+          reason: "asset-missing",
+          phase: "initializing-agent",
+          message: "Required companion assets could not be loaded.",
+          detail,
+        };
+      }
       if (timedOut) {
         return {
           reason: "agent-timeout",

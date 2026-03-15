@@ -161,6 +161,7 @@ import { handleRegistryRoutes } from "./registry-routes";
 import { RegistryService } from "./registry-service";
 import { handleSandboxRoute } from "./sandbox-routes";
 import { applySignalQrOverride, handleSignalRoute } from "./signal-routes";
+import { resolveStreamingUpdate } from "./streaming-text";
 import { handleSubscriptionRoutes } from "./subscription-routes";
 import { resolveTerminalRunLimits } from "./terminal-run-limits";
 import { handleTrainingRoutes } from "./training-routes";
@@ -2782,6 +2783,7 @@ interface ChatGenerationResult {
 
 interface ChatGenerateOptions {
   onChunk?: (chunk: string) => void;
+  onSnapshot?: (text: string) => void;
   isAborted?: () => boolean;
   resolveNoResponseText?: () => string;
 }
@@ -2905,6 +2907,11 @@ async function generateChatResponse(
     responseText += chunk;
     opts?.onChunk?.(chunk);
   };
+  const emitSnapshot = (text: string): void => {
+    if (!text) return;
+    responseText = text;
+    opts?.onSnapshot?.(text);
+  };
   const claimStreamSource = (
     source: Exclude<StreamSource, "unset">,
   ): boolean => {
@@ -2914,31 +2921,14 @@ async function generateChatResponse(
     }
     return activeStreamSource === source;
   };
-  const computeDelta = (existing: string, incoming: string): string => {
-    if (!incoming) return "";
-    if (!existing) return incoming;
-    if (incoming === existing) return "";
-    if (incoming.startsWith(existing)) return incoming.slice(existing.length);
-    if (existing.startsWith(incoming)) return "";
-
-    // Small chunks are usually raw token deltas; keep them even if they
-    // repeat suffix characters (e.g., "l" + "l" in "Hello").
-    if (incoming.length <= 3) return incoming;
-
-    const maxOverlap = Math.min(existing.length, incoming.length);
-    for (let overlap = maxOverlap; overlap > 0; overlap -= 1) {
-      if (existing.endsWith(incoming.slice(0, overlap))) {
-        const delta = incoming.slice(overlap);
-        if (!delta && overlap === incoming.length) return "";
-        return delta;
-      }
-    }
-    return incoming;
-  };
   const appendIncomingText = (incoming: string): void => {
-    const delta = computeDelta(responseText, incoming);
-    if (!delta) return;
-    emitChunk(delta);
+    const update = resolveStreamingUpdate(responseText, incoming);
+    if (update.kind === "noop") return;
+    if (update.kind === "append") {
+      emitChunk(update.emittedText);
+      return;
+    }
+    emitSnapshot(update.nextText);
   };
 
   // The core message service emits MESSAGE_SENT but not MESSAGE_RECEIVED.
@@ -3073,7 +3063,11 @@ async function generateChatResponse(
 
   // Fallback: if callbacks weren't used for text, stream + return final text.
   if (!responseText && resultText) {
-    emitChunk(resultText);
+    if (opts?.onSnapshot) {
+      emitSnapshot(resultText);
+    } else {
+      emitChunk(resultText);
+    }
   } else if (
     resultText &&
     resultText !== responseText &&
@@ -3083,7 +3077,11 @@ async function generateChatResponse(
     emitChunk(resultText.slice(responseText.length));
   } else if (resultText && resultText !== responseText) {
     // Canonical final response may differ from streamed chunks (normalization).
-    responseText = resultText;
+    if (opts?.onSnapshot) {
+      emitSnapshot(resultText);
+    } else {
+      responseText = resultText;
+    }
   }
 
   const noResponseFallback = opts?.resolveNoResponseText?.();
@@ -13558,6 +13556,9 @@ async function handleRequest(
           onChunk: (chunk) => {
             writeSse(res, { type: "token", text: chunk });
           },
+          onSnapshot: (text) => {
+            writeSse(res, { type: "token", text });
+          },
           resolveNoResponseText: () =>
             resolveNoResponseFallback(state.logBuffer),
         },
@@ -13897,6 +13898,9 @@ async function handleRequest(
           isAborted: () => aborted,
           onChunk: (chunk) => {
             writeSse(res, { type: "token", text: chunk });
+          },
+          onSnapshot: (text) => {
+            writeSse(res, { type: "token", text });
           },
           resolveNoResponseText: () =>
             resolveNoResponseFallback(state.logBuffer),
