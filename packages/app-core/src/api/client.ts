@@ -2220,36 +2220,69 @@ export class MiladyClient {
       });
     }
     const makeRequest = async (token: string | null): Promise<Response> => {
-      const timeoutController = new AbortController();
-      const timeoutId = setTimeout(() => {
-        timeoutController.abort();
-      }, DEFAULT_FETCH_TIMEOUT_MS);
-      const signal =
-        init?.signal && typeof AbortSignal.any === "function"
-          ? AbortSignal.any([init.signal, timeoutController.signal])
-          : (init?.signal ?? timeoutController.signal);
+      let timeoutId: ReturnType<typeof setTimeout> | undefined;
+      let abortListener: (() => void) | undefined;
+      const requestInit: RequestInit = {
+        ...init,
+        headers: {
+          "X-Milady-Client-Id": this.clientId,
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          ...(this._uiLanguage
+            ? { "X-Milady-UI-Language": this._uiLanguage }
+            : {}),
+          ...init?.headers,
+        },
+      };
+
+      const fetchPromise = fetch(`${this.baseUrl}${path}`, requestInit);
+      const pending: Promise<Response>[] = [fetchPromise];
+
+      pending.push(
+        new Promise<Response>((_, reject) => {
+          timeoutId = setTimeout(() => {
+            reject(
+              new ApiError({
+                kind: "timeout",
+                path,
+                message: `Request timed out after ${DEFAULT_FETCH_TIMEOUT_MS}ms`,
+              }),
+            );
+          }, DEFAULT_FETCH_TIMEOUT_MS);
+        }),
+      );
+
+      if (init?.signal) {
+        if (init.signal.aborted) {
+          throw new ApiError({
+            kind: "network",
+            path,
+            message: "Request aborted",
+          });
+        }
+
+        pending.push(
+          new Promise<Response>((_, reject) => {
+            abortListener = () => {
+              reject(
+                new ApiError({
+                  kind: "network",
+                  path,
+                  message: "Request aborted",
+                }),
+              );
+            };
+            init.signal?.addEventListener("abort", abortListener, {
+              once: true,
+            });
+          }),
+        );
+      }
 
       try {
-        return await fetch(`${this.baseUrl}${path}`, {
-          ...init,
-          signal,
-          headers: {
-            "X-Milady-Client-Id": this.clientId,
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-            ...(this._uiLanguage
-              ? { "X-Milady-UI-Language": this._uiLanguage }
-              : {}),
-            ...init?.headers,
-          },
-        });
+        return await Promise.race(pending);
       } catch (err) {
-        if (timeoutController.signal.aborted) {
-          throw new ApiError({
-            kind: "timeout",
-            path,
-            message: `Request timed out after ${DEFAULT_FETCH_TIMEOUT_MS}ms`,
-            cause: err,
-          });
+        if (err instanceof ApiError) {
+          throw err;
         }
         throw new ApiError({
           kind: "network",
@@ -2261,7 +2294,12 @@ export class MiladyClient {
           cause: err,
         });
       } finally {
-        clearTimeout(timeoutId);
+        if (timeoutId !== undefined) {
+          clearTimeout(timeoutId);
+        }
+        if (init?.signal && abortListener) {
+          init.signal.removeEventListener("abort", abortListener);
+        }
       }
     };
 

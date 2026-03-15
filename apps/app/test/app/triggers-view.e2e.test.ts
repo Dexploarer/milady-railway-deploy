@@ -12,6 +12,7 @@ import React, {
   type ReactElement,
   useCallback,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import TestRenderer, { act } from "react-test-renderer";
@@ -203,20 +204,26 @@ function TriggerUiHarness(props: { client: MiladyClient }): ReactElement {
   const [triggerHealth, setTriggerHealth] =
     useState<TriggerHealthSnapshot | null>(null);
   const [triggerError, setTriggerError] = useState<string | null>(null);
+  const triggerLoadRequestId = useRef(0);
 
   const loadTriggers = useCallback(async () => {
+    const requestId = ++triggerLoadRequestId.current;
     setTriggersLoading(true);
     try {
       const response = await client.getTriggers();
+      if (requestId !== triggerLoadRequestId.current) return;
       setTriggers(sortTriggers(response.triggers));
       setTriggerError(null);
     } catch (error) {
+      if (requestId !== triggerLoadRequestId.current) return;
       const message =
         error instanceof Error ? error.message : "Failed to load triggers";
       setTriggerError(message);
       setTriggers([]);
     } finally {
-      setTriggersLoading(false);
+      if (requestId === triggerLoadRequestId.current) {
+        setTriggersLoading(false);
+      }
     }
   }, [client]);
 
@@ -260,7 +267,7 @@ function TriggerUiHarness(props: { client: MiladyClient }): ReactElement {
       try {
         const response = await client.createTrigger(request);
         const created = response.trigger;
-        setTriggers((prev) => sortTriggers([...prev, created]));
+        await loadTriggers();
         setTriggerError(null);
         await loadTriggerHealth();
         return created;
@@ -285,11 +292,7 @@ function TriggerUiHarness(props: { client: MiladyClient }): ReactElement {
       try {
         const response = await client.updateTrigger(id, request);
         const updated = response.trigger;
-        setTriggers((prev) =>
-          sortTriggers(
-            prev.map((item) => (item.id === updated.id ? updated : item)),
-          ),
-        );
+        await loadTriggers();
         setTriggerError(null);
         await loadTriggerHealth();
         return updated;
@@ -310,7 +313,7 @@ function TriggerUiHarness(props: { client: MiladyClient }): ReactElement {
       setTriggersSaving(true);
       try {
         await client.deleteTrigger(id);
-        setTriggers((prev) => prev.filter((item) => item.id !== id));
+        await loadTriggers();
         setTriggerRunsById((prev) => {
           const next: Record<string, TriggerRunRecord[]> = {};
           for (const [key, value] of Object.entries(prev)) {
@@ -338,17 +341,7 @@ function TriggerUiHarness(props: { client: MiladyClient }): ReactElement {
       setTriggersSaving(true);
       try {
         const response = await client.runTriggerNow(id);
-        if (response.trigger) {
-          setTriggers((prev) =>
-            sortTriggers(
-              prev.map((item) =>
-                item.id === response.trigger?.id ? response.trigger : item,
-              ),
-            ),
-          );
-        } else {
-          await loadTriggers();
-        }
+        await loadTriggers();
         await loadTriggerRuns(id);
         await loadTriggerHealth();
         setTriggerError(null);
