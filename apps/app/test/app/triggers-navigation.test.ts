@@ -1,5 +1,6 @@
 import {
   ALL_TAB_GROUPS,
+  APPS_ENABLED,
   pathForTab,
   tabFromPath,
   titleForTab,
@@ -69,7 +70,7 @@ describe("navigation", () => {
   });
 
   test("keeps /game as a legacy redirect to apps", () => {
-    expect(tabFromPath("/game")).toBe("apps");
+    expect(tabFromPath("/game")).toBe(APPS_ENABLED ? "apps" : "chat");
   });
 
   test("keeps /agent as a legacy redirect to character", () => {
@@ -79,7 +80,7 @@ describe("navigation", () => {
   test("routes /connectors to connectors tab", () => {
     expect(pathForTab("connectors")).toBe("/connectors");
     expect(tabFromPath("/connectors")).toBe("connectors");
-    expect(titleForTab("connectors")).toBe("Social");
+    expect(titleForTab("connectors")).toBe("Connectors");
   });
 
   test("routes /wallets and keeps legacy /inventory redirect", () => {
@@ -95,12 +96,12 @@ describe("navigation", () => {
     expect(apps?.tabs).toEqual(["apps"]);
   });
 
-  test("keeps character/wallets/knowledge/social as top-level groups and adds heartbeats to the main nav", () => {
+  test("keeps wallets/knowledge/connectors as top-level groups, removes character from the nav, and adds heartbeats to the main nav", () => {
     const labels = ALL_TAB_GROUPS.map((group) => group.label);
-    expect(labels).toContain("Character");
+    expect(labels).not.toContain("Character");
     expect(labels).toContain("Wallets");
     expect(labels).toContain("Knowledge");
-    expect(labels).toContain("Social");
+    expect(labels).toContain("Connectors");
     expect(labels).toContain("Heartbeats");
     expect(labels).not.toContain("Tasks");
     expect(labels).not.toContain("Triggers");

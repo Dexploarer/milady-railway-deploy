@@ -1,11 +1,12 @@
 // @vitest-environment jsdom
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const viewerPropsRef: {
   current: null | Record<string, unknown>;
 } = { current: null };
+let viewerRenderCount = 0;
 
 vi.mock("@milady/app-core/api", () => ({
   client: {
@@ -23,26 +24,28 @@ vi.mock("@milady/app-core/utils", () => ({
   resolveAppAssetUrl: (path: string) => path,
 }));
 
-vi.mock("../../src/components/avatar/VrmViewer", () => ({
+vi.mock("@milady/app-core/components/avatar/VrmViewer", () => ({
   VrmViewer: (props: Record<string, unknown>) => {
+    viewerRenderCount++;
     viewerPropsRef.current = props;
     return React.createElement("div", null, "VrmViewer");
   },
 }));
 
-vi.mock("../../src/components/avatar/AvatarLoader", () => ({
+vi.mock("@milady/app-core/components/AvatarLoader", () => ({
   AvatarLoader: () => React.createElement("div", null, "AvatarLoader"),
 }));
 
-vi.mock("../../src/components/BubbleEmote", () => ({
-  BubbleEmote: () => React.createElement("div", null, "BubbleEmote"),
-}));
-
-import { VrmStage } from "../../src/components/companion/VrmStage";
+import { VrmStage } from "@milady/app-core/components/VrmStage";
 
 describe("VrmStage", () => {
   beforeEach(() => {
     viewerPropsRef.current = null;
+    viewerRenderCount = 0;
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it("renders the stage layer without a stage-level opacity gate", async () => {
@@ -93,6 +96,38 @@ describe("VrmStage", () => {
       mouthOpen: 0.42,
       isSpeaking: false,
     });
+  });
+
+  it("ignores duplicate chat voice events with the same payload", async () => {
+    await act(async () => {
+      TestRenderer.create(
+        React.createElement(VrmStage, {
+          vrmPath: "/vrms/milady-1.vrm.gz",
+          fallbackPreviewUrl: "/vrms/previews/milady-1.png",
+          t: (key: string) => key,
+        }),
+      );
+    });
+
+    await act(async () => {
+      window.dispatchEvent(
+        new CustomEvent("milady:chat-avatar-voice", {
+          detail: { mouthOpen: 0.4, isSpeaking: false },
+        }),
+      );
+    });
+
+    const renderCountAfterFirstEvent = viewerRenderCount;
+
+    await act(async () => {
+      window.dispatchEvent(
+        new CustomEvent("milady:chat-avatar-voice", {
+          detail: { mouthOpen: 0.4, isSpeaking: false },
+        }),
+      );
+    });
+
+    expect(viewerRenderCount).toBe(renderCountAfterFirstEvent);
   });
 
   it("disables canvas parallax and forwards the ready engine callback", async () => {
@@ -181,5 +216,73 @@ describe("VrmStage", () => {
       2.5,
       false,
     );
+  });
+
+  it("waves after the avatar reveal starts when the stage switches characters", async () => {
+    vi.useFakeTimers();
+    const emoteEvents: Array<Record<string, unknown>> = [];
+    const handleAppEmote = (event: Event) => {
+      emoteEvents.push((event as CustomEvent<Record<string, unknown>>).detail);
+    };
+    window.addEventListener("milady:app-emote", handleAppEmote);
+
+    let tree: TestRenderer.ReactTestRenderer | null = null;
+
+    try {
+      await act(async () => {
+        tree = TestRenderer.create(
+          React.createElement(VrmStage, {
+            vrmPath: "/vrms/milady-1.vrm.gz",
+            fallbackPreviewUrl: "/vrms/previews/milady-1.png",
+            playWaveOnAvatarChange: true,
+            t: (key: string) => key,
+          }),
+        );
+      });
+
+      await act(async () => {
+        tree?.update(
+          React.createElement(VrmStage, {
+            vrmPath: "/vrms/milady-2.vrm.gz",
+            fallbackPreviewUrl: "/vrms/previews/milady-2.png",
+            playWaveOnAvatarChange: true,
+            t: (key: string) => key,
+          }),
+        );
+      });
+
+      await act(async () => {
+        const onRevealStart = viewerPropsRef.current?.onRevealStart as
+          | (() => void)
+          | undefined;
+        onRevealStart?.();
+      });
+
+      expect(emoteEvents).toHaveLength(0);
+
+      await act(async () => {
+        vi.advanceTimersByTime(649);
+      });
+
+      expect(emoteEvents).toHaveLength(0);
+
+      await act(async () => {
+        vi.advanceTimersByTime(1);
+      });
+
+      expect(emoteEvents).toHaveLength(1);
+      expect(emoteEvents[0]).toMatchObject({
+        emoteId: "wave",
+        path: "/animations/emotes/waving-both-hands.glb",
+        duration: 2.5,
+        loop: false,
+        showOverlay: false,
+      });
+    } finally {
+      window.removeEventListener("milady:app-emote", handleAppEmote);
+      await act(async () => {
+        tree?.unmount();
+      });
+    }
   });
 });

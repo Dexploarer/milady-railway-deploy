@@ -13,6 +13,7 @@ import { spawn } from "node:child_process";
 import type { Writable } from "node:stream";
 import { logger } from "@elizaos/core";
 import type { TtsConfig, TtsProvider } from "../config/types.messages";
+import { sanitizeSpeechText } from "../utils/spoken-text";
 
 const TAG = "[TtsStreamBridge]";
 
@@ -111,14 +112,14 @@ class TtsStreamBridge implements ITtsStreamBridge {
       return false;
     }
 
-    const trimmed = text.trim();
-    if (!trimmed) return false;
+    const speakableText = sanitizeSpeechText(text);
+    if (!speakableText) return false;
 
     try {
       logger.info(
-        `${TAG} Generating TTS (${config.provider}, ${trimmed.length} chars)`,
+        `${TAG} Generating TTS (${config.provider}, ${speakableText.length} chars)`,
       );
-      const mp3 = await this.generateTts(trimmed, config);
+      const mp3 = await this.generateTts(speakableText, config);
       if (!mp3 || mp3.length === 0) {
         logger.warn(`${TAG} TTS returned empty audio`);
         return false;

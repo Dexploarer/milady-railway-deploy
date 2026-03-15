@@ -1,5 +1,5 @@
 import { resolveAppAssetUrl } from "../utils/asset-url";
-import type { UiTheme } from "./persistence";
+import type { UiTheme } from "./ui-preferences";
 
 /** Number of bundled VRM avatars shipped with the app. */
 const BASE_VRM_COUNT = 4;

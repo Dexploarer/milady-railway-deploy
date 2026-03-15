@@ -76,10 +76,11 @@ describe("createMiladyPlugin", () => {
     expect(result?.text).toContain("wave");
     expect(result?.text).toContain("dance-happy");
     expect(result?.text).toContain("Do not use idle, run, or walk");
-    expect(result?.text).toContain("one-shot visual side action");
+    expect(result?.text).toContain("silent one-shot visual side action");
     expect(result?.text).toContain(
-      'actions: ["REPLY", "PLAY_EMOTE"] or ["PLAY_EMOTE", "REPLY"]',
+      'actions: ["PLAY_EMOTE", "REPLY"] or ["REPLY", "PLAY_EMOTE"]',
     );
+    expect(result?.text).toContain("do not call it");
     expect(availableIds).not.toContain("idle");
     expect(availableIds).not.toContain("run");
     expect(availableIds).not.toContain("walk");

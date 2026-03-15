@@ -933,9 +933,7 @@ describe("handleStreamRoute", () => {
 
 describe("createRetakeDestination()", () => {
   it("returns a StreamingDestination with id and name", async () => {
-    const { createRetakeDestination } = await import(
-      "../../packages/plugin-retake/src/index.ts"
-    );
+    const { createRetakeDestination } = await import("@milady/plugin-retake");
     const dest = createRetakeDestination({ accessToken: "test-token" });
     expect(dest.id).toBe("retake");
     expect(dest.name).toBe("Retake.tv");
@@ -946,9 +944,7 @@ describe("createRetakeDestination()", () => {
     delete process.env.RETAKE_AGENT_TOKEN;
 
     try {
-      const { createRetakeDestination } = await import(
-        "../../packages/plugin-retake/src/index.ts"
-      );
+      const { createRetakeDestination } = await import("@milady/plugin-retake");
       const dest = createRetakeDestination();
       await expect(dest.getCredentials()).rejects.toThrow("not configured");
     } finally {
@@ -961,9 +957,7 @@ describe("createRetakeDestination()", () => {
     process.env.RETAKE_AGENT_TOKEN = "env-token";
 
     try {
-      const { createRetakeDestination } = await import(
-        "../../packages/plugin-retake/src/index.ts"
-      );
+      const { createRetakeDestination } = await import("@milady/plugin-retake");
       const dest = createRetakeDestination({ accessToken: "config-token" });
 
       // getCredentials will try to fetch from retake.tv API with config-token.
@@ -987,7 +981,7 @@ describe("createRetakeDestination()", () => {
 describe("createTwitchDestination()", () => {
   it("returns a StreamingDestination with id and name", async () => {
     const { createTwitchDestination } = await import(
-      "../../packages/plugin-twitch/src/index.ts"
+      "@milady/plugin-twitch-streaming"
     );
     const dest = createTwitchDestination({ streamKey: "test-key" });
     expect(dest.id).toBe("twitch");
@@ -1000,7 +994,7 @@ describe("createTwitchDestination()", () => {
 
     try {
       const { createTwitchDestination } = await import(
-        "../../packages/plugin-twitch/src/index.ts"
+        "@milady/plugin-twitch-streaming"
       );
       const dest = createTwitchDestination();
       await expect(dest.getCredentials()).rejects.toThrow("not configured");
@@ -1011,7 +1005,7 @@ describe("createTwitchDestination()", () => {
 
   it("getCredentials returns Twitch RTMP URL with config stream key", async () => {
     const { createTwitchDestination } = await import(
-      "../../packages/plugin-twitch/src/index.ts"
+      "@milady/plugin-twitch-streaming"
     );
     const dest = createTwitchDestination({ streamKey: "my-stream-key" });
     const creds = await dest.getCredentials();
@@ -1026,7 +1020,7 @@ describe("createTwitchDestination()", () => {
 
     try {
       const { createTwitchDestination } = await import(
-        "../../packages/plugin-twitch/src/index.ts"
+        "@milady/plugin-twitch-streaming"
       );
       const dest = createTwitchDestination({ streamKey: "config-key" });
       const creds = await dest.getCredentials();
@@ -1046,7 +1040,7 @@ describe("createTwitchDestination()", () => {
 
     try {
       const { createTwitchDestination } = await import(
-        "../../packages/plugin-twitch/src/index.ts"
+        "@milady/plugin-twitch-streaming"
       );
       const dest = createTwitchDestination();
       const creds = await dest.getCredentials();
@@ -1068,7 +1062,7 @@ describe("createTwitchDestination()", () => {
 describe("createYoutubeDestination()", () => {
   it("returns a StreamingDestination with id and name", async () => {
     const { createYoutubeDestination } = await import(
-      "../../packages/plugin-youtube/src/index.ts"
+      "@milady/plugin-youtube-streaming"
     );
     const dest = createYoutubeDestination({ streamKey: "test-key" });
     expect(dest.id).toBe("youtube");
@@ -1081,7 +1075,7 @@ describe("createYoutubeDestination()", () => {
 
     try {
       const { createYoutubeDestination } = await import(
-        "../../packages/plugin-youtube/src/index.ts"
+        "@milady/plugin-youtube-streaming"
       );
       const dest = createYoutubeDestination();
       await expect(dest.getCredentials()).rejects.toThrow("not configured");
@@ -1092,7 +1086,7 @@ describe("createYoutubeDestination()", () => {
 
   it("getCredentials returns default YouTube RTMP URL with config stream key", async () => {
     const { createYoutubeDestination } = await import(
-      "../../packages/plugin-youtube/src/index.ts"
+      "@milady/plugin-youtube-streaming"
     );
     const dest = createYoutubeDestination({ streamKey: "yt-key" });
     const creds = await dest.getCredentials();
@@ -1103,7 +1097,7 @@ describe("createYoutubeDestination()", () => {
 
   it("uses custom RTMP URL when provided in config", async () => {
     const { createYoutubeDestination } = await import(
-      "../../packages/plugin-youtube/src/index.ts"
+      "@milady/plugin-youtube-streaming"
     );
     const dest = createYoutubeDestination({
       streamKey: "yt-key",
@@ -1121,7 +1115,7 @@ describe("createYoutubeDestination()", () => {
 
     try {
       const { createYoutubeDestination } = await import(
-        "../../packages/plugin-youtube/src/index.ts"
+        "@milady/plugin-youtube-streaming"
       );
       const dest = createYoutubeDestination({ streamKey: "config-key" });
       const creds = await dest.getCredentials();
@@ -1141,7 +1135,7 @@ describe("createYoutubeDestination()", () => {
 
     try {
       const { createYoutubeDestination } = await import(
-        "../../packages/plugin-youtube/src/index.ts"
+        "@milady/plugin-youtube-streaming"
       );
       const dest = createYoutubeDestination();
       const creds = await dest.getCredentials();
@@ -1991,7 +1985,9 @@ describe("handleStreamRoute — voice endpoints", () => {
       expect(handled).toBe(true);
       expect(getStatus()).toBe(400);
       expect(getJson()).toEqual(
-        expect.objectContaining({ error: "text is required" }),
+        expect.objectContaining({
+          error: "text must include speakable content",
+        }),
       );
     });
 

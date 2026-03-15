@@ -39,64 +39,48 @@ vi.mock("@milady/app-core/components", async () => {
   };
 });
 
-vi.mock("../../../../packages/app-core/src/components/ConfigPageView", () => ({
+vi.mock("@milady/app-core/components/ConfigPageView", () => ({
   ConfigPageView: () =>
     React.createElement("div", { "data-testid": "config-page" }, "ConfigPage"),
 }));
 
-vi.mock(
-  "../../../../packages/app-core/src/components/CodingAgentSettingsSection",
-  () => ({
-    CodingAgentSettingsSection: () =>
-      React.createElement("div", null, "CodingAgentSettingsSection"),
-  }),
-);
+vi.mock("@milady/app-core/components/CodingAgentSettingsSection", () => ({
+  CodingAgentSettingsSection: () =>
+    React.createElement("div", null, "CodingAgentSettingsSection"),
+}));
 
-vi.mock(
-  "../../../../packages/app-core/src/components/MediaSettingsSection",
-  () => ({
-    MediaSettingsSection: () =>
-      React.createElement(
-        "div",
-        { "data-testid": "media-settings" },
-        "MediaSettingsSection",
-      ),
-  }),
-);
+vi.mock("@milady/app-core/components/MediaSettingsSection", () => ({
+  MediaSettingsSection: () =>
+    React.createElement(
+      "div",
+      { "data-testid": "media-settings" },
+      "MediaSettingsSection",
+    ),
+}));
 
-vi.mock(
-  "../../../../packages/app-core/src/components/MiladyCloudDashboard",
-  () => ({
-    CloudDashboard: () =>
-      React.createElement("div", null, "MiladyCloudDashboard"),
-  }),
-);
+vi.mock("@milady/app-core/components/ElizaCloudDashboard", () => ({
+  CloudDashboard: () => React.createElement("div", null, "ElizaCloudDashboard"),
+}));
 
-vi.mock(
-  "../../../../packages/app-core/src/components/PermissionsSection",
-  () => ({
-    PermissionsSection: () =>
-      React.createElement(
-        "div",
-        { "data-testid": "permissions" },
-        "PermissionsSection",
-      ),
-  }),
-);
+vi.mock("@milady/app-core/components/PermissionsSection", () => ({
+  PermissionsSection: () =>
+    React.createElement(
+      "div",
+      { "data-testid": "permissions" },
+      "PermissionsSection",
+    ),
+}));
 
-vi.mock(
-  "../../../../packages/app-core/src/components/ProviderSwitcher",
-  () => ({
-    ProviderSwitcher: () =>
-      React.createElement(
-        "div",
-        { "data-testid": "provider-switcher" },
-        "ProviderSwitcher",
-      ),
-  }),
-);
+vi.mock("@milady/app-core/components/ProviderSwitcher", () => ({
+  ProviderSwitcher: () =>
+    React.createElement(
+      "div",
+      { "data-testid": "provider-switcher" },
+      "ProviderSwitcher",
+    ),
+}));
 
-vi.mock("../../../../packages/app-core/src/components/VoiceConfigView", () => ({
+vi.mock("@milady/app-core/components/VoiceConfigView", () => ({
   VoiceConfigView: () =>
     React.createElement(
       "div",
@@ -105,19 +89,19 @@ vi.mock("../../../../packages/app-core/src/components/VoiceConfigView", () => ({
     ),
 }));
 
-import { SettingsView } from "../../../../packages/app-core/src/components/SettingsView";
+import { SettingsView } from "@milady/app-core/components/SettingsView";
 
 type SettingsState = {
   // Cloud
-  miladyCloudEnabled: boolean;
-  miladyCloudConnected: boolean;
-  miladyCloudCredits: number;
-  miladyCloudCreditsLow: boolean;
-  miladyCloudCreditsCritical: boolean;
-  miladyCloudTopUpUrl: string;
-  miladyCloudUserId: string;
-  miladyCloudLoginBusy: boolean;
-  miladyCloudLoginError: string;
+  elizaCloudEnabled: boolean;
+  elizaCloudConnected: boolean;
+  elizaCloudCredits: number;
+  elizaCloudCreditsLow: boolean;
+  elizaCloudCreditsCritical: boolean;
+  elizaCloudTopUpUrl: string;
+  elizaCloudUserId: string;
+  elizaCloudLoginBusy: boolean;
+  elizaCloudLoginError: string;
   cloudDisconnecting: boolean;
   // Plugins
   plugins: Array<{ name: string; enabled: boolean; description?: string }>;
@@ -132,15 +116,15 @@ type SettingsState = {
 
 function createSettingsState(): SettingsState {
   return {
-    miladyCloudEnabled: true,
-    miladyCloudConnected: false,
-    miladyCloudCredits: 100,
-    miladyCloudCreditsLow: false,
-    miladyCloudCreditsCritical: false,
-    miladyCloudTopUpUrl: "https://example.com/topup",
-    miladyCloudUserId: "",
-    miladyCloudLoginBusy: false,
-    miladyCloudLoginError: "",
+    elizaCloudEnabled: true,
+    elizaCloudConnected: false,
+    elizaCloudCredits: 100,
+    elizaCloudCreditsLow: false,
+    elizaCloudCreditsCritical: false,
+    elizaCloudTopUpUrl: "https://example.com/topup",
+    elizaCloudUserId: "",
+    elizaCloudLoginBusy: false,
+    elizaCloudLoginError: "",
     cloudDisconnecting: false,
     plugins: [
       {
@@ -340,7 +324,7 @@ describe("SettingsView Sections", () => {
 
   describe("Cloud Integration Section", () => {
     it("shows login button when not connected", async () => {
-      state.miladyCloudConnected = false;
+      state.elizaCloudConnected = false;
 
       let tree: TestRenderer.ReactTestRenderer | null = null;
 
@@ -363,8 +347,8 @@ describe("SettingsView Sections", () => {
     });
 
     it("shows disconnect button when connected", async () => {
-      state.miladyCloudConnected = true;
-      state.miladyCloudUserId = "user-123";
+      state.elizaCloudConnected = true;
+      state.elizaCloudUserId = "user-123";
 
       let tree: TestRenderer.ReactTestRenderer | null = null;
 
@@ -384,8 +368,8 @@ describe("SettingsView Sections", () => {
     });
 
     it("shows credits when connected", async () => {
-      state.miladyCloudConnected = true;
-      state.miladyCloudCredits = 500;
+      state.elizaCloudConnected = true;
+      state.elizaCloudCredits = 500;
 
       let tree: TestRenderer.ReactTestRenderer | null = null;
 

@@ -4,6 +4,8 @@
  * Since useVoiceChat is a React hook and we run in Node (not jsdom),
  * we test the underlying browser APIs and integration patterns directly.
  */
+
+import { nextIdleMouthOpen } from "@milady/app-core/hooks";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // ---------------------------------------------------------------------------
@@ -284,13 +286,18 @@ describe("Voice Chat — Mouth Animation", () => {
   });
 
   it("smooth-closes mouth when speaking stops", () => {
-    // Simulates the decay: prev * 0.85
+    // Idle decay should keep closing all the way to silence.
     let mouthOpen = 0.8;
-    for (let i = 0; i < 20; i++) {
-      mouthOpen = mouthOpen * 0.85;
+    for (let i = 0; i < 40; i++) {
+      mouthOpen = nextIdleMouthOpen(mouthOpen);
     }
-    // After 20 frames of decay, should be close to 0
-    expect(mouthOpen).toBeLessThan(0.05);
+    expect(mouthOpen).toBe(0);
+  });
+
+  it("does not get stuck at the last stepped mouth-open value", () => {
+    expect(nextIdleMouthOpen(0.06)).toBeCloseTo(0.04);
+    expect(nextIdleMouthOpen(0.04)).toBeCloseTo(0.02);
+    expect(nextIdleMouthOpen(0.02)).toBe(0);
   });
 });
 

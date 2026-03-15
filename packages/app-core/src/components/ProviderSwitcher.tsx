@@ -30,17 +30,17 @@ interface PluginInfo {
 }
 
 export interface ProviderSwitcherProps {
-  // Milady Cloud state
-  miladyCloudEnabled: boolean;
-  miladyCloudConnected: boolean;
-  miladyCloudCredits: number | null;
-  miladyCloudCreditsLow: boolean;
-  miladyCloudCreditsCritical: boolean;
-  miladyCloudTopUpUrl: string;
-  miladyCloudUserId: string | null;
-  miladyCloudLoginBusy: boolean;
-  miladyCloudLoginError: string | null;
-  miladyCloudDisconnecting: boolean;
+  // Eliza Cloud state
+  elizaCloudEnabled: boolean;
+  elizaCloudConnected: boolean;
+  elizaCloudCredits: number | null;
+  elizaCloudCreditsLow: boolean;
+  elizaCloudCreditsCritical: boolean;
+  elizaCloudTopUpUrl: string;
+  elizaCloudUserId: string | null;
+  elizaCloudLoginBusy: boolean;
+  elizaCloudLoginError: string | null;
+  elizaCloudDisconnecting: boolean;
   // Plugins
   plugins: PluginInfo[];
   pluginSaving: Set<string>;
@@ -54,21 +54,23 @@ export interface ProviderSwitcherProps {
   ) => void;
   handleCloudLogin: () => Promise<void>;
   handleCloudDisconnect: () => Promise<void>;
-  setState: (key: "miladyCloudEnabled", value: boolean) => void;
-  setTab: (tab: "plugins") => void;
+  setState: (
+    key: "elizaCloudEnabled" | "cloudDashboardView",
+    value: boolean | "billing" | "agents",
+  ) => void;
+  setTab: (tab: "plugins" | "settings") => void;
 }
 
 export function ProviderSwitcher({
-  miladyCloudEnabled,
-  miladyCloudConnected,
-  miladyCloudCredits,
-  miladyCloudCreditsLow,
-  miladyCloudCreditsCritical,
-  miladyCloudTopUpUrl,
-  miladyCloudUserId,
-  miladyCloudLoginBusy,
-  miladyCloudLoginError,
-  miladyCloudDisconnecting: cloudDisconnecting,
+  elizaCloudEnabled,
+  elizaCloudConnected,
+  elizaCloudCredits,
+  elizaCloudCreditsLow,
+  elizaCloudCreditsCritical,
+  elizaCloudUserId,
+  elizaCloudLoginBusy,
+  elizaCloudLoginError,
+  elizaCloudDisconnecting: cloudDisconnecting,
   plugins,
   pluginSaving,
   pluginSaveSuccess,
@@ -145,7 +147,7 @@ export function ProviderSwitcher({
         const cfg = await client.getConfig();
         const models = cfg.models as Record<string, string> | undefined;
         const cloud = cfg.cloud as Record<string, unknown> | undefined;
-        const miladyCloudEnabledCfg = cloud?.enabled === true;
+        const elizaCloudEnabledCfg = cloud?.enabled === true;
         const defaultSmall = "moonshotai/kimi-k2-turbo";
         const defaultLarge = "moonshotai/kimi-k2-0905";
 
@@ -163,12 +165,12 @@ export function ProviderSwitcher({
         setCurrentSmallModel(
           models?.small ||
             envSmall ||
-            (miladyCloudEnabledCfg ? defaultSmall : ""),
+            (elizaCloudEnabledCfg ? defaultSmall : ""),
         );
         setCurrentLargeModel(
           models?.large ||
             envLarge ||
-            (miladyCloudEnabledCfg ? defaultLarge : ""),
+            (elizaCloudEnabledCfg ? defaultLarge : ""),
         );
         const rawPiAi =
           (typeof vars.MILADY_USE_PI_AI === "string"
@@ -192,7 +194,7 @@ export function ProviderSwitcher({
             : "cloud";
         const inferenceToggle = cloudServices?.inference !== false;
         setCloudHandlesInference(
-          miladyCloudEnabledCfg && inferenceMode === "cloud" && inferenceToggle,
+          elizaCloudEnabledCfg && inferenceMode === "cloud" && inferenceToggle,
         );
 
         const agents = cfg.agents as Record<string, unknown> | undefined;
@@ -238,7 +240,7 @@ export function ProviderSwitcher({
     id === "anthropic-subscription" || id === "openai-subscription";
 
   const [selectedProviderId, setSelectedProviderId] = useState<string | null>(
-    () => (miladyCloudEnabled ? "__cloud__" : null),
+    () => (elizaCloudEnabled ? "__cloud__" : null),
   );
   const hasManualSelection = useRef(false);
 
@@ -295,7 +297,7 @@ export function ProviderSwitcher({
       // on enabling/disabling provider plugins + saving provider config.
       const willTogglePlugins =
         !target.enabled || enabledAiProviders.some((p) => p.id !== newId);
-      if (miladyCloudEnabled || piAiEnabled) {
+      if (elizaCloudEnabled || piAiEnabled) {
         try {
           // Disable cloud inference and explicitly mark cloud as disabled
           // so the cloud-status check doesn't re-enable it on restart.
@@ -332,7 +334,7 @@ export function ProviderSwitcher({
       allAiProviders,
       enabledAiProviders,
       handlePluginToggle,
-      miladyCloudEnabled,
+      elizaCloudEnabled,
       piAiEnabled,
     ],
   );
@@ -396,7 +398,7 @@ export function ProviderSwitcher({
           large: currentLargeModel || "moonshotai/kimi-k2-0905",
         },
       });
-      setState("miladyCloudEnabled", true);
+      setState("elizaCloudEnabled", true);
       setCloudHandlesInference(true);
       setPiAiEnabled(false);
       await client.restartAgent();
@@ -462,7 +464,7 @@ export function ProviderSwitcher({
   const providerChoices = [
     {
       id: "__cloud__",
-      label: t("providerswitcher.miladyCloud"),
+      label: t("providerswitcher.elizaCloud"),
       disabled: false,
     },
     { id: "pi-ai", label: t("providerswitcher.piAi"), disabled: false },
@@ -551,13 +553,13 @@ export function ProviderSwitcher({
       {/* Cloud settings */}
       {isCloudSelected && (
         <div className="mt-4 pt-4 border-t border-[var(--border)]">
-          {miladyCloudConnected ? (
+          {elizaCloudConnected ? (
             <div>
               <div className="flex justify-between items-center mb-3">
                 <div className="flex items-center gap-2">
                   <span className="inline-block w-2 h-2 rounded-full bg-[var(--ok,#16a34a)]" />
                   <span className="text-xs font-semibold">
-                    {t("providerswitcher.loggedIntoMiladyCloud")}
+                    {t("providerswitcher.loggedIntoElizaCloud")}
                   </span>
                 </div>
                 <Button
@@ -574,37 +576,39 @@ export function ProviderSwitcher({
               </div>
 
               <div className="text-xs mb-4">
-                {miladyCloudUserId && (
+                {elizaCloudUserId && (
                   <span className="text-[var(--muted)] mr-3">
                     <code className="font-[var(--mono)] text-[11px]">
-                      {miladyCloudUserId}
+                      {elizaCloudUserId}
                     </code>
                   </span>
                 )}
-                {miladyCloudCredits !== null && (
+                {elizaCloudCredits !== null && (
                   <span>
                     <span className="text-[var(--muted)]">
                       {t("providerswitcher.credits")}
                     </span>{" "}
                     <span
                       className={
-                        miladyCloudCreditsCritical
+                        elizaCloudCreditsCritical
                           ? "text-[var(--danger,#e74c3c)] font-bold"
-                          : miladyCloudCreditsLow
+                          : elizaCloudCreditsLow
                             ? "rounded-md bg-[var(--warn-subtle)] px-1.5 py-0.5 text-[var(--text)] font-bold"
                             : ""
                       }
                     >
-                      ${miladyCloudCredits.toFixed(2)}
+                      ${elizaCloudCredits.toFixed(2)}
                     </span>
-                    <a
-                      href={miladyCloudTopUpUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="ml-2 text-[11px] text-[var(--text)] underline decoration-[var(--accent)] underline-offset-2 hover:opacity-80"
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setState("cloudDashboardView", "billing");
+                        setTab("settings");
+                      }}
+                      className="ml-2 bg-transparent border-0 p-0 cursor-pointer text-[11px] text-[var(--text)] underline decoration-[var(--accent)] underline-offset-2 hover:opacity-80"
                     >
                       {t("providerswitcher.topUp")}
-                    </a>
+                    </button>
                   </span>
                 )}
               </div>
@@ -698,15 +702,15 @@ export function ProviderSwitcher({
             </div>
           ) : (
             <div>
-              {miladyCloudLoginBusy ? (
+              {elizaCloudLoginBusy ? (
                 <div className="text-xs text-[var(--muted)]">
                   {t("providerswitcher.waitingForBrowser")}
                 </div>
               ) : (
                 <>
-                  {miladyCloudLoginError && (
+                  {elizaCloudLoginError && (
                     <div className="text-xs text-[var(--danger,#e74c3c)] mb-2">
-                      {miladyCloudLoginError}
+                      {elizaCloudLoginError}
                     </div>
                   )}
                   <Button
@@ -715,7 +719,7 @@ export function ProviderSwitcher({
                     className="!mt-0 font-bold"
                     onClick={() => void handleCloudLogin()}
                   >
-                    {t("providerswitcher.logInToMiladyCloud")}
+                    {t("providerswitcher.logInToElizaCloud")}
                   </Button>
                   <div className="text-[11px] text-[var(--muted)] mt-1.5">
                     {t("providerswitcher.opensABrowserWindow")}

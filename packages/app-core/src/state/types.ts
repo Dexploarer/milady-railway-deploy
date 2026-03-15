@@ -56,9 +56,10 @@ import type {
 } from "../api/client";
 import type { UiLanguage } from "../i18n";
 import type { Tab } from "../navigation";
-import type { UiTheme } from "./persistence";
+import type { UiShellMode, UiTheme } from "./ui-preferences";
 
-export type UiShellMode = "companion" | "native";
+export type { UiShellMode } from "./ui-preferences";
+export type ShellView = "companion" | "character" | "desktop";
 
 export type OnboardingStep =
   | "wakeUp"
@@ -358,17 +359,18 @@ export interface AppState {
   customVrmUrl: string;
   customBackgroundUrl: string;
 
-  // Milady Cloud
-  miladyCloudEnabled: boolean;
-  miladyCloudConnected: boolean;
-  miladyCloudCredits: number | null;
-  miladyCloudCreditsLow: boolean;
-  miladyCloudCreditsCritical: boolean;
-  miladyCloudTopUpUrl: string;
-  miladyCloudUserId: string | null;
-  miladyCloudLoginBusy: boolean;
-  miladyCloudLoginError: string | null;
-  miladyCloudDisconnecting: boolean;
+  // Eliza Cloud
+  elizaCloudEnabled: boolean;
+  elizaCloudConnected: boolean;
+  elizaCloudCredits: number | null;
+  elizaCloudCreditsLow: boolean;
+  elizaCloudCreditsCritical: boolean;
+  elizaCloudTopUpUrl: string;
+  elizaCloudUserId: string | null;
+  cloudDashboardView: "billing" | "agents";
+  elizaCloudLoginBusy: boolean;
+  elizaCloudLoginError: string | null;
+  elizaCloudDisconnecting: boolean;
 
   // Updates
   updateStatus: UpdateStatus | null;
@@ -451,7 +453,7 @@ export interface AppState {
   onboardingBlooioPhoneNumber: string;
   onboardingGithubToken: string;
   onboardingSubscriptionTab: "token" | "oauth";
-  onboardingMiladyCloudTab: "login" | "apikey";
+  onboardingElizaCloudTab: "login" | "apikey";
   onboardingSelectedChains: Set<string>;
   onboardingRpcSelections: Record<string, string>;
   onboardingRpcKeys: Record<string, string>;
@@ -519,6 +521,8 @@ export interface AppActions {
   // Navigation
   setTab: (tab: Tab) => void;
   setUiShellMode: (mode: UiShellMode) => void;
+  switchUiShellMode: (mode: UiShellMode) => void;
+  switchShellView: (view: ShellView) => void;
   setUiLanguage: (language: UiLanguage) => void;
   setUiTheme: (theme: UiTheme) => void;
 

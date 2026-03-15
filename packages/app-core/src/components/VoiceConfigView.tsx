@@ -308,7 +308,7 @@ export function VoiceConfigView() {
   const { setTimeout } = useTimeout();
 
   const { t } = useApp();
-  const { miladyCloudConnected } = useApp();
+  const { elizaCloudConnected } = useApp();
   const [voiceConfig, setVoiceConfig] = useState<VoiceConfig>({});
   const [swabbleServerConfig, setSwabbleServerConfig] =
     useState<Partial<SwabbleConfig> | null>(null);
@@ -359,7 +359,7 @@ export function VoiceConfigView() {
   const providerInfo = VOICE_PROVIDERS.find((p) => p.id === currentProvider);
   const isConfigured =
     currentMode === "cloud"
-      ? miladyCloudConnected
+      ? elizaCloudConnected
       : currentProvider !== "elevenlabs"
         ? true
         : Boolean(voiceConfig.elevenlabs?.apiKey);
@@ -505,8 +505,8 @@ export function VoiceConfigView() {
       <div className="flex items-center justify-between py-2 px-3 border border-[var(--border)] bg-[var(--bg-muted)]">
         <span className="text-xs">
           {currentProvider === "elevenlabs"
-            ? `ElevenLabs — ${currentMode === "cloud" ? t("miladyclouddashboard.ServedViaMiladyCloud") : "Requires API key"}`
-            : `${providerInfo?.label} — No API key needed`}
+            ? `ElevenLabs — ${currentMode === "cloud" ? t("voiceconfigview.ServedViaElizaCloud") : t("voiceconfigview.RequiresApiKey")}`
+            : `${providerInfo?.label} — ${t("voiceconfigview.NoApiKeyNeeded")}`}
         </span>
         <span
           className={`rounded-full border px-1.5 py-0.5 text-[10px] ${
@@ -515,7 +515,9 @@ export function VoiceConfigView() {
               : "border-[var(--warn)] bg-[var(--warn-subtle)] text-[var(--text)]"
           }`}
         >
-          {isConfigured ? "Configured" : "Needs Setup"}
+          {isConfigured
+            ? t("mediasettingssection.Configured")
+            : t("mediasettingssection.NeedsSetup")}
         </span>
       </div>
 
@@ -536,10 +538,8 @@ export function VoiceConfigView() {
           {/* Cloud mode status */}
           {currentMode === "cloud" && (
             <CloudConnectionStatus
-              connected={miladyCloudConnected}
-              disconnectedText={t(
-                "miladyclouddashboard.MiladyCloudNotConnected",
-              )}
+              connected={elizaCloudConnected}
+              disconnectedText={t("elizaclouddashboard.ElizaCloudNotConnected")}
             />
           )}
 
@@ -554,8 +554,8 @@ export function VoiceConfigView() {
                 className="bg-card text-xs"
                 placeholder={
                   voiceConfig.elevenlabs?.apiKey
-                    ? "API key set"
-                    : "Enter API key..."
+                    ? t("mediasettingssection.ApiKeySetLeaveBlank")
+                    : t("mediasettingssection.EnterApiKey")
                 }
                 onChange={(e) => handleApiKeyChange(e.target.value)}
               />
@@ -615,7 +615,11 @@ export function VoiceConfigView() {
                 disabled={testing}
                 onClick={() => handleTestVoice(selectedPreset.previewUrl)}
               >
-                {testing ? "Playing..." : `Test ${selectedPreset.name}`}
+                {testing
+                  ? t("voiceconfigview.Playing")
+                  : t("voiceconfigview.TestVoice", {
+                      name: selectedPreset.name,
+                    })}
               </Button>
               {testing && (
                 <Button

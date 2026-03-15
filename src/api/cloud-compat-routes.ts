@@ -1,5 +1,5 @@
 /**
- * Cloud Compat proxy routes — forwards /api/cloud/compat/* to Milady Cloud's
+ * Cloud Compat proxy routes — forwards /api/cloud/compat/* to Eliza Cloud's
  * /api/compat/* endpoints, injecting stored credentials for authentication.
  *
  * Auth strategy:
@@ -15,6 +15,7 @@
 
 import type http from "node:http";
 import { logger } from "@elizaos/core";
+import { normalizeCloudSiteUrl } from "../cloud/base-url";
 import { validateCloudBaseUrl } from "../cloud/validate-url";
 import type { MiladyConfig } from "../config/config";
 import { sendJson, sendJsonError } from "./http-helpers";
@@ -28,12 +29,10 @@ const MAX_BODY_BYTES = 1_048_576;
 const RETRY_BACKOFF_MS = 2_000;
 
 /**
- * Resolve the Milady Cloud base URL from config (without trailing slashes).
+ * Resolve the Eliza Cloud base URL from config (without trailing slashes).
  */
 export function resolveCloudBaseUrl(config: MiladyConfig): string {
-  return (config.cloud?.baseUrl ?? "https://cloud.milady.ai")
-    .trim()
-    .replace(/\/+$/, "");
+  return normalizeCloudSiteUrl(config.cloud?.baseUrl);
 }
 
 /**
@@ -126,7 +125,7 @@ export async function handleCloudCompatRoute(
   if (!apiKey) {
     sendJsonError(
       res,
-      "Not connected to Milady Cloud. Please log in first.",
+      "Not connected to Eliza Cloud. Please log in first.",
       401,
     );
     return true;
@@ -202,7 +201,7 @@ export async function handleCloudCompatRoute(
     ) {
       sendJsonError(
         res,
-        "Milady Cloud request was redirected; redirects are not allowed",
+        "Eliza Cloud request was redirected; redirects are not allowed",
         502,
       );
       return true;
@@ -216,12 +215,12 @@ export async function handleCloudCompatRoute(
 
     if (isTimeout) {
       logger.warn(`[cloud-compat] Upstream request timed out: ${compatPath}`);
-      sendJsonError(res, "Milady Cloud request timed out", 504);
+      sendJsonError(res, "Eliza Cloud request timed out", 504);
     } else {
       logger.warn(
         `[cloud-compat] Upstream request failed: ${compatPath} — ${err instanceof Error ? err.message : String(err)}`,
       );
-      sendJsonError(res, "Failed to reach Milady Cloud", 502);
+      sendJsonError(res, "Failed to reach Eliza Cloud", 502);
     }
     return true;
   }

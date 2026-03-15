@@ -63,19 +63,19 @@ python -m benchmarks.orchestrator run \
   --benchmarks milady_replay \
   --provider openai \
   --model gpt-4o-mini \
-  --extra '{"per_benchmark":{"milady_replay":{"capture_path":"<path-to-your-workspaces>/milaidy/replays/solo","capture_glob":"*.replay.json"}}}'
+  --extra '{"per_benchmark":{"milady_replay":{"capture_path":"<path-to-your-workspaces>/milady/replays/solo","capture_glob":"*.replay.json"}}}'
 
 python -m benchmarks.orchestrator run \
   --benchmarks milady_replay \
   --provider openai \
   --model gpt-4o-mini \
-  --extra '{"per_benchmark":{"milady_replay":{"capture_path":"<path-to-your-workspaces>/milaidy/replays/swarm-baseline","capture_glob":"*.replay.json"}}}'
+  --extra '{"per_benchmark":{"milady_replay":{"capture_path":"<path-to-your-workspaces>/milady/replays/swarm-baseline","capture_glob":"*.replay.json"}}}'
 
 python -m benchmarks.orchestrator run \
   --benchmarks milady_replay \
   --provider openai \
   --model gpt-4o-mini \
-  --extra '{"per_benchmark":{"milady_replay":{"capture_path":"<path-to-your-workspaces>/milaidy/replays/swarm-reflection","capture_glob":"*.replay.json"}}}'
+  --extra '{"per_benchmark":{"milady_replay":{"capture_path":"<path-to-your-workspaces>/milady/replays/swarm-reflection","capture_glob":"*.replay.json"}}}'
 ```
 
 ## 4. Compare metrics

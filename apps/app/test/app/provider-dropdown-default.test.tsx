@@ -48,15 +48,15 @@ import { ProviderSwitcher } from "@milady/app-core/components";
 
 function defaultProps() {
   return {
-    miladyCloudEnabled: false,
-    miladyCloudConnected: false,
-    miladyCloudCredits: null,
-    miladyCloudCreditsLow: false,
-    miladyCloudCreditsCritical: false,
-    miladyCloudTopUpUrl: "",
-    miladyCloudUserId: null,
-    miladyCloudLoginBusy: false,
-    miladyCloudLoginError: null,
+    elizaCloudEnabled: false,
+    elizaCloudConnected: false,
+    elizaCloudCredits: null,
+    elizaCloudCreditsLow: false,
+    elizaCloudCreditsCritical: false,
+    elizaCloudTopUpUrl: "",
+    elizaCloudUserId: null,
+    elizaCloudLoginBusy: false,
+    elizaCloudLoginError: null,
     cloudDisconnecting: false,
     plugins: [
       {
@@ -149,7 +149,7 @@ describe("ProviderSwitcher provider dropdown default", () => {
       tree = create(
         React.createElement(ProviderSwitcher, {
           ...defaultProps(),
-          miladyCloudEnabled: true,
+          elizaCloudEnabled: true,
         }),
       );
     });

@@ -6,6 +6,7 @@
 import { logger } from "@elizaos/core";
 import type { CloudConfig } from "../config/types.milady";
 import { BackupScheduler } from "./backup";
+import { normalizeCloudSiteUrl } from "./base-url";
 import { ElizaCloudClient } from "./bridge-client";
 import { CloudRuntimeProxy } from "./cloud-proxy";
 import { ConnectionMonitor } from "./reconnect";
@@ -36,7 +37,7 @@ export class CloudManager {
   ) {}
 
   async init(): Promise<void> {
-    const rawUrl = this.cloudConfig.baseUrl ?? "https://cloud.milady.ai";
+    const rawUrl = normalizeCloudSiteUrl(this.cloudConfig.baseUrl);
     const apiKey = this.cloudConfig.apiKey;
     if (!apiKey)
       throw new Error(
@@ -48,7 +49,7 @@ export class CloudManager {
       throw new Error(urlError);
     }
 
-    const siteUrl = rawUrl.replace(/\/api\/v1\/?$/, "").replace(/\/+$/, "");
+    const siteUrl = normalizeCloudSiteUrl(rawUrl);
     this.client = new ElizaCloudClient(siteUrl, apiKey);
     logger.info(`[cloud-manager] Client initialised (baseUrl=${siteUrl})`);
   }

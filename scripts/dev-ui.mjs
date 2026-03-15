@@ -893,7 +893,7 @@ function killOrphanedWorkspaceProcesses() {
 
   try {
     // Kill orphaned node-pty spawn-helpers and any processes running inside
-    // .milaidy/workspaces (vite, esbuild, etc.) that survived a crash.
+    // .milady/workspaces (or legacy .milaidy/workspaces) that survived a crash.
     const out = execSync(
       `ps axo pid,command 2>/dev/null | grep -E '\\.mil(aidy|ady)/workspaces' | grep -v grep`,
       { encoding: "utf-8", stdio: ["pipe", "pipe", "ignore"] },

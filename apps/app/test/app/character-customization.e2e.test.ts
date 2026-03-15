@@ -387,17 +387,18 @@ type CharacterState = {
 
 function createCharacterUIState(): CharacterState {
   const charData: CharacterData = {
-    name: "TestAgent",
-    bio: ["A helpful AI assistant"],
-    system: "You are helpful",
+    name: "Reimu",
+    username: "Reimu",
+    bio: ["Reimu is soft and friendly"],
+    system: "You are Reimu",
     adjectives: ["friendly", "helpful"],
-    topics: ["technology"],
+    topics: ["technology", "art"],
     style: { all: ["Rule 1"], chat: ["Chat rule"], post: ["Post rule"] },
     messageExamples: [
       {
         examples: [
-          { name: "{{user1}}", content: { text: "hello" } },
-          { name: "TestAgent", content: { text: "hi" } },
+          { name: "{{user1}}", content: { text: "hi" } },
+          { name: "Reimu", content: { text: "hey" } },
         ],
       },
     ],
@@ -574,7 +575,32 @@ describe("CharacterView UI", () => {
     ).toHaveLength(0);
   });
 
-  it("starts in custom mode when the saved draft differs from the selected preset", async () => {
+  it("anchors the scene overlay layout to the bottom of the viewport", async () => {
+    let tree: TestRenderer.ReactTestRenderer | null = null;
+
+    await act(async () => {
+      tree = TestRenderer.create(
+        React.createElement(CharacterView, { sceneOverlay: true }),
+      );
+    });
+
+    const json = tree?.toJSON();
+    expect(json).not.toBeNull();
+    expect(
+      json &&
+        !Array.isArray(json) &&
+        typeof json.props.className === "string" &&
+        json.props.className.includes("min-h-full"),
+    ).toBe(true);
+    expect(
+      json &&
+        !Array.isArray(json) &&
+        typeof json.props.className === "string" &&
+        json.props.className.includes("justify-end"),
+    ).toBe(true);
+  });
+
+  it("starts in roster mode even when the saved draft differs from the selected preset", async () => {
     let tree: TestRenderer.ReactTestRenderer | null = null;
 
     await act(async () => {
@@ -585,7 +611,11 @@ describe("CharacterView UI", () => {
       tree?.root.findAll(
         (node) => node.props["data-testid"] === "character-customize-grid",
       ) ?? [],
-    ).toHaveLength(1);
+    ).toHaveLength(0);
+    expect(state.characterDraft?.name).toBe("Reimu");
+    expect(state.characterDraft?.bio).toBe("Reimu is soft and friendly");
+    expect(state.characterDraft?.system).toBe("You are Reimu");
+    expect(state.selectedVrmIndex).toBe(1);
   });
 
   it("removes adjective editors from the character screen", async () => {
@@ -612,6 +642,20 @@ describe("CharacterView UI", () => {
     await act(async () => {
       tree = TestRenderer.create(React.createElement(CharacterView));
     });
+
+    const customizeButton = tree?.root.find(
+      (node) => node.props["data-testid"] === "character-customize-toggle",
+    );
+
+    await act(async () => {
+      customizeButton?.props.onClick();
+    });
+
+    expect(
+      tree?.root.findAll(
+        (node) => node.props["data-testid"] === "character-roster-grid",
+      ) ?? [],
+    ).toHaveLength(0);
 
     const customizeSidebar = tree?.root.find(
       (node) => node.props["data-testid"] === "character-customize-sidebar",
@@ -661,7 +705,15 @@ describe("CharacterView UI", () => {
     );
 
     await act(async () => {
-      customizeButton?.props.onCheckedChange(false);
+      customizeButton?.props.onClick();
+    });
+
+    const backButton = tree?.root.find(
+      (node) => node.props["data-testid"] === "character-customize-toggle",
+    );
+
+    await act(async () => {
+      backButton?.props.onClick();
     });
 
     expect(state.characterDraft?.name).toBe("Reimu");
@@ -673,30 +725,14 @@ describe("CharacterView UI", () => {
         (node) => node.props["data-testid"] === "character-customize-grid",
       ) ?? [],
     ).toHaveLength(0);
+    expect(
+      tree?.root.findAll(
+        (node) => node.props["data-testid"] === "character-roster-grid",
+      ) ?? [],
+    ).toHaveLength(1);
   });
 
-  it("keeps custom overrides when switching characters with custom on", async () => {
-    let tree: TestRenderer.ReactTestRenderer | null = null;
-
-    await act(async () => {
-      tree = TestRenderer.create(React.createElement(CharacterView));
-    });
-
-    const sakuyaCard = tree?.root.find(
-      (node) => node.props["data-testid"] === "character-preset-Noted.",
-    );
-
-    await act(async () => {
-      sakuyaCard?.props.onClick();
-    });
-
-    expect(state.characterDraft?.name).toBe("TestAgent");
-    expect(state.characterDraft?.bio).toEqual(["A helpful AI assistant"]);
-    expect(state.characterDraft?.system).toBe("You are helpful");
-    expect(state.selectedVrmIndex).toBe(4);
-  });
-
-  it("uses the selected character defaults when switching characters with custom off", async () => {
+  it("turning custom off keeps deep overrides intact", async () => {
     let tree: TestRenderer.ReactTestRenderer | null = null;
 
     await act(async () => {
@@ -708,7 +744,122 @@ describe("CharacterView UI", () => {
     );
 
     await act(async () => {
-      customizeButton?.props.onCheckedChange(false);
+      customizeButton?.props.onClick();
+    });
+
+    await act(async () => {
+      state.characterDraft = {
+        ...(state.characterDraft as CharacterData),
+        system: "Custom preserved system",
+      };
+      tree?.update(React.createElement(CharacterView));
+    });
+
+    const backButton = tree?.root.find(
+      (node) => node.props["data-testid"] === "character-customize-toggle",
+    );
+
+    await act(async () => {
+      backButton?.props.onClick();
+    });
+
+    expect(state.characterDraft?.system).toBe("Custom preserved system");
+    expect(
+      tree?.root.findAll(
+        (node) => node.props["data-testid"] === "character-roster-grid",
+      ) ?? [],
+    ).toHaveLength(1);
+  });
+
+  it("does not wipe deep overrides when switching presets after leaving custom mode", async () => {
+    let tree: TestRenderer.ReactTestRenderer | null = null;
+
+    await act(async () => {
+      tree = TestRenderer.create(React.createElement(CharacterView));
+    });
+
+    const customizeButton = tree?.root.find(
+      (node) => node.props["data-testid"] === "character-customize-toggle",
+    );
+
+    await act(async () => {
+      customizeButton?.props.onClick();
+    });
+
+    await act(async () => {
+      state.characterDraft = {
+        ...(state.characterDraft as CharacterData),
+        system: "Custom preserved system",
+      };
+      tree?.update(React.createElement(CharacterView));
+    });
+
+    const backButton = tree?.root.find(
+      (node) => node.props["data-testid"] === "character-customize-toggle",
+    );
+
+    await act(async () => {
+      backButton?.props.onClick();
+    });
+
+    const sakuyaCard = tree?.root.find(
+      (node) => node.props["data-testid"] === "character-preset-Noted.",
+    );
+
+    await act(async () => {
+      sakuyaCard?.props.onClick();
+    });
+
+    expect(state.characterDraft?.name).toBe("Reimu");
+    expect(state.characterDraft?.system).toBe("Custom preserved system");
+    expect(state.selectedVrmIndex).toBe(4);
+  });
+
+  it("hides character select while customizing and restores it when going back", async () => {
+    let tree: TestRenderer.ReactTestRenderer | null = null;
+
+    await act(async () => {
+      tree = TestRenderer.create(React.createElement(CharacterView));
+    });
+
+    const customizeButton = tree?.root.find(
+      (node) => node.props["data-testid"] === "character-customize-toggle",
+    );
+
+    await act(async () => {
+      customizeButton?.props.onClick();
+    });
+
+    expect(
+      tree?.root.findAll(
+        (node) => node.props["data-testid"] === "character-roster-grid",
+      ) ?? [],
+    ).toHaveLength(0);
+    expect(
+      tree?.root.findAll(
+        (node) => node.props["data-testid"] === "character-customize-header",
+      ) ?? [],
+    ).toHaveLength(0);
+
+    const backButton = tree?.root.find(
+      (node) => node.props["data-testid"] === "character-customize-toggle",
+    );
+
+    await act(async () => {
+      backButton?.props.onClick();
+    });
+
+    expect(
+      tree?.root.findAll(
+        (node) => node.props["data-testid"] === "character-roster-grid",
+      ) ?? [],
+    ).toHaveLength(1);
+  });
+
+  it("uses the selected character defaults when switching characters with custom off", async () => {
+    let tree: TestRenderer.ReactTestRenderer | null = null;
+    await act(async () => {
+      tree = TestRenderer.create(React.createElement(CharacterView));
     });
 
     const sakuyaCard = tree?.root.find(
@@ -726,6 +877,55 @@ describe("CharacterView UI", () => {
     );
     expect(state.characterDraft?.topics).toEqual(["systems", "writing"]);
     expect(state.selectedVrmIndex).toBe(4);
+  });
+
+  it("preserves deep custom character settings on load instead of forcing preset defaults", async () => {
+    state.characterData = {
+      name: "Reimu",
+      username: "Reimu",
+      bio: ["Custom bio line"],
+      system: "Custom Reimu system",
+      adjectives: ["friendly", "helpful", "wildcard"],
+      topics: ["technology", "art", "custom lore"],
+      style: {
+        all: ["Custom all rule"],
+        chat: ["Custom chat rule"],
+        post: ["Custom post rule"],
+      },
+      messageExamples: [
+        {
+          examples: [
+            { name: "{{user1}}", content: { text: "hey?" } },
+            { name: "Reimu", content: { text: "custom answer" } },
+          ],
+        },
+      ],
+      postExamples: ["Custom post"],
+    };
+    state.characterDraft = { ...state.characterData };
+
+    let tree: TestRenderer.ReactTestRenderer | null = null;
+    await act(async () => {
+      tree = TestRenderer.create(React.createElement(CharacterView));
+    });
+
+    expect(
+      tree?.root.findAll(
+        (node) => node.props["data-testid"] === "character-customize-grid",
+      ) ?? [],
+    ).toHaveLength(1);
+    expect(
+      tree?.root.findAll(
+        (node) => node.props["data-testid"] === "character-roster-grid",
+      ) ?? [],
+    ).toHaveLength(0);
+    expect(state.characterDraft?.bio).toEqual(["Custom bio line"]);
+    expect(state.characterDraft?.system).toBe("Custom Reimu system");
+    expect(state.characterDraft?.topics).toEqual([
+      "technology",
+      "art",
+      "custom lore",
+    ]);
   });
 
   it("renders save button", async () => {
@@ -749,29 +949,6 @@ describe("CharacterView UI", () => {
   });
 
   it("saves the full character payload, voice config, and avatar selection", async () => {
-    state.characterDraft = {
-      name: "Custom Sakuya",
-      bio: "  First line  \n\n Second line ",
-      system: "Be exact.",
-      adjectives: ["precise", "calm"],
-      topics: ["systems", "writing"],
-      style: {
-        all: ["Be exact"],
-        chat: ["Stay calm"],
-        post: ["Be clear"],
-      },
-      messageExamples: [
-        {
-          examples: [
-            { name: "{{user1}}", content: { text: "status?" } },
-            { name: "Custom Sakuya", content: { text: "On track." } },
-          ],
-        },
-      ],
-      postExamples: ["Mission remains on schedule."],
-    };
-    state.selectedVrmIndex = 4;
-
     mockUseApp.mockReset();
     mockUseApp.mockImplementation(() => ({
       uiLanguage: "en",
@@ -833,6 +1010,29 @@ describe("CharacterView UI", () => {
     await act(async () => {
       tree = TestRenderer.create(React.createElement(CharacterView));
     });
+
+    state.characterDraft = {
+      name: "Custom Sakuya",
+      bio: "  First line  \n\n Second line ",
+      system: "Be exact.",
+      adjectives: ["precise", "calm"],
+      topics: ["systems", "writing"],
+      style: {
+        all: ["Be exact"],
+        chat: ["Stay calm"],
+        post: ["Be clear"],
+      },
+      messageExamples: [
+        {
+          examples: [
+            { name: "{{user1}}", content: { text: "status?" } },
+            { name: "Custom Sakuya", content: { text: "On track." } },
+          ],
+        },
+      ],
+      postExamples: ["Mission remains on schedule."],
+    };
+    state.selectedVrmIndex = 4;
 
     const saveButton = tree?.root.find(
       (node) =>

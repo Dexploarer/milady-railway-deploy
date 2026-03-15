@@ -313,4 +313,14 @@ describe("MessageContent — XML action stripping", () => {
     expect(rendered.replace(/\s+/g, " ").trim()).toBe("Visible text after");
     expect(rendered).not.toContain("planning output");
   });
+
+  it("strips single-star stage directions from displayed assistant text", () => {
+    const rendered = renderText("*waves warmly* Hello there.");
+    expect(rendered).toBe("Hello there.");
+  });
+
+  it("preserves bold markdown-style text", () => {
+    const rendered = renderText("**Saturday**: Sunny and warm.");
+    expect(rendered).toBe("**Saturday**: Sunny and warm.");
+  });
 });

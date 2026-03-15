@@ -2,15 +2,15 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import type {
-  RegistryAppMeta,
-  RegistryAppViewerMeta,
-  RegistryPluginInfo,
-} from "./registry-client.js";
 import {
   mergeAppMeta,
   resolveAppOverride,
 } from "./registry-client-app-meta.js";
+import type {
+  RegistryAppMeta,
+  RegistryAppViewerMeta,
+  RegistryPluginInfo,
+} from "./registry-client-types.js";
 
 interface LocalPackageAppMeta {
   displayName?: string;

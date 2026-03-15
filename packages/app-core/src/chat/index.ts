@@ -108,7 +108,7 @@ export const NAV_COMMANDS: readonly { id: string; label: string; tab: Tab }[] =
     { id: "nav-triggers", label: "Open Heartbeats", tab: "triggers" },
     { id: "nav-wallets", label: "Open Wallets", tab: "wallets" },
     { id: "nav-knowledge", label: "Open Knowledge", tab: "knowledge" },
-    { id: "nav-connectors", label: "Open Social", tab: "connectors" },
+    { id: "nav-connectors", label: "Open Connectors", tab: "connectors" },
     { id: "nav-plugins", label: "Open Plugins", tab: "plugins" },
     { id: "nav-settings", label: "Open Settings", tab: "settings" },
     { id: "nav-database", label: "Open Database", tab: "database" },

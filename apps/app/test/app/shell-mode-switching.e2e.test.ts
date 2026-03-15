@@ -22,6 +22,7 @@ const { mockKeyboardSetScroll, mockUseApp, noop, sceneHostState } = vi.hoisted(
     noop: vi.fn(),
     sceneHostState: {
       activeHistory: [] as boolean[],
+      interactiveHistory: [] as boolean[],
       mounts: 0,
       unmounts: 0,
     },
@@ -64,7 +65,7 @@ vi.mock("@milady/app-core/components", async () => {
       React.createElement("section", null, "AppsPageView Ready"),
     BugReportModal: () => React.createElement("div", null, "BugReportModal"),
     CloudDashboard: () =>
-      React.createElement("section", null, "MiladyCloudDashboard Ready"),
+      React.createElement("section", null, "ElizaCloudDashboard Ready"),
     CommandPalette: () => React.createElement("div", null, "CommandPalette"),
     ConnectorsPageView: () =>
       React.createElement("section", null, "ConnectorsPageView Ready"),
@@ -158,9 +159,11 @@ vi.mock("../../src/components/companion/CompanionSceneHost", async () => {
   return {
     SharedCompanionScene: ({
       active,
+      interactive,
       children,
     }: {
       active: boolean;
+      interactive?: boolean;
       children: React.ReactNode;
     }) => {
       const { useEffect } = React;
@@ -171,6 +174,7 @@ vi.mock("../../src/components/companion/CompanionSceneHost", async () => {
         };
       }, []);
       sceneHostState.activeHistory.push(active);
+      sceneHostState.interactiveHistory.push(Boolean(interactive));
       return React.createElement(React.Fragment, null, children);
     },
     CompanionSceneHost: () => null,
@@ -283,7 +287,7 @@ function tFn(k: string): string {
     "nav.character": "Character",
     "nav.wallets": "Wallets",
     "nav.knowledge": "Knowledge",
-    "nav.social": "Social",
+    "nav.social": "Connectors",
     "nav.apps": "Apps",
     "nav.settings": "Settings",
     "nav.heartbeats": "Heartbeats",
@@ -378,6 +382,7 @@ describe("shell mode switching (e2e)", () => {
     mockUseApp.mockReset();
     mockUseApp.mockImplementation(() => state);
     sceneHostState.activeHistory = [];
+    sceneHostState.interactiveHistory = [];
     sceneHostState.mounts = 0;
     sceneHostState.unmounts = 0;
   });
@@ -438,15 +443,14 @@ describe("shell mode switching (e2e)", () => {
     warnSpy.mockRestore();
   });
 
-  // --- Companion shell: only companion tab uses companion shell; others use native ---
+  // --- Companion shell: companion mode always renders the companion chat surface ---
 
-  it("renders companion tab in COMPANION shell mode; other tabs use native layout", async () => {
+  it("renders the companion shell for every tab while companion mode is active", async () => {
     const errorSpy = vi.spyOn(console, "error");
     const warnSpy = vi.spyOn(console, "warn");
 
     state.uiShellMode = "companion";
 
-    // Only companion tab stays in companion shell
     state.tab = "companion";
     let tree: TestRenderer.ReactTestRenderer | null = null;
     await act(async () => {
@@ -459,22 +463,22 @@ describe("shell mode switching (e2e)", () => {
     expect(text).not.toContain("Header");
     expectValidContent(text);
 
-    // Settings/skills/etc. in companion mode fall back to native layout
-    const nativeFallbackCases: Array<{ tab: Tab; token: string }> = [
-      { tab: "settings", token: "SettingsView Ready" },
-      { tab: "triggers", token: "HeartbeatsView Ready" },
-      { tab: "skills", token: "AdvancedPageView Ready" },
-      { tab: "character", token: "CharacterView Ready" },
+    const companionCases: Tab[] = [
+      "settings",
+      "triggers",
+      "skills",
+      "character",
+      "wallets",
     ];
 
-    for (const { tab, token } of nativeFallbackCases) {
+    for (const tab of companionCases) {
       state.tab = tab;
       await act(async () => {
         tree?.update(React.createElement(App));
       });
       text = textOf(tree.root);
-      expect(text).toContain("Header");
-      expect(text).toContain(token);
+      expect(text).toContain("CompanionView Ready");
+      expect(text).not.toContain("Header");
       expectValidContent(text);
     }
 
@@ -532,24 +536,24 @@ describe("shell mode switching (e2e)", () => {
     expect(text).not.toContain("Header");
     expectValidContent(text);
 
-    // 4. Navigate to skills in companion mode — falls back to native layout
+    // 4. Navigate around in companion mode — still stays on companion shell
     state.tab = "skills";
     await act(async () => {
       tree?.update(React.createElement(App));
     });
     text = textOf(tree.root);
-    expect(text).toContain("Header");
-    expect(text).toContain("AdvancedPageView Ready");
+    expect(text).toContain("CompanionView Ready");
+    expect(text).not.toContain("Header");
     expectValidContent(text);
 
-    // 5. Navigate to settings in companion mode — falls back to native layout
+    // 5. Navigate to settings in companion mode — still companion shell
     state.tab = "settings";
     await act(async () => {
       tree?.update(React.createElement(App));
     });
     text = textOf(tree.root);
-    expect(text).toContain("Header");
-    expect(text).toContain("SettingsView Ready");
+    expect(text).toContain("CompanionView Ready");
+    expect(text).not.toContain("Header");
     expectValidContent(text);
 
     // 6. Switch back to native mode
@@ -605,7 +609,7 @@ describe("shell mode switching (e2e)", () => {
     });
     if (!tree) throw new Error("failed to render App");
 
-    // Rapid-fire: companion stays in CompanionShell; others show native layout
+    // Rapid-fire: every tab still renders the companion shell while in companion mode
     const rapidTabs: Tab[] = [
       "companion",
       "skills",
@@ -620,6 +624,8 @@ describe("shell mode switching (e2e)", () => {
         tree?.update(React.createElement(App));
       });
       const text = textOf(tree.root);
+      expect(text).toContain("CompanionView Ready");
+      expect(text).not.toContain("Header");
       expectValidContent(text);
     }
 
@@ -705,6 +711,40 @@ describe("shell mode switching (e2e)", () => {
     expect(sceneHostState.activeHistory).toEqual([false, true, false]);
   });
 
+  it("routes companion mode back to the companion shell even if the tab state says character", async () => {
+    let tree: TestRenderer.ReactTestRenderer | null = null;
+
+    state.uiShellMode = "native";
+    state.tab = "chat";
+    await act(async () => {
+      tree = TestRenderer.create(React.createElement(App));
+    });
+    if (!tree) throw new Error("failed to render App");
+
+    state.tab = "character";
+    await act(async () => {
+      tree?.update(React.createElement(App));
+    });
+
+    let text = textOf(tree.root);
+    expect(text).toContain("Header");
+    expect(text).toContain("CharacterView Ready");
+    expect(sceneHostState.activeHistory.at(-1)).toBe(true);
+    expect(sceneHostState.interactiveHistory.at(-1)).toBe(false);
+
+    state.uiShellMode = "companion";
+    state.tab = "character";
+    await act(async () => {
+      tree?.update(React.createElement(App));
+    });
+
+    text = textOf(tree.root);
+    expect(text).toContain("CompanionView Ready");
+    expect(text).not.toContain("Header");
+    expect(sceneHostState.activeHistory.at(-1)).toBe(true);
+    expect(sceneHostState.interactiveHistory.at(-1)).toBe(true);
+  });
+
   it("disables iOS native scrolling only while the companion shell is visible", async () => {
     let tree: TestRenderer.ReactTestRenderer | null = null;
 
@@ -725,7 +765,7 @@ describe("shell mode switching (e2e)", () => {
       tree?.update(React.createElement(App));
     });
     expect(mockKeyboardSetScroll).toHaveBeenLastCalledWith({
-      isDisabled: false,
+      isDisabled: true,
     });
 
     state.uiShellMode = "companion";

@@ -1,5 +1,8 @@
 import { releaseData } from "../generated/release-data";
 
+const ELIZA_CLOUD_LOGIN_URL =
+  "https://elizacloud.ai/login?returnTo=%2Fdashboard%2Fmilady";
+
 export function Nav() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 md:px-12 bg-dark/95 backdrop-blur-md border-b border-sharp">
@@ -18,7 +21,7 @@ export function Nav() {
           Install
         </a>
         <a
-          href="https://cloud.milady.ai"
+          href={ELIZA_CLOUD_LOGIN_URL}
           target="_blank"
           rel="noreferrer"
           className="text-text-muted hover:text-brand transition-colors duration-300"

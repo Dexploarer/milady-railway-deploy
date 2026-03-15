@@ -78,6 +78,22 @@ export function resolveEmoteFromChat(text: string): string | false {
   return false;
 }
 
+/**
+ * Fallback auto-emote heuristic for retake chat.
+ *
+ * If the agent already selected PLAY_EMOTE we trust the runtime action
+ * execution path and do not trigger a second emote from chat-poll.
+ */
+export function resolveAutoEmoteId(
+  text: string,
+  actions: unknown,
+): string | false {
+  if (Array.isArray(actions) && actions.includes("PLAY_EMOTE")) {
+    return false;
+  }
+  return resolveEmoteFromChat(text);
+}
+
 /** POST to the local emote API endpoint. */
 export function triggerEmote(emoteId: string): void {
   fetch(`http://127.0.0.1:${LOCAL_API_PORT}/api/emote`, {

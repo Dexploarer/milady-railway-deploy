@@ -6,7 +6,7 @@ export type CloudSourceMode = "cloud" | "own-key";
 export function CloudSourceModeToggle({
   mode,
   onChange,
-  cloudLabel = "Milady Cloud",
+  cloudLabel = "Eliza Cloud",
   ownKeyLabel = "Own API Key",
 }: {
   mode: CloudSourceMode;
@@ -48,7 +48,7 @@ export function CloudSourceModeToggle({
 
 export function CloudConnectionStatus({
   connected,
-  connectedText = "Connected to Milady Cloud",
+  connectedText = "Connected to Eliza Cloud",
   disconnectedText,
 }: {
   connected: boolean;

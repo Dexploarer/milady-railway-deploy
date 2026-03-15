@@ -118,7 +118,7 @@ describe("CloudManager", () => {
       const mgr = new CloudManager(cfg({ baseUrl: undefined }));
       await mgr.init();
       expect((mgr.getClient() as Record<string, string>)._baseUrl).toBe(
-        "https://cloud.milady.ai",
+        "https://www.elizacloud.ai",
       );
     });
   });

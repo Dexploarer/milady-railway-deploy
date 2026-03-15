@@ -55,6 +55,7 @@ import type {
   SystemPermissionId,
 } from "../../../../src/permissions/types";
 import type { ConfigUiHint } from "../types";
+import { stripAssistantStageDirections } from "../utils/assistant-text";
 import { mergeStreamingText } from "../utils/streaming-text";
 
 export type {
@@ -1204,6 +1205,106 @@ export interface CloudCredits {
   critical?: boolean;
   topUpUrl?: string;
 }
+export interface CloudBillingPaymentMethod {
+  id: string;
+  type: string;
+  label?: string;
+  brand?: string;
+  last4?: string;
+  expiryMonth?: number;
+  expiryYear?: number;
+  isDefault?: boolean;
+  walletAddress?: string;
+  network?: string;
+}
+export interface CloudBillingHistoryItem {
+  id: string;
+  kind?: string;
+  provider?: string;
+  status: string;
+  amount: number;
+  currency: string;
+  description?: string;
+  receiptUrl?: string;
+  createdAt: string;
+}
+export interface CloudBillingSummary {
+  balance: number | null;
+  currency?: string;
+  low?: boolean;
+  critical?: boolean;
+  topUpUrl?: string;
+  embeddedCheckoutEnabled?: boolean;
+  hostedCheckoutEnabled?: boolean;
+  cryptoEnabled?: boolean;
+  paymentMethods?: CloudBillingPaymentMethod[];
+  history?: CloudBillingHistoryItem[];
+  [key: string]: unknown;
+}
+export interface CloudBillingSettings {
+  success?: boolean;
+  message?: string;
+  error?: string;
+  settings?: {
+    autoTopUp?: {
+      enabled?: boolean;
+      amount?: number | null;
+      threshold?: number | null;
+      hasPaymentMethod?: boolean;
+    };
+    limits?: {
+      minAmount?: number;
+      maxAmount?: number;
+      minThreshold?: number;
+      maxThreshold?: number;
+    };
+  };
+  [key: string]: unknown;
+}
+export interface CloudBillingSettingsUpdateRequest {
+  autoTopUp?: {
+    enabled?: boolean;
+    amount?: number;
+    threshold?: number;
+  };
+}
+export interface CloudBillingCheckoutRequest {
+  amountUsd: number;
+  mode?: "embedded" | "hosted";
+}
+export interface CloudBillingCheckoutResponse {
+  success?: boolean;
+  provider?: string;
+  mode?: "embedded" | "hosted";
+  checkoutUrl?: string;
+  url?: string;
+  publishableKey?: string;
+  clientSecret?: string;
+  sessionId?: string;
+  message?: string;
+  [key: string]: unknown;
+}
+export interface CloudBillingCryptoQuoteRequest {
+  amountUsd: number;
+  currency?: string;
+  network?: string;
+  walletAddress?: string;
+}
+export interface CloudBillingCryptoQuoteResponse {
+  success?: boolean;
+  provider?: string;
+  invoiceId?: string;
+  network?: string;
+  currency?: string;
+  amount?: string;
+  amountUsd?: number;
+  payToAddress?: string;
+  tokenAddress?: string;
+  paymentLinkUrl?: string;
+  expiresAt?: string;
+  memo?: string;
+  [key: string]: unknown;
+}
 export interface CloudLoginResponse {
   ok: boolean;
   sessionId: string;
@@ -1260,6 +1361,18 @@ export interface CloudCompatJob {
   state: string;
   created_on: string;
   completed_on: string | null;
+}
+
+export interface CloudCompatLaunchResult {
+  agentId: string;
+  agentName: string;
+  appUrl: string;
+  launchSessionId: string | null;
+  issuedAt: string;
+  connection: {
+    apiBase: string;
+    token: string;
+  };
 }
 
 // Skills Marketplace
@@ -2054,11 +2167,13 @@ export class MiladyClient {
     this._token = token?.trim() || null;
     if (typeof window !== "undefined") {
       if (this._token) {
+        window.__MILADY_API_TOKEN__ = this._token;
         window.sessionStorage.setItem(
           SESSION_STORAGE_API_TOKEN_KEY,
           this._token,
         );
       } else {
+        delete window.__MILADY_API_TOKEN__;
         window.sessionStorage.removeItem(SESSION_STORAGE_API_TOKEN_KEY);
       }
     }
@@ -3300,6 +3415,54 @@ export class MiladyClient {
   async getCloudCredits(): Promise<CloudCredits> {
     return this.fetch("/api/cloud/credits");
   }
+  async getCloudBillingSummary(): Promise<CloudBillingSummary> {
+    return this.fetch("/api/cloud/billing/summary");
+  }
+  async getCloudBillingSettings(): Promise<CloudBillingSettings> {
+    return this.fetch("/api/cloud/billing/settings");
+  }
+  async updateCloudBillingSettings(
+    request: CloudBillingSettingsUpdateRequest,
+  ): Promise<CloudBillingSettings> {
+    return this.fetch("/api/cloud/billing/settings", {
+      method: "PUT",
+      body: JSON.stringify(request),
+    });
+  }
+  async getCloudBillingPaymentMethods(): Promise<{
+    success?: boolean;
+    data?: CloudBillingPaymentMethod[];
+    items?: CloudBillingPaymentMethod[];
+    paymentMethods?: CloudBillingPaymentMethod[];
+    [key: string]: unknown;
+  }> {
+    return this.fetch("/api/cloud/billing/payment-methods");
+  }
+  async getCloudBillingHistory(): Promise<{
+    success?: boolean;
+    data?: CloudBillingHistoryItem[];
+    items?: CloudBillingHistoryItem[];
+    history?: CloudBillingHistoryItem[];
+    [key: string]: unknown;
+  }> {
+    return this.fetch("/api/cloud/billing/history");
+  }
+  async createCloudBillingCheckout(
+    request: CloudBillingCheckoutRequest,
+  ): Promise<CloudBillingCheckoutResponse> {
+    return this.fetch("/api/cloud/billing/checkout", {
+      method: "POST",
+      body: JSON.stringify(request),
+    });
+  }
+  async createCloudBillingCryptoQuote(
+    request: CloudBillingCryptoQuoteRequest,
+  ): Promise<CloudBillingCryptoQuoteResponse> {
+    return this.fetch("/api/cloud/billing/crypto/quote", {
+      method: "POST",
+      body: JSON.stringify(request),
+    });
+  }
   async cloudLogin(): Promise<CloudLoginResponse> {
     return this.fetch("/api/cloud/login", { method: "POST" });
   }
@@ -3414,6 +3577,17 @@ export class MiladyClient {
   }> {
     return this.fetch(
       `/api/cloud/compat/agents/${encodeURIComponent(agentId)}/resume`,
+      { method: "POST" },
+    );
+  }
+
+  /** Launch a managed cloud agent into the Milady app. */
+  async launchCloudCompatAgent(agentId: string): Promise<{
+    success: boolean;
+    data: CloudCompatLaunchResult;
+  }> {
+    return this.fetch(
+      `/api/cloud/compat/agents/${encodeURIComponent(agentId)}/launch`,
       { method: "POST" },
     );
   }
@@ -4169,17 +4343,35 @@ export class MiladyClient {
   }
 
   private normalizeAssistantText(text: string): string {
-    const trimmed = text.trim();
-    if (trimmed.length === 0 || /^\(?no response\)?$/i.test(trimmed)) {
+    const stripped = stripAssistantStageDirections(text);
+    const trimmed = stripped.trim();
+    if (trimmed.length === 0) {
+      if (
+        text.trim().length === 0 ||
+        /^\(?no response\)?$/i.test(text.trim())
+      ) {
+        return GENERIC_NO_RESPONSE_TEXT;
+      }
+      return "";
+    }
+    if (/^\(?no response\)?$/i.test(trimmed)) {
       return GENERIC_NO_RESPONSE_TEXT;
     }
-    return text;
+    return trimmed;
+  }
+
+  private normalizeConversationMessage(
+    message: ConversationMessage,
+  ): ConversationMessage {
+    if (message.role !== "assistant") return message;
+    const text = this.normalizeAssistantText(message.text);
+    return text === message.text ? message : { ...message, text };
   }
 
   private async streamChatEndpoint(
     path: string,
     text: string,
-    onToken: (token: string) => void,
+    onToken: (token: string, accumulatedText?: string) => void,
     channelType: ConversationChannelType = "DM",
     signal?: AbortSignal,
     images?: ImageAttachment[],
@@ -4257,10 +4449,15 @@ export class MiladyClient {
 
       if (parsed.type === "token") {
         const chunk = parsed.text ?? "";
-        if (chunk) {
-          fullText = mergeStreamingText(fullText, chunk);
-          onToken(chunk);
-        }
+        const nextFullText =
+          typeof parsed.fullText === "string"
+            ? parsed.fullText
+            : chunk
+              ? mergeStreamingText(fullText, chunk)
+              : fullText;
+        if (nextFullText === fullText) return;
+        fullText = nextFullText;
+        onToken(chunk, fullText);
         return;
       }
 
@@ -4288,7 +4485,7 @@ export class MiladyClient {
       // Backward compatibility with legacy stream payloads: { text: "..." }
       if (parsed.text) {
         fullText = mergeStreamingText(fullText, parsed.text);
-        onToken(parsed.text);
+        onToken(parsed.text, fullText);
       }
     };
 
@@ -4358,7 +4555,7 @@ export class MiladyClient {
 
   async sendChatStream(
     text: string,
-    onToken: (token: string) => void,
+    onToken: (token: string, accumulatedText?: string) => void,
     channelType: ConversationChannelType = "DM",
     signal?: AbortSignal,
     conversationMode?: ConversationMode,
@@ -4389,7 +4586,10 @@ export class MiladyClient {
     title?: string,
     options?: CreateConversationOptions,
   ): Promise<{ conversation: Conversation; greeting?: ConversationGreeting }> {
-    return this.fetch("/api/conversations", {
+    const response = await this.fetch<{
+      conversation: Conversation;
+      greeting?: ConversationGreeting;
+    }>("/api/conversations", {
       method: "POST",
       body: JSON.stringify({
         title,
@@ -4401,12 +4601,29 @@ export class MiladyClient {
           : {}),
       }),
     });
+    if (!response.greeting) {
+      return response;
+    }
+    return {
+      ...response,
+      greeting: {
+        ...response.greeting,
+        text: this.normalizeAssistantText(response.greeting.text),
+      },
+    };
   }
 
   async getConversationMessages(
     id: string,
   ): Promise<{ messages: ConversationMessage[] }> {
-    return this.fetch(`/api/conversations/${encodeURIComponent(id)}/messages`);
+    const response = await this.fetch<{ messages: ConversationMessage[] }>(
+      `/api/conversations/${encodeURIComponent(id)}/messages`,
+    );
+    return {
+      messages: response.messages.map((message) =>
+        this.normalizeConversationMessage(message),
+      ),
+    };
   }
 
   async truncateConversationMessages(
@@ -4455,7 +4672,7 @@ export class MiladyClient {
   async sendConversationMessageStream(
     id: string,
     text: string,
-    onToken: (token: string) => void,
+    onToken: (token: string, accumulatedText?: string) => void,
     channelType: ConversationChannelType = "DM",
     signal?: AbortSignal,
     images?: ImageAttachment[],
@@ -4487,12 +4704,18 @@ export class MiladyClient {
     persisted?: boolean;
   }> {
     const qs = lang ? `?lang=${encodeURIComponent(lang)}` : "";
-    return this.fetch(
-      `/api/conversations/${encodeURIComponent(id)}/greeting${qs}`,
-      {
-        method: "POST",
-      },
-    );
+    const response = await this.fetch<{
+      text: string;
+      agentName: string;
+      generated: boolean;
+      persisted?: boolean;
+    }>(`/api/conversations/${encodeURIComponent(id)}/greeting${qs}`, {
+      method: "POST",
+    });
+    return {
+      ...response,
+      text: this.normalizeAssistantText(response.text),
+    };
   }
 
   async renameConversation(

@@ -112,7 +112,7 @@ export function stripActionBlockFromDisplay(text: string): string {
 }
 
 /**
- * Parse a JSON action block from Milaidy's natural language response.
+ * Parse a JSON action block from Milady's natural language response.
  * Looks for a fenced ```json block first, then bare JSON with "action" key.
  * Returns null if no valid action block is found.
  */

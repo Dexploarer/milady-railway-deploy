@@ -1831,7 +1831,7 @@
       "pluginParameters": {
         "ELIZAOS_CLOUD_API_KEY": {
           "type": "string",
-          "description": "API key used to authenticate requests to elizaOS Cloud API (format: eliza_xxxxx). Get it from https://www.elizacloud.ai/dashboard/api-keys",
+          "description": "API key used to authenticate requests to elizaOS Cloud API (format: eliza_xxxxx). Get it from https://elizacloud.ai/dashboard/api-keys",
           "required": true,
           "sensitive": true
         },
@@ -1839,7 +1839,7 @@
           "type": "string",
           "description": "Base URL for all elizaOS Cloud API requests.",
           "required": false,
-          "default": "https://www.elizacloud.ai/api/v1",
+          "default": "https://elizacloud.ai/api/v1",
           "sensitive": false
         },
         "ELIZAOS_CLOUD_SMALL_MODEL": {

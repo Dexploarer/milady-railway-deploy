@@ -15,7 +15,7 @@ const NAV_LABEL_I18N_KEY: Record<string, string> = {
   Character: "nav.character",
   Wallets: "nav.wallets",
   Knowledge: "nav.knowledge",
-  Social: "nav.social",
+  Connectors: "nav.social",
   Apps: "nav.apps",
   Settings: "nav.settings",
   Heartbeats: "nav.heartbeats",
@@ -24,23 +24,23 @@ const NAV_LABEL_I18N_KEY: Record<string, string> = {
 
 interface HeaderProps {
   mobileLeft?: ReactNode;
+  transparent?: boolean;
 }
 
-export function Header(_props: HeaderProps) {
+export function Header({ mobileLeft, transparent = false }: HeaderProps) {
   const {
-    miladyCloudEnabled,
-    miladyCloudConnected,
-    miladyCloudCredits,
-    miladyCloudCreditsCritical,
-    miladyCloudCreditsLow,
-    miladyCloudTopUpUrl,
+    elizaCloudEnabled,
+    elizaCloudConnected,
+    elizaCloudCredits,
+    elizaCloudCreditsCritical,
+    elizaCloudCreditsLow,
     tab,
     setTab,
     setState,
     plugins,
     loadDropStatus,
     uiShellMode,
-    setUiShellMode,
+    switchShellView,
     uiLanguage,
     setUiLanguage,
     uiTheme,
@@ -84,17 +84,27 @@ export function Header(_props: HeaderProps) {
     [streamingEnabled],
   );
 
-  const creditColor = miladyCloudCreditsCritical
+  const creditColor = elizaCloudCreditsCritical
     ? "border-danger text-danger bg-danger/10"
-    : miladyCloudCreditsLow
+    : elizaCloudCreditsLow
       ? "border-warn text-warn bg-warn/10"
       : "border-ok text-ok bg-ok/10";
 
   const shellMode = uiShellMode ?? "companion";
+  const activeShellView =
+    shellMode === "companion"
+      ? "companion"
+      : tab === "character" || tab === "character-select"
+        ? "character"
+        : "desktop";
+  const useMinimalHeaderChrome = transparent || activeShellView !== "desktop";
+  const showNavigationMenu = activeShellView === "desktop";
+  const showCloudCredits = activeShellView === "desktop";
 
-  const handleShellModeChange = (mode: "companion" | "native") => {
-    setUiShellMode(mode);
-    setTab(mode === "companion" ? "companion" : "chat");
+  const handleShellViewChange = (
+    view: "companion" | "character" | "desktop",
+  ) => {
+    switchShellView(view);
   };
 
   useEffect(() => {
@@ -102,12 +112,23 @@ export function Header(_props: HeaderProps) {
     setState("chatMode", "power");
   }, [setState, shellMode]);
 
+  useEffect(() => {
+    if (showNavigationMenu) return;
+    setMobileMenuOpen(false);
+  }, [showNavigationMenu]);
+
   return (
     <>
-      <header className="border-b border-border/50 bg-bg/80 backdrop-blur-xl py-2 px-3 sm:py-3 sm:px-4 z-20 sticky top-0 w-full transition-all">
+      <header
+        className={`py-2 px-3 sm:py-3 sm:px-4 z-20 sticky top-0 w-full transition-all ${
+          useMinimalHeaderChrome
+            ? "border-b border-transparent bg-transparent backdrop-blur-0 shadow-none"
+            : "border-b border-border/50 bg-bg/80 backdrop-blur-xl"
+        }`}
+      >
         <ShellHeaderControls
-          shellMode={shellMode}
-          onShellModeChange={handleShellModeChange}
+          activeShellView={activeShellView}
+          onShellViewChange={handleShellViewChange}
           uiLanguage={uiLanguage}
           setUiLanguage={setUiLanguage}
           uiTheme={uiTheme}
@@ -115,20 +136,23 @@ export function Header(_props: HeaderProps) {
           t={t}
           rightExtras={
             <>
-              {(miladyCloudEnabled || miladyCloudConnected) &&
-                (miladyCloudConnected ? (
-                  <a
-                    href={miladyCloudTopUpUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`inline-flex shrink-0 items-center gap-1.5 px-2.5 py-1.5 h-11 border rounded-md font-mono text-[11px] sm:text-xs no-underline transition-all duration-200 hover:border-accent hover:text-txt hover:shadow-sm ${miladyCloudCredits === null ? "border-muted text-muted" : creditColor}`}
+              {showCloudCredits &&
+                (elizaCloudEnabled || elizaCloudConnected) &&
+                (elizaCloudConnected ? (
+                  <button
+                    type="button"
+                    className={`inline-flex shrink-0 items-center gap-1.5 px-2.5 py-1.5 h-11 border rounded-md font-mono text-[11px] sm:text-xs no-underline transition-all duration-200 hover:border-accent hover:text-txt hover:shadow-sm ${elizaCloudCredits === null ? "border-muted text-muted" : creditColor}`}
                     title={t("header.CloudCreditsBalanc")}
+                    onClick={() => {
+                      setState("cloudDashboardView", "billing");
+                      setTab("settings");
+                    }}
                   >
                     <CircleDollarSign className="w-3.5 h-3.5" />
-                    {miladyCloudCredits === null
-                      ? t("header.miladyCloudConnected")
-                      : `$${miladyCloudCredits.toFixed(2)}`}
-                  </a>
+                    {elizaCloudCredits === null
+                      ? t("header.elizaCloudConnected")
+                      : `$${elizaCloudCredits.toFixed(2)}`}
+                  </button>
                 ) : (
                   <span className="inline-flex shrink-0 items-center gap-1 px-2.5 py-1.5 h-11 border border-danger text-danger bg-danger/10 rounded-md font-mono text-[11px] sm:text-xs">
                     <AlertTriangle className="w-3.5 h-3.5" />
@@ -138,48 +162,55 @@ export function Header(_props: HeaderProps) {
                     <span className="sm:hidden">{t("header.Cloud")}</span>
                   </span>
                 ))}
-              <button
-                type="button"
-                className={`md:hidden ${HEADER_ICON_BUTTON_CLASSNAME}`}
-                onClick={() => setMobileMenuOpen(true)}
-                aria-label="Open navigation menu"
-                aria-expanded={mobileMenuOpen}
-              >
-                <Menu className="w-5 h-5" />
-              </button>
+              {showNavigationMenu ? (
+                <button
+                  type="button"
+                  className={`md:hidden ${HEADER_ICON_BUTTON_CLASSNAME}`}
+                  onClick={() => setMobileMenuOpen(true)}
+                  aria-label="Open navigation menu"
+                  aria-expanded={mobileMenuOpen}
+                >
+                  <Menu className="w-5 h-5" />
+                </button>
+              ) : null}
             </>
           }
         >
-          <nav className="hidden md:flex flex-1 items-center justify-left gap-1 overflow-x-auto whitespace-nowrap px-2 scrollbar-hide">
-            {tabGroups.map((group: TabGroup) => {
-              const primaryTab = group.tabs[0];
-              const isActive = group.tabs.includes(tab);
-              const Icon = group.icon;
-              return (
-                <button
-                  type="button"
-                  key={group.label}
-                  className={`inline-flex items-center justify-center gap-1.5 shrink-0 px-3 lg:px-4 py-2 text-[12px] bg-transparent border border-transparent cursor-pointer transition-all duration-300 rounded-full ${
-                    isActive
-                      ? "text-accent-fg dark:text-txt-strong font-bold bg-accent dark:bg-accent/15 shadow-[0_0_15px_rgba(var(--accent),0.28)] border-accent/50 dark:border-accent/40 ring-1 ring-inset ring-white/18 dark:ring-accent/25"
-                      : "text-muted hover:text-txt hover:bg-bg-hover hover:border-border/50"
-                  }`}
-                  onClick={() => setTab(primaryTab)}
-                  title={group.description}
-                >
-                  <Icon className="w-4 h-4" />
-                  <span className="hidden lg:inline">
-                    {t(NAV_LABEL_I18N_KEY[group.label] ?? group.label)}
-                  </span>
-                </button>
-              );
-            })}
-          </nav>
+          {mobileLeft ? (
+            <div className="flex md:hidden">{mobileLeft}</div>
+          ) : null}
+          {showNavigationMenu ? (
+            <nav className="hidden md:flex flex-1 items-center justify-left gap-1 overflow-x-auto whitespace-nowrap px-2 scrollbar-hide">
+              {tabGroups.map((group: TabGroup) => {
+                const primaryTab = group.tabs[0];
+                const isActive = group.tabs.includes(tab);
+                const Icon = group.icon;
+                return (
+                  <button
+                    type="button"
+                    key={group.label}
+                    className={`inline-flex items-center justify-center gap-1.5 shrink-0 px-3 lg:px-4 py-2 text-[12px] bg-transparent border border-transparent cursor-pointer transition-all duration-300 rounded-full ${
+                      isActive
+                        ? "text-accent-fg dark:text-txt-strong font-bold bg-accent dark:bg-accent/15 shadow-[0_0_15px_rgba(var(--accent),0.28)] border-accent/50 dark:border-accent/40 ring-1 ring-inset ring-white/18 dark:ring-accent/25"
+                        : "text-muted hover:text-txt hover:bg-bg-hover hover:border-border/50"
+                    }`}
+                    onClick={() => setTab(primaryTab)}
+                    title={group.description}
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span className="hidden lg:inline">
+                      {t(NAV_LABEL_I18N_KEY[group.label] ?? group.label)}
+                    </span>
+                  </button>
+                );
+              })}
+            </nav>
+          ) : null}
         </ShellHeaderControls>
       </header>
 
       {/* Mobile Menu Overlay */}
-      {mobileMenuOpen && (
+      {showNavigationMenu && mobileMenuOpen && (
         <div
           className="fixed inset-0 z-[140] md:hidden"
           role="dialog"

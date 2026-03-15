@@ -14,7 +14,6 @@ import type {
   WalletNftsResponse,
 } from "@milady/app-core/api";
 import { useMemo } from "react";
-import type { TrackedToken } from "../BscTradePanel";
 import {
   CHAIN_CONFIGS,
   PRIMARY_CHAIN_KEYS,
@@ -25,6 +24,7 @@ import {
   type NftItem,
   type TokenRow,
   type TrackedBscToken,
+  type TrackedToken,
   toNormalizedAddress,
 } from "./constants";
 

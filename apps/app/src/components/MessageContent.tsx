@@ -23,6 +23,7 @@ import {
 } from "@milady/app-core/config";
 import { useApp } from "@milady/app-core/state";
 import type { ConfigUiHint } from "@milady/app-core/types";
+import { stripAssistantStageDirections } from "@milady/app-core/utils";
 import { Button } from "@milady/ui";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
@@ -123,6 +124,7 @@ function normalizeDisplayText(text: string): string {
 
   // Drop any leftover wrapper tags without disturbing plain text.
   normalized = normalized.replace(/<\/?(response|text|thought)\b[^>]*>/gi, "");
+  normalized = stripAssistantStageDirections(normalized);
   return normalized.trim();
 }
 
@@ -582,8 +584,7 @@ function InlinePluginConfig({ pluginId: rawPluginId }: { pluginId: string }) {
   if (loading) {
     return (
       <div className="my-2 px-3 py-2 border border-border bg-card text-xs text-muted italic">
-        {t("common.loading")} {pluginId}{" "}
-        {t("messagecontent.configuration")}
+        {t("common.loading")} {pluginId} {t("messagecontent.configuration")}
       </div>
     );
   }

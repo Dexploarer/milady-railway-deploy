@@ -91,6 +91,7 @@ import {
   taskToTriggerSummary,
 } from "../triggers/runtime";
 import { parseClampedInteger } from "../utils/number-parsing";
+import { sanitizeSpeechText } from "../utils/spoken-text";
 import { handleAgentAdminRoutes } from "./agent-admin-routes";
 import { handleAgentLifecycleRoutes } from "./agent-lifecycle-routes";
 import { detectRuntimeModel, resolveProviderFromModel } from "./agent-model";
@@ -109,6 +110,7 @@ import {
 } from "./bsc-trade";
 import { handleBugReportRoutes } from "./bug-report-routes";
 import { handleCharacterRoutes } from "./character-routes";
+import { handleCloudBillingRoute } from "./cloud-billing-routes";
 import { handleCloudCompatRoute } from "./cloud-compat-routes";
 import { type CloudRouteState, handleCloudRoute } from "./cloud-routes";
 import { handleCloudStatusRoutes } from "./cloud-status-routes";
@@ -2605,9 +2607,10 @@ function resolveUiDir(): string | null {
   }
 
   const thisDir = path.dirname(fileURLToPath(import.meta.url));
+  const packageRoot = findOwnPackageRoot(thisDir);
   const candidates = [
     path.resolve("apps/app/dist"),
-    path.resolve(thisDir, "../../apps/app/dist"),
+    path.resolve(packageRoot, "apps", "app", "dist"),
   ];
 
   for (const candidate of candidates) {
@@ -2828,9 +2831,19 @@ function findRecentInsufficientCreditsLog(
   return null;
 }
 
-function resolveNoResponseFallback(logBuffer: LogEntry[]): string {
+function resolveNoResponseFallback(
+  logBuffer: LogEntry[],
+  runtime?: AgentRuntime | null,
+  lang = "en",
+): string {
   if (findRecentInsufficientCreditsLog(logBuffer)) {
     return pickInsufficientCreditsChatReply();
+  }
+  const characterDefault = runtime
+    ? resolveConversationGreetingText(runtime, lang).trim()
+    : "";
+  if (characterDefault) {
+    return characterDefault;
   }
   return GENERIC_NO_RESPONSE_CHAT_REPLY;
 }
@@ -2869,6 +2882,14 @@ function writeSse(
 ): void {
   if (res.writableEnded || res.destroyed) return;
   res.write(`data: ${JSON.stringify(payload)}\n\n`);
+}
+
+function writeChatTokenSse(
+  res: http.ServerResponse,
+  text: string,
+  fullText: string,
+): void {
+  writeSse(res, { type: "token", text, fullText });
 }
 
 function writeSseData(
@@ -4018,8 +4039,8 @@ function getProviderOptions(): Array<{
 }> {
   return [
     {
-      id: "miladycloud",
-      name: "Milady Cloud",
+      id: "elizacloud",
+      name: "Eliza Cloud",
       envKey: null,
       pluginName: "@elizaos/plugin-elizacloud",
       keyPrefix: null,
@@ -4150,8 +4171,8 @@ function getCloudProviderOptions(): Array<{
 }> {
   return [
     {
-      id: "miladycloud",
-      name: "Milady Cloud",
+      id: "elizacloud",
+      name: "Eliza Cloud",
       description:
         "Managed cloud infrastructure. Wallets, LLMs, and RPCs included.",
     },
@@ -4735,8 +4756,8 @@ function getInventoryProviderOptions(): Array<{
       description: "Ethereum, Base, Arbitrum, Optimism, Polygon.",
       rpcProviders: [
         {
-          id: "miladycloud",
-          name: "Milady Cloud",
+          id: "elizacloud",
+          name: "Eliza Cloud",
           description: "Managed RPC. No setup needed.",
           envKey: null,
           requiresKey: false,
@@ -4770,8 +4791,8 @@ function getInventoryProviderOptions(): Array<{
       description: "Solana mainnet tokens and NFTs.",
       rpcProviders: [
         {
-          id: "miladycloud",
-          name: "Milady Cloud",
+          id: "elizacloud",
+          name: "Eliza Cloud",
           description: "Managed RPC. No setup needed.",
           envKey: null,
           requiresKey: false,
@@ -6393,7 +6414,7 @@ export async function handleSwarmSynthesis(
   }
 }
 
-// ── Parse Action Block from Milaidy's Response ─────────────────────────
+// ── Parse Action Block from Milady's Response ─────────────────────────
 import {
   parseActionBlock,
   stripActionBlockFromDisplay,
@@ -6403,7 +6424,7 @@ import {
 
 /**
  * Wire the SwarmCoordinator's agentDecisionCallback so coordinator events
- * (blocked prompts, turn completions) route through Milaidy's full
+ * (blocked prompts, turn completions) route through Milady's full
  * elizaOS pipeline (memory, personality, actions) so she has conversation
  * context to make informed decisions. The pipeline's model size is
  * The pipeline's model size is temporarily overridden to TEXT_SMALL
@@ -6412,10 +6433,10 @@ import {
  * stalling CLI agents waiting for input.
  *
  * Events are serialized (one at a time) to prevent context confusion.
- * Milaidy's response appears in chat via WS broadcast, and the embedded
+ * Milady's response appears in chat via WS broadcast, and the embedded
  * JSON action block is parsed and returned to the coordinator for execution.
  *
- * If the callback fails or Milaidy's response has no action block,
+ * If the callback fails or Milady's response has no action block,
  * returns null → coordinator falls back to the small LLM.
  */
 function wireCoordinatorEventRouting(st: ServerState): boolean {
@@ -6479,7 +6500,7 @@ function wireCoordinatorEventRouting(st: ServerState): boolean {
             return;
           }
 
-          // Create a message memory so the event enters Milaidy's conversation history.
+          // Create a message memory so the event enters Milady's conversation history.
           const message = createMessageMemory({
             id: crypto.randomUUID() as UUID,
             entityId: st.chatUserId,
@@ -7173,8 +7194,8 @@ async function handleRequest(
 
     // P1 §7 — explicit provider allowlist
     const VALID_PROVIDERS = new Set([
-      "miladycloud",
       "elizacloud",
+      "miladycloud",
       "pi-ai",
       "openai-codex",
       "openai-subscription",
@@ -7192,9 +7213,9 @@ async function handleRequest(
       return;
     }
 
-    // Normalize legacy alias — "elizacloud" → "miladycloud"
+    // Normalize legacy alias — "miladycloud" → "elizacloud"
     const normalizedProvider =
-      provider === "elizacloud" ? "miladycloud" : provider;
+      provider === "miladycloud" ? "elizacloud" : provider;
 
     // P0 §3 — race guard: reject concurrent provider switch requests
     if (providerSwitchInProgress) {
@@ -7316,8 +7337,8 @@ async function handleRequest(
         body.apiKey = trimmedKey;
       }
 
-      if (normalizedProvider === "miladycloud") {
-        // Switching TO miladycloud for inference
+      if (normalizedProvider === "elizacloud") {
+        // Switching TO elizacloud for inference
         clearPiAi();
         await clearSubscriptions();
         clearOtherApiKeys();
@@ -10955,7 +10976,8 @@ async function handleRequest(
     }>(req, res);
     if (!body) return;
 
-    const text = typeof body.text === "string" ? body.text.trim() : "";
+    const text =
+      typeof body.text === "string" ? sanitizeSpeechText(body.text) : "";
     if (!text) {
       error(res, "Missing text", 400);
       return;
@@ -12423,6 +12445,15 @@ async function handleRequest(
 
   // ── Cloud routes (/api/cloud/*) ─────────────────────────────────────────
   if (pathname.startsWith("/api/cloud/")) {
+    const billingHandled = await handleCloudBillingRoute(
+      req,
+      res,
+      pathname,
+      method,
+      { config: state.config },
+    );
+    if (billingHandled) return;
+
     // Compat proxy routes — transparent proxy to Eliza Cloud v2 /api/compat/*
     const compatHandled = await handleCloudCompatRoute(
       req,
@@ -12853,17 +12884,17 @@ async function handleRequest(
     memories.sort((a, b) => (a.createdAt ?? 0) - (b.createdAt ?? 0));
     const targetIndex = memories.findIndex((memory) => memory.id === messageId);
     if (targetIndex < 0) {
-      const notFoundError = new Error("Conversation message not found") as Error &
-        {
-          status?: number;
-        };
+      const notFoundError = new Error(
+        "Conversation message not found",
+      ) as Error & {
+        status?: number;
+      };
       notFoundError.status = 404;
       throw notFoundError;
     }
 
-    const deleteStartIndex = options?.inclusive === true
-      ? targetIndex
-      : targetIndex + 1;
+    const deleteStartIndex =
+      options?.inclusive === true ? targetIndex : targetIndex + 1;
     const memoryIds = memories
       .slice(deleteStartIndex)
       .map((memory) => memory.id)
@@ -13084,7 +13115,7 @@ async function handleRequest(
               if (chunk) sendChunk({ content: chunk }, null);
             },
             resolveNoResponseText: () =>
-              resolveNoResponseFallback(state.logBuffer),
+              resolveNoResponseFallback(state.logBuffer, runtime),
           });
         }
 
@@ -13160,7 +13191,7 @@ async function handleRequest(
           state.agentName,
           {
             resolveNoResponseText: () =>
-              resolveNoResponseFallback(state.logBuffer),
+              resolveNoResponseFallback(state.logBuffer, runtime),
           },
         );
         responseText = result.text;
@@ -13339,7 +13370,7 @@ async function handleRequest(
             isAborted: () => aborted,
             onChunk: onDelta,
             resolveNoResponseText: () =>
-              resolveNoResponseFallback(state.logBuffer),
+              resolveNoResponseFallback(state.logBuffer, runtime),
           });
         }
 
@@ -13425,7 +13456,7 @@ async function handleRequest(
           state.agentName,
           {
             resolveNoResponseText: () =>
-              resolveNoResponseFallback(state.logBuffer),
+              resolveNoResponseFallback(state.logBuffer, runtime),
           },
         );
         responseText = result.text;
@@ -13617,9 +13648,14 @@ async function handleRequest(
     }
 
     try {
-      const result = await truncateConversationMessages(runtime, conv, messageId, {
-        inclusive: body.inclusive === true,
-      });
+      const result = await truncateConversationMessages(
+        runtime,
+        conv,
+        messageId,
+        {
+          inclusive: body.inclusive === true,
+        },
+      );
       conv.updatedAt = new Date().toISOString();
       state.broadcastWs?.({
         type: "conversation-updated",
@@ -13710,6 +13746,8 @@ async function handleRequest(
       }
     }, 5000);
 
+    let streamedText = "";
+
     try {
       const result = await generateChatResponse(
         runtime,
@@ -13718,13 +13756,17 @@ async function handleRequest(
         {
           isAborted: () => aborted,
           onChunk: (chunk) => {
-            writeSse(res, { type: "token", text: chunk });
+            if (!chunk) return;
+            streamedText += chunk;
+            writeChatTokenSse(res, chunk, streamedText);
           },
           onSnapshot: (text) => {
-            writeSse(res, { type: "token", text });
+            if (!text) return;
+            streamedText = text;
+            writeChatTokenSse(res, text, streamedText);
           },
           resolveNoResponseText: () =>
-            resolveNoResponseFallback(state.logBuffer),
+            resolveNoResponseFallback(state.logBuffer, runtime),
         },
       );
 
@@ -13859,7 +13901,7 @@ async function handleRequest(
         state.agentName,
         {
           resolveNoResponseText: () =>
-            resolveNoResponseFallback(state.logBuffer),
+            resolveNoResponseFallback(state.logBuffer, runtime),
         },
       );
 
@@ -14032,6 +14074,8 @@ async function handleRequest(
       streamCoordinator.pause?.();
     }
 
+    let streamedText = "";
+
     try {
       const runtime = state.runtime;
       const agentName = runtime.character.name ?? "Milady";
@@ -14062,13 +14106,17 @@ async function handleRequest(
         {
           isAborted: () => aborted,
           onChunk: (chunk) => {
-            writeSse(res, { type: "token", text: chunk });
+            if (!chunk) return;
+            streamedText += chunk;
+            writeChatTokenSse(res, chunk, streamedText);
           },
           onSnapshot: (text) => {
-            writeSse(res, { type: "token", text });
+            if (!text) return;
+            streamedText = text;
+            writeChatTokenSse(res, text, streamedText);
           },
           resolveNoResponseText: () =>
-            resolveNoResponseFallback(state.logBuffer),
+            resolveNoResponseFallback(state.logBuffer, runtime),
         },
       );
 
@@ -14169,7 +14217,7 @@ async function handleRequest(
         state.agentName,
         {
           resolveNoResponseText: () =>
-            resolveNoResponseFallback(state.logBuffer),
+            resolveNoResponseFallback(state.logBuffer, runtime),
         },
       );
 

@@ -8,18 +8,14 @@
  * STT: Web Speech API (SpeechRecognition) for user voice input.
  */
 
-import { Capacitor } from "@capacitor/core";
 import type { PluginListenerHandle } from "@capacitor/core";
+import { Capacitor } from "@capacitor/core";
 import { TalkMode } from "@milady/capacitor-talkmode";
-import type {
-  TalkModeErrorEvent,
-  TalkModeStateEvent,
-  TalkModeTranscriptEvent,
-} from "@milady/capacitor-talkmode";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { VoiceConfig } from "../api/client";
 import { getElectrobunRendererRpc } from "../bridge/electrobun-rpc";
 import { resolveApiUrl } from "../utils";
+import { sanitizeSpeechText } from "../utils/spoken-text";
 import { mergeStreamingText } from "../utils/streaming-text";
 
 // ── Speech Recognition types ──────────────────────────────────────────
@@ -40,6 +36,20 @@ interface SpeechRecognitionInstance extends EventTarget {
 interface SpeechRecognitionResultEvent {
   results: SpeechRecognitionResultList;
   resultIndex: number;
+}
+
+interface TalkModeTranscriptEvent {
+  transcript?: string;
+  isFinal?: boolean;
+}
+
+interface TalkModeErrorEvent {
+  code?: string;
+  message?: string;
+}
+
+interface TalkModeStateEvent {
+  state?: string;
 }
 
 interface SpeechRecognitionResultList {
@@ -116,9 +126,7 @@ export interface VoiceChatState {
   /** Toggle voice listening on/off */
   toggleListening: () => void;
   /** Begin voice capture in compose or push-to-talk mode */
-  startListening: (
-    mode?: Exclude<VoiceCaptureMode, "idle">,
-  ) => Promise<void>;
+  startListening: (mode?: Exclude<VoiceCaptureMode, "idle">) => Promise<void>;
   /** End voice capture and optionally submit the transcript */
   stopListening: (options?: { submit?: boolean }) => Promise<void>;
   /** Speak text aloud with mouth animation */
@@ -155,6 +163,7 @@ const MAX_SPOKEN_CHARS = 360;
 const MAX_CACHED_SEGMENTS = 128;
 const TALKMODE_STOP_SETTLE_MS = 120;
 const REDACTED_SECRET = "[REDACTED]";
+const MOUTH_OPEN_STEP = 0.02;
 function resolveElevenProxyEndpoint(): string {
   return resolveApiUrl("/api/tts/elevenlabs");
 }
@@ -169,8 +178,18 @@ function collapseWhitespace(input: string): string {
   return input.replace(/\s+/g, " ").trim();
 }
 
-function stripUrls(input: string): string {
-  return input.replace(/\bhttps?:\/\/\S+/gi, " ");
+function normalizeMouthOpen(value: number): number {
+  const clamped = Math.max(0, Math.min(1, value));
+  const stepped = Math.round(clamped / MOUTH_OPEN_STEP) * MOUTH_OPEN_STEP;
+  return stepped < MOUTH_OPEN_STEP ? 0 : Math.min(1, stepped);
+}
+
+export function nextIdleMouthOpen(currentValue: number): number {
+  const current = normalizeMouthOpen(currentValue);
+  if (current <= MOUTH_OPEN_STEP) {
+    return 0;
+  }
+  return Math.max(0, Math.min(current * 0.85, current - MOUTH_OPEN_STEP));
 }
 
 function normalizeCacheText(input: string): string {
@@ -184,53 +203,6 @@ function isRedactedSecret(value: unknown): boolean {
   );
 }
 
-function stripThinkingAndMarkup(input: string): string {
-  let text = input;
-  text = text.replace(/<think\b[^>]*>[\s\S]*?<\/think>/gi, " ");
-  text = text.replace(
-    /<(analysis|reasoning|scratchpad|tool_calls?|tools?)\b[^>]*>[\s\S]*?<\/\1>/gi,
-    " ",
-  );
-  text = text.replace(/```[\s\S]*?```/g, " ");
-  text = text.replace(/`([^`]+)`/g, "$1");
-  text = text.replace(/\[([^\]]+)\]\([^)]+\)/g, "$1");
-  text = text.replace(/<[^>\n]+>/g, " ");
-  text = stripUrls(text);
-  return text;
-}
-
-function stripRoleplayMarkers(input: string): string {
-  let text = input;
-  text = text.replace(/(^|\s)[*_~]+([^*_~]+)[*_~]+(?=\s|$)/g, " ");
-  text = text.replace(/[_~]/g, " ");
-  return text;
-}
-
-function rewriteParentheticalAside(input: string): string {
-  return input.replace(/\(([^()]+)\)/g, (_match, inner: string) => {
-    const content = collapseWhitespace(inner);
-    return content ? `, i.e. ${content}, ` : " ";
-  });
-}
-
-function sanitizeSpeechPunctuation(input: string): string {
-  const iePlaceholder = "MILADYIEPLACEHOLDER";
-  let text = input;
-  text = text.replace(/\bi\.e\./gi, iePlaceholder);
-  text = text.replace(/[•·■▪◦]/g, " ");
-  text = text.replace(/[“”]/g, '"');
-  text = text.replace(/[‘’]/g, "'");
-  text = text.replace(/[…]/g, "...");
-  text = text.replace(/[–—]/g, ", ");
-  text = text.replace(/\s*([,;:])\s*/g, "$1 ");
-  text = text.replace(/\s*([.!?])\s*/g, "$1 ");
-  text = text.replace(/[()[\]{}]/g, " ");
-  text = text.replace(/[^\p{L}\p{N}\s.,!?'"%/$:+-]/gu, " ");
-  text = text.replace(/([,.!?])\1+/g, "$1");
-  text = text.replace(new RegExp(iePlaceholder, "g"), "i.e.");
-  return text;
-}
-
 function capSpeechLength(input: string): string {
   if (input.length <= MAX_SPOKEN_CHARS) return input;
   const clipped = input.slice(0, MAX_SPOKEN_CHARS);
@@ -240,9 +212,7 @@ function capSpeechLength(input: string): string {
 }
 
 function toSpeakableText(input: string): string {
-  const stripped = stripThinkingAndMarkup(input);
-  const conversational = rewriteParentheticalAside(stripRoleplayMarkers(stripped));
-  const normalized = collapseWhitespace(sanitizeSpeechPunctuation(conversational));
+  const normalized = sanitizeSpeechText(input);
   if (!normalized) return "";
   return capSpeechLength(normalized);
 }
@@ -466,6 +436,8 @@ export function useVoiceChat(options: VoiceChatOptions): VoiceChatState {
   const audioSourceRef = useRef<AudioBufferSourceNode | null>(null);
   const timeDomainDataRef = useRef<Float32Array<ArrayBuffer> | null>(null);
   const usingAudioAnalysisRef = useRef(false);
+  const mouthOpenRef = useRef(0);
+  mouthOpenRef.current = mouthOpen;
 
   // ── Progressive speech queue state ────────────────────────────────
   const queueRef = useRef<SpeakTask[]>([]);
@@ -521,6 +493,21 @@ export function useVoiceChat(options: VoiceChatOptions): VoiceChatState {
     [],
   );
 
+  const updateMouthOpen = useCallback(
+    (value: number | ((previousValue: number) => number)) => {
+      const previousValue = mouthOpenRef.current;
+      const resolvedValue =
+        typeof value === "function" ? value(previousValue) : value;
+      const nextValue = normalizeMouthOpen(resolvedValue);
+      if (nextValue === previousValue) {
+        return;
+      }
+      mouthOpenRef.current = nextValue;
+      setMouthOpen(nextValue);
+    },
+    [],
+  );
+
   // ── Init ──────────────────────────────────────────────────────────
 
   useEffect(() => {
@@ -544,11 +531,18 @@ export function useVoiceChat(options: VoiceChatOptions): VoiceChatState {
   // ── Mouth animation loop ──────────────────────────────────────────
 
   useEffect(() => {
-    const animate = () => {
-      animFrameRef.current = requestAnimationFrame(animate);
+    let frameId = 0;
 
+    const animate = () => {
       if (!isSpeaking) {
-        setMouthOpen((prev) => prev * 0.85); // smooth close
+        const nextMouthOpen = nextIdleMouthOpen(mouthOpenRef.current);
+        updateMouthOpen(nextMouthOpen);
+        if (nextMouthOpen > 0) {
+          frameId = requestAnimationFrame(animate);
+          animFrameRef.current = frameId;
+        } else {
+          animFrameRef.current = 0;
+        }
         return;
       }
 
@@ -568,8 +562,10 @@ export function useVoiceChat(options: VoiceChatOptions): VoiceChatState {
             0,
             Math.min(1, 1 / (1 + Math.exp(-(rms * 30 - 2)))),
           );
-          setMouthOpen(volume);
+          updateMouthOpen(volume);
         }
+        frameId = requestAnimationFrame(animate);
+        animFrameRef.current = frameId;
         return;
       }
 
@@ -590,12 +586,25 @@ export function useVoiceChat(options: VoiceChatOptions): VoiceChatState {
       const base = Math.sin(elapsed * 12) * 0.3 + 0.4;
       const detail = Math.sin(elapsed * 18.7) * 0.15;
       const slow = Math.sin(elapsed * 4.2) * 0.1;
-      setMouthOpen(Math.max(0, Math.min(1, base + detail + slow)));
+      updateMouthOpen(Math.max(0, Math.min(1, base + detail + slow)));
+      frameId = requestAnimationFrame(animate);
+      animFrameRef.current = frameId;
     };
 
-    animFrameRef.current = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(animFrameRef.current);
-  }, [isSpeaking]);
+    if (isSpeaking || mouthOpenRef.current > 0) {
+      frameId = requestAnimationFrame(animate);
+      animFrameRef.current = frameId;
+    } else {
+      animFrameRef.current = 0;
+    }
+
+    return () => {
+      cancelAnimationFrame(frameId);
+      if (animFrameRef.current === frameId) {
+        animFrameRef.current = 0;
+      }
+    };
+  }, [isSpeaking, updateMouthOpen]);
 
   // ── STT (Speech Recognition) ──────────────────────────────────────
 
@@ -645,7 +654,7 @@ export function useVoiceChat(options: VoiceChatOptions): VoiceChatState {
     const transcriptHandle = await TalkMode.addListener(
       "transcript",
       (event: TalkModeTranscriptEvent) => {
-        applyTranscriptUpdate(event.transcript, event.isFinal);
+        applyTranscriptUpdate(event.transcript ?? "", event.isFinal === true);
       },
     );
     const errorHandle = await TalkMode.addListener(
@@ -656,12 +665,12 @@ export function useVoiceChat(options: VoiceChatOptions): VoiceChatState {
           event.code === "service-not-allowed"
         ) {
           enabledRef.current = false;
-        listeningModeRef.current = "idle";
-        sttBackendRef.current = null;
+          listeningModeRef.current = "idle";
+          sttBackendRef.current = null;
           setCaptureMode("idle");
           setIsListening(false);
         }
-      }
+      },
     );
     const stateHandle = await TalkMode.addListener(
       "stateChange",
@@ -788,24 +797,21 @@ export function useVoiceChat(options: VoiceChatOptions): VoiceChatState {
     [ensureTalkModeListeners, options.lang],
   );
 
-  const finalizeRecognition = useCallback(
-    (submit: boolean) => {
-      const transcript = collapseWhitespace(transcriptBufferRef.current);
-      if (submit && transcript) {
-        onTranscriptRef.current(transcript);
-      }
+  const finalizeRecognition = useCallback((submit: boolean) => {
+    const transcript = collapseWhitespace(transcriptBufferRef.current);
+    if (submit && transcript) {
+      onTranscriptRef.current(transcript);
+    }
 
-      transcriptBufferRef.current = "";
-      recognitionRef.current = null;
-      sttBackendRef.current = null;
-      enabledRef.current = false;
-      listeningModeRef.current = "idle";
-      setIsListening(false);
-      setCaptureMode("idle");
-      setInterimTranscript("");
-    },
-    [],
-  );
+    transcriptBufferRef.current = "";
+    recognitionRef.current = null;
+    sttBackendRef.current = null;
+    enabledRef.current = false;
+    listeningModeRef.current = "idle";
+    setIsListening(false);
+    setCaptureMode("idle");
+    setInterimTranscript("");
+  }, []);
 
   const startListening = useCallback(
     async (mode: Exclude<VoiceCaptureMode, "idle"> = "compose") => {
@@ -1363,17 +1369,36 @@ export function useVoiceChat(options: VoiceChatOptions): VoiceChatState {
 
   useEffect(() => {
     const config = effectiveVoiceConfig;
-    if (config?.provider !== "elevenlabs" || !config.elevenlabs) {
+    if (
+      typeof window === "undefined" ||
+      config?.provider !== "elevenlabs" ||
+      !config.elevenlabs
+    ) {
       return;
     }
 
-    if (!audioCtxRef.current) {
-      audioCtxRef.current = new AudioContext();
-    }
+    const warmAudioContext = () => {
+      if (!audioCtxRef.current) {
+        audioCtxRef.current = new AudioContext();
+      }
 
-    void audioCtxRef.current.resume().catch(() => {
-      // Can fail until a user gesture; next speak() call resumes again.
-    });
+      void audioCtxRef.current.resume().catch(() => {
+        // Ignore until the next gesture or playback attempt.
+      });
+    };
+    const handleUserGesture = () => {
+      window.removeEventListener("pointerdown", handleUserGesture, true);
+      window.removeEventListener("keydown", handleUserGesture, true);
+      warmAudioContext();
+    };
+
+    window.addEventListener("pointerdown", handleUserGesture, true);
+    window.addEventListener("keydown", handleUserGesture, true);
+
+    return () => {
+      window.removeEventListener("pointerdown", handleUserGesture, true);
+      window.removeEventListener("keydown", handleUserGesture, true);
+    };
   }, [effectiveVoiceConfig]);
 
   // ── Cleanup on unmount ────────────────────────────────────────────

@@ -12,7 +12,7 @@ import {
   TAG,
   VIEWER_STATS_POLL_INTERVAL_MS,
 } from "./constants.ts";
-import { resolveEmoteFromChat, triggerEmote } from "./emotes.ts";
+import { resolveAutoEmoteId, triggerEmote } from "./emotes.ts";
 import {
   cachedAccessToken,
   cachedApiUrl,
@@ -246,17 +246,11 @@ async function pollChatInner(): Promise<void> {
             );
           }
 
-          // Auto-trigger emote based on the original viewer message OR the
-          // agent's chosen actions.
-          const shouldEmote =
-            (Array.isArray(actions) && actions.includes("PLAY_EMOTE")) ||
-            resolveEmoteFromChat(comment.text);
-          if (shouldEmote) {
-            const emoteId =
-              typeof shouldEmote === "string"
-                ? shouldEmote
-                : resolveEmoteFromChat(comment.text) || "wave";
-            void triggerEmote(emoteId as string);
+          // Only fall back to chat-text emote heuristics when the agent did
+          // not already request PLAY_EMOTE through the runtime action system.
+          const autoEmoteId = resolveAutoEmoteId(comment.text, actions);
+          if (autoEmoteId) {
+            void triggerEmote(autoEmoteId);
           }
 
           const replyMemory: Memory = {

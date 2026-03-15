@@ -32,40 +32,25 @@ describe("emoteAction", () => {
 
   it("describes PLAY_EMOTE as a chainable one-shot action", () => {
     expect(emoteAction.description).toContain("one-shot emote animation");
+    expect(emoteAction.description).toContain(
+      "silent non-blocking visual side action",
+    );
+    expect(emoteAction.description).toContain("required emote parameter");
     expect(emoteAction.description).toContain("before, after, or alongside");
     expect(emoteAction.description).toContain("same turn");
   });
 
-  it("resolves emote id from message text when parameters are missing", async () => {
-    vi.mocked(fetch).mockResolvedValue(mockResponse({ ok: true }));
-
+  it("does not infer emotes from message text when parameters are missing", async () => {
     const result = await emoteAction.handler(
       undefined,
-      { roomId: "room", content: { text: "please do dance-happy now" } },
+      { roomId: "room", content: { text: "please wave now" } },
       undefined,
       undefined,
     );
 
-    expect(result.success).toBe(true);
-    expect(result.data).toMatchObject({ emoteId: "dance-happy" });
-    expect(vi.mocked(fetch)).toHaveBeenCalledWith(
-      "http://localhost:2138/api/emote",
-      expect.objectContaining({ method: "POST" }),
-    );
-  });
-
-  it("falls back to heuristic keyword matching for message text", async () => {
-    vi.mocked(fetch).mockResolvedValue(mockResponse({ ok: true }));
-
-    const result = await emoteAction.handler(
-      undefined,
-      { roomId: "room", content: { text: "hello there!" } },
-      undefined,
-      undefined,
-    );
-
-    expect(result.success).toBe(true);
-    expect(result.data).toMatchObject({ emoteId: "wave" });
+    expect(result.success).toBe(false);
+    expect(result.text).toBe("");
+    expect(vi.mocked(fetch)).not.toHaveBeenCalled();
   });
 
   it("rejects unknown emote IDs", async () => {
@@ -136,7 +121,7 @@ describe("emoteAction", () => {
     );
 
     expect(result.success).toBe(true);
-    expect(result.text).toBe("*waves*");
+    expect(result.text).toBe("");
     expect(result.data).toMatchObject({ emoteId: "wave" });
   });
 

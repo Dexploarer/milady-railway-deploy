@@ -17,6 +17,7 @@ export {
 } from "./parsers";
 export {
   applyUiTheme,
+  loadLastNativeTab,
   loadActiveConversationId,
   loadAvatarIndex,
   loadChatAvatarVisible,
@@ -34,6 +35,7 @@ export {
   saveChatMode,
   saveChatVoiceMuted,
   saveCompanionMessageCutoffTs,
+  saveLastNativeTab,
   saveUiLanguage,
   saveUiShellMode,
   saveUiTheme,
@@ -55,6 +57,7 @@ export {
   ONBOARDING_PERMISSION_LABELS,
   type OnboardingNextOptions,
   type OnboardingStep,
+  type ShellView,
   type SlashCommandInput,
   type StartupErrorReason,
   type StartupErrorState,

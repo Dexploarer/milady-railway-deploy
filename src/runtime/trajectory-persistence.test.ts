@@ -1,8 +1,8 @@
 import type { IAgentRuntime } from "@elizaos/core";
 import { describe, expect, it, vi } from "vitest";
 import {
-  DatabaseTrajectoryLogger,
   computeBySource,
+  DatabaseTrajectoryLogger,
   extractInsightsFromResponse,
   extractRows,
   flushObservationBuffer,
@@ -68,14 +68,17 @@ function withNodeEnv<T>(value: string | undefined, run: () => T): T {
 
 describe("shouldEnableTrajectoryLoggingByDefault", () => {
   it("defaults to enabled outside production", () => {
-    expect(withNodeEnv(undefined, () => shouldEnableTrajectoryLoggingByDefault()))
-      .toBe(true);
     expect(
-      withNodeEnv("development", () => shouldEnableTrajectoryLoggingByDefault()),
+      withNodeEnv(undefined, () => shouldEnableTrajectoryLoggingByDefault()),
     ).toBe(true);
-    expect(withNodeEnv("test", () => shouldEnableTrajectoryLoggingByDefault())).toBe(
-      true,
-    );
+    expect(
+      withNodeEnv("development", () =>
+        shouldEnableTrajectoryLoggingByDefault(),
+      ),
+    ).toBe(true);
+    expect(
+      withNodeEnv("test", () => shouldEnableTrajectoryLoggingByDefault()),
+    ).toBe(true);
   });
 
   it("defaults to disabled in production", () => {

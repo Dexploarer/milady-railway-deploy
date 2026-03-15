@@ -83,11 +83,7 @@ export const LongMessage: Story = {
 export const Interrupted: Story = {
   render: () => (
     <div style={{ maxWidth: 600 }}>
-      <ChatMessage
-        message={interruptedMsg}
-        agentName="Milady"
-        onRetry={() => alert("retry")}
-      />
+      <ChatMessage message={interruptedMsg} agentName="Milady" />
     </div>
   ),
 };

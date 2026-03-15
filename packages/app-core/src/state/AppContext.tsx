@@ -126,6 +126,7 @@ import {
   loadChatMode,
   loadChatVoiceMuted,
   loadCompanionMessageCutoffTs,
+  loadLastNativeTab,
   loadUiLanguage,
   loadUiShellMode,
   loadUiTheme,
@@ -142,6 +143,7 @@ import {
   parseProactiveMessageEvent,
   parseSlashCommandInput,
   parseStreamEventEnvelopeEvent,
+  type ShellView,
   type StartupErrorState,
   type StartupPhase,
   saveActiveConversationId,
@@ -150,6 +152,7 @@ import {
   saveChatMode,
   saveChatVoiceMuted,
   saveCompanionMessageCutoffTs,
+  saveLastNativeTab,
   saveUiLanguage,
   saveUiShellMode,
   saveUiTheme,
@@ -206,6 +209,7 @@ export {
   parseProactiveMessageEvent,
   parseSlashCommandInput,
   parseStreamEventEnvelopeEvent,
+  type ShellView,
   type SlashCommandInput,
   type StartupErrorReason,
   type StartupErrorState,
@@ -237,7 +241,11 @@ const GREETING_WAVE_EMOTE: AppEmoteEventDetail = {
   path: "/animations/emotes/waving-both-hands.glb",
   duration: 2.5,
   loop: false,
+  showOverlay: false,
 };
+const ELIZA_CLOUD_LOGIN_POLL_INTERVAL_MS = 1000;
+const ELIZA_CLOUD_LOGIN_TIMEOUT_MS = 300_000;
+const ELIZA_CLOUD_LOGIN_MAX_CONSECUTIVE_ERRORS = 3;
 
 function normalizeAppEmoteEvent(
   data: Record<string, unknown>,
@@ -258,7 +266,20 @@ function normalizeAppEmoteEvent(
         ? data.duration
         : 3,
     loop: data.loop === true,
+    showOverlay: data.showOverlay !== false,
   };
+}
+
+function shouldKeepConversationMessage(message: ConversationMessage): boolean {
+  if (message.role !== "assistant") return true;
+  if (message.text.trim().length > 0) return true;
+  return Boolean(message.blocks?.length);
+}
+
+function filterRenderableConversationMessages(
+  messages: ConversationMessage[],
+): ConversationMessage[] {
+  return messages.filter((message) => shouldKeepConversationMessage(message));
 }
 
 function isPrivateNetworkHost(host: string): boolean {
@@ -328,6 +349,8 @@ function isRemoteApiBase(baseUrl: string): boolean {
 // ── Provider ───────────────────────────────────────────────────────────
 
 export function AppProvider({ children }: { children: ReactNode }) {
+  const [lastNativeTab, setLastNativeTabState] =
+    useState<Tab>(loadLastNativeTab);
   // --- Core state ---
   const [tab, setTabRaw] = useState<Tab>("chat");
   const [uiShellMode, setUiShellModeState] =
@@ -431,6 +454,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const autonomousRunHealthByRunIdRef = useRef<AutonomyRunHealthMap>({});
   const autonomousReplayInFlightRef = useRef(false);
   const activeConversationIdRef = useRef<string | null>(null);
+  const conversationMessagesRef = useRef<ConversationMessage[]>([]);
   const conversationsRef = useRef<Conversation[]>([]);
 
   useEffect(() => {
@@ -444,6 +468,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     autonomousRunHealthByRunIdRef.current = autonomousRunHealthByRunId;
   }, [autonomousRunHealthByRunId]);
+
+  useEffect(() => {
+    conversationMessagesRef.current = conversationMessages;
+  }, [conversationMessages]);
 
   useEffect(() => {
     conversationsRef.current = conversations;
@@ -607,26 +635,26 @@ export function AppProvider({ children }: { children: ReactNode }) {
     client.saveStreamSettings({ avatarIndex: normalized }).catch(() => {});
   }, []);
 
-  // --- Milady Cloud ---
-  const [miladyCloudEnabled, setMiladyCloudEnabled] = useState(false);
-  const [miladyCloudConnected, setMiladyCloudConnected] = useState(false);
-  const [miladyCloudCredits, setMiladyCloudCredits] = useState<number | null>(
+  // --- Eliza Cloud ---
+  const [elizaCloudEnabled, setElizaCloudEnabled] = useState(false);
+  const [elizaCloudConnected, setElizaCloudConnected] = useState(false);
+  const [elizaCloudCredits, setElizaCloudCredits] = useState<number | null>(
     null,
   );
-  const [miladyCloudCreditsLow, setMiladyCloudCreditsLow] = useState(false);
-  const [miladyCloudCreditsCritical, setMiladyCloudCreditsCritical] =
+  const [elizaCloudCreditsLow, setElizaCloudCreditsLow] = useState(false);
+  const [elizaCloudCreditsCritical, setElizaCloudCreditsCritical] =
     useState(false);
-  const [miladyCloudTopUpUrl, setMiladyCloudTopUpUrl] =
+  const [elizaCloudTopUpUrl, setElizaCloudTopUpUrl] =
     useState("/cloud/billing");
-  const [miladyCloudUserId, setMiladyCloudUserId] = useState<string | null>(
-    null,
-  );
-  const [miladyCloudLoginBusy, setMiladyCloudLoginBusy] = useState(false);
-  const [miladyCloudLoginError, setMiladyCloudLoginError] = useState<
+  const [elizaCloudUserId, setElizaCloudUserId] = useState<string | null>(null);
+  const [cloudDashboardView, setCloudDashboardView] = useState<
+    "billing" | "agents"
+  >("billing");
+  const [elizaCloudLoginBusy, setElizaCloudLoginBusy] = useState(false);
+  const [elizaCloudLoginError, setElizaCloudLoginError] = useState<
     string | null
   >(null);
-  const [miladyCloudDisconnecting, setMiladyCloudDisconnecting] =
-    useState(false);
+  const [elizaCloudDisconnecting, setElizaCloudDisconnecting] = useState(false);
 
   // --- Updates ---
   const [updateStatus, setUpdateStatus] = useState<UpdateStatus | null>(null);
@@ -750,7 +778,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [onboardingSubscriptionTab, setOnboardingSubscriptionTab] = useState<
     "token" | "oauth"
   >("token");
-  const [onboardingMiladyCloudTab, setOnboardingMiladyCloudTab] = useState<
+  const [onboardingElizaCloudTab, setOnboardingElizaCloudTab] = useState<
     "login" | "apikey"
   >("login");
   const [onboardingSelectedChains, setOnboardingSelectedChains] = useState<
@@ -835,8 +863,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   // --- Refs for timers ---
   const actionNoticeTimer = useRef<number | null>(null);
-  const miladyCloudPollInterval = useRef<number | null>(null);
-  const miladyCloudLoginPollTimer = useRef<number | null>(null);
+  const elizaCloudPollInterval = useRef<number | null>(null);
+  const elizaCloudLoginPollTimer = useRef<number | null>(null);
   const prevAgentStateRef = useRef<string | null>(null);
   /** Tracks last agent status to skip no-op updates from WS heartbeats. */
   const agentStatusRef = useRef<AgentStatus | null>(null);
@@ -876,7 +904,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   /** Synchronous lock for wallet API key save to prevent duplicate clicks in the same tick. */
   const walletApiKeySavingRef = useRef(false);
   /** Synchronous lock for cloud login action to prevent duplicate clicks in the same tick. */
-  const miladyCloudLoginBusyRef = useRef(false);
+  const elizaCloudLoginBusyRef = useRef(false);
   /** Synchronous lock for update channel changes to prevent duplicate submits. */
   const updateChannelSavingRef = useRef(false);
   /** Synchronous lock for onboarding completion submit to prevent duplicate clicks. */
@@ -916,6 +944,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
       greetingEmoteTimerRef.current = null;
     }, GREETING_EMOTE_DELAY_MS);
   }, []);
+
+  const scheduleGreetingWaveForCompanion = useCallback(() => {
+    if (uiShellMode !== "companion") {
+      return;
+    }
+    scheduleGreetingWave();
+  }, [scheduleGreetingWave, uiShellMode]);
 
   useEffect(() => {
     return () => {
@@ -969,6 +1004,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     saveUiShellMode(uiShellMode);
   }, [uiShellMode]);
 
+  useEffect(() => {
+    saveLastNativeTab(lastNativeTab);
+  }, [lastNativeTab]);
+
   // ── Theme ──────────────────────────────────────────────────────────
 
   const setUiTheme = useCallback((theme: UiTheme) => {
@@ -1004,6 +1043,56 @@ export function AppProvider({ children }: { children: ReactNode }) {
       }
     },
     [activeGameViewerUrl],
+  );
+
+  useEffect(() => {
+    const shouldRememberTab =
+      uiShellMode === "native" &&
+      tab !== "companion" &&
+      tab !== "character" &&
+      tab !== "character-select";
+    if (!shouldRememberTab) {
+      return;
+    }
+    setLastNativeTabState((prev) => (prev === tab ? prev : tab));
+  }, [tab, uiShellMode]);
+
+  const switchUiShellMode = useCallback(
+    (mode: UiShellMode) => {
+      const nextMode = normalizeUiShellMode(mode);
+      if (nextMode === uiShellMode) {
+        return;
+      }
+
+      if (nextMode === "native") {
+        setUiShellModeState("native");
+        setTab(lastNativeTab);
+        return;
+      }
+
+      setUiShellModeState("companion");
+      setTab("companion");
+    },
+    [lastNativeTab, setTab, uiShellMode],
+  );
+
+  const switchShellView = useCallback(
+    (view: ShellView) => {
+      if (view === "companion") {
+        setUiShellModeState("companion");
+        setTab("companion");
+        return;
+      }
+
+      setUiShellModeState("native");
+      if (view === "character") {
+        setTab("character");
+        return;
+      }
+
+      setTab(lastNativeTab);
+    },
+    [lastNativeTab, setTab],
   );
 
   const sortTriggersByNextRun = useCallback(
@@ -1335,8 +1424,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     async (convId: string): Promise<LoadConversationMessagesResult> => {
       try {
         const { messages } = await client.getConversationMessages(convId);
-        greetingFiredRef.current = messages.length > 0;
-        setConversationMessages(messages);
+        const nextMessages = filterRenderableConversationMessages(messages);
+        greetingFiredRef.current = nextMessages.length > 0;
+        setConversationMessages(nextMessages);
         return { ok: true };
       } catch (err) {
         const status = (err as { status?: number }).status;
@@ -1536,36 +1626,36 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const pollCloudCredits = useCallback(async (): Promise<boolean> => {
     const cloudStatus = await client.getCloudStatus().catch(() => null);
     if (!cloudStatus) {
-      setMiladyCloudConnected(false);
-      setMiladyCloudCredits(null);
-      setMiladyCloudCreditsLow(false);
-      setMiladyCloudCreditsCritical(false);
+      setElizaCloudConnected(false);
+      setElizaCloudCredits(null);
+      setElizaCloudCreditsLow(false);
+      setElizaCloudCreditsCritical(false);
       return false;
     }
     // A cached cloud API key represents a completed login and should be shared
     // across all views, even before runtime CLOUD_AUTH fully initializes.
     const isConnected = Boolean(cloudStatus.connected || cloudStatus.hasApiKey);
-    setMiladyCloudEnabled(Boolean(cloudStatus.enabled ?? false));
-    setMiladyCloudConnected(isConnected);
-    setMiladyCloudUserId(cloudStatus.userId ?? null);
-    if (cloudStatus.topUpUrl) setMiladyCloudTopUpUrl(cloudStatus.topUpUrl);
+    setElizaCloudEnabled(Boolean(cloudStatus.enabled ?? false));
+    setElizaCloudConnected(isConnected);
+    setElizaCloudUserId(cloudStatus.userId ?? null);
+    if (cloudStatus.topUpUrl) setElizaCloudTopUpUrl(cloudStatus.topUpUrl);
     if (isConnected) {
       const credits = await client.getCloudCredits().catch(() => null);
       if (credits && typeof credits.balance === "number") {
-        setMiladyCloudCredits(credits.balance);
-        setMiladyCloudCreditsLow(credits.low ?? false);
-        setMiladyCloudCreditsCritical(credits.critical ?? false);
-        if (credits.topUpUrl) setMiladyCloudTopUpUrl(credits.topUpUrl);
+        setElizaCloudCredits(credits.balance);
+        setElizaCloudCreditsLow(credits.low ?? false);
+        setElizaCloudCreditsCritical(credits.critical ?? false);
+        if (credits.topUpUrl) setElizaCloudTopUpUrl(credits.topUpUrl);
       } else {
-        setMiladyCloudCredits(null);
-        setMiladyCloudCreditsLow(false);
-        setMiladyCloudCreditsCritical(false);
-        if (credits?.topUpUrl) setMiladyCloudTopUpUrl(credits.topUpUrl);
+        setElizaCloudCredits(null);
+        setElizaCloudCreditsLow(false);
+        setElizaCloudCreditsCritical(false);
+        if (credits?.topUpUrl) setElizaCloudTopUpUrl(credits.topUpUrl);
       }
     } else {
-      setMiladyCloudCredits(null);
-      setMiladyCloudCreditsLow(false);
-      setMiladyCloudCreditsCritical(false);
+      setElizaCloudCredits(null);
+      setElizaCloudCreditsLow(false);
+      setElizaCloudCreditsCritical(false);
     }
     return isConnected;
   }, []);
@@ -1615,7 +1705,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         if (data.text) {
           greetingFiredRef.current = true;
           if (data.persisted === true) {
-            scheduleGreetingWave();
+            scheduleGreetingWaveForCompanion();
           }
           if (activeConversationIdRef.current === convId) {
             setConversationMessages((prev: ConversationMessage[]) => {
@@ -1655,7 +1745,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       }
       return false;
     },
-    [scheduleGreetingWave, uiLanguage],
+    [scheduleGreetingWaveForCompanion, uiLanguage],
   );
 
   const requestGreetingWhenRunning = useCallback(
@@ -1699,9 +1789,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
           const { messages } = await client.getConversationMessages(
             restoredConversation.id,
           );
-          greetingFiredRef.current = messages.length > 0;
-          setConversationMessages(messages);
-          return messages.length === 0 ? restoredConversation.id : null;
+          const nextMessages = filterRenderableConversationMessages(messages);
+          greetingFiredRef.current = nextMessages.length > 0;
+          setConversationMessages(nextMessages);
+          return nextMessages.length === 0 ? restoredConversation.id : null;
         } catch (err) {
           console.warn(
             "[milady][chat:init] failed to load restored conversation messages",
@@ -1734,7 +1825,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       if (greetingText) {
         greetingFiredRef.current = true;
         if (greeting?.persisted === true) {
-          scheduleGreetingWave();
+          scheduleGreetingWaveForCompanion();
         }
         setConversationMessages([
           {
@@ -1755,7 +1846,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       console.warn("[milady][chat:init] failed to hydrate conversations", err);
       return null;
     }
-  }, [scheduleGreetingWave, uiLanguage]);
+  }, [scheduleGreetingWaveForCompanion, uiLanguage]);
 
   const handleStart = useCallback(async () => {
     if (!beginLifecycleAction("start")) return;
@@ -1966,6 +2057,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const handleNewConversation = useCallback(
     async (title?: string) => {
+      const previousConversationId = activeConversationIdRef.current;
+      const previousMessages = conversationMessagesRef.current;
+      const previousCutoffTs = companionMessageCutoffTs;
+
+      greetingFiredRef.current = false;
+      greetingInFlightConversationRef.current = null;
+      setChatInput("");
+      setChatPendingImages([]);
+      setChatSending(false);
+      setChatFirstTokenReceived(false);
+      setConversationMessages([]);
+      setActiveConversationId(null);
+      activeConversationIdRef.current = null;
+      setCompanionMessageCutoffTs(Date.now());
+
       try {
         const { conversation, greeting } = await client.createConversation(
           title,
@@ -1983,7 +2089,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         if (greetingText) {
           greetingFiredRef.current = true;
           if (greeting?.persisted === true) {
-            scheduleGreetingWave();
+            scheduleGreetingWaveForCompanion();
           }
           setConversationMessages([
             {
@@ -2004,10 +2110,25 @@ export function AppProvider({ children }: { children: ReactNode }) {
           conversationId: conversation.id,
         });
       } catch {
-        /* ignore */
+        setActiveConversationId(previousConversationId);
+        activeConversationIdRef.current = previousConversationId;
+        setConversationMessages(previousMessages);
+        setCompanionMessageCutoffTs(previousCutoffTs);
+        greetingFiredRef.current = previousMessages.length > 0;
+        if (previousConversationId) {
+          client.sendWsMessage({
+            type: "active-conversation",
+            conversationId: previousConversationId,
+          });
+        }
       }
     },
-    [requestGreetingWhenRunning, scheduleGreetingWave, uiLanguage],
+    [
+      companionMessageCutoffTs,
+      requestGreetingWhenRunning,
+      scheduleGreetingWaveForCompanion,
+      uiLanguage,
+    ],
   );
 
   const appendLocalCommandTurn = useCallback(
@@ -2302,7 +2423,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
           text = commandResult.rewrittenText.trim();
         }
 
-        let convId: string = options?.conversationId ?? activeConversationId ?? "";
+        let convId: string =
+          options?.conversationId ?? activeConversationId ?? "";
         if (!convId) {
           try {
             const { conversation } = await client.createConversation();
@@ -2346,8 +2468,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
           const data = await client.sendConversationMessageStream(
             convId,
             text,
-            (token) => {
-              const nextText = mergeStreamingText(streamedAssistantText, token);
+            (token, accumulatedText) => {
+              const nextText =
+                typeof accumulatedText === "string"
+                  ? accumulatedText
+                  : mergeStreamingText(streamedAssistantText, token);
               if (nextText === streamedAssistantText) return;
               streamedAssistantText = nextText;
               setChatFirstTokenReceived(true);
@@ -2367,7 +2492,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
             conversationMode,
           );
 
-          if (shouldApplyFinalStreamText(streamedAssistantText, data.text)) {
+          if (!data.text.trim()) {
+            setConversationMessages((prev) =>
+              prev.filter((message) => message.id !== assistantMsgId),
+            );
+          } else if (
+            shouldApplyFinalStreamText(streamedAssistantText, data.text)
+          ) {
             setConversationMessages((prev) => {
               let changed = false;
               const next = prev.map((message) => {
@@ -2432,20 +2563,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
                 imagesToSend,
                 conversationMode,
               );
-              setConversationMessages([
-                {
-                  id: `temp-${Date.now()}`,
-                  role: "user",
-                  text,
-                  timestamp: Date.now(),
-                },
-                {
-                  id: `temp-resp-${Date.now()}`,
-                  role: "assistant",
-                  text: retryData.text,
-                  timestamp: Date.now(),
-                },
-              ]);
+              setConversationMessages(
+                filterRenderableConversationMessages([
+                  {
+                    id: `temp-${Date.now()}`,
+                    role: "user",
+                    text,
+                    timestamp: Date.now(),
+                  },
+                  {
+                    id: `temp-resp-${Date.now()}`,
+                    role: "assistant",
+                    text: retryData.text,
+                    timestamp: Date.now(),
+                  },
+                ]),
+              );
             } catch {
               setConversationMessages((prev) =>
                 prev.filter(
@@ -2495,7 +2628,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         clearChatInput: true,
       });
     },
-    [chatInput, chatPendingImages, sendChatText, setChatPendingImages],
+    [chatInput, chatPendingImages, sendChatText],
   );
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: t is stable but defined later
@@ -2553,8 +2686,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
           const data = await client.sendConversationMessageStream(
             convId,
             trimmed,
-            (token) => {
-              const nextText = mergeStreamingText(streamedAssistantText, token);
+            (token, accumulatedText) => {
+              const nextText =
+                typeof accumulatedText === "string"
+                  ? accumulatedText
+                  : mergeStreamingText(streamedAssistantText, token);
               if (nextText === streamedAssistantText) return;
               streamedAssistantText = nextText;
               setChatFirstTokenReceived(true);
@@ -2574,7 +2710,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
             conversationMode,
           );
 
-          if (shouldApplyFinalStreamText(streamedAssistantText, data.text)) {
+          if (!data.text.trim()) {
+            setConversationMessages((prev) =>
+              prev.filter((message) => message.id !== assistantMsgId),
+            );
+          } else if (
+            shouldApplyFinalStreamText(streamedAssistantText, data.text)
+          ) {
             setConversationMessages((prev) => {
               let changed = false;
               const next = prev.map((message) => {
@@ -2718,7 +2860,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
         return false;
       }
     },
-    [conversationMessages, loadConversationMessages, sendChatText, setActionNotice],
+    [
+      conversationMessages,
+      loadConversationMessages,
+      sendChatText,
+      setActionNotice,
+    ],
   );
 
   const handleChatClear = useCallback(async () => {
@@ -3599,11 +3746,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const systemPrompt = style?.system
       ? style.system.replace(/\{\{name\}\}/g, onboardingName)
       : `You are ${onboardingName}, an autonomous AI agent powered by elizaOS. ${onboardingOptions.sharedStyleRules}`;
-    const miladyCloudProvisioned =
+    const elizaCloudProvisioned =
       onboardingRunMode === "cloud" &&
-      onboardingCloudProvider === "miladycloud" &&
+      onboardingCloudProvider === "elizacloud" &&
       !onboardingRemoteConnected;
-    const apiRunMode = miladyCloudProvisioned ? "cloud" : "local";
+    const apiRunMode = elizaCloudProvisioned ? "cloud" : "local";
 
     onboardingFinishBusyRef.current = true;
     setOnboardingRestarting(true);
@@ -3620,7 +3767,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const rpcK = onboardingRpcKeys as Record<string, string>;
 
       const defaultRpcProvider =
-        miladyCloudProvisioned || miladyCloudConnected
+        elizaCloudProvisioned || elizaCloudConnected
           ? "eliza-cloud"
           : undefined;
       const evmProvider = rpcSel.evm || defaultRpcProvider;
@@ -3660,13 +3807,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
         topics: style?.topics,
         postExamples: style?.postExamples,
         messageExamples: style?.messageExamples,
-        cloudProvider: miladyCloudProvisioned
+        cloudProvider: elizaCloudProvisioned
           ? onboardingCloudProvider
           : undefined,
-        smallModel: miladyCloudProvisioned
+        smallModel: elizaCloudProvisioned
           ? onboardingSmallModel.trim() || undefined
           : undefined,
-        largeModel: miladyCloudProvisioned
+        largeModel: elizaCloudProvisioned
           ? onboardingLargeModel.trim() || undefined
           : undefined,
         provider:
@@ -3718,7 +3865,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     onboardingRpcKeys,
     hydrateInitialConversationState,
     setTab,
-    miladyCloudConnected,
+    elizaCloudConnected,
     requestGreetingWhenRunning,
   ]);
 
@@ -3880,18 +4027,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
   // ── Cloud ──────────────────────────────────────────────────────────
 
   const handleCloudLogin = useCallback(async () => {
-    if (miladyCloudLoginBusyRef.current || miladyCloudLoginBusy) return;
-    miladyCloudLoginBusyRef.current = true;
-    setMiladyCloudLoginBusy(true);
-    setMiladyCloudLoginError(null);
+    if (elizaCloudLoginBusyRef.current || elizaCloudLoginBusy) return;
+    elizaCloudLoginBusyRef.current = true;
+    setElizaCloudLoginBusy(true);
+    setElizaCloudLoginError(null);
     try {
       const resp = await client.cloudLogin();
       if (!resp.ok) {
-        setMiladyCloudLoginError(
-          resp.error || "Failed to start Milady Cloud login",
+        setElizaCloudLoginError(
+          resp.error || "Failed to start Eliza Cloud login",
         );
-        miladyCloudLoginBusyRef.current = false;
-        setMiladyCloudLoginBusy(false);
+        elizaCloudLoginBusyRef.current = false;
+        setElizaCloudLoginBusy(false);
         return;
       }
 
@@ -3904,28 +4051,51 @@ export function AppProvider({ children }: { children: ReactNode }) {
           // Popup was blocked (common when window.open runs after an async
           // gap and loses user-gesture context). Surface the URL so the user
           // can open it manually — the polling loop below still runs.
-          setMiladyCloudLoginError(
+          setElizaCloudLoginError(
             `Open this link to log in: ${resp.browserUrl}`,
           );
         }
       }
 
+      let pollInFlight = false;
+      let consecutivePollErrors = 0;
+      const pollDeadline = Date.now() + ELIZA_CLOUD_LOGIN_TIMEOUT_MS;
+      const stopCloudLoginPolling = (error: string | null = null) => {
+        if (elizaCloudLoginPollTimer.current !== null) {
+          clearInterval(elizaCloudLoginPollTimer.current);
+          elizaCloudLoginPollTimer.current = null;
+        }
+        elizaCloudLoginBusyRef.current = false;
+        setElizaCloudLoginBusy(false);
+        if (error !== null) {
+          setElizaCloudLoginError(error);
+        }
+      };
+
       // Start polling
-      miladyCloudLoginPollTimer.current = window.setInterval(async () => {
+      elizaCloudLoginPollTimer.current = window.setInterval(async () => {
+        if (!elizaCloudLoginPollTimer.current || pollInFlight) return;
+        if (Date.now() >= pollDeadline) {
+          stopCloudLoginPolling(
+            "Eliza Cloud login timed out. Please try again.",
+          );
+          return;
+        }
+
+        pollInFlight = true;
         try {
-          if (!miladyCloudLoginPollTimer.current) return;
+          if (!elizaCloudLoginPollTimer.current) return;
           const poll = await client.cloudLoginPoll(resp.sessionId);
+          if (!elizaCloudLoginPollTimer.current) return;
+
+          consecutivePollErrors = 0;
           if (poll.status === "authenticated") {
-            if (miladyCloudLoginPollTimer.current)
-              clearInterval(miladyCloudLoginPollTimer.current);
-            miladyCloudLoginPollTimer.current = null;
-            miladyCloudLoginBusyRef.current = false;
-            setMiladyCloudLoginBusy(false);
-            setMiladyCloudConnected(true);
-            setMiladyCloudEnabled(true);
-            setMiladyCloudLoginError(null);
+            stopCloudLoginPolling();
+            setElizaCloudConnected(true);
+            setElizaCloudEnabled(true);
+            setElizaCloudLoginError(null);
             setActionNotice(
-              "Logged in to Milady Cloud successfully.",
+              "Logged in to Eliza Cloud successfully.",
               "success",
               6000,
             );
@@ -3934,29 +4104,39 @@ export function AppProvider({ children }: { children: ReactNode }) {
             // persist the API key before we query cloud status / credits.
             setTimeout(() => void pollCloudCredits(), 2000);
           } else if (poll.status === "expired" || poll.status === "error") {
-            if (miladyCloudLoginPollTimer.current)
-              clearInterval(miladyCloudLoginPollTimer.current);
-            miladyCloudLoginPollTimer.current = null;
-            setMiladyCloudLoginError(
+            stopCloudLoginPolling(
               poll.error ?? "Login session expired. Please try again.",
             );
-            miladyCloudLoginBusyRef.current = false;
-            setMiladyCloudLoginBusy(false);
           }
         } catch (pollErr) {
-          // Keep polling unless explicit failure
-          console.error("Milady Cloud login poll error:", pollErr);
+          console.error("Eliza Cloud login poll error:", pollErr);
+          if (!elizaCloudLoginPollTimer.current) return;
+
+          consecutivePollErrors += 1;
+          if (
+            consecutivePollErrors >= ELIZA_CLOUD_LOGIN_MAX_CONSECUTIVE_ERRORS
+          ) {
+            const detail =
+              pollErr instanceof Error && pollErr.message
+                ? ` Last error: ${pollErr.message}`
+                : "";
+            stopCloudLoginPolling(
+              `Eliza Cloud login check failed after repeated errors.${detail}`,
+            );
+          }
+        } finally {
+          pollInFlight = false;
         }
-      }, 1000);
+      }, ELIZA_CLOUD_LOGIN_POLL_INTERVAL_MS);
     } catch (err) {
-      setMiladyCloudLoginError(
-        err instanceof Error ? err.message : "Milady Cloud login failed",
+      setElizaCloudLoginError(
+        err instanceof Error ? err.message : "Eliza Cloud login failed",
       );
-      miladyCloudLoginBusyRef.current = false;
-      setMiladyCloudLoginBusy(false);
+      elizaCloudLoginBusyRef.current = false;
+      setElizaCloudLoginBusy(false);
     }
   }, [
-    miladyCloudLoginBusy,
+    elizaCloudLoginBusy,
     setActionNotice,
     pollCloudCredits,
     loadWalletConfig,
@@ -3965,7 +4145,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const handleCloudDisconnect = useCallback(async () => {
     if (
       !(await confirmDesktopAction({
-        title: "Disconnect from Milady Cloud",
+        title: "Disconnect from Eliza Cloud",
         message: "The agent will need a local AI provider to continue working.",
         confirmLabel: "Disconnect",
         cancelLabel: "Cancel",
@@ -3973,21 +4153,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
       }))
     )
       return;
-    setMiladyCloudDisconnecting(true);
+    setElizaCloudDisconnecting(true);
     try {
       await client.cloudDisconnect();
-      setMiladyCloudEnabled(false);
-      setMiladyCloudConnected(false);
-      setMiladyCloudCredits(null);
-      setMiladyCloudUserId(null);
-      setActionNotice("Disconnected from Milady Cloud.", "success");
+      setElizaCloudEnabled(false);
+      setElizaCloudConnected(false);
+      setElizaCloudCredits(null);
+      setElizaCloudUserId(null);
+      setActionNotice("Disconnected from Eliza Cloud.", "success");
     } catch (err) {
       setActionNotice(
         `Failed to disconnect: ${err instanceof Error ? err.message : err}`,
         "error",
       );
     } finally {
-      setMiladyCloudDisconnecting(false);
+      setElizaCloudDisconnecting(false);
     }
   }, [setActionNotice]);
 
@@ -4194,11 +4374,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
         onboardingBlooioPhoneNumber: setOnboardingBlooioPhoneNumber,
         onboardingGithubToken: setOnboardingGithubToken,
         onboardingSubscriptionTab: setOnboardingSubscriptionTab,
-        onboardingMiladyCloudTab: setOnboardingMiladyCloudTab,
+        onboardingElizaCloudTab: setOnboardingElizaCloudTab,
         onboardingRpcKeys: setOnboardingRpcKeys,
         onboardingAvatar: setOnboardingAvatar,
         onboardingRestarting: setOnboardingRestarting,
-        miladyCloudEnabled: setMiladyCloudEnabled,
+        elizaCloudEnabled: setElizaCloudEnabled,
+        cloudDashboardView: setCloudDashboardView,
         selectedVrmIndex: setSelectedVrmIndex,
         customVrmUrl: setCustomVrmUrl,
         customBackgroundUrl: setCustomBackgroundUrl,
@@ -4960,7 +5141,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       // recurring interval too.
       pollCloudCredits().then((connected) => {
         if (connected) {
-          miladyCloudPollInterval.current = window.setInterval(
+          elizaCloudPollInterval.current = window.setInterval(
             () => pollCloudCredits(),
             60_000,
           );
@@ -5014,10 +5195,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true;
       window.removeEventListener(navEvent, handleNavChange);
-      if (miladyCloudPollInterval.current)
-        clearInterval(miladyCloudPollInterval.current);
-      if (miladyCloudLoginPollTimer.current)
-        clearInterval(miladyCloudLoginPollTimer.current);
+      if (elizaCloudPollInterval.current) {
+        clearInterval(elizaCloudPollInterval.current);
+        elizaCloudPollInterval.current = null;
+      }
+      if (elizaCloudLoginPollTimer.current) {
+        clearInterval(elizaCloudLoginPollTimer.current);
+        elizaCloudLoginPollTimer.current = null;
+      }
       unbindStatus?.();
       unbindAgentEvents?.();
       unbindHeartbeatEvents?.();
@@ -5203,16 +5388,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
     selectedVrmIndex,
     customVrmUrl,
     customBackgroundUrl,
-    miladyCloudEnabled,
-    miladyCloudConnected,
-    miladyCloudCredits,
-    miladyCloudCreditsLow,
-    miladyCloudCreditsCritical,
-    miladyCloudTopUpUrl,
-    miladyCloudUserId,
-    miladyCloudLoginBusy,
-    miladyCloudLoginError,
-    miladyCloudDisconnecting,
+    elizaCloudEnabled,
+    elizaCloudConnected,
+    elizaCloudCredits,
+    elizaCloudCreditsLow,
+    elizaCloudCreditsCritical,
+    elizaCloudTopUpUrl,
+    elizaCloudUserId,
+    cloudDashboardView,
+    elizaCloudLoginBusy,
+    elizaCloudLoginError,
+    elizaCloudDisconnecting,
     updateStatus,
     updateLoading,
     updateChannelSaving,
@@ -5281,7 +5467,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     onboardingBlooioPhoneNumber,
     onboardingGithubToken,
     onboardingSubscriptionTab,
-    onboardingMiladyCloudTab,
+    onboardingElizaCloudTab,
     onboardingSelectedChains,
     onboardingRpcSelections,
     onboardingRpcKeys,
@@ -5322,6 +5508,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     // Actions
     setTab,
     setUiShellMode,
+    switchUiShellMode,
+    switchShellView,
     setUiLanguage,
     setUiTheme,
     handleStart,

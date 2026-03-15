@@ -51,6 +51,15 @@ describe("GlobalEmoteOverlay", () => {
     expect(
       tree?.root.findAll(
         (node) =>
+          typeof node.props.className === "string" &&
+          node.props.className.includes("text-[88px]") &&
+          node.props.className.includes("h-32") &&
+          node.props.className.includes("w-32"),
+      ),
+    ).toHaveLength(1);
+    expect(
+      tree?.root.findAll(
+        (node) =>
           node.type === "span" &&
           node.children.some((child) => child === "\u{1F44B}"),
       ),
@@ -58,6 +67,34 @@ describe("GlobalEmoteOverlay", () => {
 
     await act(async () => {
       vi.advanceTimersByTime(2400);
+    });
+
+    expect(
+      tree?.root.findAll(
+        (node) => node.props["data-testid"] === "global-emote-overlay",
+      ),
+    ).toHaveLength(0);
+  });
+
+  it("skips rendering the emoji burst when the emote disables overlays", async () => {
+    let tree: TestRenderer.ReactTestRenderer | undefined;
+
+    await act(async () => {
+      tree = TestRenderer.create(React.createElement(GlobalEmoteOverlay));
+    });
+
+    await act(async () => {
+      window.dispatchEvent(
+        new CustomEvent(APP_EMOTE_EVENT, {
+          detail: {
+            emoteId: "wave",
+            path: "/animations/emotes/waving-both-hands.glb",
+            duration: 2.5,
+            loop: false,
+            showOverlay: false,
+          },
+        }),
+      );
     });
 
     expect(

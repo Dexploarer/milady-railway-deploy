@@ -136,6 +136,42 @@ export default defineConfig({
       },
       {
         // workspace plugin not built in CI (--ignore-scripts); resolve from
+        // source so dynamic imports don't fail on missing dist/.
+        find: "@milady/plugin-retake",
+        replacement: path.join(
+          repoRoot,
+          "packages",
+          "plugin-retake",
+          "src",
+          "index.ts",
+        ),
+      },
+      {
+        // workspace plugin not built in CI (--ignore-scripts); resolve from
+        // source so dynamic imports don't fail on missing dist/.
+        find: "@milady/plugin-twitch-streaming",
+        replacement: path.join(
+          repoRoot,
+          "packages",
+          "plugin-twitch",
+          "src",
+          "index.ts",
+        ),
+      },
+      {
+        // workspace plugin not built in CI (--ignore-scripts); resolve from
+        // source so dynamic imports don't fail on missing dist/.
+        find: "@milady/plugin-youtube-streaming",
+        replacement: path.join(
+          repoRoot,
+          "packages",
+          "plugin-youtube",
+          "src",
+          "index.ts",
+        ),
+      },
+      {
+        // workspace plugin not built in CI (--ignore-scripts); resolve from
         // source so vi.mock() and dynamic import() don't fail on missing dist/.
         find: "@milady/plugin-bnb-identity",
         replacement: path.join(
@@ -200,11 +236,12 @@ export default defineConfig({
     // teardown, especially for jsdom-heavy test files.
     execArgv: ["--max-old-space-size=4096"],
     include: [
+      "packages/app-core/src/**/*.test.ts",
+      "packages/plugin-retake/src/**/*.test.ts",
       "src/**/*.test.ts",
       "scripts/**/*.test.ts",
       "apps/**/*.test.ts",
       "apps/**/*.test.tsx",
-      "packages/app-core/src/state/parsers.test.ts",
       "apps/app/test/app/lifecycle-lock.test.ts",
       "apps/app/test/app/api-client-timeout.test.ts",
       "apps/app/test/app/startup-backend-missing.e2e.test.ts",

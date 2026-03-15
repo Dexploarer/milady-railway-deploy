@@ -28,6 +28,12 @@ describe("i18n helpers", () => {
     expect(t("zh-CN", "nonexistent.key")).toBe("nonexistent.key");
   });
 
+  it("uses defaultValue when a translation key is missing everywhere", () => {
+    expect(
+      t("pt", "settings.missingExample", { defaultValue: "Fallback copy" }),
+    ).toBe("Fallback copy");
+  });
+
   it("interpolates template variables", () => {
     expect(t("en", "pairing.expiresIn", { seconds: 12 })).toContain("12");
     expect(t("zh-CN", "conversations.minutesAgo", { count: 8 })).toContain("8");
@@ -93,7 +99,6 @@ describe("i18n helpers", () => {
       path.resolve(process.cwd(), "src");
     const exclusions = [
       path.join(sourceDir, "i18n", "messages.ts"),
-      path.join(sourceDir, "components", "BubbleEmote.tsx"),
       path.join(sourceDir, "onboarding-presets.ts"),
     ];
 

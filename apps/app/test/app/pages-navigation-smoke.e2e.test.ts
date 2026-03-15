@@ -1,10 +1,6 @@
 // @vitest-environment jsdom
 
-import {
-  APPS_ENABLED,
-  getTabGroups,
-  type Tab,
-} from "@milady/app-core/navigation";
+import { getTabGroups, type Tab } from "@milady/app-core/navigation";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -53,7 +49,7 @@ vi.mock("@milady/app-core/components", async () => {
       React.createElement("section", null, "AppsPageView Ready"),
     BugReportModal: () => React.createElement("div", null, "BugReportModal"),
     CloudDashboard: () =>
-      React.createElement("section", null, "MiladyCloudDashboard Ready"),
+      React.createElement("section", null, "ElizaCloudDashboard Ready"),
     CommandPalette: () => React.createElement("div", null, "CommandPalette"),
     ConnectorsPageView: () =>
       React.createElement("section", null, "ConnectorsPageView Ready"),
@@ -291,12 +287,8 @@ function mainContent(tree: TestRenderer.ReactTestRenderer): string {
   return textOf(mains[0]);
 }
 
-function expectedShellTab(tab: Tab): string {
-  const routedTab = !APPS_ENABLED && tab === "apps" ? "chat" : tab;
-  const companionShellTab = routedTab === "chat" ? "companion" : routedTab;
-  return companionOverlayTabs.has(companionShellTab)
-    ? companionShellTab
-    : "companion";
+function expectedShellTab(_tab: Tab): string {
+  return "companion";
 }
 
 function requireTree(
@@ -332,7 +324,7 @@ describe("pages navigation smoke (e2e)", () => {
           "nav.character": "Character",
           "nav.wallets": "Wallets",
           "nav.knowledge": "Knowledge",
-          "nav.social": "Social",
+          "nav.social": "Connectors",
           "nav.apps": "Apps",
           "nav.settings": "Settings",
           "nav.heartbeats": "Heartbeats",
@@ -521,7 +513,7 @@ describe("pages navigation smoke (e2e)", () => {
             "nav.character": "Character",
             "nav.wallets": "Wallets",
             "nav.knowledge": "Knowledge",
-            "nav.social": "Social",
+            "nav.social": "Connectors",
             "nav.apps": "Apps",
             "nav.settings": "Settings",
             "nav.heartbeats": "Heartbeats",

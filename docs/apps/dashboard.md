@@ -35,7 +35,7 @@ The header displays across all tabs and includes:
 - **Agent name** -- the name of the currently running agent, pulled from `agentStatus.agentName`.
 - **Agent status indicator** -- a color-coded dot showing the agent's runtime state (see [Agent Status Indicator](#agent-status-indicator) below).
 - **Wallet addresses** -- truncated EVM and Solana addresses with copy-to-clipboard functionality.
-- **Cloud credits** -- if Milady Cloud is enabled, the header shows credit balance with color-coded thresholds (green for OK, yellow for low, red for critical), along with a top-up link.
+- **Cloud credits** -- if Eliza Cloud is enabled, the header shows credit balance with color-coded thresholds (green for OK, yellow for low, red for critical), along with a top-up link.
 - **Lifecycle controls** -- Pause/Resume and Restart buttons for the agent runtime. These are disabled during state transitions (starting, restarting).
 - **Drop / Mint status** -- when a public mint is active and the user has not yet minted, a mint button appears.
 
@@ -133,7 +133,7 @@ The active theme is highlighted. Theme selection is persisted to local storage a
 
 Provider selection and model configuration via the `ProviderSwitcher` component. This section supports:
 
-- **Milady Cloud** -- if cloud is enabled, shows connection status, credit balance (with low/critical thresholds), and a login/disconnect flow.
+- **Eliza Cloud** -- if cloud is enabled, shows connection status, credit balance (with low/critical thresholds), and a login/disconnect flow.
 - **Local/third-party providers** -- toggle AI provider plugins (e.g., Anthropic, OpenAI) and configure their API keys and model settings.
 - **Plugin config save** -- each provider plugin's settings can be saved independently.
 

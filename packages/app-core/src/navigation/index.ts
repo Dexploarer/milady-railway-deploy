@@ -4,7 +4,6 @@
 
 import type { LucideIcon } from "lucide-react";
 import {
-  Bot,
   Brain,
   Clock3,
   Gamepad2,
@@ -75,12 +74,6 @@ export const ALL_TAB_GROUPS: TabGroup[] = [
     description: "Live streaming controls",
   },
   {
-    label: "Character",
-    tabs: ["character", "character-select"],
-    icon: Bot,
-    description: "AI personality and behavior",
-  },
-  {
     label: "Wallets",
     tabs: ["wallets"],
     icon: Wallet,
@@ -93,10 +86,10 @@ export const ALL_TAB_GROUPS: TabGroup[] = [
     description: "Documents and memory",
   },
   {
-    label: "Social",
+    label: "Connectors",
     tabs: ["connectors"],
     icon: Share2,
-    description: "Platform connections",
+    description: "Service and data source connections",
   },
   {
     label: "Apps",
@@ -254,7 +247,7 @@ export function titleForTab(tab: Tab): string {
     case "knowledge":
       return "Knowledge";
     case "connectors":
-      return "Social";
+      return "Connectors";
     case "plugins":
       return "Plugins";
     case "skills":

@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 
+import { ThemeToggle } from "@milady/app-core/components/ThemeToggle";
 import TestRenderer, { act } from "react-test-renderer";
 import { describe, expect, it, vi } from "vitest";
-import { ThemeToggle } from "../../../../packages/app-core/src/components/ThemeToggle";
 
 describe("ThemeToggle", () => {
   it("renders the shared toggle style and flips to dark mode", async () => {

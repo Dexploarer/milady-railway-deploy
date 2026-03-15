@@ -33,20 +33,20 @@ type RpcFieldGroup = ReadonlyArray<RpcFieldDefinition>;
 type RpcSectionConfigMap = Record<string, RpcFieldGroup>;
 
 const EVM_RPC_OPTIONS = [
-  { id: "eliza-cloud", label: "Milady Cloud" },
+  { id: "eliza-cloud", label: "Eliza Cloud" },
   { id: "alchemy", label: "Alchemy" },
   { id: "infura", label: "Infura" },
   { id: "ankr", label: "Ankr" },
 ] as const;
 
 const BSC_RPC_OPTIONS = [
-  { id: "eliza-cloud", label: "Milady Cloud" },
+  { id: "eliza-cloud", label: "Eliza Cloud" },
   { id: "nodereal", label: "NodeReal" },
   { id: "quicknode", label: "QuickNode" },
 ] as const;
 
 const SOLANA_RPC_OPTIONS = [
-  { id: "eliza-cloud", label: "Milady Cloud" },
+  { id: "eliza-cloud", label: "Eliza Cloud" },
   { id: "helius-birdeye", label: "Helius + Birdeye" },
 ] as const;
 
@@ -65,11 +65,10 @@ function CloudRpcStatus({
   credits,
   creditsLow,
   creditsCritical,
-  topUpUrl,
   loginBusy,
   onLogin,
 }: CloudRpcStatusProps) {
-  const { t } = useApp();
+  const { t, setState, setTab } = useApp();
   if (connected) {
     return (
       <div className="flex items-center gap-2 text-xs">
@@ -91,16 +90,16 @@ function CloudRpcStatus({
             >
               ${credits.toFixed(2)}
             </span>
-            {topUpUrl && (
-              <a
-                href={topUpUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="ml-1.5 text-[10px] text-[var(--text)] underline decoration-[var(--accent)] underline-offset-2 hover:opacity-80"
-              >
-                {t("configpageview.TopUp")}
-              </a>
-            )}
+            <button
+              type="button"
+              onClick={() => {
+                setState("cloudDashboardView", "billing");
+                setTab("settings");
+              }}
+              className="ml-1.5 text-[10px] text-[var(--text)] underline decoration-[var(--accent)] underline-offset-2 hover:opacity-80 bg-transparent border-0 p-0 cursor-pointer"
+            >
+              {t("configpageview.TopUp")}
+            </button>
           </span>
         )}
       </div>
@@ -220,8 +219,8 @@ function RpcConfigSection<T extends string>({
         containerClassName,
         (key: string) => {
           // hack to get t function without breaking hook rules
-          return key === "miladyclouddashboard.MiladyCloud"
-            ? "Milady Cloud"
+          return key === "elizaclouddashboard.ElizaCloud"
+            ? "Eliza Cloud"
             : key;
         },
       )}
@@ -276,7 +275,7 @@ function renderRpcProviderButtons<T extends string>(
           >
             <div className="leading-tight">
               {provider.id === "eliza-cloud" && tFallback
-                ? "Milady Cloud"
+                ? "Eliza Cloud"
                 : provider.label}
             </div>
           </button>
@@ -299,27 +298,27 @@ const CLOUD_SERVICE_DEFS: {
     key: "inference",
     label: "Model Inference",
     description:
-      "Use MiladyCloud for LLM calls. Turn off to use your own API keys (Anthropic, OpenAI, etc.)",
+      "Use Eliza Cloud for LLM calls. Turn off to use your own API keys (Anthropic, OpenAI, etc.)",
   },
   {
     key: "rpc",
     label: "Blockchain RPC",
-    description: "Use MiladyCloud RPC endpoints for EVM, BSC, and Solana",
+    description: "Use Eliza Cloud RPC endpoints for EVM, BSC, and Solana",
   },
   {
     key: "media",
     label: "Media Generation",
-    description: "Use MiladyCloud for image, video, audio, and vision",
+    description: "Use Eliza Cloud for image, video, audio, and vision",
   },
   {
     key: "tts",
     label: "Text-to-Speech",
-    description: "Use MiladyCloud for TTS voice synthesis",
+    description: "Use Eliza Cloud for TTS voice synthesis",
   },
   {
     key: "embeddings",
     label: "Embeddings",
-    description: "Use MiladyCloud for text embedding generation",
+    description: "Use Eliza Cloud for text embedding generation",
   },
 ];
 
@@ -453,12 +452,12 @@ function CloudServicesSection() {
 export function ConfigPageView({ embedded = false }: { embedded?: boolean }) {
   const {
     t,
-    miladyCloudConnected,
-    miladyCloudCredits,
-    miladyCloudCreditsLow,
-    miladyCloudCreditsCritical,
-    miladyCloudTopUpUrl,
-    miladyCloudLoginBusy,
+    elizaCloudConnected,
+    elizaCloudCredits,
+    elizaCloudCreditsLow,
+    elizaCloudCreditsCritical,
+    elizaCloudTopUpUrl,
+    elizaCloudLoginBusy,
     walletConfig,
     walletApiKeySaving,
     handleWalletApiKeySave,
@@ -552,12 +551,12 @@ export function ConfigPageView({ embedded = false }: { embedded?: boolean }) {
   };
 
   const cloudStatusProps = {
-    connected: miladyCloudConnected,
-    credits: miladyCloudCredits,
-    creditsLow: miladyCloudCreditsLow,
-    creditsCritical: miladyCloudCreditsCritical,
-    topUpUrl: miladyCloudTopUpUrl,
-    loginBusy: miladyCloudLoginBusy,
+    connected: elizaCloudConnected,
+    credits: elizaCloudCredits,
+    creditsLow: elizaCloudCreditsLow,
+    creditsCritical: elizaCloudCreditsCritical,
+    topUpUrl: elizaCloudTopUpUrl,
+    loginBusy: elizaCloudLoginBusy,
     onLogin: () => void handleCloudLogin(),
   };
 
@@ -666,7 +665,7 @@ export function ConfigPageView({ embedded = false }: { embedded?: boolean }) {
       {/* ═══════════════════════════════════════════════════════════════
           2. CLOUD SERVICES
           ═══════════════════════════════════════════════════════════════ */}
-      {miladyCloudConnected && <CloudServicesSection />}
+      {elizaCloudConnected && <CloudServicesSection />}
 
       {/* ── Secrets modal ── */}
       {secretsOpen && (

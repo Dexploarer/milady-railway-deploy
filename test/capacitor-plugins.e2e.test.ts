@@ -11,12 +11,11 @@
  * These tests require plugins to be built first (bun run plugin:build).
  */
 import fs from "node:fs";
+import { createRequire } from "node:module";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
-const here = path.dirname(fileURLToPath(import.meta.url));
-const pluginsDir = path.resolve(here, "../apps/app/plugins");
+const localRequire = createRequire(import.meta.url);
 
 function resolveEsmIndexPath(pluginDir: string): string | null {
   const standard = path.join(pluginDir, "dist", "esm", "index");
@@ -28,24 +27,25 @@ function resolveEsmIndexPath(pluginDir: string): string | null {
   return null;
 }
 
+function resolvePackageDir(packageName: string): string {
+  return path.dirname(localRequire.resolve(`${packageName}/package.json`));
+}
+
 const PLUGINS = [
-  { dir: "gateway", name: "@milady/capacitor-gateway", exportName: "Gateway" },
-  { dir: "camera", name: "@milady/capacitor-camera", exportName: "Camera" },
-  { dir: "canvas", name: "@milady/capacitor-canvas", exportName: "Canvas" },
-  { dir: "desktop", name: "@milady/capacitor-desktop", exportName: "Desktop" },
+  { name: "@milady/capacitor-gateway", exportName: "Gateway" },
+  { name: "@milady/capacitor-camera", exportName: "Camera" },
+  { name: "@milady/capacitor-canvas", exportName: "Canvas" },
+  { name: "@milady/capacitor-desktop", exportName: "Desktop" },
   {
-    dir: "location",
     name: "@milady/capacitor-location",
     exportName: "Location",
   },
   {
-    dir: "screencapture",
     name: "@milady/capacitor-screencapture",
     exportName: "ScreenCapture",
   },
-  { dir: "swabble", name: "@milady/capacitor-swabble", exportName: "Swabble" },
+  { name: "@milady/capacitor-swabble", exportName: "Swabble" },
   {
-    dir: "talkmode",
     name: "@milady/capacitor-talkmode",
     exportName: "TalkMode",
   },
@@ -54,7 +54,7 @@ const PLUGINS = [
 describe("Capacitor Plugin Build Verification", () => {
   for (const plugin of PLUGINS) {
     describe(plugin.name, () => {
-      const dir = path.join(pluginsDir, plugin.dir);
+      const dir = resolvePackageDir(plugin.name);
       const pkgPath = path.join(dir, "package.json");
 
       it("package.json exists and is valid JSON", () => {

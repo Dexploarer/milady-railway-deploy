@@ -19,6 +19,7 @@ export {
   saveTrackedTokens,
   type TokenRow,
   type TrackedBscToken,
+  type TrackedToken,
   toNormalizedAddress,
 } from "./constants";
 export { InventoryToolbar } from "./InventoryToolbar";

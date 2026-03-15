@@ -1,5 +1,7 @@
 import { useRenderGuard } from "@milady/app-core/hooks";
 import { useApp } from "@milady/app-core/state";
+import { Button } from "@milady/ui";
+import { Volume2, VolumeX } from "lucide-react";
 import { memo, useCallback, useEffect } from "react";
 import { ChatModalView } from "./ChatModalView";
 import { CompanionHeader } from "./companion/CompanionHeader";
@@ -15,19 +17,19 @@ export const CompanionView = memo(function CompanionView() {
     setUiLanguage,
     uiTheme,
     setUiTheme,
-    setTab,
+    chatAgentVoiceMuted,
+    handleNewConversation,
     setState,
-    setUiShellMode,
+    switchShellView,
     t,
   } = useApp();
   const hasSharedCompanionScene = useSharedCompanionScene();
 
-  const handleShellModeChange = useCallback(
-    (mode: "companion" | "native") => {
-      setUiShellMode(mode);
-      setTab(mode === "native" ? "chat" : "companion");
+  const handleShellViewChange = useCallback(
+    (view: "companion" | "character" | "desktop") => {
+      switchShellView(view);
     },
-    [setTab, setUiShellMode],
+    [switchShellView],
   );
 
   useEffect(() => {
@@ -37,14 +39,54 @@ export const CompanionView = memo(function CompanionView() {
   const overlay = (
     <div className="absolute inset-0 z-10 flex flex-col pointer-events-none">
       <CompanionHeader
-        shellMode="companion"
-        onShellModeChange={handleShellModeChange}
+        activeShellView="companion"
+        onShellViewChange={handleShellViewChange}
         uiLanguage={uiLanguage}
         setUiLanguage={setUiLanguage}
         uiTheme={uiTheme}
         setUiTheme={setUiTheme}
         t={t}
-      />
+      >
+        <div className="flex items-center justify-center">
+          <div
+            className="inline-flex items-center gap-2"
+            data-testid="companion-header-chat-controls"
+          >
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              aria-label={
+                chatAgentVoiceMuted ? "Agent voice off" : "Agent voice on"
+              }
+              aria-pressed={!chatAgentVoiceMuted}
+              title={chatAgentVoiceMuted ? "Agent voice off" : "Agent voice on"}
+              className="h-8 rounded-full border border-border/50 bg-card/80 px-3 text-xs text-txt shadow-sm backdrop-blur-sm hover:bg-bg-hover"
+              onClick={() =>
+                setState("chatAgentVoiceMuted", !chatAgentVoiceMuted)
+              }
+            >
+              {chatAgentVoiceMuted ? (
+                <VolumeX className="mr-1.5 h-3.5 w-3.5" />
+              ) : (
+                <Volume2 className="mr-1.5 h-3.5 w-3.5" />
+              )}
+              {chatAgentVoiceMuted ? "Voice Off" : "Voice On"}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              aria-label="+ New Chat"
+              title="+ New Chat"
+              className="h-8 rounded-full border border-border/50 bg-card/80 px-3 text-xs text-black shadow-sm backdrop-blur-sm hover:text-black dark:text-txt dark:hover:text-txt"
+              onClick={() => void handleNewConversation()}
+            >
+              + New Chat
+            </Button>
+          </div>
+        </div>
+      </CompanionHeader>
 
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-full max-w-3xl h-[45%] z-20 pointer-events-auto">
         <ChatModalView variant="companion-dock" />

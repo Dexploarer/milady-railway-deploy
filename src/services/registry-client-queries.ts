@@ -3,7 +3,7 @@ import type {
   RegistryPluginInfo,
   RegistryPluginListItem,
   RegistrySearchResult,
-} from "./registry-client.js";
+} from "./registry-client-types.js";
 
 export function normalizePluginLookupAlias(name: string): string {
   const trimmed = name.trim();

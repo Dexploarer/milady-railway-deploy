@@ -1,10 +1,11 @@
 /**
- * Milady Cloud login flow — reuses the CLI auth session pattern:
+ * Eliza Cloud login flow — reuses the CLI auth session pattern:
  * create session, open browser, poll until authenticated, return API key.
  */
 
 import crypto from "node:crypto";
 import { logger } from "@elizaos/core";
+import { normalizeCloudSiteUrl } from "./base-url";
 import { validateCloudBaseUrl } from "./validate-url";
 
 export interface CloudLoginResult {
@@ -50,10 +51,7 @@ async function fetchWithTimeout(
 export async function cloudLogin(
   options: CloudLoginOptions = {},
 ): Promise<CloudLoginResult> {
-  const baseUrl = (options.baseUrl ?? "https://cloud.milady.ai").replace(
-    /\/+$/,
-    "",
-  );
+  const baseUrl = normalizeCloudSiteUrl(options.baseUrl);
   const urlError = await validateCloudBaseUrl(baseUrl);
   if (urlError) {
     throw new Error(urlError);

@@ -36,6 +36,12 @@ export interface AppEmoteEventDetail {
   path: string;
   duration: number;
   loop: boolean;
+  showOverlay?: boolean;
+}
+
+export interface ChatAvatarVoiceEventDetail {
+  mouthOpen: number;
+  isSpeaking: boolean;
 }
 
 export type MiladyDocumentEventName =

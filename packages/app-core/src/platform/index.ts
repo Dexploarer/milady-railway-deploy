@@ -258,3 +258,4 @@ export {
   type ShareTargetPayload,
   setupPlatformStyles,
 } from "./init";
+export { applyLaunchConnectionFromUrl } from "./browser-launch";

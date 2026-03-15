@@ -18,20 +18,12 @@ import { useApp } from "@milady/app-core/state";
 import { Button, Input } from "@milady/ui";
 import { useCallback, useState } from "react";
 import { HEX_ADDRESS_RE } from "./companion/walletUtils";
-import { formatBalance } from "./inventory/constants";
+import { formatBalance, type TrackedToken } from "./inventory/constants";
 
 /* ── Constants ─────────────────────────────────────────────────────── */
 
 const AMOUNT_PRESETS = [0.05, 0.1, 0.2, 0.5];
 const DEFAULT_QUICK_AMOUNT = "0.1";
-
-/* ── Types ─────────────────────────────────────────────────────────── */
-
-export interface TrackedToken {
-  address: string;
-  symbol: string;
-  addedAt: number;
-}
 
 export interface TradePanelProps {
   tradeReady: boolean;
@@ -553,7 +545,5 @@ export function TradePanel({
   );
 }
 
-/** @deprecated Use TradePanel instead */
-export const BscTradePanel = TradePanel;
-/** @deprecated Use TradePanelProps instead */
-export type BscTradePanelProps = TradePanelProps;
+export { TradePanel as BscTradePanel };
+export type { TradePanelProps as BscTradePanelProps };

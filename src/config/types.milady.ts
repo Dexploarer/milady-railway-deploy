@@ -486,7 +486,7 @@ export type PluginsConfig = {
   registryEndpoints?: RegistryEndpoint[];
 };
 
-// --- Cloud types (ElizaCloud integration) ---
+// --- Cloud types (Eliza Cloud integration) ---
 
 export type CloudInferenceMode = "cloud" | "byok" | "local";
 
@@ -520,24 +520,24 @@ export type CloudContainerDefaults = {
 };
 
 export type CloudServiceToggles = {
-  /** Use ElizaCloud for model inference. Default: true. */
+  /** Use Eliza Cloud for model inference. Default: true. */
   inference?: boolean;
-  /** Use ElizaCloud for blockchain RPC. Default: true. */
+  /** Use Eliza Cloud for blockchain RPC. Default: true. */
   rpc?: boolean;
-  /** Use ElizaCloud for media generation (image/video/audio/vision). Default: true. */
+  /** Use Eliza Cloud for media generation (image/video/audio/vision). Default: true. */
   media?: boolean;
-  /** Use ElizaCloud for TTS (text-to-speech). Default: true. */
+  /** Use Eliza Cloud for TTS (text-to-speech). Default: true. */
   tts?: boolean;
-  /** Use ElizaCloud for embeddings. Default: true. */
+  /** Use Eliza Cloud for embeddings. Default: true. */
   embeddings?: boolean;
 };
 
 export type CloudConfig = {
-  /** Enable ElizaCloud integration. Default: false. */
+  /** Enable Eliza Cloud integration. Default: false. */
   enabled?: boolean;
   /** Selected cloud provider ID (e.g. "elizacloud"). Set during onboarding. */
   provider?: string;
-  /** ElizaCloud API base URL. Default: https://www.elizacloud.ai/api/v1 */
+  /** Eliza Cloud API base URL. Default: https://elizacloud.ai/api/v1 */
   baseUrl?: string;
   /** Cached API key (stored encrypted via gateway auth). */
   apiKey?: string;
@@ -726,7 +726,7 @@ export type MiladyConfig = {
   embedding?: EmbeddingConfig;
   /** Database provider and connection configuration (local-only feature). */
   database?: DatabaseConfig;
-  /** ElizaCloud integration for remote agent provisioning and inference. */
+  /** Eliza Cloud integration for remote agent provisioning and inference. */
   cloud?: CloudConfig;
   /** CUA (Computer Use Agent) cloud sandbox configuration. */
   cua?: CuaConfig;

@@ -1349,6 +1349,10 @@ describe("API Server E2E (no runtime)", () => {
           "Hello ",
           "world",
         ]);
+        expect(tokenEvents.map((event) => event.fullText)).toEqual([
+          "Hello ",
+          "Hello world",
+        ]);
 
         const doneEvent = events.find((event) => event.type === "done");
         expect(doneEvent?.fullText).toBe("Hello world");
@@ -1458,6 +1462,11 @@ describe("API Server E2E (no runtime)", () => {
           "Hello wrld",
           "Hello world",
           "!",
+        ]);
+        expect(tokenEvents.map((event) => event.fullText)).toEqual([
+          "Hello wrld",
+          "Hello world",
+          "Hello world!",
         ]);
 
         const doneEvent = events.find((event) => event.type === "done");
@@ -1660,6 +1669,10 @@ describe("API Server E2E (no runtime)", () => {
           "Hello ",
           "world",
         ]);
+        expect(tokenEvents.map((event) => event.fullText)).toEqual([
+          "Hello ",
+          "Hello world",
+        ]);
 
         const doneEvent = events.find((event) => event.type === "done");
         expect(doneEvent?.fullText).toBe("Hello world");
@@ -1746,6 +1759,11 @@ describe("API Server E2E (no runtime)", () => {
           "Hello wrld",
           "Hello world",
           "!",
+        ]);
+        expect(tokenEvents.map((event) => event.fullText)).toEqual([
+          "Hello wrld",
+          "Hello world",
+          "Hello world!",
         ]);
 
         const doneEvent = events.find((event) => event.type === "done");
@@ -4493,8 +4511,20 @@ describe("API Server E2E (chat SSE)", () => {
 
     expect(status).toBe(200);
     expect(String(headers["content-type"])).toContain("text/event-stream");
-    expect(events).toContainEqual({ type: "token", text: "Hello " });
-    expect(events).toContainEqual({ type: "token", text: "world" });
+    expect(events).toContainEqual(
+      expect.objectContaining({
+        type: "token",
+        text: "Hello ",
+        fullText: "Hello ",
+      }),
+    );
+    expect(events).toContainEqual(
+      expect.objectContaining({
+        type: "token",
+        text: "world",
+        fullText: "Hello world",
+      }),
+    );
     expect(events).toContainEqual(
       expect.objectContaining({
         type: "done",
@@ -4523,8 +4553,20 @@ describe("API Server E2E (chat SSE)", () => {
     );
 
     expect(status).toBe(200);
-    expect(events).toContainEqual({ type: "token", text: "Hello " });
-    expect(events).toContainEqual({ type: "token", text: "world" });
+    expect(events).toContainEqual(
+      expect.objectContaining({
+        type: "token",
+        text: "Hello ",
+        fullText: "Hello ",
+      }),
+    );
+    expect(events).toContainEqual(
+      expect.objectContaining({
+        type: "token",
+        text: "world",
+        fullText: "Hello world",
+      }),
+    );
     expect(events).toContainEqual(
       expect.objectContaining({
         type: "done",

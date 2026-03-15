@@ -27,6 +27,7 @@ import {
   SHARE_TARGET_EVENT,
   TRAY_ACTION_EVENT,
 } from "@milady/app-core/events";
+import { applyLaunchConnectionFromUrl } from "@milady/app-core/platform";
 import { AppProvider } from "@milady/app-core/state";
 // Import the agent plugin
 import { Agent } from "@milady/capacitor-agent";
@@ -445,6 +446,15 @@ function injectPopoutApiBase(): void {
 async function main(): Promise<void> {
   // Set up platform-specific styles first
   setupPlatformStyles();
+
+  try {
+    await applyLaunchConnectionFromUrl();
+  } catch (err) {
+    console.error(
+      "[Milady] Failed to apply managed cloud launch session:",
+      err instanceof Error ? err.message : err,
+    );
+  }
 
   if (isPopoutWindow()) {
     // Popout mode — skip platform init (agent lifecycle, Capacitor bridges,

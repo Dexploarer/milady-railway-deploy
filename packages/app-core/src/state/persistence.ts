@@ -4,12 +4,13 @@ import {
   normalizeLanguage,
   type UiLanguage,
 } from "../i18n";
-import type { UiShellMode } from "./types";
+import type { Tab } from "../navigation";
+import type { UiShellMode, UiTheme } from "./ui-preferences";
 import { normalizeAvatarIndex } from "./vrm";
 
 /* ── Theme persistence ────────────────────────────────────────────────── */
 
-export type UiTheme = "light" | "dark";
+export type { UiTheme } from "./ui-preferences";
 
 const UI_THEME_STORAGE_KEY = "milady:ui-theme";
 
@@ -52,6 +53,7 @@ export function applyUiTheme(theme: UiTheme): void {
 
 const UI_LANGUAGE_STORAGE_KEY = "milady:ui-language";
 const UI_SHELL_MODE_STORAGE_KEY = "milady:ui-shell-mode";
+const LAST_NATIVE_TAB_STORAGE_KEY = "milady:last-native-tab";
 
 export function loadUiLanguage(): UiLanguage {
   try {
@@ -88,6 +90,54 @@ export function loadUiShellMode(): UiShellMode {
 export function saveUiShellMode(mode: UiShellMode): void {
   try {
     localStorage.setItem(UI_SHELL_MODE_STORAGE_KEY, normalizeUiShellMode(mode));
+  } catch {
+    // ignore
+  }
+}
+
+function normalizeLastNativeTab(tab: unknown): Tab {
+  switch (tab) {
+    case "chat":
+    case "stream":
+    case "apps":
+    case "wallets":
+    case "knowledge":
+    case "connectors":
+    case "triggers":
+    case "plugins":
+    case "skills":
+    case "actions":
+    case "advanced":
+    case "fine-tuning":
+    case "voice":
+    case "runtime":
+    case "database":
+    case "lifo":
+    case "settings":
+    case "logs":
+    case "security":
+      return tab;
+    default:
+      return "chat";
+  }
+}
+
+export function loadLastNativeTab(): Tab {
+  try {
+    return normalizeLastNativeTab(
+      localStorage.getItem(LAST_NATIVE_TAB_STORAGE_KEY),
+    );
+  } catch {
+    return "chat";
+  }
+}
+
+export function saveLastNativeTab(tab: Tab): void {
+  try {
+    localStorage.setItem(
+      LAST_NATIVE_TAB_STORAGE_KEY,
+      normalizeLastNativeTab(tab),
+    );
   } catch {
     // ignore
   }

@@ -69,6 +69,10 @@ export function ChatComposer({
 }: ChatComposerProps) {
   const isGameModal = variant === "game-modal";
   const showVoiceButton = isGameModal || voice.supported;
+  const defaultMicButtonClassName = voice.isListening
+    ? "bg-[#ff6b70] text-white shadow-sm hover:bg-[#ff6b70]/90 hover:text-white"
+    : "text-muted hover:bg-black/5 hover:text-txt";
+  const micIconClassName = isGameModal ? "w-5 h-5 text-[#fff1f2]" : "w-4 h-4";
   const holdTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pushToTalkActiveRef = useRef(false);
   const suppressClickRef = useRef(false);
@@ -80,6 +84,15 @@ export function ChatComposer({
         : t("chat.send")
       : t("chat.stopSpeaking");
   const actionButtonLabel = isGameModal ? undefined : actionButtonTitle;
+  const defaultTextareaPlaceholder = isAgentStarting
+    ? t("chat.agentStarting")
+    : voice.isListening
+      ? voice.captureMode === "push-to-talk"
+        ? "Release to send..."
+        : !chatInput.trim()
+          ? "Listening..."
+          : t("chat.inputPlaceholder")
+      : t("chat.inputPlaceholder");
 
   useEffect(() => {
     return () => {
@@ -184,11 +197,7 @@ export function ChatComposer({
                     ? "animate-pulse border border-[#ff6b70] bg-[#ff6b70] text-[#fff1f2] shadow-[0_0_30px_rgba(255,107,112,0.5)]"
                     : "border border-[#ff6b70]/75 bg-transparent text-[#fff1f2] shadow-[0_0_14px_rgba(255,107,112,0.18)] hover:bg-[#ff6b70]/10"
                 } ${isComposerLocked ? "opacity-50" : ""}`
-              : `${COMPOSER_ICON_BUTTON_CLASSNAME} ${
-                  voice.isListening
-                    ? "animate-pulse border border-[#ff6b70] bg-[#ff6b70] text-[#fff1f2] shadow-[0_0_30px_rgba(255,107,112,0.5)]"
-                    : "border border-[#ff6b70]/80 bg-transparent text-[#fff1f2] shadow-[0_0_14px_rgba(255,107,112,0.18)] hover:bg-[#ff6b70]/10"
-                }`
+              : `${COMPOSER_ICON_BUTTON_CLASSNAME} ${defaultMicButtonClassName}`
           }
           onClick={handleMicClick}
           onPointerDown={handleMicPointerDown}
@@ -216,9 +225,7 @@ export function ChatComposer({
           }
           disabled={isComposerLocked}
         >
-          <Mic
-            className={`${isGameModal ? "w-5 h-5" : "w-4 h-4"}`}
-          />
+          <Mic className={micIconClassName} />
         </Button>
       )}
 
@@ -226,11 +233,7 @@ export function ChatComposer({
         className={
           isGameModal
             ? "flex min-h-[46px] flex-1 items-center rounded-2xl bg-black/40 transition-all min-w-0"
-            : `flex min-h-[46px] flex-1 items-center rounded-md border min-w-0 ${
-                voice.isListening
-                  ? "border-[#ff5a5f]/45 bg-[#2a0f13]/70 shadow-[0_0_24px_rgba(255,90,95,0.12)]"
-                  : "border-border/40 bg-card/60 backdrop-blur-md"
-              }`
+            : "flex min-h-[46px] flex-1 items-center rounded-md border min-w-0 border-border/40 bg-card/60 backdrop-blur-md"
         }
       >
         <Textarea
@@ -245,13 +248,15 @@ export function ChatComposer({
           rows={1}
           aria-label="Chat message"
           placeholder={
-            isAgentStarting
-              ? t("chat.agentStarting")
-              : voice.isListening
-                ? voice.captureMode === "push-to-talk"
-                  ? "Release to send..."
-                  : t("chat.listening")
-                : t("chat.inputPlaceholder")
+            isGameModal
+              ? isAgentStarting
+                ? t("chat.agentStarting")
+                : voice.isListening
+                  ? voice.captureMode === "push-to-talk"
+                    ? "Release to send..."
+                    : t("chat.listening")
+                  : t("chat.inputPlaceholder")
+              : defaultTextareaPlaceholder
           }
           value={chatInput}
           onChange={(event) => onChatInputChange(event.target.value)}

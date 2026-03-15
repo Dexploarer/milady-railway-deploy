@@ -127,7 +127,7 @@ const ALWAYS_ON_PLUGIN_IDS = new Set([
   "goals",
   "scheduling",
   // Internal / infrastructure
-  "miladycloud",
+  "elizacloud",
   "evm",
   "memory",
   "rolodex",
@@ -700,7 +700,7 @@ const DEFAULT_ICONS: Record<string, LucideIcon> = {
   tee: LockKeyhole,
   blooio: Circle,
   acp: Construction,
-  miladycloud: Cloud,
+  elizacloud: Cloud,
   twilio: Phone,
 };
 
@@ -845,6 +845,24 @@ const SUBGROUP_LABELS: Record<string, string> = {
   showcase: "Showcase",
 };
 
+const SUBGROUP_NAV_ICONS: Record<string, LucideIcon> = {
+  all: Package,
+  "ai-provider": Brain,
+  connector: MessageCircle,
+  streaming: Video,
+  voice: Mic,
+  blockchain: Wallet,
+  devtools: Shell,
+  knowledge: BookOpen,
+  agents: Target,
+  media: Eye,
+  automation: Calendar,
+  storage: Server,
+  gaming: Gamepad2,
+  "feature-other": Puzzle,
+  showcase: Sparkles,
+};
+
 function subgroupForPlugin(plugin: PluginInfo): string {
   if (plugin.id === "__ui-showcase__") return "showcase";
   if (plugin.category === "ai-provider") return "ai-provider";
@@ -926,6 +944,10 @@ function PluginListView({ label, mode = "all", inModal }: PluginListViewProps) {
   const dragRef = useRef<string | null>(null);
   const isSocialMode = mode === "social";
   const isConnectorLikeMode = mode === "connectors" || mode === "social";
+  const resultLabel = isSocialMode ? "connectors" : label.toLowerCase();
+  const searchPlaceholder = isSocialMode
+    ? "Search..."
+    : `Search ${label.toLowerCase()}...`;
   const effectiveStatusFilter: StatusFilter = pluginStatusFilter;
   const effectiveSearch = pluginSearch;
   const showToolbar = true;
@@ -979,10 +1001,9 @@ function PluginListView({ label, mode = "all", inModal }: PluginListViewProps) {
           p.category !== "database" &&
           !ALWAYS_ON_PLUGIN_IDS.has(p.id) &&
           (!isConnectorLikeMode || p.category === "connector") &&
-          (mode !== "streaming" || p.category === "streaming") &&
-          (!isSocialMode || (p.tags ?? []).includes("social-chat")),
+          (mode !== "streaming" || p.category === "streaming"),
       ),
-    [plugins, isConnectorLikeMode, isSocialMode, mode],
+    [plugins, isConnectorLikeMode, mode],
   );
 
   const nonDbPlugins = useMemo(() => {
@@ -1053,6 +1074,7 @@ function PluginListView({ label, mode = "all", inModal }: PluginListViewProps) {
   const [subgroupFilter, setSubgroupFilter] = useState<string>("all");
   const showSubgroupFilters =
     mode !== "connectors" && mode !== "streaming" && mode !== "social";
+  const showDesktopSubgroupSidebar = showSubgroupFilters;
 
   const subgroupCounts = useMemo(() => {
     const counts: Record<string, number> = {};
@@ -1088,6 +1110,77 @@ function PluginListView({ label, mode = "all", inModal }: PluginListViewProps) {
       .filter(({ subgroup }) => subgroup === subgroupFilter)
       .map(({ plugin }) => plugin);
   }, [showSubgroupFilters, pluginsWithSubgroup, sorted, subgroupFilter]);
+
+  const renderSubgroupFilterButton = useCallback(
+    (
+      tag: { id: string; label: string; count: number },
+      options?: { sidebar?: boolean },
+    ) => {
+      const isActive = subgroupFilter === tag.id;
+      if (options?.sidebar) {
+        const Icon = SUBGROUP_NAV_ICONS[tag.id] ?? Package;
+        return (
+          <button
+            key={tag.id}
+            type="button"
+            onClick={() => setSubgroupFilter(tag.id)}
+            aria-current={isActive ? "page" : undefined}
+            className={`flex w-full items-center gap-3 rounded-2xl border px-4 py-3 text-left transition-all duration-200 ${
+              isActive
+                ? "border-accent/40 bg-accent/12 text-txt shadow-[0_10px_30px_rgba(var(--accent),0.08)]"
+                : "border-transparent text-muted hover:border-border/60 hover:bg-card/55 hover:text-txt"
+            }`}
+          >
+            <span
+              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${
+                isActive
+                  ? "border-accent/30 bg-accent/18 text-txt-strong"
+                  : "border-border/50 bg-bg-accent/80 text-muted"
+              }`}
+            >
+              <Icon className="w-4 h-4" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-sm font-semibold leading-snug text-current">
+                {tag.label}
+              </span>
+            </span>
+            <span
+              className={`rounded-full border px-2 py-0.5 text-[10px] font-mono leading-none ${
+                isActive
+                  ? "border-accent/20 bg-accent/20 text-txt"
+                  : "border-border/50 bg-black/10 text-muted"
+              }`}
+            >
+              {tag.count}
+            </span>
+          </button>
+        );
+      }
+
+      return (
+        <Button
+          key={tag.id}
+          variant={isActive ? "default" : "outline"}
+          size="sm"
+          className={`h-7 px-3 text-[11px] font-bold tracking-wide rounded-lg transition-all ${
+            isActive
+              ? "shadow-[0_0_10px_rgba(var(--accent),0.2)] border-accent"
+              : "bg-card/40 backdrop-blur-sm border-border/40 text-muted hover:text-txt shadow-sm hover:border-accent/30"
+          }`}
+          onClick={() => setSubgroupFilter(tag.id)}
+        >
+          {tag.label}
+          <span
+            className={`ml-1.5 px-1.5 py-0.5 rounded border text-[9px] font-mono leading-none ${isActive ? "bg-black/20 border-black/10" : "bg-black/10 border-white/5"}`}
+          >
+            {tag.count}
+          </span>
+        </Button>
+      );
+    },
+    [subgroupFilter],
+  );
 
   // ── Handlers ───────────────────────────────────────────────────────
 
@@ -1659,7 +1752,11 @@ function PluginListView({ label, mode = "all", inModal }: PluginListViewProps) {
   // ── Game-modal render ─────────────────────────────────────────────
   if (inModal) {
     const sectionTitle =
-      mode === "social" ? "Social" : mode === "connectors" ? "Channels" : label;
+      mode === "social"
+        ? "Connectors"
+        : mode === "connectors"
+          ? "Connectors"
+          : label;
     return (
       <div className="plugins-game-modal">
         <div
@@ -1673,7 +1770,7 @@ function PluginListView({ label, mode = "all", inModal }: PluginListViewProps) {
           <div className="plugins-game-list-scroll">
             {gameVisiblePlugins.length === 0 ? (
               <div className="plugins-game-list-empty">
-                No {sectionTitle.toLowerCase()} {t("pluginsview.found")}
+                No {resultLabel} {t("pluginsview.found")}
               </div>
             ) : (
               gameVisiblePlugins.map((p: PluginInfo) => (
@@ -1888,7 +1985,7 @@ function PluginListView({ label, mode = "all", inModal }: PluginListViewProps) {
               <span className="plugins-game-detail-empty-icon">🧩</span>
               <span className="plugins-game-detail-empty-text">
                 {t("pluginsview.SelectA")}{" "}
-                {isConnectorLikeMode ? "channel" : "plugin"}{" "}
+                {isConnectorLikeMode ? "connector" : "plugin"}{" "}
                 {t("pluginsview.toC")}
               </span>
             </div>
@@ -1901,126 +1998,131 @@ function PluginListView({ label, mode = "all", inModal }: PluginListViewProps) {
   // ── Main render ────────────────────────────────────────────────────
 
   return (
-    <div>
-      {showToolbar && (
-        <div className="flex items-center gap-3 mb-4 flex-wrap">
-          <div className="relative flex-1 min-w-[220px]">
+    <div
+      className={`relative min-h-0 ${showDesktopSubgroupSidebar ? "md:pl-[18rem]" : ""}`}
+    >
+      {showDesktopSubgroupSidebar && (
+        <aside
+          className="hidden md:absolute md:left-0 md:top-0 md:block md:w-64"
+          data-testid="plugins-subgroup-sidebar"
+        >
+          <div className="sticky top-0 rounded-[28px] border border-border/50 bg-bg/35 p-5 backdrop-blur-xl shadow-sm">
+            <div className="mb-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted/80">
+              Plugin Types
+            </div>
+            <nav className="flex flex-col gap-2">
+              {subgroupTags.map((tag) =>
+                renderSubgroupFilterButton(tag, { sidebar: true }),
+              )}
+            </nav>
+          </div>
+        </aside>
+      )}
+
+      <div className="min-w-0">
+        {showToolbar && (
+          <div className="flex items-center gap-3 mb-4 flex-wrap">
+            <div className="relative flex-1 min-w-[220px]">
             <Input
               type="text"
               className="w-full bg-card/60 backdrop-blur-md shadow-inner pr-8 h-9 rounded-xl focus-visible:ring-accent border-border/40"
-              placeholder={`Search ${label.toLowerCase()}...`}
+              placeholder={searchPlaceholder}
               value={pluginSearch}
               onChange={(e) => setState("pluginSearch", e.target.value)}
             />
-            {pluginSearch && (
+              {pluginSearch && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 w-6 h-6 text-muted hover:text-txt rounded-full"
+                  onClick={() => setState("pluginSearch", "")}
+                  title={t("pluginsview.ClearSearch")}
+                >
+                  ✕
+                </Button>
+              )}
+            </div>
+
+            <div className="flex gap-1.5 shrink-0 bg-black/10 p-1 rounded-xl border border-white/5">
+              {(["all", "enabled"] as const).map((s) => (
+                <Button
+                  key={s}
+                  variant={pluginStatusFilter === s ? "default" : "ghost"}
+                  size="sm"
+                  className={`h-7 px-3 text-[11px] font-bold tracking-wide rounded-lg transition-all ${
+                    pluginStatusFilter === s
+                      ? "shadow-sm"
+                      : "text-muted hover:text-txt hover:bg-white/5"
+                  }`}
+                  onClick={() =>
+                    setState("pluginStatusFilter", s as StatusFilter)
+                  }
+                >
+                  {s === "all"
+                    ? `All (${categoryPlugins.length})`
+                    : `Enabled (${enabledCount})`}
+                </Button>
+              ))}
+            </div>
+
+            {allowCustomOrder && pluginOrder.length > 0 && (
               <Button
-                variant="ghost"
-                size="icon"
-                className="absolute right-1 top-1/2 -translate-y-1/2 w-6 h-6 text-muted hover:text-txt rounded-full"
-                onClick={() => setState("pluginSearch", "")}
-                title={t("pluginsview.ClearSearch")}
+                variant="outline"
+                size="sm"
+                className="h-8 px-3 text-[11px] font-bold border-border/40 bg-card/40 backdrop-blur-md shadow-sm rounded-xl shrink-0"
+                onClick={handleResetOrder}
+                title={t("pluginsview.ResetToDefaultSor")}
               >
-                ✕
+                {t("pluginsview.ResetOrder")}
+              </Button>
+            )}
+
+            {showPluginManagementActions && (
+              <Button
+                variant="secondary"
+                size="sm"
+                className="h-8 px-4 text-[11px] font-bold tracking-wide border border-accent/30 text-txt bg-accent/10 hover:bg-accent/20 hover:border-accent/50 shadow-sm rounded-xl shrink-0 transition-all"
+                onClick={() => setAddDirOpen(true)}
+              >
+                {t("pluginsview.AddPlugin")}
               </Button>
             )}
           </div>
+        )}
 
-          <div className="flex gap-1.5 shrink-0 bg-black/10 p-1 rounded-xl border border-white/5">
-            {(["all", "enabled"] as const).map((s) => (
-              <Button
-                key={s}
-                variant={pluginStatusFilter === s ? "default" : "ghost"}
-                size="sm"
-                className={`h-7 px-3 text-[11px] font-bold tracking-wide rounded-lg transition-all ${
-                  pluginStatusFilter === s
-                    ? "shadow-sm"
-                    : "text-muted hover:text-txt hover:bg-white/5"
-                }`}
-                onClick={() =>
-                  setState("pluginStatusFilter", s as StatusFilter)
-                }
-              >
-                {s === "all"
-                  ? `All (${categoryPlugins.length})`
-                  : `Enabled (${enabledCount})`}
-              </Button>
-            ))}
+        {hasPluginToggleInFlight && (
+          <div className="mb-3 px-3 py-2 border border-accent bg-accent-subtle text-[11px] text-txt">
+            {t("pluginsview.ApplyingPluginChan")}
           </div>
+        )}
 
-          {allowCustomOrder && pluginOrder.length > 0 && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-8 px-3 text-[11px] font-bold border-border/40 bg-card/40 backdrop-blur-md shadow-sm rounded-xl shrink-0"
-              onClick={handleResetOrder}
-              title={t("pluginsview.ResetToDefaultSor")}
-            >
-              {t("pluginsview.ResetOrder")}
-            </Button>
-          )}
+        {showSubgroupFilters && (
+          <div
+            className="flex items-center gap-2 mb-5 flex-wrap md:hidden"
+            data-testid="plugins-subgroup-chips"
+          >
+            {subgroupTags.map((tag) => renderSubgroupFilterButton(tag))}
+          </div>
+        )}
 
-          {showPluginManagementActions && (
-            <Button
-              variant="secondary"
-              size="sm"
-              className="h-8 px-4 text-[11px] font-bold tracking-wide border border-accent/30 text-txt bg-accent/10 hover:bg-accent/20 hover:border-accent/50 shadow-sm rounded-xl shrink-0 transition-all"
-              onClick={() => setAddDirOpen(true)}
-            >
-              {t("pluginsview.AddPlugin")}
-            </Button>
-          )}
-        </div>
-      )}
-
-      {hasPluginToggleInFlight && (
-        <div className="mb-3 px-3 py-2 border border-accent bg-accent-subtle text-[11px] text-txt">
-          {t("pluginsview.ApplyingPluginChan")}
-        </div>
-      )}
-
-      {/* Tag filters */}
-      {showSubgroupFilters && (
-        <div className="flex items-center gap-2 mb-5 flex-wrap">
-          {subgroupTags.map((tag) => (
-            <Button
-              key={tag.id}
-              variant={subgroupFilter === tag.id ? "default" : "outline"}
-              size="sm"
-              className={`h-7 px-3 text-[11px] font-bold tracking-wide rounded-lg transition-all ${
-                subgroupFilter === tag.id
-                  ? "shadow-[0_0_10px_rgba(var(--accent),0.2)] border-accent"
-                  : "bg-card/40 backdrop-blur-sm border-border/40 text-muted hover:text-txt shadow-sm hover:border-accent/30"
-              }`}
-              onClick={() => setSubgroupFilter(tag.id)}
-            >
-              {tag.label}
-              <span
-                className={`ml-1.5 px-1.5 py-0.5 rounded border text-[9px] font-mono leading-none ${subgroupFilter === tag.id ? "bg-black/20 border-black/10" : "bg-black/10 border-white/5"}`}
-              >
-                {tag.count}
-              </span>
-            </Button>
-          ))}
-        </div>
-      )}
-
-      {/* Plugin grid */}
-      <div className="overflow-y-auto">
+        {/* Plugin grid */}
+        <div className="overflow-y-auto">
         {sorted.length === 0 ? (
           <div className="text-center py-10 px-5 text-muted border border-dashed border-border">
             {effectiveSearch
-              ? `No ${label.toLowerCase()} match your search.`
-              : `No ${label.toLowerCase()} available.`}
+              ? `No ${resultLabel} match your search.`
+              : `No ${resultLabel} available.`}
           </div>
         ) : visiblePlugins.length === 0 ? (
           <div className="text-center py-10 px-5 text-muted border border-dashed border-border">
             {showSubgroupFilters
               ? "No plugins match this tag filter."
-              : `No ${label.toLowerCase()} match your filters.`}
+              : `No ${resultLabel} match your filters.`}
           </div>
         ) : (
           renderPluginGrid(visiblePlugins)
-        )}
+          )}
+        </div>
       </div>
 
       {/* Settings dialog */}
@@ -2345,7 +2447,7 @@ export function PluginsView({
 }) {
   const label =
     mode === "social"
-      ? "Social"
+      ? "Connectors"
       : mode === "connectors"
         ? "Connectors"
         : mode === "streaming"

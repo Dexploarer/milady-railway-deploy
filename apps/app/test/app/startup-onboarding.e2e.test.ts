@@ -93,10 +93,10 @@ type AppHarnessState = {
   onboardingRpcKeys: Record<string, string>;
   onboardingAvatar: number;
   onboardingRestarting: boolean;
-  miladyCloudConnected: boolean;
-  miladyCloudLoginBusy: boolean;
-  miladyCloudLoginError: string;
-  miladyCloudUserId: string;
+  elizaCloudConnected: boolean;
+  elizaCloudLoginBusy: boolean;
+  elizaCloudLoginError: string;
+  elizaCloudUserId: string;
   uiShellMode: string;
   [key: string]: unknown;
 };
@@ -321,7 +321,7 @@ function onboardingOptions() {
         rpcProviders: [
           {
             id: "elizacloud",
-            name: "Milady Cloud",
+            name: "Eliza Cloud",
             description: "Managed RPC",
             envKey: null,
             requiresKey: false,
@@ -373,10 +373,10 @@ function createHarnessState(): AppHarnessState {
     selectedVrmIndex: 1,
     customBackgroundUrl: "",
     onboardingRestarting: false,
-    miladyCloudConnected: false,
-    miladyCloudLoginBusy: false,
-    miladyCloudLoginError: "",
-    miladyCloudUserId: "",
+    elizaCloudConnected: false,
+    elizaCloudLoginBusy: false,
+    elizaCloudLoginError: "",
+    elizaCloudUserId: "",
     uiShellMode: "native",
   };
 }
@@ -459,8 +459,8 @@ describe("app startup onboarding flow (e2e)", () => {
       handleOnboardingNext,
       handleOnboardingBack,
       handleCloudLogin: async () => {
-        state.miladyCloudConnected = true;
-        state.miladyCloudUserId = "test-user";
+        state.elizaCloudConnected = true;
+        state.elizaCloudUserId = "test-user";
       },
       handleOnboardingRemoteConnect: async () => {},
       handleOnboardingUseLocalBackend: () => {},

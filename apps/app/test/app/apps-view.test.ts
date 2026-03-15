@@ -48,7 +48,7 @@ vi.mock("@milady/app-core/state", () => ({
 import {
   AppsView,
   shouldShowAppInAppsView,
-} from "../../../../packages/app-core/src/components/AppsView";
+} from "@milady/app-core/components/AppsView";
 
 function createApp(
   name: string,

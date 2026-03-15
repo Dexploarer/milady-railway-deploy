@@ -2,7 +2,7 @@ import { logger } from "@elizaos/core";
 import type {
   RegistryAppMeta,
   RegistryAppViewerMeta,
-} from "./registry-client.js";
+} from "./registry-client-types.js";
 
 export const LOCAL_APP_DEFAULT_SANDBOX =
   "allow-scripts allow-same-origin allow-popups";

@@ -19,134 +19,131 @@ const {
   executeDatabaseQueryMock: vi.fn(),
 }));
 
-vi.mock(
-  "../../../../packages/app-core/src/components/vector-browser-three",
-  () => {
-    class MockVector2 {
-      x = 0;
-      y = 0;
+vi.mock("@milady/app-core/components/vector-browser-three", () => {
+  class MockVector2 {
+    x = 0;
+    y = 0;
 
-      set(x: number, y: number) {
-        this.x = x;
-        this.y = y;
-        return this;
+    set(x: number, y: number) {
+      this.x = x;
+      this.y = y;
+      return this;
+    }
+  }
+
+  class MockVector3 {
+    x = 0;
+    y = 0;
+    z = 0;
+
+    set(x: number, y: number, z: number) {
+      this.x = x;
+      this.y = y;
+      this.z = z;
+      return this;
+    }
+  }
+
+  class MockColor {}
+
+  class MockMaterial {
+    opacity = 1;
+    transparent = false;
+
+    constructor(config?: { opacity?: number; transparent?: boolean }) {
+      if (typeof config?.opacity === "number") {
+        this.opacity = config.opacity;
+      }
+      if (typeof config?.transparent === "boolean") {
+        this.transparent = config.transparent;
       }
     }
 
-    class MockVector3 {
-      x = 0;
-      y = 0;
-      z = 0;
+    dispose() {}
+  }
 
-      set(x: number, y: number, z: number) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        return this;
-      }
+  class MockGeometry {
+    setAttribute() {}
+    dispose() {}
+  }
+
+  class MockMesh {
+    position = new MockVector3();
+    scale = { setScalar: vi.fn() };
+    userData: Record<string, unknown> = {};
+    material: MockMaterial | MockMaterial[];
+    geometry: MockGeometry;
+
+    constructor(
+      geometry: MockGeometry = new MockGeometry(),
+      material: MockMaterial | MockMaterial[] = new MockMaterial(),
+    ) {
+      this.geometry = geometry;
+      this.material = material;
     }
+  }
 
-    class MockColor {}
-
-    class MockMaterial {
-      opacity = 1;
-      transparent = false;
-
-      constructor(config?: { opacity?: number; transparent?: boolean }) {
-        if (typeof config?.opacity === "number") {
-          this.opacity = config.opacity;
-        }
-        if (typeof config?.transparent === "boolean") {
-          this.transparent = config.transparent;
-        }
-      }
-
-      dispose() {}
+  class MockGridHelper extends MockMesh {
+    constructor() {
+      super(new MockGeometry(), new MockMaterial());
     }
+  }
 
-    class MockGeometry {
-      setAttribute() {}
-      dispose() {}
+  class MockScene {
+    background: unknown = null;
+    add() {}
+    remove() {}
+  }
+
+  class MockCamera {
+    position = new MockVector3();
+    aspect = 1;
+
+    lookAt() {}
+    updateProjectionMatrix() {}
+  }
+
+  class MockRenderer {
+    domElement = document.createElement("canvas");
+
+    setSize() {}
+    setPixelRatio() {}
+    render() {}
+    dispose() {
+      rendererDisposeMock();
     }
+  }
 
-    class MockMesh {
-      position = new MockVector3();
-      scale = { setScalar: vi.fn() };
-      userData: Record<string, unknown> = {};
-      material: MockMaterial | MockMaterial[];
-      geometry: MockGeometry;
-
-      constructor(
-        geometry: MockGeometry = new MockGeometry(),
-        material: MockMaterial | MockMaterial[] = new MockMaterial(),
-      ) {
-        this.geometry = geometry;
-        this.material = material;
-      }
+  class MockRaycaster {
+    setFromCamera() {}
+    intersectObjects() {
+      return [];
     }
+  }
 
-    class MockGridHelper extends MockMesh {
-      constructor() {
-        super(new MockGeometry(), new MockMaterial());
-      }
-    }
-
-    class MockScene {
-      background: unknown = null;
-      add() {}
-      remove() {}
-    }
-
-    class MockCamera {
-      position = new MockVector3();
-      aspect = 1;
-
-      lookAt() {}
-      updateProjectionMatrix() {}
-    }
-
-    class MockRenderer {
-      domElement = document.createElement("canvas");
-
-      setSize() {}
-      setPixelRatio() {}
-      render() {}
-      dispose() {
-        rendererDisposeMock();
-      }
-    }
-
-    class MockRaycaster {
-      setFromCamera() {}
-      intersectObjects() {
-        return [];
-      }
-    }
-
-    return {
-      THREE: {
-        Scene: MockScene,
-        PerspectiveCamera: MockCamera,
-        SphereGeometry: MockGeometry,
-        BufferGeometry: MockGeometry,
-        MeshBasicMaterial: MockMaterial,
-        LineBasicMaterial: MockMaterial,
-        Mesh: MockMesh,
-        LineSegments: MockMesh,
-        GridHelper: MockGridHelper,
-        Vector2: MockVector2,
-        Vector3: MockVector3,
-        Color: MockColor,
-        Raycaster: MockRaycaster,
-        BufferAttribute: class {},
-      },
-      createVectorBrowserRenderer:
-        createVectorBrowserRendererMock.mockImplementation(
-          async () => new MockRenderer(),
-        ),
-    };
-  },
-);
+  return {
+    THREE: {
+      Scene: MockScene,
+      PerspectiveCamera: MockCamera,
+      SphereGeometry: MockGeometry,
+      BufferGeometry: MockGeometry,
+      MeshBasicMaterial: MockMaterial,
+      LineBasicMaterial: MockMaterial,
+      Mesh: MockMesh,
+      LineSegments: MockMesh,
+      GridHelper: MockGridHelper,
+      Vector2: MockVector2,
+      Vector3: MockVector3,
+      Color: MockColor,
+      Raycaster: MockRaycaster,
+      BufferAttribute: class {},
+    },
+    createVectorBrowserRenderer:
+      createVectorBrowserRendererMock.mockImplementation(
+        async () => new MockRenderer(),
+      ),
+  };
+});
 
 vi.mock("@milady/app-core/api", () => ({
   client: {
@@ -156,7 +153,7 @@ vi.mock("@milady/app-core/api", () => ({
 }));
 
 import { client } from "@milady/app-core/api";
-import { VectorBrowserView } from "../../../../packages/app-core/src/components/VectorBrowserView";
+import { VectorBrowserView } from "@milady/app-core/components/VectorBrowserView";
 
 async function flush(times = 4): Promise<void> {
   for (let i = 0; i < times; i++) {

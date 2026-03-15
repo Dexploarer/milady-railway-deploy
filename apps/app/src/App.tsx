@@ -31,10 +31,7 @@ import { AdvancedPageView } from "./components/AdvancedPageView";
 import { AvatarLoader } from "./components/avatar/AvatarLoader";
 import { CharacterView } from "./components/CharacterView";
 import { ChatView } from "./components/ChatView";
-import {
-  COMPANION_OVERLAY_TABS,
-  CompanionShell,
-} from "./components/CompanionShell";
+import { CompanionShell } from "./components/CompanionShell";
 import { CompanionView } from "./components/CompanionView";
 import { ConversationsSidebar } from "./components/ConversationsSidebar";
 import { CustomActionEditor } from "./components/CustomActionEditor";
@@ -88,7 +85,15 @@ function TabContentView({ children }: { children: ReactNode }) {
   );
 }
 
-function ViewRouter() {
+function isCharacterTab(tab: Tab): boolean {
+  return tab === "character" || tab === "character-select";
+}
+
+function ViewRouter({
+  characterSceneVisible = false,
+}: {
+  characterSceneVisible?: boolean;
+}) {
   const { tab } = useApp();
   const view = (() => {
     switch (tab) {
@@ -111,7 +116,7 @@ function ViewRouter() {
       case "character-select":
         return (
           <TabScrollView>
-            <CharacterView />
+            <CharacterView sceneOverlay={characterSceneVisible} />
           </TabScrollView>
         );
       case "wallets":
@@ -197,15 +202,17 @@ export function App() {
   const isPopout = useIsPopout();
   const shellMode = uiShellMode ?? "companion";
   const effectiveTab: Tab =
-    shellMode === "native" && tab === "companion"
-      ? "chat"
-      : shellMode === "companion" && tab === "chat"
-        ? "companion"
+    shellMode === "companion"
+      ? "companion"
+      : tab === "companion"
+        ? "chat"
         : tab;
-  const companionShellVisible =
-    shellMode === "companion" && COMPANION_OVERLAY_TABS.has(effectiveTab);
+  const characterSceneVisible =
+    shellMode === "native" &&
+    (isCharacterTab(effectiveTab) || isCharacterTab(tab));
+  const companionShellVisible = shellMode === "companion";
   const companionSceneActive =
-    COMPANION_ENABLED && (effectiveTab === "companion" || tab === "companion");
+    COMPANION_ENABLED && (companionShellVisible || characterSceneVisible);
   const contextMenu = useContextMenu();
 
   useStreamPopoutNavigation(setTab);
@@ -405,16 +412,27 @@ export function App() {
       </div>
     </div>
   ) : (
-    <div className="flex flex-col flex-1 min-h-0 w-full font-body text-txt bg-bg">
-      <Header />
-      <main className="flex flex-1 min-h-0 min-w-0 overflow-hidden py-4 px-3 xl:py-6 xl:px-5">
-        <ViewRouter />
+    <div
+      className={`flex flex-col flex-1 min-h-0 w-full font-body text-txt ${
+        characterSceneVisible ? "bg-transparent" : "bg-bg"
+      }`}
+    >
+      <Header transparent={characterSceneVisible} />
+      <main
+        className={`flex flex-1 min-h-0 min-w-0 overflow-hidden px-3 xl:px-5 ${
+          characterSceneVisible ? "pb-4 pt-2 xl:pb-6" : "py-4 xl:py-6"
+        }`}
+      >
+        <ViewRouter characterSceneVisible={characterSceneVisible} />
       </main>
     </div>
   );
 
   const appShell = COMPANION_ENABLED ? (
-    <SharedCompanionScene active={companionSceneActive}>
+    <SharedCompanionScene
+      active={companionSceneActive}
+      interactive={companionShellVisible}
+    >
       {shellContent}
     </SharedCompanionScene>
   ) : (

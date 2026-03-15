@@ -1,6 +1,9 @@
 import { motion, type Variants } from "framer-motion";
 import { releaseData } from "../generated/release-data";
 
+const ELIZA_CLOUD_LOGIN_URL =
+  "https://elizacloud.ai/login?returnTo=%2Fdashboard%2Fmilady";
+
 const heroDownloads = releaseData.release.downloads.slice(0, 4);
 const releaseChannelLabel = releaseData.release.prerelease
   ? "Latest published canary"
@@ -107,7 +110,7 @@ export function HeroForeground() {
             GitHub release downloads, deployed into the real homepage.
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-white/70 md:text-base">
-            Run Milady locally, or point the same frontend at Milady Cloud or a
+            Run Milady locally, or point the same frontend at Eliza Cloud or a
             remote self-hosted backend. Signed desktop artifacts still ship
             straight from GitHub Releases.
           </p>
@@ -170,7 +173,7 @@ export function HeroForeground() {
           </a>
 
           <a
-            href="https://cloud.milady.ai"
+            href={ELIZA_CLOUD_LOGIN_URL}
             target="_blank"
             rel="noreferrer"
             className="group relative flex items-center justify-between gap-3 border border-white/20 bg-black/80 px-4 py-4 font-mono text-white backdrop-blur-md transition-colors duration-300 hover:border-white hover:bg-white hover:text-dark"
@@ -180,11 +183,11 @@ export function HeroForeground() {
                 Managed
               </div>
               <div className="mt-1 text-sm font-bold uppercase tracking-[0.08em]">
-                Milady Cloud
+                Eliza Cloud
               </div>
             </div>
             <span className="text-[10px] uppercase tracking-[0.2em] opacity-60">
-              cloud.milady.ai
+              elizacloud.ai
             </span>
           </a>
 

@@ -197,7 +197,7 @@ function createContext(
     inventoryChainFocus: "bsc" | "all";
     walletBalances: ReturnType<typeof createWalletBalances> | null;
     walletConfig: ReturnType<typeof createWalletConfig> | null;
-    miladyCloudConnected: boolean;
+    elizaCloudConnected: boolean;
     walletError: string | null;
   }>,
 ) {
@@ -217,7 +217,7 @@ function createContext(
     inventoryCollapseOtherEvm: true,
     inventoryCollapseSolana: true,
     walletError: null,
-    miladyCloudConnected: true,
+    elizaCloudConnected: true,
     loadBalances: vi.fn(async () => {}),
     loadNfts: vi.fn(async () => {}),
     getBscTradePreflight: vi.fn(async () => createPreflight(true)),
@@ -430,7 +430,7 @@ describe("InventoryView unified wallets", () => {
       (chain) => chain.chain !== "BSC",
     );
     const ctx = createContext({
-      miladyCloudConnected: false,
+      elizaCloudConnected: false,
       walletBalances: balances,
       walletConfig: {
         ...createWalletConfig(),
@@ -457,7 +457,7 @@ describe("InventoryView unified wallets", () => {
     );
     const ctx = createContext({
       inventoryChainFocus: "bsc",
-      miladyCloudConnected: false,
+      elizaCloudConnected: false,
       walletBalances: balances,
       walletConfig: {
         ...createWalletConfig(),
@@ -653,16 +653,20 @@ describe("InventoryView unified wallets", () => {
       await flushAsync();
     });
 
-    // Inline confirmation should appear
-    expect(text(tree?.root)).toContain("bsctradepanel.Confirm buy");
-
-    // Click the Confirm button
     const confirmButton = tree?.root.findAll(
       (node) =>
         node.type === "button" &&
         node.props["data-testid"] === "wallet-quote-confirm",
     )[0];
     expect(confirmButton).toBeDefined();
+    const cancelButton = tree?.root.findAll(
+      (node) =>
+        node.type === "button" &&
+        node.props["data-testid"] === "wallet-quote-cancel",
+    )[0];
+    expect(cancelButton).toBeDefined();
+
+    // Click the Confirm button
     await act(async () => {
       confirmButton.props.onClick();
       await flushAsync();

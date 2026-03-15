@@ -339,9 +339,7 @@ export function TrajectoryDetailView({
           <span className="text-txt">{trajectory.source}</span>
         </div>
         <div>
-          <span className="text-muted">
-            {t("finetuningview.Status1")}{" "}
-          </span>
+          <span className="text-muted">{t("finetuningview.Status1")} </span>
           <span
             className={
               trajectory.status === "completed"
@@ -361,9 +359,7 @@ export function TrajectoryDetailView({
           <span>{formatTrajectoryDuration(trajectory.durationMs)}</span>
         </div>
         <div>
-          <span className="text-muted">
-            {t("trajectoriesview.LLMCalls")}{" "}
-          </span>
+          <span className="text-muted">{t("trajectoriesview.LLMCalls")} </span>
           <span className="font-semibold">{llmCalls.length}</span>
         </div>
         <div>

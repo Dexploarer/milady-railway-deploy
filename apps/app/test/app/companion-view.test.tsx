@@ -18,7 +18,7 @@ vi.mock("@milady/app-core/state", () => ({
   VRM_COUNT: 24,
 }));
 
-vi.mock("../../src/components/avatar/VrmViewer", () => ({
+vi.mock("@milady/app-core/components/avatar/VrmViewer", () => ({
   VrmViewer: (props: Record<string, unknown>) => {
     viewerPropsRef.current = props;
     return React.createElement("div", null, "VrmViewer");
@@ -51,16 +51,18 @@ vi.mock("@milady/app-core/utils", () => ({
   resolveAppAssetUrl: (p: string) => p,
 }));
 
+import { CompanionSceneHost } from "@milady/app-core/components/CompanionSceneHost";
 import { CompanionView } from "../../src/components/CompanionView";
-import { CompanionSceneHost } from "../../src/components/companion/CompanionSceneHost";
 
 const COMPANION_ZOOM_STORAGE_KEY = "milady.companion.zoom.v1";
 
-function createContext() {
+function createContext(overrides: Record<string, unknown> = {}) {
   return {
     t: (k: string) => k,
     chatMode: "simple",
+    chatAgentVoiceMuted: false,
     setState: vi.fn(),
+    handleNewConversation: vi.fn(async () => {}),
     selectedVrmIndex: 1,
     customVrmUrl: "",
     customBackgroundUrl: "",
@@ -134,12 +136,12 @@ function createContext() {
       platform: "test",
       pid: null,
     },
-    miladyCloudEnabled: false,
-    miladyCloudConnected: false,
-    miladyCloudCredits: null,
-    miladyCloudCreditsCritical: false,
-    miladyCloudCreditsLow: false,
-    miladyCloudTopUpUrl: "",
+    elizaCloudEnabled: false,
+    elizaCloudConnected: false,
+    elizaCloudCredits: null,
+    elizaCloudCreditsCritical: false,
+    elizaCloudCreditsLow: false,
+    elizaCloudTopUpUrl: "",
     lifecycleBusy: false,
     lifecycleAction: null,
 
@@ -147,10 +149,15 @@ function createContext() {
     copyToClipboard: vi.fn(async () => {}),
     uiLanguage: "en",
     setUiLanguage: vi.fn(),
+    uiTheme: "light",
+    setUiTheme: vi.fn(),
     uiShellMode: "companion",
     setUiShellMode: vi.fn(),
+    switchUiShellMode: vi.fn(),
+    switchShellView: vi.fn(),
     setTab: vi.fn(),
     plugins: [],
+    ...overrides,
   };
 }
 
@@ -245,6 +252,51 @@ describe("CompanionView", () => {
     expect(content).toContain("VrmViewer");
     // Should render the mock ChatModalView text
     expect(content).toContain("ChatModalView");
+  });
+
+  it("renders centered companion header chat controls", async () => {
+    const setState = vi.fn();
+    const handleNewConversation = vi.fn(async () => {});
+    mockUseApp.mockReturnValue(
+      createContext({
+        setState,
+        handleNewConversation,
+      }),
+    );
+
+    let tree: TestRenderer.ReactTestRenderer;
+    await act(async () => {
+      tree = TestRenderer.create(React.createElement(CompanionView));
+    });
+
+    const controls = tree?.root.findByProps({
+      "data-testid": "companion-header-chat-controls",
+    });
+    const voiceButton = tree?.root.find(
+      (node) =>
+        node.type === "button" && node.props["aria-label"] === "Agent voice on",
+    );
+    const newChatButton = tree?.root.find(
+      (node) =>
+        node.type === "button" && node.props["aria-label"] === "+ New Chat",
+    );
+
+    expect(controls).toBeDefined();
+    expect(String(controls.props.className)).not.toContain("rounded-full");
+    expect(String(controls.props.className)).not.toContain("border");
+    expect(voiceButton).toBeDefined();
+    expect(newChatButton).toBeDefined();
+    expect(String(newChatButton.props.className)).toContain("text-black");
+
+    await act(async () => {
+      voiceButton?.props.onClick();
+    });
+    expect(setState).toHaveBeenCalledWith("chatAgentVoiceMuted", true);
+
+    await act(async () => {
+      newChatButton?.props.onClick();
+    });
+    expect(handleNewConversation).toHaveBeenCalledTimes(1);
   });
 
   it("keeps the shared companion scene wrapper height-bounded", async () => {

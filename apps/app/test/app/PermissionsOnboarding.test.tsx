@@ -57,12 +57,12 @@ vi.mock("@milady/app-core/bridge", () => ({
   invokeDesktopBridgeRequest: vi.fn(),
 }));
 
-vi.mock("../../../../packages/app-core/src/components/ui-badges", () => ({
+vi.mock("@milady/app-core/components/ui-badges", () => ({
   StatusBadge: ({ label }: { label: string }) =>
     React.createElement("span", { "data-testid": "status-badge" }, label),
 }));
 
-vi.mock("../../../../packages/app-core/src/components/ui-switch", () => ({
+vi.mock("@milady/app-core/components/ui-switch", () => ({
   Switch: () => React.createElement("span", null, "switch"),
 }));
 
@@ -95,7 +95,7 @@ vi.mock("lucide-react", () => ({
   Terminal: () => React.createElement("span", null, "💻"),
 }));
 
-import { PermissionsOnboardingSection } from "../../../../packages/app-core/src/components/PermissionsSection";
+import { PermissionsOnboardingSection } from "@milady/app-core/components/PermissionsSection";
 
 // ── Helpers ───────────────────────────────────────────────────────────
 

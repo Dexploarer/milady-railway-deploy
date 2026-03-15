@@ -25,14 +25,7 @@ import {
   sanitizeApiKey,
   type VoicePreset,
 } from "@milady/app-core/voice";
-import {
-  Button,
-  Checkbox,
-  Input,
-  TagEditor,
-  Textarea,
-  ThemedSelect,
-} from "@milady/ui";
+import { Button, Input, TagEditor, Textarea, ThemedSelect } from "@milady/ui";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 const DEFAULT_ELEVEN_FAST_MODEL = "eleven_flash_v2_5";
@@ -140,47 +133,49 @@ function buildCharacterDraftFromPreset(
   };
 }
 
-function normalizeCharacterDraft(character: CharacterData | null | undefined) {
+function normalizeCharacterDraftForComparison(
+  character: CharacterData | null | undefined,
+) {
   return {
-    name: typeof character?.name === "string" ? character.name.trim() : "",
+    name: (character?.name ?? "").trim(),
+    username: (character?.username ?? "").trim(),
     bio:
       typeof character?.bio === "string"
         ? character.bio.trim()
         : Array.isArray(character?.bio)
           ? character.bio.join("\n").trim()
           : "",
-    system:
-      typeof character?.system === "string" ? character.system.trim() : "",
-    adjectives: Array.isArray(character?.adjectives)
-      ? [...character.adjectives]
-      : [],
-    topics: Array.isArray(character?.topics) ? [...character.topics] : [],
+    system: (character?.system ?? "").trim(),
+    adjectives: [...(character?.adjectives ?? [])],
+    topics: [...(character?.topics ?? [])],
     style: {
-      all: Array.isArray(character?.style?.all) ? [...character.style.all] : [],
-      chat: Array.isArray(character?.style?.chat)
-        ? [...character.style.chat]
-        : [],
-      post: Array.isArray(character?.style?.post)
-        ? [...character.style.post]
-        : [],
+      all: [...(character?.style?.all ?? [])],
+      chat: [...(character?.style?.chat ?? [])],
+      post: [...(character?.style?.post ?? [])],
     },
-    messageExamples: character?.messageExamples ?? [],
-    postExamples: Array.isArray(character?.postExamples)
-      ? [...character.postExamples]
-      : [],
+    messageExamples: (character?.messageExamples ?? []).map((conversation) => ({
+      examples: (conversation.examples ?? []).map((message) => ({
+        name: message.name,
+        content: {
+          text: message.content?.text ?? "",
+        },
+      })),
+    })),
+    postExamples: [...(character?.postExamples ?? [])],
   };
 }
 
-function doesDraftMatchRosterEntry(
+function characterDraftMatchesPreset(
   character: CharacterData | null | undefined,
+  avatarIndex: number,
   entry: CharacterRosterEntry,
 ) {
-  return (
-    JSON.stringify(normalizeCharacterDraft(character)) ===
-    JSON.stringify(
-      normalizeCharacterDraft(buildCharacterDraftFromPreset(entry)),
-    )
+  if (avatarIndex !== entry.avatarIndex) return false;
+  const normalizedCurrent = normalizeCharacterDraftForComparison(character);
+  const normalizedPreset = normalizeCharacterDraftForComparison(
+    buildCharacterDraftFromPreset(entry),
   );
+  return JSON.stringify(normalizedCurrent) === JSON.stringify(normalizedPreset);
 }
 
 function truncateCopy(value: string, max = 170) {
@@ -243,6 +238,44 @@ function findMatchingRosterEntry(
   }
 
   return bestMatch && bestMatch.score >= 4 ? bestMatch.id : null;
+}
+
+function findExactRosterEntry(
+  character: CharacterData | null,
+  roster: CharacterRosterEntry[],
+) {
+  if (!character) return null;
+  const currentName =
+    typeof character.name === "string" ? character.name.trim() : "";
+  return roster.find((entry) => entry.name === currentName) ?? null;
+}
+
+function hasCharacterContent(character: CharacterData | null | undefined) {
+  return Boolean(character && Object.keys(character).length > 0);
+}
+
+function resolveActiveRosterEntry(
+  character: CharacterData | null | undefined,
+  avatarIndex: number,
+  selectedCharacterId: string | null,
+  roster: CharacterRosterEntry[],
+) {
+  if (selectedCharacterId) {
+    const selectedEntry =
+      roster.find((entry) => entry.id === selectedCharacterId) ?? null;
+    if (selectedEntry) return selectedEntry;
+  }
+
+  const exactEntry = findExactRosterEntry(character ?? null, roster);
+  if (exactEntry) return exactEntry;
+
+  const matchedId = findMatchingRosterEntry(
+    character ?? null,
+    avatarIndex,
+    roster,
+  );
+  if (!matchedId) return null;
+  return roster.find((entry) => entry.id === matchedId) ?? null;
 }
 
 function getStyleEntryRenderKey(
@@ -315,7 +348,13 @@ function parseImportedMessageExamples(
 
 /* ── CharacterView ──────────────────────────────────────────────────── */
 
-export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
+export function CharacterView({
+  inModal,
+  sceneOverlay = false,
+}: {
+  inModal?: boolean;
+  sceneOverlay?: boolean;
+} = {}) {
   const {
     characterData,
     characterDraft,
@@ -539,6 +578,15 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
 
   const characterRoster = resolveRosterEntries(rosterStyles);
   const visibleCharacterRoster = characterRoster.slice(0, 4);
+  const currentCharacter = hasCharacterContent(characterDraft)
+    ? characterDraft
+    : characterData;
+  const activeRosterEntry = resolveActiveRosterEntry(
+    currentCharacter,
+    selectedVrmIndex,
+    selectedCharacterId,
+    characterRoster,
+  );
 
   /* Load voice config on mount */
   useEffect(() => {
@@ -696,32 +744,6 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
   );
 
   useEffect(() => {
-    if (selectedCharacterId || !characterRoster.length) return;
-    const matchedId = findMatchingRosterEntry(
-      characterData ?? characterDraft,
-      selectedVrmIndex,
-      characterRoster,
-    );
-    if (!matchedId) {
-      setCustomOverridesEnabled(true);
-      return;
-    }
-    const matchedEntry =
-      characterRoster.find((entry) => entry.id === matchedId) ?? null;
-    if (!matchedEntry) return;
-    setSelectedCharacterId(matchedId);
-    setCustomOverridesEnabled(
-      !doesDraftMatchRosterEntry(characterDraft, matchedEntry),
-    );
-  }, [
-    characterData,
-    characterDraft,
-    characterRoster,
-    selectedCharacterId,
-    selectedVrmIndex,
-  ]);
-
-  useEffect(() => {
     setStyleEntryDrafts({
       all: [...(d.style?.all ?? [])],
       chat: [...(d.style?.chat ?? [])],
@@ -877,9 +899,24 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
 
   const handleSelectCharacter = useCallback(
     (entry: CharacterRosterEntry) => {
-      commitCharacterSelection(entry, !customOverridesEnabled);
+      const shouldApplyDefaults =
+        !customOverridesEnabled &&
+        (!currentCharacter ||
+          !activeRosterEntry ||
+          characterDraftMatchesPreset(
+            currentCharacter,
+            selectedVrmIndex,
+            activeRosterEntry,
+          ));
+      commitCharacterSelection(entry, shouldApplyDefaults);
     },
-    [commitCharacterSelection, customOverridesEnabled],
+    [
+      activeRosterEntry,
+      commitCharacterSelection,
+      currentCharacter,
+      customOverridesEnabled,
+      selectedVrmIndex,
+    ],
   );
 
   const handleCustomOverridesChange = useCallback(
@@ -887,15 +924,57 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
       setCustomOverridesEnabled(enabled);
       if (enabled) return;
 
-      const activeEntry =
-        characterRoster.find((entry) => entry.id === selectedCharacterId) ??
-        null;
+      const activeEntry = resolveActiveRosterEntry(
+        currentCharacter,
+        selectedVrmIndex,
+        selectedCharacterId,
+        characterRoster,
+      );
       if (activeEntry) {
-        commitCharacterSelection(activeEntry, true);
+        setSelectedCharacterId(activeEntry.id);
       }
     },
-    [characterRoster, commitCharacterSelection, selectedCharacterId],
+    [characterRoster, currentCharacter, selectedCharacterId, selectedVrmIndex],
   );
+
+  useEffect(() => {
+    if (
+      characterLoading ||
+      selectedCharacterId ||
+      !characterRoster.length ||
+      !currentCharacter
+    ) {
+      return;
+    }
+
+    const activeEntry =
+      resolveActiveRosterEntry(
+        currentCharacter,
+        selectedVrmIndex,
+        selectedCharacterId,
+        characterRoster,
+      ) ??
+      characterRoster[0] ??
+      null;
+    if (!activeEntry) return;
+    const matchesFactory = characterDraftMatchesPreset(
+      currentCharacter,
+      selectedVrmIndex,
+      activeEntry,
+    );
+    setSelectedCharacterId(activeEntry.id);
+    setCustomOverridesEnabled(!matchesFactory);
+    if (matchesFactory) {
+      commitCharacterSelection(activeEntry, true);
+    }
+  }, [
+    characterLoading,
+    characterRoster,
+    commitCharacterSelection,
+    currentCharacter,
+    selectedCharacterId,
+    selectedVrmIndex,
+  ]);
 
   const handleSaveAll = useCallback(async () => {
     setVoiceSaving(true);
@@ -914,10 +993,12 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
   }, [handleSaveCharacter, persistVoiceConfig]);
 
   /* ── Helpers ────────────────────────────────────────────────────── */
-  const cardCls =
-    "p-5 border border-border/40 bg-card/40 backdrop-blur-xl rounded-2xl shadow-sm";
+  const cardCls = sceneOverlay
+    ? "p-5 border border-white/10 bg-black/15 backdrop-blur-md rounded-2xl shadow-[0_18px_48px_rgba(0,0,0,0.28)]"
+    : "p-5 border border-border/40 bg-card/40 backdrop-blur-xl rounded-2xl shadow-sm";
   const editorCardCls = `${cardCls} flex min-h-0 flex-col overflow-hidden`;
-  const sectionCls = inModal ? `mt-4 ${cardCls}` : `mt-4 ${cardCls}`;
+  const sectionCls =
+    sceneOverlay && !inModal ? "relative z-10 mt-4 px-1" : `mt-4 ${cardCls}`;
   const labelCls = "font-medium text-xs text-muted mb-1 block";
   const hintCls = "text-[11px] text-muted";
   const scrollPaneCls =
@@ -951,15 +1032,25 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
     dropStatus?.publicMintOpen &&
     !dropStatus?.mintedOut;
   const userMinted = dropStatus?.userHasMinted === true;
-  const activeCharacter =
-    characterRoster.find((entry) => entry.id === selectedCharacterId) ?? null;
   const activeVoicePreset =
     PREMADE_VOICES.find((preset) => preset.id === selectedVoicePresetId) ??
     null;
   const combinedSaveError = voiceSaveError ?? characterSaveError;
+  const customizationActionLabel = customOverridesEnabled
+    ? t("characterview.backToCharacterSelect")
+    : t("characterview.customize");
+  const characterRosterGridCls = sceneOverlay
+    ? "grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-4"
+    : "grid grid-cols-4 gap-4";
+  const rootCls =
+    sceneOverlay && !inModal
+      ? "relative z-10 flex min-h-full flex-col justify-end pb-4"
+      : `${inModal || sceneOverlay ? "pb-8" : ""} ${
+          sceneOverlay ? "relative z-10" : ""
+        }`;
 
   return (
-    <div className={inModal ? "pb-8" : ""}>
+    <div className={rootCls}>
       {fileInput}
 
       {/* ═══ ON-CHAIN IDENTITY ═══ */}
@@ -1056,175 +1147,105 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
         </div>
       )}
 
-      <div className={sectionCls}>
-        <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-border/40 pb-3">
-          <div className="font-bold text-sm tracking-wide text-txt">
-            Character Select
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-7 text-[11px] font-medium border-border/50 bg-bg/50 backdrop-blur-sm shadow-inner hover:text-accent hover:border-accent/40 transition-all"
-              onClick={() => {
-                setSelectedCharacterId(null);
-                setCustomOverridesEnabled(false);
-                void loadCharacter();
-              }}
-              disabled={characterLoading}
-            >
-              {characterLoading ? "loading..." : "reload"}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-7 text-[11px] font-medium border-border/50 bg-bg/50 backdrop-blur-sm shadow-inner hover:text-accent hover:border-accent/40 transition-all"
-              onClick={() => fileInputRef.current?.click()}
-              title={t("characterview.importCharacterJso")}
-            >
-              {t("characterview.import")}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-7 text-[11px] font-medium border-border/50 bg-bg/50 backdrop-blur-sm shadow-inner hover:text-accent hover:border-accent/40 transition-all"
-              onClick={handleExport}
-              title={t("characterview.exportAsCharacter")}
-            >
-              {t("characterview.export")}
-            </Button>
-          </div>
-        </div>
-        <div
-          className="mt-4 overflow-hidden"
-          data-testid="character-roster-grid"
-        >
-          <div className="grid grid-cols-4 gap-4">
-            {visibleCharacterRoster.length > 0 ? (
-              visibleCharacterRoster.map((entry) => {
-                const isSelected = selectedCharacterId === entry.id;
-                const rosterBio = truncateCopy(
-                  replaceCharacterToken(entry.preset.bio[0] ?? "", entry.name),
-                  120,
-                );
-                const rosterDirections = truncateCopy(
-                  replaceCharacterToken(entry.preset.system, entry.name),
-                  160,
-                );
+      {!customOverridesEnabled ? (
+        <div className={sectionCls}>
+          <div className="overflow-hidden" data-testid="character-roster-grid">
+            <div className={characterRosterGridCls}>
+              {visibleCharacterRoster.length > 0 ? (
+                visibleCharacterRoster.map((entry) => {
+                  const isSelected = selectedCharacterId === entry.id;
+                  const rosterBio = truncateCopy(
+                    replaceCharacterToken(
+                      entry.preset.bio[0] ?? "",
+                      entry.name,
+                    ),
+                    120,
+                  );
+                  const rosterDirections = truncateCopy(
+                    replaceCharacterToken(entry.preset.system, entry.name),
+                    160,
+                  );
 
-                return (
-                  <button
-                    key={entry.id}
-                    type="button"
-                    className={`flex min-w-0 w-full flex-col rounded-2xl border p-4 text-left transition-all ${
-                      isSelected
-                        ? "border-accent bg-accent/5 shadow-[0_0_0_1px_rgba(var(--accent),0.25)]"
-                        : "border-border/40 bg-black/10 hover:border-accent/30 hover:bg-accent/5"
-                    }`}
-                    onClick={() => handleSelectCharacter(entry)}
-                    data-testid={`character-preset-${entry.id}`}
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <div className="text-base font-semibold text-txt">
-                          {entry.name}
+                  return (
+                    <button
+                      key={entry.id}
+                      type="button"
+                      className={`flex min-w-0 w-full flex-col rounded-2xl border p-4 text-left transition-all ${
+                        isSelected
+                          ? "border-accent bg-black/45 backdrop-blur-md shadow-[0_0_0_1px_rgba(var(--accent),0.25)]"
+                          : sceneOverlay
+                            ? "border-white/10 bg-black/32 backdrop-blur-md hover:border-accent/30 hover:bg-black/40"
+                            : "border-border/40 bg-black/10 hover:border-accent/30 hover:bg-accent/5"
+                      }`}
+                      onClick={() => handleSelectCharacter(entry)}
+                      data-testid={`character-preset-${entry.id}`}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <div className="text-base font-semibold text-txt">
+                            {entry.name}
+                          </div>
+                          <div className="mt-1 text-xs uppercase tracking-[0.18em] text-muted">
+                            {entry.preset.hint}
+                          </div>
                         </div>
-                        <div className="mt-1 text-xs uppercase tracking-[0.18em] text-muted">
-                          {entry.preset.hint}
-                        </div>
+                        <span
+                          className={`rounded-full border px-2 py-1 text-[10px] font-bold uppercase tracking-[0.18em] ${
+                            isSelected
+                              ? "border-accent/40 bg-accent/10 text-accent"
+                              : "border-white/10 bg-black/20 text-muted"
+                          }`}
+                        >
+                          {isSelected ? "selected" : entry.preset.catchphrase}
+                        </span>
                       </div>
-                      <span
-                        className={`rounded-full border px-2 py-1 text-[10px] font-bold uppercase tracking-[0.18em] ${
-                          isSelected
-                            ? "border-accent/40 bg-accent/10 text-accent"
-                            : "border-white/10 bg-black/20 text-muted"
-                        }`}
-                      >
-                        {isSelected ? "selected" : entry.preset.catchphrase}
-                      </span>
-                    </div>
 
-                    <img
-                      src={getVrmPreviewUrl(entry.avatarIndex)}
-                      alt={entry.name}
-                      className="mt-4 h-44 w-full rounded-2xl object-cover"
-                    />
+                      <img
+                        src={getVrmPreviewUrl(entry.avatarIndex)}
+                        alt={entry.name}
+                        className="mt-4 h-44 w-full rounded-2xl object-cover"
+                      />
 
-                    <p className="mt-4 text-sm leading-relaxed text-muted">
-                      {rosterBio}
-                    </p>
-
-                    <div className="mt-4">
-                      <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted">
-                        Directions
-                      </div>
-                      <p className="mt-2 text-xs leading-relaxed text-muted">
-                        {rosterDirections}
+                      <p className="mt-4 text-sm leading-relaxed text-muted">
+                        {rosterBio}
                       </p>
-                    </div>
 
-                    <div className="mt-4">
-                      <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted">
-                        Topics
+                      <div className="mt-4">
+                        <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted">
+                          Directions
+                        </div>
+                        <p className="mt-2 text-xs leading-relaxed text-muted">
+                          {rosterDirections}
+                        </p>
                       </div>
-                      <div className="mt-2 flex flex-wrap gap-1.5">
-                        {entry.preset.topics.slice(0, 4).map((topic) => (
-                          <span
-                            key={topic}
-                            className="rounded-full border border-border/40 bg-bg/50 px-2 py-1 text-[11px] text-txt"
-                          >
-                            {topic}
-                          </span>
-                        ))}
+
+                      <div className="mt-4">
+                        <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted">
+                          Topics
+                        </div>
+                        <div className="mt-2 flex flex-wrap gap-1.5">
+                          {entry.preset.topics.slice(0, 4).map((topic) => (
+                            <span
+                              key={topic}
+                              className="rounded-full border border-border/40 bg-bg/50 px-2 py-1 text-[11px] text-txt"
+                            >
+                              {topic}
+                            </span>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  </button>
-                );
-              })
-            ) : (
-              <div className="rounded-2xl border border-border/40 bg-black/10 p-4 text-sm text-muted">
-                Loading character presets...
-              </div>
-            )}
+                    </button>
+                  );
+                })
+              ) : (
+                <div className="rounded-2xl border border-border/40 bg-black/10 p-4 text-sm text-muted">
+                  Loading character presets...
+                </div>
+              )}
+            </div>
           </div>
         </div>
-
-        <div className="mt-6 rounded-2xl border border-border/40 bg-black/10 p-4 shadow-inner">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div className="space-y-1">
-              <div className="text-sm font-bold tracking-wide text-txt">
-                Custom Overrides
-              </div>
-              <div className="text-xs leading-relaxed text-muted">
-                When custom is on, the fields below override the selected
-                character and switching characters only swaps the avatar. Turn
-                custom off to use the selected character defaults.
-              </div>
-            </div>
-            <label
-              htmlFor="character-customize-toggle"
-              className="flex items-center gap-3 rounded-xl border border-border/40 bg-bg/40 px-3 py-2 text-sm text-txt cursor-pointer"
-            >
-              <Checkbox
-                id="character-customize-toggle"
-                checked={customOverridesEnabled}
-                onCheckedChange={(checked) =>
-                  handleCustomOverridesChange(checked === true)
-                }
-                data-testid="character-customize-toggle"
-              />
-              <span className="font-medium">Enable custom overrides</span>
-            </label>
-          </div>
-          {!customOverridesEnabled && (
-            <div className="mt-4 rounded-xl border border-border/30 bg-bg/40 px-3 py-2 text-xs text-muted">
-              {activeCharacter
-                ? `${activeCharacter.name} defaults are active. Turn custom on to override them below.`
-                : "Pick a character to load its defaults, then turn custom on if you want to override them."}
-            </div>
-          )}
-        </div>
-      </div>
+      ) : null}
 
       {customOverridesEnabled && (
         <>
@@ -1888,7 +1909,7 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
       )}
 
       <div className={`${sectionCls} relative z-10`}>
-        <div className="flex items-center justify-end gap-4">
+        <div className="flex flex-wrap items-center justify-end gap-2">
           {characterSaveSuccess && (
             <span className="text-xs text-green-400 font-bold bg-green-400/10 px-3 py-1.5 rounded-lg border border-green-400/20">
               {characterSaveSuccess}
@@ -1899,6 +1920,51 @@ export function CharacterView({ inModal }: { inModal?: boolean } = {}) {
               {combinedSaveError}
             </span>
           )}
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-10 rounded-xl border-border/50 bg-bg/50 px-4 text-sm font-medium shadow-inner backdrop-blur-sm transition-all hover:border-accent/40 hover:text-accent"
+            onClick={() => {
+              setSelectedCharacterId(null);
+              setCustomOverridesEnabled(false);
+              void loadCharacter();
+            }}
+            disabled={characterLoading}
+          >
+            {characterLoading ? "loading..." : t("characterview.reload")}
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-10 rounded-xl border-border/50 bg-bg/50 px-4 text-sm font-medium shadow-inner backdrop-blur-sm transition-all hover:border-accent/40 hover:text-accent"
+            onClick={() => fileInputRef.current?.click()}
+            title={t("characterview.importCharacterJso")}
+          >
+            {t("characterview.import")}
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-10 rounded-xl border-border/50 bg-bg/50 px-4 text-sm font-medium shadow-inner backdrop-blur-sm transition-all hover:border-accent/40 hover:text-accent"
+            onClick={handleExport}
+            title={t("characterview.exportAsCharacter")}
+          >
+            {t("characterview.export")}
+          </Button>
+          <Button
+            type="button"
+            variant={customOverridesEnabled ? "outline" : "default"}
+            size="sm"
+            className={`h-10 rounded-xl px-4 text-sm font-semibold ${
+              customOverridesEnabled
+                ? "border-border/40 bg-bg/40 text-txt"
+                : "shadow-[0_0_18px_rgba(var(--accent),0.18)]"
+            }`}
+            onClick={() => handleCustomOverridesChange(!customOverridesEnabled)}
+            data-testid="character-customize-toggle"
+          >
+            {customizationActionLabel}
+          </Button>
           <Button
             size="lg"
             className="font-bold tracking-wider px-8 shadow-[0_0_15px_rgba(var(--accent),0.2)] hover:shadow-[0_0_20px_rgba(var(--accent),0.4)] transition-all text-[13px] rounded-xl"

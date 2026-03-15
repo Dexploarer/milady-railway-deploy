@@ -8,6 +8,7 @@ interface ChatViewContextStub {
     agentName: string;
     state?: string;
   } | null;
+  activeConversationId: string | null;
   chatInput: string;
   chatSending: boolean;
   chatFirstTokenReceived: boolean;
@@ -36,7 +37,7 @@ interface ChatViewContextStub {
   uiLanguage: "en" | "zh-CN";
   chatMode: "simple" | "power";
   chatAgentVoiceMuted: boolean;
-  miladyCloudConnected: boolean;
+  elizaCloudConnected: boolean;
   t: (k: string) => string;
   handleStart: () => Promise<void>;
 
@@ -53,14 +54,14 @@ interface ChatViewContextStub {
 
 const { mockClient, mockUseApp, mockUseVoiceChat, mockIsElectronPlatform } =
   vi.hoisted(() => ({
-  mockClient: {
-    getCodingAgentStatus: vi.fn(async () => null),
-    getConfig: vi.fn().mockResolvedValue({}),
-  },
-  mockUseApp: vi.fn(),
-  mockUseVoiceChat: vi.fn(),
-  mockIsElectronPlatform: vi.fn(() => false),
-}));
+    mockClient: {
+      getCodingAgentStatus: vi.fn(async () => null),
+      getConfig: vi.fn().mockResolvedValue({}),
+    },
+    mockUseApp: vi.fn(),
+    mockUseVoiceChat: vi.fn(),
+    mockIsElectronPlatform: vi.fn(() => false),
+  }));
 
 vi.mock("@milady/app-core/state", () => ({
   useApp: () => mockUseApp(),
@@ -101,6 +102,7 @@ function createContext(
 ): ChatViewContextStub {
   return {
     agentStatus: { agentName: "Milady", state: "running" },
+    activeConversationId: "conv-1",
     chatInput: "",
     chatSending: false,
     chatFirstTokenReceived: false,
@@ -116,7 +118,7 @@ function createContext(
     setChatPendingImages: vi.fn(),
     chatMode: "simple",
     chatAgentVoiceMuted: false,
-    miladyCloudConnected: false,
+    elizaCloudConnected: false,
     handleStart: vi.fn(async () => {}),
 
     handleRestart: vi.fn(async () => {}),
@@ -233,7 +235,7 @@ describe("ChatView", () => {
     expect(userTextNodes.length).toBe(1);
   });
 
-  it("queues assistant speech as non-final while stream is active", async () => {
+  it("does not auto-play assistant speech while stream is active in default chat", async () => {
     const queueAssistantSpeech = vi.fn();
     mockUseVoiceChat.mockReturnValue({
       supported: false,
@@ -265,14 +267,10 @@ describe("ChatView", () => {
     });
     await flush();
 
-    expect(queueAssistantSpeech).toHaveBeenCalledWith(
-      "a1",
-      "Hello world.",
-      false,
-    );
+    expect(queueAssistantSpeech).not.toHaveBeenCalled();
   });
 
-  it("queues assistant speech as final after stream completes", async () => {
+  it("does not auto-play assistant speech after stream completes in default chat", async () => {
     const queueAssistantSpeech = vi.fn();
     mockUseVoiceChat.mockReturnValue({
       supported: false,
@@ -304,11 +302,7 @@ describe("ChatView", () => {
     });
     await flush();
 
-    expect(queueAssistantSpeech).toHaveBeenCalledWith(
-      "a1",
-      "Hello world.",
-      true,
-    );
+    expect(queueAssistantSpeech).not.toHaveBeenCalled();
   });
 
   it("does not auto-play assistant speech in desktop chat view", async () => {
@@ -345,6 +339,81 @@ describe("ChatView", () => {
     await flush();
 
     expect(queueAssistantSpeech).not.toHaveBeenCalled();
+  });
+
+  it("does not render top-center voice or new chat controls in desktop chat view", async () => {
+    mockIsElectronPlatform.mockReturnValue(true);
+    mockUseVoiceChat.mockReturnValue({
+      supported: true,
+      isListening: false,
+      captureMode: "idle",
+      interimTranscript: "",
+      toggleListening: vi.fn(),
+      startListening: vi.fn(),
+      stopListening: vi.fn(),
+      mouthOpen: 0,
+      isSpeaking: false,
+      usingAudioAnalysis: false,
+      speak: vi.fn(),
+      queueAssistantSpeech: vi.fn(),
+      stopSpeaking: vi.fn(),
+    });
+    mockUseApp.mockReturnValue(createContext());
+
+    let tree: TestRenderer.ReactTestRenderer | undefined;
+    await act(async () => {
+      tree = TestRenderer.create(React.createElement(ChatView));
+    });
+    await flush();
+
+    const voiceButtons = tree?.root.findAll(
+      (node) =>
+        node.type === "button" &&
+        (node.props["aria-label"] === "Agent voice on" ||
+          node.props["aria-label"] === "Agent voice off"),
+    );
+    const newChatButtons = tree?.root.findAll(
+      (node) =>
+        node.type === "button" && node.props["aria-label"] === "+ New Chat",
+    );
+
+    expect(voiceButtons?.length ?? 0).toBe(0);
+    expect(newChatButtons.length).toBe(0);
+  });
+
+  it("does not render a global agent voice toggle in default chat", async () => {
+    mockIsElectronPlatform.mockReturnValue(false);
+    mockUseVoiceChat.mockReturnValue({
+      supported: true,
+      isListening: false,
+      captureMode: "idle",
+      interimTranscript: "",
+      toggleListening: vi.fn(),
+      startListening: vi.fn(),
+      stopListening: vi.fn(),
+      mouthOpen: 0,
+      isSpeaking: false,
+      usingAudioAnalysis: false,
+      speak: vi.fn(),
+      queueAssistantSpeech: vi.fn(),
+      stopSpeaking: vi.fn(),
+    });
+    mockUseApp.mockReturnValue(createContext());
+
+    let tree: TestRenderer.ReactTestRenderer | undefined;
+    await act(async () => {
+      tree = TestRenderer.create(React.createElement(ChatView));
+    });
+    await flush();
+
+    const voiceButtons = tree?.root.findAll(
+      (node) =>
+        node.type === "button" &&
+        (node.props["aria-label"] === "Agent voice on" ||
+          node.props["aria-label"] === "Agent voice off"),
+    );
+
+    expect(voiceButtons?.length ?? 0).toBe(0);
   });
 
   it("pins the native scrollbar to the edge while keeping message text inset", async () => {

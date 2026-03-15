@@ -82,11 +82,15 @@ describe("useVoiceChat streaming text helpers", () => {
     });
   });
 
-  it("rewrites parenthetical asides and strips stage directions for speech", () => {
+  it("drops parenthetical asides and stage directions from speech", () => {
     expect(
       toSpeakableText(
-        'Hello there (with extra context). *curtsies* Visit https://example.com now.',
+        "Hello there (with extra context). *curtsies* Visit https://example.com now.",
       ),
-    ).toBe("Hello there, i.e. with extra context,. Visit now.");
+    ).toBe("Hello there. Visit now.");
+  });
+
+  it("returns empty text when only stage directions remain", () => {
+    expect(toSpeakableText("*waves* (quietly) [off mic]")).toBe("");
   });
 });

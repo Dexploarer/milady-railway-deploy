@@ -321,15 +321,12 @@ vi.mock("@milady/app-core/config", () => ({
   defaultRegistry: {},
 }));
 
-vi.mock(
-  "../../../../packages/app-core/src/components/WhatsAppQrOverlay",
-  () => ({
-    WhatsAppQrOverlay: () =>
-      React.createElement("div", null, "WhatsAppQrOverlay"),
-  }),
-);
+vi.mock("@milady/app-core/components/WhatsAppQrOverlay", () => ({
+  WhatsAppQrOverlay: () =>
+    React.createElement("div", null, "WhatsAppQrOverlay"),
+}));
 
-import { PluginsView } from "../../../../packages/app-core/src/components/PluginsView";
+import { PluginsView } from "@milady/app-core/components/PluginsView";
 
 type PluginInfo = {
   id: string;

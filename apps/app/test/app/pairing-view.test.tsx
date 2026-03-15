@@ -10,7 +10,7 @@ vi.mock("@milady/app-core/state", () => ({
   useApp: () => mockUseApp(),
 }));
 
-import { PairingView } from "../../../../packages/app-core/src/components/PairingView";
+import { PairingView } from "@milady/app-core/components/PairingView";
 
 function createContext(overrides?: Record<string, unknown>) {
   return {

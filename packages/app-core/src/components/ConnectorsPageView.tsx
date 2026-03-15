@@ -1,8 +1,7 @@
 /**
- * Social page — curated chat connector view.
+ * Connectors page — curated connector view.
  */
 
-import { useApp } from "../state";
 import { PluginsView } from "./PluginsView";
 
 export function ConnectorsPageView({ inModal }: { inModal?: boolean } = {}) {

@@ -773,9 +773,7 @@ export function CustomActionEditor({
 
           {/* Name */}
           <div className="flex flex-col gap-1">
-            <span className="text-xs text-muted">
-              {t("triggersview.Name")}
-            </span>
+            <span className="text-xs text-muted">{t("triggersview.Name")}</span>
             <input
               type="text"
               value={name}

@@ -200,7 +200,7 @@ describe("wallet routes", () => {
     });
   });
 
-  test("uses cloud-managed fallback RPCs when Milady Cloud is connected", async () => {
+  test("uses cloud-managed fallback RPCs when Eliza Cloud is connected", async () => {
     const deps = createDeps();
     const result = await invoke({
       method: "GET",
@@ -256,7 +256,7 @@ describe("wallet routes", () => {
     });
   });
 
-  test("reports managed BSC RPC as ready when Milady Cloud is connected", async () => {
+  test("reports managed BSC RPC as ready when Eliza Cloud is connected", async () => {
     const result = await invoke({
       method: "GET",
       pathname: "/api/wallet/config",

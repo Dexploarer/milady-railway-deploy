@@ -34,7 +34,7 @@ import { useApp } from "../state";
 import { CodingAgentSettingsSection } from "./CodingAgentSettingsSection";
 import { ConfigPageView } from "./ConfigPageView";
 import { MediaSettingsSection } from "./MediaSettingsSection";
-import { CloudDashboard } from "./MiladyCloudDashboard";
+import { CloudDashboard } from "./ElizaCloudDashboard";
 import { PermissionsSection } from "./PermissionsSection";
 import { ProviderSwitcher } from "./ProviderSwitcher";
 import { VoiceConfigView } from "./VoiceConfigView";
@@ -55,7 +55,7 @@ const SETTINGS_SECTIONS: SettingsSectionDef[] = [
   },
   {
     id: "cloud",
-    label: "miladyclouddashboard.MiladyCloud",
+    label: "elizaclouddashboard.ElizaCloud",
     icon: Cloud,
     description: "settings.sections.cloud.desc",
   },
@@ -560,17 +560,17 @@ export function SettingsView({
   const scrollContainerRef = useRef<HTMLElement | null>(null);
 
   const {
-    // Milady Cloud
-    miladyCloudEnabled,
-    miladyCloudConnected,
-    miladyCloudCredits,
-    miladyCloudCreditsLow,
-    miladyCloudCreditsCritical,
-    miladyCloudTopUpUrl,
-    miladyCloudUserId,
-    miladyCloudLoginBusy,
-    miladyCloudLoginError,
-    miladyCloudDisconnecting,
+    // Eliza Cloud
+    elizaCloudEnabled,
+    elizaCloudConnected,
+    elizaCloudCredits,
+    elizaCloudCreditsLow,
+    elizaCloudCreditsCritical,
+    elizaCloudTopUpUrl,
+    elizaCloudUserId,
+    elizaCloudLoginBusy,
+    elizaCloudLoginError,
+    elizaCloudDisconnecting,
     // Plugins
     plugins,
     pluginSaving,
@@ -697,16 +697,16 @@ export function SettingsView({
           className="p-4 sm:p-5 lg:p-6"
         >
           <ProviderSwitcher
-            miladyCloudEnabled={miladyCloudEnabled}
-            miladyCloudConnected={miladyCloudConnected}
-            miladyCloudCredits={miladyCloudCredits}
-            miladyCloudCreditsLow={miladyCloudCreditsLow}
-            miladyCloudCreditsCritical={miladyCloudCreditsCritical}
-            miladyCloudTopUpUrl={miladyCloudTopUpUrl}
-            miladyCloudUserId={miladyCloudUserId}
-            miladyCloudLoginBusy={miladyCloudLoginBusy}
-            miladyCloudLoginError={miladyCloudLoginError}
-            miladyCloudDisconnecting={miladyCloudDisconnecting}
+            elizaCloudEnabled={elizaCloudEnabled}
+            elizaCloudConnected={elizaCloudConnected}
+            elizaCloudCredits={elizaCloudCredits}
+            elizaCloudCreditsLow={elizaCloudCreditsLow}
+            elizaCloudCreditsCritical={elizaCloudCreditsCritical}
+            elizaCloudTopUpUrl={elizaCloudTopUpUrl}
+            elizaCloudUserId={elizaCloudUserId}
+            elizaCloudLoginBusy={elizaCloudLoginBusy}
+            elizaCloudLoginError={elizaCloudLoginError}
+            elizaCloudDisconnecting={elizaCloudDisconnecting}
             plugins={plugins}
             pluginSaving={pluginSaving}
             pluginSaveSuccess={pluginSaveSuccess}

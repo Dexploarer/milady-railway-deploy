@@ -6,7 +6,7 @@ import {
   isBlockedPrivateOrLinkLocalIp,
   normalizeHostLike,
 } from "../security/network-policy.js";
-import type { RegistryPluginInfo } from "./registry-client.js";
+import type { RegistryPluginInfo } from "./registry-client-types.js";
 
 const BLOCKED_REGISTRY_HOST_LITERALS = new Set([
   "localhost",

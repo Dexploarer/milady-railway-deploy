@@ -17,7 +17,7 @@ vi.mock("@milady/app-core/hooks", () => ({
   BugReportProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
-import { CommandPalette } from "../../../../packages/app-core/src/components/CommandPalette";
+import { CommandPalette } from "@milady/app-core/components/CommandPalette";
 
 type PaletteContext = {
   commandPaletteOpen: boolean;

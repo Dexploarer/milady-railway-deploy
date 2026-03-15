@@ -5,7 +5,7 @@
  * the TTS bridge singleton (isSpeaking, isAttached).
  */
 
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   createMockHttpResponse,
   createMockIncomingMessage,
@@ -83,6 +83,17 @@ function mockState(
 }
 
 describe("handleStreamVoiceRoute — speak guards", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    (ttsStreamBridge.isSpeaking as ReturnType<typeof vi.fn>).mockReturnValue(
+      false,
+    );
+    (ttsStreamBridge.isAttached as ReturnType<typeof vi.fn>).mockReturnValue(
+      false,
+    );
+    (ttsStreamBridge.speak as ReturnType<typeof vi.fn>).mockResolvedValue(true);
+  });
+
   it("returns 429 when bridge is already speaking", async () => {
     // Mock bridge as attached AND speaking
     (ttsStreamBridge.isAttached as ReturnType<typeof vi.fn>).mockReturnValue(
@@ -165,6 +176,73 @@ describe("handleStreamVoiceRoute — speak guards", () => {
     (ttsStreamBridge.isAttached as ReturnType<typeof vi.fn>).mockReturnValue(
       false,
     );
+  });
+
+  it("sanitizes non-speech directions before calling speak", async () => {
+    (ttsStreamBridge.isAttached as ReturnType<typeof vi.fn>).mockReturnValue(
+      true,
+    );
+    (ttsStreamBridge.isSpeaking as ReturnType<typeof vi.fn>).mockReturnValue(
+      false,
+    );
+
+    const { res, getStatus, getJson } = createMockHttpResponse();
+    const req = createMockIncomingMessage({
+      method: "POST",
+      url: "/api/stream/voice/speak",
+      body: { text: "Hello there (quietly). *waves* Visit now." },
+      json: true,
+    });
+    const state = mockState();
+
+    const handled = await handleStreamVoiceRoute(
+      req,
+      res,
+      "/api/stream/voice/speak",
+      "POST",
+      state,
+    );
+
+    expect(handled).toBe(true);
+    expect(getStatus()).toBe(200);
+    expect(getJson()).toEqual(
+      expect.objectContaining({ ok: true, speaking: true }),
+    );
+    expect(ttsStreamBridge.speak).toHaveBeenCalledWith(
+      "Hello there. Visit now.",
+      expect.any(Object),
+    );
+
+    (ttsStreamBridge.isAttached as ReturnType<typeof vi.fn>).mockReturnValue(
+      false,
+    );
+  });
+
+  it("returns 400 when text becomes empty after filtering", async () => {
+    const { res, getStatus, getJson } = createMockHttpResponse();
+    const req = createMockIncomingMessage({
+      method: "POST",
+      url: "/api/stream/voice/speak",
+      body: { text: "*waves* (quietly)" },
+      json: true,
+    });
+    const state = mockState();
+
+    await handleStreamVoiceRoute(
+      req,
+      res,
+      "/api/stream/voice/speak",
+      "POST",
+      state,
+    );
+
+    expect(getStatus()).toBe(400);
+    expect(getJson()).toEqual(
+      expect.objectContaining({
+        error: expect.stringContaining("speakable content"),
+      }),
+    );
+    expect(ttsStreamBridge.speak).not.toHaveBeenCalled();
   });
 
   it("returns 400 for text exceeding 2000 characters", async () => {

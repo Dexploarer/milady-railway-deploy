@@ -3,28 +3,31 @@ import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const mockUseApp = vi.fn();
-const mockClient = {
-  getTrajectories: vi.fn(),
-  getTrajectoryStats: vi.fn(),
-  getTrajectoryConfig: vi.fn(),
-  updateTrajectoryConfig: vi.fn(),
-  exportTrajectories: vi.fn(),
-  clearAllTrajectories: vi.fn(),
-};
-const mockConfirmDesktopAction = vi.fn();
+const hoisted = vi.hoisted(() => ({
+  mockUseApp: vi.fn(),
+  mockClient: {
+    getTrajectories: vi.fn(),
+    getTrajectoryStats: vi.fn(),
+    getTrajectoryConfig: vi.fn(),
+    updateTrajectoryConfig: vi.fn(),
+    exportTrajectories: vi.fn(),
+    clearAllTrajectories: vi.fn(),
+  },
+  mockConfirmDesktopAction: vi.fn(),
+}));
 
 vi.mock("@milady/app-core/state", () => ({
-  useApp: () => mockUseApp(),
+  useApp: () => hoisted.mockUseApp(),
 }));
 
 vi.mock("@milady/app-core/api", () => ({
-  client: mockClient,
+  client: hoisted.mockClient,
 }));
 
 vi.mock("@milady/app-core/utils", () => ({
-  confirmDesktopAction: (...args: Parameters<typeof mockConfirmDesktopAction>) =>
-    mockConfirmDesktopAction(...args),
+  confirmDesktopAction: (
+    ...args: Parameters<typeof hoisted.mockConfirmDesktopAction>
+  ) => hoisted.mockConfirmDesktopAction(...args),
 }));
 
 vi.mock("@milady/ui", () => ({
@@ -89,6 +92,8 @@ import type {
   TrajectoryStats,
 } from "@milady/app-core/api";
 import { TrajectoriesView } from "../../src/components/TrajectoriesView";
+
+const { mockClient, mockConfirmDesktopAction, mockUseApp } = hoisted;
 
 const trajectoryList: TrajectoryListResult = {
   trajectories: [],
@@ -174,7 +179,9 @@ describe("TrajectoriesView logging toggle", () => {
     await flush();
 
     const buttons = tree?.root.findAllByType("button") ?? [];
-    const loggingButton = buttons.find((node) => collectText(node) === "OFF_TEXT");
+    const loggingButton = buttons.find(
+      (node) => collectText(node) === "OFF_TEXT",
+    );
     expect(loggingButton).toBeDefined();
 
     await act(async () => {
@@ -197,7 +204,9 @@ describe("TrajectoriesView logging toggle", () => {
     await flush();
 
     const buttons = tree?.root.findAllByType("button") ?? [];
-    const loggingButton = buttons.find((node) => collectText(node) === "ON_TEXT");
+    const loggingButton = buttons.find(
+      (node) => collectText(node) === "ON_TEXT",
+    );
     expect(loggingButton).toBeDefined();
 
     await act(async () => {

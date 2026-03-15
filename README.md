@@ -2,7 +2,7 @@
 
 > *your schizo AI waifu that actually respects your privacy*
 
-**Milady** is a personal AI assistant that is **local-first by default** and can also connect to **Milady Cloud** or a **remote self-hosted backend** when you want hosted runtime access. Built on [elizaOS](https://github.com/elizaOS)
+**Milady** is a personal AI assistant that is **local-first by default** and can also connect to **Eliza Cloud** or a **remote self-hosted backend** when you want hosted runtime access. Built on [elizaOS](https://github.com/elizaOS)
 
 manages your sessions, tools, and vibes through a Gateway control plane. Connects to Telegram, Discord, whatever normie platform you use. Has a cute WebChat UI too.
 
@@ -101,9 +101,9 @@ milady setup
 ### Homebrew (macOS / Linux)
 
 ```bash
-brew tap milady-ai/milaidy
-brew install milaidy          # CLI
-brew install --cask milaidy   # Desktop app (macOS only)
+brew tap milady-ai/milady
+brew install milady          # CLI
+brew install --cask milady   # Desktop app (macOS only)
 ```
 
 ### Snap
@@ -136,8 +136,8 @@ flatpak --user install milady.flatpak
 
 ```bash
 # Add the repository
-curl -fsSL https://apt.milaidy.com/gpg.key | sudo gpg --dearmor -o /usr/share/keyrings/milady.gpg
-echo "deb [signed-by=/usr/share/keyrings/milady.gpg] https://apt.milaidy.com stable main" | \
+curl -fsSL https://apt.milady.ai/gpg.key | sudo gpg --dearmor -o /usr/share/keyrings/milady.gpg
+echo "deb [signed-by=/usr/share/keyrings/milady.gpg] https://apt.milady.ai stable main" | \
   sudo tee /etc/apt/sources.list.d/milady.list
 
 # Install
@@ -161,9 +161,9 @@ Without a token on a public bind, anyone who can reach the server gets full acce
 On first run, onboarding now asks where the backend should live:
 
 - `Local` — run the backend on the current machine, exactly like the existing local flow.
-- `Cloud` — either use `Milady Cloud` or attach to a `Remote Milady` backend with its address and access key.
+- `Cloud` — either use `Eliza Cloud` or attach to a `Remote Milady` backend with its address and access key.
 
-If you choose `Milady Cloud`, the app provisions and connects to a managed backend. If you choose `Remote Milady`, the frontend rebinds to the backend you specify and continues against that API.
+If you choose `Eliza Cloud`, the app provisions and connects to a managed backend. If you choose `Remote Milady`, the frontend rebinds to the backend you specify and continues against that API.
 
 ### Remote Backend Deployment
 
@@ -180,7 +180,7 @@ Recommended server environment:
 ```bash
 export MILADY_API_BIND=0.0.0.0
 export MILADY_API_TOKEN="$(openssl rand -hex 32)"
-export MILADY_ALLOWED_ORIGINS="https://cloud.milady.ai,https://milady.ai"
+export MILADY_ALLOWED_ORIGINS="https://elizacloud.ai,https://milady.ai"
 milady start --headless
 ```
 
@@ -210,18 +210,24 @@ tailscale funnel --https=443 http://127.0.0.1:2138
 
 Then use the Tailscale HTTPS URL as the backend address in onboarding and keep using the same `MILADY_API_TOKEN` as the access key.
 
-### Milady Cloud Wrapper
+### Eliza Cloud
 
-`Milady Cloud` is the Milady-branded wrapper around the Eliza Cloud control plane. The target deploy is `https://cloud.milady.ai`, backed by the `../eliza-cloud-v2` app with Milady branding on the login and CLI confirmation surfaces.
+`Milady` uses `Eliza Cloud` directly at `https://elizacloud.ai`. The managed control plane, auth surface, billing, and instance dashboard are all backed by the `../eliza-cloud-v2` app.
+
+There is no separate Milady cloud backend to deploy beyond Eliza Cloud itself. `elizacloud.ai` launches `app.milady.ai` with a one-time launch session so the frontend attaches directly to the selected managed backend.
 
 Railway deployment shape:
 
 1. Deploy `../eliza-cloud-v2` from repo root.
-2. Keep `NEXT_PUBLIC_APP_URL=https://cloud.milady.ai`.
-3. Attach the custom domain `cloud.milady.ai`.
-4. Verify `/login` and `/auth/cli-login` on the Railway deploy before rollout.
+2. Keep `NEXT_PUBLIC_APP_URL=https://elizacloud.ai`.
+3. Set `NEXT_PUBLIC_MILADY_APP_URL=https://app.milady.ai`.
+4. Set `ELIZA_CLOUD_AGENT_BASE_DOMAIN=containers.elizacloud.ai` for managed agent hostnames.
+5. Attach the custom domain `elizacloud.ai`.
+6. Verify `/login`, `/dashboard/milady`, and `/auth/cli-login` on the Railway deploy before rollout.
 
-The detailed rollout plan and execution checklist live in [docs/milady-cloud-rollout.md](docs/milady-cloud-rollout.md).
+The detailed rollout plan and execution checklist live in [docs/eliza-cloud-rollout.md](docs/eliza-cloud-rollout.md).
+
+The production deployment runbook lives in [docs/eliza-cloud-deployment.md](docs/eliza-cloud-deployment.md).
 
 ---
 

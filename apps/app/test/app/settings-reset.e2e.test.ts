@@ -318,55 +318,38 @@ vi.mock("@milady/app-core/components", async () => {
   };
 });
 
-vi.mock("../../../../packages/app-core/src/components/ConfigPageView", () => ({
+vi.mock("@milady/app-core/components/ConfigPageView", () => ({
   ConfigPageView: () => React.createElement("div", null, "ConfigPageView"),
 }));
 
-vi.mock(
-  "../../../../packages/app-core/src/components/CodingAgentSettingsSection",
-  () => ({
-    CodingAgentSettingsSection: () =>
-      React.createElement("div", null, "CodingAgentSettingsSection"),
-  }),
-);
+vi.mock("@milady/app-core/components/CodingAgentSettingsSection", () => ({
+  CodingAgentSettingsSection: () =>
+    React.createElement("div", null, "CodingAgentSettingsSection"),
+}));
 
-vi.mock(
-  "../../../../packages/app-core/src/components/MediaSettingsSection",
-  () => ({
-    MediaSettingsSection: () =>
-      React.createElement("div", null, "MediaSettingsSection"),
-  }),
-);
+vi.mock("@milady/app-core/components/MediaSettingsSection", () => ({
+  MediaSettingsSection: () =>
+    React.createElement("div", null, "MediaSettingsSection"),
+}));
 
-vi.mock(
-  "../../../../packages/app-core/src/components/MiladyCloudDashboard",
-  () => ({
-    CloudDashboard: () =>
-      React.createElement("div", null, "MiladyCloudDashboard"),
-  }),
-);
+vi.mock("@milady/app-core/components/ElizaCloudDashboard", () => ({
+  CloudDashboard: () => React.createElement("div", null, "ElizaCloudDashboard"),
+}));
 
-vi.mock(
-  "../../../../packages/app-core/src/components/PermissionsSection",
-  () => ({
-    PermissionsSection: () =>
-      React.createElement("div", null, "PermissionsSection"),
-  }),
-);
+vi.mock("@milady/app-core/components/PermissionsSection", () => ({
+  PermissionsSection: () =>
+    React.createElement("div", null, "PermissionsSection"),
+}));
 
-vi.mock(
-  "../../../../packages/app-core/src/components/ProviderSwitcher",
-  () => ({
-    ProviderSwitcher: () =>
-      React.createElement("div", null, "ProviderSwitcher"),
-  }),
-);
+vi.mock("@milady/app-core/components/ProviderSwitcher", () => ({
+  ProviderSwitcher: () => React.createElement("div", null, "ProviderSwitcher"),
+}));
 
-vi.mock("../../../../packages/app-core/src/components/VoiceConfigView", () => ({
+vi.mock("@milady/app-core/components/VoiceConfigView", () => ({
   VoiceConfigView: () => React.createElement("div", null, "VoiceConfigView"),
 }));
 
-import { SettingsView } from "../../../../packages/app-core/src/components/SettingsView";
+import { SettingsView } from "@milady/app-core/components/SettingsView";
 
 function createUIHarnessState(): AppHarnessState {
   return {
@@ -392,15 +375,15 @@ function createUIHarnessState(): AppHarnessState {
     skills: [],
     logs: [],
     currentTheme: "milady",
-    miladyCloudEnabled: false,
-    miladyCloudConnected: false,
-    miladyCloudCredits: 0,
-    miladyCloudCreditsLow: false,
-    miladyCloudCreditsCritical: false,
-    miladyCloudTopUpUrl: "",
-    miladyCloudUserId: "",
-    miladyCloudLoginBusy: false,
-    miladyCloudLoginError: "",
+    elizaCloudEnabled: false,
+    elizaCloudConnected: false,
+    elizaCloudCredits: 0,
+    elizaCloudCreditsLow: false,
+    elizaCloudCreditsCritical: false,
+    elizaCloudTopUpUrl: "",
+    elizaCloudUserId: "",
+    elizaCloudLoginBusy: false,
+    elizaCloudLoginError: "",
     cloudDisconnecting: false,
     pluginSaving: false,
     pluginSaveSuccess: false,

@@ -38,7 +38,7 @@ interface ProviderOption {
 const IMAGE_PROVIDERS: ProviderOption[] = [
   {
     id: "cloud",
-    label: "Milady Cloud",
+    label: "Eliza Cloud",
     hint: "mediasettingssection.ProviderHintNoSetup",
   },
   {
@@ -66,7 +66,7 @@ const IMAGE_PROVIDERS: ProviderOption[] = [
 const VIDEO_PROVIDERS: ProviderOption[] = [
   {
     id: "cloud",
-    label: "Milady Cloud",
+    label: "Eliza Cloud",
     hint: "mediasettingssection.ProviderHintNoSetup",
   },
   {
@@ -89,7 +89,7 @@ const VIDEO_PROVIDERS: ProviderOption[] = [
 const AUDIO_PROVIDERS: ProviderOption[] = [
   {
     id: "cloud",
-    label: "Milady Cloud",
+    label: "Eliza Cloud",
     hint: "mediasettingssection.ProviderHintNoSetup",
   },
   { id: "suno", label: "Suno", hint: "mediasettingssection.ProviderHintSuno" },
@@ -103,7 +103,7 @@ const AUDIO_PROVIDERS: ProviderOption[] = [
 const VISION_PROVIDERS: ProviderOption[] = [
   {
     id: "cloud",
-    label: "Milady Cloud",
+    label: "Eliza Cloud",
     hint: "mediasettingssection.ProviderHintNoSetup",
   },
   {
@@ -249,7 +249,7 @@ export function MediaSettingsSection() {
   const { setTimeout } = useTimeout();
 
   const { t } = useApp();
-  const { miladyCloudConnected } = useApp();
+  const { elizaCloudConnected } = useApp();
   const [mediaConfig, setMediaConfig] = useState<MediaConfig>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -338,7 +338,7 @@ export function MediaSettingsSection() {
   const isProviderConfigured = useCallback(
     (category: MediaCategory): boolean => {
       const mode = getMode(category);
-      if (mode === "cloud") return miladyCloudConnected;
+      if (mode === "cloud") return elizaCloudConnected;
 
       const provider = getProvider(category);
       const apiKeyField = getApiKeyField(category, provider);
@@ -350,7 +350,7 @@ export function MediaSettingsSection() {
       );
       return typeof value === "string" && value.length > 0;
     },
-    [getMode, getProvider, mediaConfig, miladyCloudConnected],
+    [getMode, getProvider, mediaConfig, elizaCloudConnected],
   );
 
   if (loading) {
@@ -435,9 +435,9 @@ export function MediaSettingsSection() {
       {/* Cloud mode status */}
       {currentMode === "cloud" && (
         <CloudConnectionStatus
-          connected={miladyCloudConnected}
+          connected={elizaCloudConnected}
           disconnectedText={t(
-            "miladyclouddashboard.MiladyCloudNotConnectedSettings",
+            "elizaclouddashboard.ElizaCloudNotConnectedSettings",
           )}
         />
       )}
@@ -478,12 +478,12 @@ export function MediaSettingsSection() {
                   >
                     <div className="font-semibold">
                       {p.id === "cloud"
-                        ? t("miladyclouddashboard.MiladyCloud")
+                        ? t("elizaclouddashboard.ElizaCloud")
                         : p.label}
                     </div>
                     <div className="text-[10px] text-muted mt-0.5">
                       {p.id === "cloud"
-                        ? t("miladyclouddashboard.NoSetupNeeded")
+                        ? t("elizaclouddashboard.NoSetupNeeded")
                         : t(p.hint)}
                     </div>
                   </Button>

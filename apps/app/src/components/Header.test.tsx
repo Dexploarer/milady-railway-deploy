@@ -50,6 +50,7 @@ vi.mock("lucide-react", () => ({
   Monitor: () => React.createElement("span", null, "🖥"),
   Smartphone: () => React.createElement("span", null, "📱"),
   UserRound: () => React.createElement("span", null, "👤"),
+  Users: () => React.createElement("span", null, "👥"),
   X: () => React.createElement("span", null, "✕"),
 }));
 
@@ -59,12 +60,12 @@ describe("Header", () => {
     const mockUseApp = {
       t: (k: string) => k,
       agentStatus: { state: "running", agentName: "Milady" },
-      miladyCloudEnabled: false,
-      miladyCloudConnected: false,
-      miladyCloudCredits: null,
-      miladyCloudCreditsCritical: false,
-      miladyCloudCreditsLow: false,
-      miladyCloudTopUpUrl: "",
+      elizaCloudEnabled: false,
+      elizaCloudConnected: false,
+      elizaCloudCredits: null,
+      elizaCloudCreditsCritical: false,
+      elizaCloudCreditsLow: false,
+      elizaCloudTopUpUrl: "",
       lifecycleBusy: false,
       lifecycleAction: null,
       handleRestart: vi.fn(),
@@ -79,7 +80,7 @@ describe("Header", () => {
       uiTheme: "dark",
       setUiTheme: vi.fn(),
       uiShellMode: "native",
-      setUiShellMode: vi.fn(),
+      switchShellView: vi.fn(),
     };
 
     // @ts-expect-error - test uses a narrowed subset of the full app context type.
@@ -96,8 +97,11 @@ describe("Header", () => {
 
     // Check shell toggle button
     const shellToggle = root.findByProps({ "data-testid": "ui-shell-toggle" });
-    const activeNativeToggle = root.findByProps({
-      "data-testid": "ui-shell-toggle-native",
+    const activeDesktopToggle = root.findByProps({
+      "data-testid": "ui-shell-toggle-desktop",
+    });
+    const inactiveCharacterToggle = root.findByProps({
+      "data-testid": "ui-shell-toggle-character",
     });
     const inactiveCompanionToggle = root.findByProps({
       "data-testid": "ui-shell-toggle-companion",
@@ -105,18 +109,190 @@ describe("Header", () => {
     expect(shellToggle).toBeDefined();
     expect(String(shellToggle.props.className)).toContain("border-border/60");
     expect(String(shellToggle.props.className)).toContain("bg-transparent");
-    expect(String(activeNativeToggle.props.className)).toContain(
+    expect(String(activeDesktopToggle.props.className)).toContain(
       "text-[#8a6500]",
     );
-    expect(String(activeNativeToggle.props.className)).toContain(
+    expect(String(activeDesktopToggle.props.className)).toContain(
       "bg-bg-muted/85",
     );
-    expect(String(activeNativeToggle.props.className)).toContain(
+    expect(String(activeDesktopToggle.props.className)).toContain(
       "dark:text-[#f0b232]",
+    );
+    expect(String(inactiveCharacterToggle.props.className)).toContain(
+      "text-muted-strong",
     );
     expect(String(inactiveCompanionToggle.props.className)).toContain(
       "text-muted-strong",
     );
     expect(mockUseApp.setState).toHaveBeenCalledWith("chatMode", "power");
+  });
+
+  it("uses minimal chrome for the character view and hides cloud pricing", async () => {
+    const mockUseApp = {
+      t: (k: string) => k,
+      agentStatus: { state: "running", agentName: "Milady" },
+      elizaCloudEnabled: true,
+      elizaCloudConnected: true,
+      elizaCloudCredits: 12.34,
+      elizaCloudCreditsCritical: false,
+      elizaCloudCreditsLow: false,
+      elizaCloudTopUpUrl: "https://example.com/topup",
+      lifecycleBusy: false,
+      lifecycleAction: null,
+      handleRestart: vi.fn(),
+      handleStart: vi.fn(),
+      loadDropStatus: vi.fn().mockResolvedValue(undefined),
+      tab: "character",
+      setTab: vi.fn(),
+      setState: vi.fn(),
+      plugins: [],
+      uiLanguage: "en",
+      setUiLanguage: vi.fn(),
+      uiTheme: "dark",
+      setUiTheme: vi.fn(),
+      uiShellMode: "native",
+      switchShellView: vi.fn(),
+    };
+
+    // @ts-expect-error - test uses a narrowed subset of the full app context type.
+    vi.spyOn(AppContext, "useApp").mockReturnValue(mockUseApp);
+
+    let testRenderer: ReactTestRenderer | null = null;
+    await act(async () => {
+      testRenderer = create(<Header transparent />);
+    });
+    if (!testRenderer) {
+      throw new Error("Failed to render Header");
+    }
+
+    const header = (testRenderer as ReactTestRenderer).root.findByType(
+      "header",
+    );
+    expect(String(header.props.className)).toContain("bg-transparent");
+    expect(String(header.props.className)).toContain("border-transparent");
+    expect(
+      (testRenderer as ReactTestRenderer).root.findAll(
+        (node) => node.props.title === "Chat",
+      ),
+    ).toHaveLength(0);
+    expect(
+      (testRenderer as ReactTestRenderer).root.findAll(
+        (node) => node.props["aria-label"] === "Open navigation menu",
+      ),
+    ).toHaveLength(0);
+    expect(
+      (testRenderer as ReactTestRenderer).root.findAll(
+        (node) => node.props.title === "header.CloudCreditsBalanc",
+      ),
+    ).toHaveLength(0);
+  });
+
+  it("uses minimal chrome in companion mode", async () => {
+    const mockUseApp = {
+      t: (k: string) => k,
+      agentStatus: { state: "running", agentName: "Milady" },
+      elizaCloudEnabled: false,
+      elizaCloudConnected: false,
+      elizaCloudCredits: null,
+      elizaCloudCreditsCritical: false,
+      elizaCloudCreditsLow: false,
+      elizaCloudTopUpUrl: "",
+      lifecycleBusy: false,
+      lifecycleAction: null,
+      handleRestart: vi.fn(),
+      handleStart: vi.fn(),
+      loadDropStatus: vi.fn().mockResolvedValue(undefined),
+      tab: "character",
+      setTab: vi.fn(),
+      setState: vi.fn(),
+      plugins: [],
+      uiLanguage: "en",
+      setUiLanguage: vi.fn(),
+      uiTheme: "dark",
+      setUiTheme: vi.fn(),
+      uiShellMode: "companion",
+      switchShellView: vi.fn(),
+    };
+
+    // @ts-expect-error - test uses a narrowed subset of the full app context type.
+    vi.spyOn(AppContext, "useApp").mockReturnValue(mockUseApp);
+
+    let testRenderer: ReactTestRenderer | null = null;
+    await act(async () => {
+      testRenderer = create(<Header transparent />);
+    });
+    if (!testRenderer) {
+      throw new Error("Failed to render Header");
+    }
+
+    const header = (testRenderer as ReactTestRenderer).root.findByType(
+      "header",
+    );
+    expect(String(header.props.className)).toContain("bg-transparent");
+    expect(String(header.props.className)).toContain("border-transparent");
+    expect(
+      (testRenderer as ReactTestRenderer).root.findAll(
+        (node) => node.props.title === "Chat",
+      ),
+    ).toHaveLength(0);
+    expect(
+      (testRenderer as ReactTestRenderer).root.findAll(
+        (node) => node.props["aria-label"] === "Open navigation menu",
+      ),
+    ).toHaveLength(0);
+  });
+
+  it("routes cloud credits to settings billing instead of an external link", async () => {
+    const setTab = vi.fn();
+    const setState = vi.fn();
+    const mockUseApp = {
+      t: (k: string) => k,
+      agentStatus: { state: "running", agentName: "Milady" },
+      elizaCloudEnabled: true,
+      elizaCloudConnected: true,
+      elizaCloudCredits: 12.34,
+      elizaCloudCreditsCritical: false,
+      elizaCloudCreditsLow: false,
+      elizaCloudTopUpUrl: "https://example.com/topup",
+      lifecycleBusy: false,
+      lifecycleAction: null,
+      handleRestart: vi.fn(),
+      handleStart: vi.fn(),
+      loadDropStatus: vi.fn().mockResolvedValue(undefined),
+      tab: "chat",
+      setTab,
+      setState,
+      plugins: [],
+      uiLanguage: "en",
+      setUiLanguage: vi.fn(),
+      uiTheme: "dark",
+      setUiTheme: vi.fn(),
+      uiShellMode: "native",
+      switchShellView: vi.fn(),
+    };
+
+    // @ts-expect-error - test uses a narrowed subset of the full app context type.
+    vi.spyOn(AppContext, "useApp").mockReturnValue(mockUseApp);
+
+    let testRenderer: ReactTestRenderer | null = null;
+    await act(async () => {
+      testRenderer = create(<Header />);
+    });
+    if (!testRenderer) {
+      throw new Error("Failed to render Header");
+    }
+
+    const creditButton = (testRenderer as ReactTestRenderer).root.find(
+      (node) =>
+        node.type === "button" &&
+        node.props.title === "header.CloudCreditsBalanc",
+    );
+
+    await act(async () => {
+      creditButton.props.onClick();
+    });
+
+    expect(setState).toHaveBeenCalledWith("cloudDashboardView", "billing");
+    expect(setTab).toHaveBeenCalledWith("settings");
   });
 });

@@ -12,18 +12,14 @@ import {
   type ImageAttachment,
   type VoiceConfig,
 } from "@milady/app-core/api";
+import { VOICE_CONFIG_UPDATED_EVENT } from "@milady/app-core/events";
 import {
-  CHAT_AVATAR_VOICE_EVENT,
-  dispatchWindowEvent,
-  VOICE_CONFIG_UPDATED_EVENT,
-} from "@milady/app-core/events";
-import {
+  useChatAvatarVoiceBridge,
   useTimeout,
   useVoiceChat,
   type VoiceCaptureMode,
   type VoicePlaybackStartEvent,
 } from "@milady/app-core/hooks";
-import { isElectronPlatform } from "@milady/app-core/platform";
 import { getVrmPreviewUrl, useApp } from "@milady/app-core/state";
 import {
   type ChangeEvent,
@@ -81,11 +77,11 @@ export function ChatView({ variant = "default" }: ChatViewProps) {
   const { setTimeout } = useTimeout();
 
   const isGameModal = variant === "game-modal";
-  const isDesktopShell = isElectronPlatform();
-  const autoAssistantSpeechEnabled = isGameModal || !isDesktopShell;
-  const showComposerVoiceToggle = isGameModal || !isDesktopShell;
+  const autoAssistantSpeechEnabled = isGameModal;
+  const showComposerVoiceToggle = false;
   const {
     agentStatus,
+    activeConversationId,
     chatInput,
     chatSending,
     chatFirstTokenReceived,
@@ -93,9 +89,8 @@ export function ChatView({ variant = "default" }: ChatViewProps) {
     conversationMessages,
     handleChatSend,
     handleChatStop,
-    handleChatRetry,
     handleChatEdit,
-    miladyCloudConnected,
+    elizaCloudConnected,
     setState,
     droppedFiles,
     shareIngestNotice,
@@ -113,6 +108,8 @@ export function ChatView({ variant = "default" }: ChatViewProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const previousCompanionCutoffTsRef = useRef(companionMessageCutoffTs);
   const previousGameModalVisibleMsgsRef = useRef<ConversationMessage[]>([]);
+  const previousActiveConversationIdRef = useRef(activeConversationId);
+  const companionVoiceInitializedRef = useRef(false);
   const [imageDragOver, setImageDragOver] = useState(false);
   const [companionNowMs, setCompanionNowMs] = useState(() => Date.now());
   const [companionCarryover, setCompanionCarryover] = useState<{
@@ -249,7 +246,7 @@ export function ChatView({ variant = "default" }: ChatViewProps) {
     onTranscript: handleVoiceTranscript,
     onTranscriptPreview: handleVoiceTranscriptPreview,
     onPlaybackStart: handleVoicePlaybackStart,
-    cloudConnected: miladyCloudConnected,
+    cloudConnected: elizaCloudConnected,
     interruptOnSpeech: isGameModal,
     lang: uiLanguage === "zh-CN" ? "zh-CN" : "en-US",
     voiceConfig,
@@ -261,6 +258,12 @@ export function ChatView({ variant = "default" }: ChatViewProps) {
     stopListening,
     stopSpeaking,
   } = voice;
+  const handleChatAvatarSpeakingChange = useCallback(
+    (isSpeaking: boolean) => {
+      setState("chatAvatarSpeaking", isSpeaking);
+    },
+    [setState],
+  );
 
   const beginVoiceCapture = useCallback(
     (mode: Exclude<VoiceCaptureMode, "idle"> = "compose") => {
@@ -279,6 +282,7 @@ export function ChatView({ variant = "default" }: ChatViewProps) {
       isComposerLocked,
       startListening,
       stopSpeaking,
+      voice.isListening,
     ],
   );
 
@@ -352,6 +356,41 @@ export function ChatView({ variant = "default" }: ChatViewProps) {
   }, [companionCarryover, companionNowMs]);
   const agentAvatarSrc =
     selectedVrmIndex > 0 ? getVrmPreviewUrl(selectedVrmIndex) : null;
+
+  useEffect(() => {
+    if (!isGameModal) {
+      previousActiveConversationIdRef.current = activeConversationId;
+      companionVoiceInitializedRef.current = false;
+      return;
+    }
+    if (companionVoiceInitializedRef.current) return;
+    companionVoiceInitializedRef.current = true;
+    if (agentVoiceMuted) {
+      setState("chatAgentVoiceMuted", false);
+    }
+  }, [activeConversationId, agentVoiceMuted, isGameModal, setState]);
+
+  useEffect(() => {
+    if (!isGameModal) {
+      previousActiveConversationIdRef.current = activeConversationId;
+      return;
+    }
+
+    if (previousActiveConversationIdRef.current === activeConversationId) {
+      return;
+    }
+
+    previousActiveConversationIdRef.current = activeConversationId;
+    previousGameModalVisibleMsgsRef.current = [];
+    previousCompanionCutoffTsRef.current = companionMessageCutoffTs;
+    setCompanionCarryover(null);
+    stopSpeaking();
+  }, [
+    activeConversationId,
+    companionMessageCutoffTs,
+    isGameModal,
+    stopSpeaking,
+  ]);
 
   useEffect(() => {
     if (!isGameModal) {
@@ -430,21 +469,12 @@ export function ChatView({ variant = "default" }: ChatViewProps) {
     stopSpeaking();
   }, [agentVoiceMuted, stopSpeaking]);
 
-  useEffect(() => {
-    const avatarIsSpeaking = voice.isSpeaking && !voice.usingAudioAnalysis;
-    setState("chatAvatarSpeaking", avatarIsSpeaking);
-    dispatchWindowEvent(CHAT_AVATAR_VOICE_EVENT, {
-      mouthOpen: voice.mouthOpen,
-      isSpeaking: avatarIsSpeaking,
-    });
-    return () => {
-      setState("chatAvatarSpeaking", false);
-      dispatchWindowEvent(CHAT_AVATAR_VOICE_EVENT, {
-        mouthOpen: 0,
-        isSpeaking: false,
-      });
-    };
-  }, [setState, voice.isSpeaking, voice.mouthOpen, voice.usingAudioAnalysis]);
+  useChatAvatarVoiceBridge({
+    mouthOpen: voice.mouthOpen,
+    isSpeaking: voice.isSpeaking,
+    usingAudioAnalysis: voice.usingAudioAnalysis,
+    onSpeakingChange: handleChatAvatarSpeakingChange,
+  });
 
   useEffect(() => {
     const pending = pendingVoiceTurnRef.current;
@@ -727,7 +757,6 @@ export function ChatView({ variant = "default" }: ChatViewProps) {
                   agentAvatarSrc={agentAvatarSrc}
                   onSpeak={handleSpeakMessage}
                   onEdit={handleEditMessage}
-                  onRetry={handleChatRetry}
                 />
               );
             })}

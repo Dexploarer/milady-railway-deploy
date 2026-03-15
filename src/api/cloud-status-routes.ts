@@ -1,11 +1,12 @@
 import { type AgentRuntime, logger } from "@elizaos/core";
+import { resolveCloudApiBaseUrl as resolveCanonicalCloudApiBaseUrl } from "../cloud/base-url";
 import { validateCloudBaseUrl } from "../cloud/validate-url";
 import type { MiladyConfig } from "../config/config";
 import type { RouteHelpers, RouteRequestMeta } from "./route-helpers";
 
-const DEFAULT_CLOUD_API_BASE_URL = "https://cloud.milady.ai/api/v1";
+const DEFAULT_CLOUD_API_BASE_URL = "https://www.elizacloud.ai/api/v1";
 const CLOUD_BILLING_URL =
-  "https://cloud.milady.ai/dashboard/settings?tab=billing";
+  "https://www.elizacloud.ai/dashboard/settings?tab=billing";
 
 interface CloudAuthIdentityService {
   isAuthenticated: () => boolean;
@@ -26,11 +27,9 @@ export interface CloudStatusRouteContext
 }
 
 function resolveCloudApiBaseUrl(rawBaseUrl?: string): string {
-  const base = (rawBaseUrl ?? DEFAULT_CLOUD_API_BASE_URL)
-    .trim()
-    .replace(/\/+$/, "");
-  if (base.endsWith("/api/v1")) return base;
-  return `${base}/api/v1`;
+  return resolveCanonicalCloudApiBaseUrl(
+    rawBaseUrl ?? DEFAULT_CLOUD_API_BASE_URL,
+  );
 }
 
 async function fetchCloudCreditsByApiKey(

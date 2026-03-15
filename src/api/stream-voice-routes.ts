@@ -16,13 +16,14 @@ import {
   resolveTtsConfig,
   ttsStreamBridge,
 } from "../services/tts-stream-bridge";
+import { sanitizeSpeechText } from "../utils/spoken-text";
 import { readRequestBody, sendJson, sendJsonError } from "./http-helpers";
 import {
   readStreamSettings,
   type StreamVoiceSettings,
   writeStreamSettings,
 } from "./stream-persistence";
-import type { StreamRouteState } from "./stream-routes";
+import type { StreamRouteState } from "./stream-route-state";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -114,9 +115,10 @@ export async function handleStreamVoiceRoute(
     try {
       const body = await readRequestBody(req);
       const parsed = typeof body === "string" ? JSON.parse(body) : body;
-      const text = typeof parsed?.text === "string" ? parsed.text.trim() : "";
+      const text =
+        typeof parsed?.text === "string" ? sanitizeSpeechText(parsed.text) : "";
       if (!text) {
-        error(res, "text is required", 400);
+        error(res, "text must include speakable content", 400);
         return true;
       }
 
@@ -177,7 +179,8 @@ export async function onAgentMessage(
   text: string,
   state: StreamRouteState,
 ): Promise<void> {
-  if (!text.trim()) return;
+  const speakableText = sanitizeSpeechText(text);
+  if (!speakableText) return;
   if (!state.streamManager.isRunning()) return;
   if (!ttsStreamBridge.isAttached()) return;
 
@@ -190,7 +193,7 @@ export async function onAgentMessage(
   if (!resolved) return;
 
   try {
-    await ttsStreamBridge.speak(text.trim(), resolved);
+    await ttsStreamBridge.speak(speakableText, resolved);
   } catch (err) {
     logger.warn(
       `[stream-voice] Auto-TTS failed: ${err instanceof Error ? err.message : String(err)}`,

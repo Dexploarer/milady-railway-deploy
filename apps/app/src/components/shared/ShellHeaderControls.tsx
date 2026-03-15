@@ -1,7 +1,13 @@
 import { LanguageDropdown, ThemeToggle } from "@milady/app-core/components";
 import type { UiLanguage } from "@milady/app-core/i18n";
-import type { UiShellMode, UiTheme } from "@milady/app-core/state";
-import { type LucideIcon, Monitor, Smartphone, UserRound } from "lucide-react";
+import type { ShellView, UiTheme } from "@milady/app-core/state";
+import {
+  type LucideIcon,
+  Monitor,
+  Smartphone,
+  UserRound,
+  Users,
+} from "lucide-react";
 import { type ReactNode, useEffect, useState } from "react";
 
 export const HEADER_ICON_BUTTON_CLASSNAME =
@@ -47,8 +53,8 @@ function useIsMobileShellViewport(): boolean {
 }
 
 interface ShellHeaderControlsProps {
-  shellMode: UiShellMode | null | undefined;
-  onShellModeChange: (mode: UiShellMode) => void;
+  activeShellView: ShellView;
+  onShellViewChange: (view: ShellView) => void;
   uiLanguage: UiLanguage;
   setUiLanguage: (language: UiLanguage) => void;
   uiTheme: UiTheme;
@@ -61,8 +67,8 @@ interface ShellHeaderControlsProps {
 }
 
 export function ShellHeaderControls({
-  shellMode,
-  onShellModeChange,
+  activeShellView,
+  onShellViewChange,
   uiLanguage,
   setUiLanguage,
   uiTheme,
@@ -74,19 +80,23 @@ export function ShellHeaderControls({
   controlsVariant = "native",
 }: ShellHeaderControlsProps) {
   const isMobileViewport = useIsMobileShellViewport();
-  const activeShellMode = shellMode ?? "companion";
   const shellOptions: Array<{
-    mode: UiShellMode;
+    view: ShellView;
     label: string;
     Icon: LucideIcon;
   }> = [
     {
-      mode: "companion",
+      view: "companion",
       label: t("header.companionMode"),
       Icon: UserRound,
     },
     {
-      mode: "native",
+      view: "character",
+      label: t("nav.character"),
+      Icon: Users,
+    },
+    {
+      view: "desktop",
       label: t("header.nativeMode"),
       Icon: isMobileViewport ? Smartphone : Monitor,
     },
@@ -100,20 +110,22 @@ export function ShellHeaderControls({
         <fieldset
           className="inline-flex items-center gap-0.5 rounded-xl border border-border/60 bg-transparent p-0.5 shadow-sm dark:border-border/70 dark:bg-transparent"
           data-testid="ui-shell-toggle"
-          aria-label={t("header.switchToNative")}
+          aria-label="Switch shell view"
         >
-          <legend className="sr-only">{t("header.switchToNative")}</legend>
-          {shellOptions.map(({ mode, label, Icon }, index) => {
-            const selected = activeShellMode === mode;
+          <legend className="sr-only">Switch shell view</legend>
+          {shellOptions.map(({ view, label, Icon }, index) => {
+            const selected = activeShellView === view;
             const edgeClass =
               index === 0
                 ? "rounded-l-xl rounded-r-none"
-                : "rounded-l-none rounded-r-xl";
+                : index === shellOptions.length - 1
+                  ? "rounded-l-none rounded-r-xl"
+                  : "rounded-none";
             return (
               <button
-                key={mode}
+                key={view}
                 type="button"
-                onClick={() => onShellModeChange(mode)}
+                onClick={() => onShellViewChange(view)}
                 className={`inline-flex h-9 min-w-[44px] items-center justify-center px-3 transition-all duration-200 ${edgeClass} ${
                   selected
                     ? "border border-[#d8a108]/40 bg-bg-muted/85 text-[#8a6500] shadow-sm dark:border-accent/25 dark:bg-bg/85 dark:text-[#f0b232]"
@@ -122,7 +134,7 @@ export function ShellHeaderControls({
                 aria-label={label}
                 aria-pressed={selected}
                 title={label}
-                data-testid={`ui-shell-toggle-${mode}`}
+                data-testid={`ui-shell-toggle-${view}`}
               >
                 <Icon className="h-4 w-4" />
               </button>

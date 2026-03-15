@@ -7,22 +7,22 @@
 
 import { useApp } from "@milady/app-core/state";
 import { useCallback, useState } from "react";
-import { BscTradePanel, type TrackedToken } from "./BscTradePanel";
+import { TradePanel } from "./BscTradePanel";
 import { CHAIN_CONFIGS, resolveChainKey } from "./chainConfig";
 import {
+  BSC_GAS_READY_THRESHOLD,
   BSC_GAS_THRESHOLD,
   loadTrackedBscTokens,
   loadTrackedTokens,
   removeTrackedBscToken,
   saveTrackedTokens,
+  type TrackedToken,
 } from "./inventory";
 import { InventoryToolbar } from "./inventory/InventoryToolbar";
 import { NftGrid } from "./inventory/NftGrid";
 import { PortfolioHeader } from "./inventory/PortfolioHeader";
 import { TokensTable } from "./inventory/TokensTable";
 import { useInventoryData } from "./inventory/useInventoryData";
-
-const BSC_GAS_READY_THRESHOLD = 0.005;
 
 /* ── Component ─────────────────────────────────────────────────────── */
 
@@ -40,7 +40,7 @@ export function InventoryView({ inModal }: { inModal?: boolean } = {}) {
     walletError,
     loadBalances,
     loadNfts,
-    miladyCloudConnected,
+    elizaCloudConnected,
     setTab,
     setState,
     setActionNotice,
@@ -62,7 +62,7 @@ export function InventoryView({ inModal }: { inModal?: boolean } = {}) {
   const cfg = walletConfig;
   const hasManagedBscRpc = Boolean(cfg?.managedBscRpcReady);
   const cloudManagedAccess = Boolean(
-    cfg?.cloudManagedAccess || miladyCloudConnected,
+    cfg?.cloudManagedAccess || elizaCloudConnected,
   );
 
   const goToRpcSettings = useCallback(() => {
@@ -237,25 +237,25 @@ export function InventoryView({ inModal }: { inModal?: boolean } = {}) {
         chainStatus(
           CHAIN_CONFIGS.ethereum.name,
           ethereumReady,
-          "Connect Milady Cloud or configure Alchemy / ETHEREUM_RPC_URL in Settings.",
+          "Connect Eliza Cloud or configure Alchemy / ETHEREUM_RPC_URL in Settings.",
           evmChainErrors.get("ethereum"),
         ),
         chainStatus(
           CHAIN_CONFIGS.base.name,
           baseReady,
-          "Connect Milady Cloud or configure Alchemy / BASE_RPC_URL in Settings.",
+          "Connect Eliza Cloud or configure Alchemy / BASE_RPC_URL in Settings.",
           evmChainErrors.get("base"),
         ),
         chainStatus(
           CHAIN_CONFIGS.bsc.name,
           bscReady,
-          "Connect Milady Cloud or configure ANKR_API_KEY or BSC RPC access in Settings.",
+          "Connect Eliza Cloud or configure ANKR_API_KEY or BSC RPC access in Settings.",
           evmChainErrors.get("bsc"),
         ),
         chainStatus(
           CHAIN_CONFIGS.avax.name,
           avaxReady,
-          "Connect Milady Cloud or configure Alchemy / AVALANCHE_RPC_URL in Settings.",
+          "Connect Eliza Cloud or configure Alchemy / AVALANCHE_RPC_URL in Settings.",
           evmChainErrors.get("avax"),
         ),
       );
@@ -273,7 +273,7 @@ export function InventoryView({ inModal }: { inModal?: boolean } = {}) {
         ? chainStatus(
             CHAIN_CONFIGS.solana.name,
             solanaReady,
-            "Connect Milady Cloud or configure HELIUS_API_KEY / SOLANA_RPC_URL in Settings.",
+            "Connect Eliza Cloud or configure HELIUS_API_KEY / SOLANA_RPC_URL in Settings.",
           )
         : {
             ready: false,
@@ -287,7 +287,7 @@ export function InventoryView({ inModal }: { inModal?: boolean } = {}) {
         ? chainStatus(
             CHAIN_CONFIGS.solana.name,
             solanaReady,
-            "Connect Milady Cloud or configure HELIUS_API_KEY / SOLANA_RPC_URL in Settings.",
+            "Connect Eliza Cloud or configure HELIUS_API_KEY / SOLANA_RPC_URL in Settings.",
           )
         : {
             ready: false,
@@ -313,7 +313,7 @@ export function InventoryView({ inModal }: { inModal?: boolean } = {}) {
         ? chainStatus(
             focusedChainLabel ?? "EVM",
             focusedReady,
-            `Connect Milady Cloud or configure ${focusedChainLabel ?? "this chain"} access in Settings.`,
+            `Connect Eliza Cloud or configure ${focusedChainLabel ?? "this chain"} access in Settings.`,
             focusedError,
           )
         : {
@@ -350,7 +350,7 @@ export function InventoryView({ inModal }: { inModal?: boolean } = {}) {
       : chainFocus === "solana" && solAddr && !solanaReady
         ? {
             title: "Solana RPC is not configured.",
-            body: "Connect via Milady Cloud or configure HELIUS_API_KEY / SOLANA_RPC_URL in Settings to load Solana balances.",
+            body: "Connect via Eliza Cloud or configure HELIUS_API_KEY / SOLANA_RPC_URL in Settings to load Solana balances.",
             actionLabel: t("wallet.setup.configureRpc"),
           }
         : chainFocus !== "all" &&
@@ -366,7 +366,7 @@ export function InventoryView({ inModal }: { inModal?: boolean } = {}) {
                   : false)
           ? {
               title: `${focusedChainLabel ?? "Chain"} access is not configured.`,
-              body: `Connect via Milady Cloud or configure ${focusedChainLabel ?? "this chain"} RPC access in Settings to load balances.`,
+              body: `Connect via Eliza Cloud or configure ${focusedChainLabel ?? "this chain"} RPC access in Settings to load balances.`,
               actionLabel: t("wallet.setup.configureRpc"),
             }
           : null;
@@ -470,7 +470,7 @@ export function InventoryView({ inModal }: { inModal?: boolean } = {}) {
         />
 
         {chainFocus === "bsc" && evmAddr && !bscHasError && (
-          <BscTradePanel
+          <TradePanel
             tradeReady={tradeReady}
             bnbBalance={bnbBalance}
             onAddToken={handleAddToken}

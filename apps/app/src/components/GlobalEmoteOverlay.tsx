@@ -52,6 +52,7 @@ export function GlobalEmoteOverlay() {
     const handler = (event: Event) => {
       const detail = (event as CustomEvent<AppEmoteEventDetail>).detail;
       if (!detail?.emoteId) return;
+      if (detail.showOverlay === false) return;
       if (hideTimerRef.current != null) {
         window.clearTimeout(hideTimerRef.current);
       }
@@ -86,19 +87,19 @@ export function GlobalEmoteOverlay() {
         @keyframes milady-emote-burst {
           0% {
             opacity: 0;
-            transform: translateY(26px) scale(0.46) rotate(-10deg);
+            transform: translateY(32px) scale(0.42) rotate(-10deg);
           }
           16% {
             opacity: 1;
-            transform: translateY(-6px) scale(1.08) rotate(5deg);
+            transform: translateY(-10px) scale(1.12) rotate(5deg);
           }
           48% {
             opacity: 1;
-            transform: translateY(-16px) scale(1) rotate(-2deg);
+            transform: translateY(-24px) scale(1) rotate(-2deg);
           }
           100% {
             opacity: 0;
-            transform: translateY(-54px) scale(0.82) rotate(6deg);
+            transform: translateY(-72px) scale(0.84) rotate(6deg);
           }
         }
 
@@ -126,17 +127,17 @@ export function GlobalEmoteOverlay() {
         >
           <div className="relative mt-[18vh] flex items-center justify-center">
             <div
-              className="absolute h-28 w-28 rounded-full"
+              className="absolute h-36 w-36 rounded-full"
               style={{
                 background:
                   "radial-gradient(circle, rgba(255,255,255,0.35) 0%, rgba(255,214,102,0.18) 34%, rgba(255,214,102,0) 72%)",
-                filter: "blur(4px)",
+                filter: "blur(6px)",
                 animation: "milady-emote-aura 2400ms ease-out forwards",
               }}
             />
             <div
               key={activeEmote.key}
-              className="relative flex h-24 w-24 items-center justify-center rounded-full border border-white/18 bg-black/18 text-[64px] shadow-[0_14px_40px_rgba(0,0,0,0.22)] backdrop-blur-md"
+              className="relative flex h-32 w-32 items-center justify-center rounded-full border border-white/18 bg-black/18 text-[88px] shadow-[0_20px_54px_rgba(0,0,0,0.24)] backdrop-blur-md"
               style={{
                 animation:
                   "milady-emote-burst 2400ms cubic-bezier(.2,.8,.2,1) forwards",

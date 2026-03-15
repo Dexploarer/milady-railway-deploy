@@ -84,7 +84,7 @@ Response:
   "hasApiKey": true,
   "userId": "user-123",
   "organizationId": "org-456",
-  "topUpUrl": "https://www.elizacloud.ai/dashboard/settings?tab=billing"
+  "topUpUrl": "https://elizacloud.ai/dashboard/settings?tab=billing"
 }
 ```
 
@@ -266,7 +266,7 @@ When `maxFailures` consecutive heartbeat failures occur:
   "hasApiKey": true,
   "userId": "...",
   "organizationId": "...",
-  "topUpUrl": "https://www.elizacloud.ai/dashboard/settings?tab=billing"
+  "topUpUrl": "https://elizacloud.ai/dashboard/settings?tab=billing"
 }
 ```
 
@@ -282,7 +282,7 @@ When not connected, the response includes a `reason` field: `"not_authenticated"
   "balance": 15.50,
   "low": false,
   "critical": false,
-  "topUpUrl": "https://www.elizacloud.ai/dashboard/settings?tab=billing"
+  "topUpUrl": "https://elizacloud.ai/dashboard/settings?tab=billing"
 }
 ```
 
@@ -306,7 +306,7 @@ Response:
   "balance": 12.50,
   "low": false,
   "critical": false,
-  "topUpUrl": "https://www.elizacloud.ai/dashboard/settings?tab=billing"
+  "topUpUrl": "https://elizacloud.ai/dashboard/settings?tab=billing"
 }
 ```
 

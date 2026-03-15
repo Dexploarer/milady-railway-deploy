@@ -1,5 +1,6 @@
 import {
   ALL_TAB_GROUPS,
+  APPS_ENABLED,
   getTabGroups,
   pathForTab,
   type Tab,
@@ -39,7 +40,7 @@ describe("tabFromPath", () => {
   });
 
   it("maps legacy paths", () => {
-    expect(tabFromPath("/game")).toBe("apps");
+    expect(tabFromPath("/game")).toBe(APPS_ENABLED ? "apps" : "chat");
     expect(tabFromPath("/agent")).toBe("character");
     expect(tabFromPath("/inventory")).toBe("wallets");
     expect(tabFromPath("/features")).toBe("plugins");
@@ -63,7 +64,6 @@ describe("pathForTab", () => {
     "chat",
     "companion",
     "stream",
-    "apps",
     "character",
     "character-select",
     "wallets",
@@ -83,6 +83,9 @@ describe("pathForTab", () => {
     "logs",
     "security",
   ];
+  if (APPS_ENABLED) {
+    roundTripTabs.splice(3, 0, "apps");
+  }
 
   it("round-trips every routed tab through tabFromPath", () => {
     for (const tab of roundTripTabs) {
@@ -98,6 +101,15 @@ describe("pathForTab", () => {
 });
 
 describe("tab groups", () => {
+  it("removes Character from the top-level navigation groups", () => {
+    expect(ALL_TAB_GROUPS.map((group) => group.label)).not.toContain(
+      "Character",
+    );
+    expect(getTabGroups(false).map((group) => group.label)).not.toContain(
+      "Character",
+    );
+  });
+
   it("promotes heartbeats to a top-level group and keeps advanced tools grouped together", () => {
     const settings = ALL_TAB_GROUPS.find((group) => group.label === "Settings");
     expect(settings?.tabs).toEqual(["settings"]);
@@ -129,8 +141,6 @@ describe("tab groups", () => {
       "chat",
       "stream",
       "apps",
-      "character",
-      "character-select",
       "wallets",
       "knowledge",
       "connectors",

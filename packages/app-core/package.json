@@ -18,6 +18,7 @@
     "./bridge/electrobun-runtime": "./src/bridge/electrobun-runtime.ts",
     "./state": "./src/state/index.ts",
     "./components": "./src/components/index.ts",
+    "./components/*": "./src/components/*",
     "./utils": "./src/utils/index.ts",
     "./voice": "./src/voice/index.ts",
     "./autonomy": "./src/autonomy/index.ts",
@@ -40,6 +41,8 @@
     "@capacitor/core": "8.0.2",
     "@capacitor/haptics": "8.0.0",
     "@capacitor/preferences": "^8.0.1",
+    "@pixiv/three-vrm": "^3.4.5",
+    "@sparkjsdev/spark": "^0.1.10",
     "@milady/capacitor-camera": "workspace:*",
     "@milady/capacitor-canvas": "workspace:*",
     "@milady/capacitor-desktop": "workspace:*",
@@ -49,12 +52,14 @@
     "@milady/capacitor-swabble": "workspace:*",
     "@milady/capacitor-talkmode": "workspace:*",
     "@milady/ui": "workspace:*",
+    "three": "^0.182.0",
     "lucide-react": "^0.575.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "@types/three": "^0.182.0",
     "typescript": "^5.9.3"
   }
 }

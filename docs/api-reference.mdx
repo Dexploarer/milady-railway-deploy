@@ -446,6 +446,11 @@ Conversations are scoped to the web-chat interface. Each conversation maps to an
 | `GET` | `/api/cloud/login/status` | Poll login session status. Param: `sessionId` |
 | `GET` | `/api/cloud/status` | Get cloud connection status, auth state, and billing URL |
 | `GET` | `/api/cloud/credits` | Get cloud credit balance |
+| `GET` | `/api/cloud/billing/summary` | Get cloud billing summary for in-app billing |
+| `GET` | `/api/cloud/billing/payment-methods` | List saved cloud billing payment methods |
+| `GET` | `/api/cloud/billing/history` | List recent cloud billing activity |
+| `POST` | `/api/cloud/billing/checkout` | Create a cloud billing checkout session |
+| `POST` | `/api/cloud/billing/crypto/quote` | Create a cloud billing crypto quote |
 | `POST` | `/api/cloud/disconnect` | Disconnect from Eliza Cloud and clear credentials |
 | `GET` | `/api/cloud/agents` | List cloud agents |
 | `POST` | `/api/cloud/agents` | Create a new cloud agent |

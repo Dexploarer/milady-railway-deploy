@@ -2082,20 +2082,4 @@ kbd {
     grid-template-columns: 1fr;
   }
 
-  .companion-bubble-emote__icon {
-    width: 42px;
-    height: 42px;
-    border-radius: 11px;
-  }
-
-  .companion-bubble-emote__icon svg {
-    width: 22px;
-    height: 22px;
-  }
-
-  .companion-bubble-emote__tail {
-    width: 10px;
-    height: 10px;
-    margin-top: -6px;
-  }
 }

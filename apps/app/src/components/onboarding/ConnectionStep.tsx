@@ -31,11 +31,11 @@ export function ConnectionStep() {
     onboardingRemoteError,
     onboardingRemoteConnected,
     onboardingPrimaryModel,
-    onboardingMiladyCloudTab,
+    onboardingElizaCloudTab,
     onboardingOpenRouterModel,
-    miladyCloudConnected,
-    miladyCloudLoginBusy,
-    miladyCloudLoginError,
+    elizaCloudConnected,
+    elizaCloudLoginBusy,
+    elizaCloudLoginError,
     handleCloudLogin,
     handleOnboardingRemoteConnect,
     handleOnboardingUseLocalBackend,
@@ -148,12 +148,12 @@ export function ConnectionStep() {
   };
 
   const providers = (onboardingOptions?.providers ?? []).filter(
-    (provider: ProviderOption) => provider.id !== "miladycloud",
+    (provider: ProviderOption) => provider.id !== "elizacloud",
   );
-  const miladyCloudReady =
-    miladyCloudConnected ||
+  const elizaCloudReady =
+    elizaCloudConnected ||
     (onboardingRunMode === "cloud" &&
-      onboardingCloudProvider === "miladycloud" &&
+      onboardingCloudProvider === "elizacloud" &&
       onboardingApiKey.trim().length > 0);
   const showProviderSelection =
     onboardingRemoteConnected || onboardingRunMode === "local";
@@ -167,7 +167,7 @@ export function ConnectionStep() {
     string,
     { name: string; description?: string }
   > = {
-    miladycloud: { name: "Milady Cloud", description: "Managed hosting" },
+    elizacloud: { name: "Eliza Cloud", description: "Managed hosting" },
     "anthropic-subscription": {
       name: "Claude Sub",
       description: "Pro/Max subscription",
@@ -337,7 +337,7 @@ export function ConnectionStep() {
             <button
               type="button"
               className="onboarding-provider-card onboarding-provider-card--recommended"
-              onClick={() => setState("onboardingCloudProvider", "miladycloud")}
+              onClick={() => setState("onboardingCloudProvider", "elizacloud")}
             >
               <div>
                 <div className="onboarding-provider-name">
@@ -482,7 +482,7 @@ export function ConnectionStep() {
 
     return (
       <>
-        <div className="onboarding-section-title">Milady Cloud</div>
+        <div className="onboarding-section-title">Eliza Cloud</div>
         <div className="onboarding-divider">
           <div className="onboarding-divider-diamond" />
         </div>
@@ -502,18 +502,18 @@ export function ConnectionStep() {
                 fontSize: "0.875rem",
                 paddingBottom: "0.5rem",
                 color:
-                  onboardingMiladyCloudTab === "login"
+                  onboardingElizaCloudTab === "login"
                     ? "#f0b90b"
                     : "var(--muted)",
                 background: "none",
                 border: "none",
                 borderBottom:
-                  onboardingMiladyCloudTab === "login"
+                  onboardingElizaCloudTab === "login"
                     ? "2px solid #f0b90b"
                     : "2px solid transparent",
                 cursor: "pointer",
               }}
-              onClick={() => setState("onboardingMiladyCloudTab", "login")}
+              onClick={() => setState("onboardingElizaCloudTab", "login")}
             >
               {t("onboarding.login")}
             </button>
@@ -523,26 +523,26 @@ export function ConnectionStep() {
                 fontSize: "0.875rem",
                 paddingBottom: "0.5rem",
                 borderBottom:
-                  onboardingMiladyCloudTab === "apikey"
+                  onboardingElizaCloudTab === "apikey"
                     ? "2px solid #f0b90b"
                     : "2px solid transparent",
                 color:
-                  onboardingMiladyCloudTab === "apikey"
+                  onboardingElizaCloudTab === "apikey"
                     ? "#f0b90b"
                     : "var(--muted)",
                 background: "none",
                 border: "none",
                 cursor: "pointer",
               }}
-              onClick={() => setState("onboardingMiladyCloudTab", "apikey")}
+              onClick={() => setState("onboardingElizaCloudTab", "apikey")}
             >
               {t("onboarding.apiKey")}
             </button>
           </div>
 
-          {onboardingMiladyCloudTab === "login" ? (
+          {onboardingElizaCloudTab === "login" ? (
             <div style={{ textAlign: "center" }}>
-              {miladyCloudConnected ? (
+              {elizaCloudConnected ? (
                 <div
                   style={{
                     display: "flex",
@@ -577,16 +577,16 @@ export function ConnectionStep() {
                   type="button"
                   className="onboarding-confirm-btn"
                   onClick={handleCloudLogin}
-                  disabled={miladyCloudLoginBusy}
+                  disabled={elizaCloudLoginBusy}
                 >
-                  {miladyCloudLoginBusy
+                  {elizaCloudLoginBusy
                     ? t("onboarding.connecting")
                     : t("onboarding.connectAccount")}
                 </button>
               )}
-              {miladyCloudLoginError &&
+              {elizaCloudLoginError &&
                 (() => {
-                  const urlMatch = miladyCloudLoginError.match(
+                  const urlMatch = elizaCloudLoginError.match(
                     /^Open this link to log in: (.+)$/,
                   );
                   if (urlMatch) {
@@ -621,7 +621,7 @@ export function ConnectionStep() {
                         marginTop: "0.5rem",
                       }}
                     >
-                      {miladyCloudLoginError}
+                      {elizaCloudLoginError}
                     </p>
                   );
                 })()}
@@ -630,7 +630,7 @@ export function ConnectionStep() {
           ) : (
             <div>
               <label
-                htmlFor="miladycloud-apikey"
+                htmlFor="elizacloud-apikey"
                 style={{
                   display: "block",
                   fontSize: "0.875rem",
@@ -641,7 +641,7 @@ export function ConnectionStep() {
                 {t("onboarding.apiKey")}
               </label>
               <input
-                id="miladycloud-apikey"
+                id="elizacloud-apikey"
                 type="password"
                 className="onboarding-input"
                 placeholder="ck-..."
@@ -651,7 +651,7 @@ export function ConnectionStep() {
               <p className="onboarding-desc">
                 {t("onboarding.useExistingKey")}{" "}
                 <a
-                  href="https://cloud.milady.ai/dashboard/settings"
+                  href="https://elizacloud.ai/dashboard/settings"
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{ color: "var(--text)" }}
@@ -674,7 +674,7 @@ export function ConnectionStep() {
           <button
             className="onboarding-confirm-btn"
             onClick={() => void handleOnboardingNext()}
-            disabled={!miladyCloudReady}
+            disabled={!elizaCloudReady}
             type="button"
           >
             {t("onboarding.confirm")}
@@ -798,8 +798,8 @@ export function ConnectionStep() {
         <div className="onboarding-divider-diamond" />
       </div>
 
-      {/* miladycloud */}
-      {onboardingProvider === "miladycloud" && (
+      {/* elizacloud */}
+      {onboardingProvider === "elizacloud" && (
         <div style={{ width: "100%", textAlign: "left" }}>
           <div
             style={{
@@ -815,18 +815,18 @@ export function ConnectionStep() {
                 fontSize: "0.875rem",
                 paddingBottom: "0.5rem",
                 color:
-                  onboardingMiladyCloudTab === "login"
+                  onboardingElizaCloudTab === "login"
                     ? "#f0b90b"
                     : "var(--muted)",
                 background: "none",
                 border: "none",
                 borderBottom:
-                  onboardingMiladyCloudTab === "login"
+                  onboardingElizaCloudTab === "login"
                     ? "2px solid #f0b90b"
                     : "2px solid transparent",
                 cursor: "pointer",
               }}
-              onClick={() => setState("onboardingMiladyCloudTab", "login")}
+              onClick={() => setState("onboardingElizaCloudTab", "login")}
             >
               {t("onboarding.login")}
             </button>
@@ -836,26 +836,26 @@ export function ConnectionStep() {
                 fontSize: "0.875rem",
                 paddingBottom: "0.5rem",
                 borderBottom:
-                  onboardingMiladyCloudTab === "apikey"
+                  onboardingElizaCloudTab === "apikey"
                     ? "2px solid #f0b90b"
                     : "2px solid transparent",
                 color:
-                  onboardingMiladyCloudTab === "apikey"
+                  onboardingElizaCloudTab === "apikey"
                     ? "#f0b90b"
                     : "var(--muted)",
                 background: "none",
                 border: "none",
                 cursor: "pointer",
               }}
-              onClick={() => setState("onboardingMiladyCloudTab", "apikey")}
+              onClick={() => setState("onboardingElizaCloudTab", "apikey")}
             >
               {t("onboarding.apiKey")}
             </button>
           </div>
 
-          {onboardingMiladyCloudTab === "login" ? (
+          {onboardingElizaCloudTab === "login" ? (
             <div style={{ textAlign: "center" }}>
-              {miladyCloudConnected ? (
+              {elizaCloudConnected ? (
                 <div
                   style={{
                     display: "flex",
@@ -890,16 +890,16 @@ export function ConnectionStep() {
                   type="button"
                   className="onboarding-confirm-btn"
                   onClick={handleCloudLogin}
-                  disabled={miladyCloudLoginBusy}
+                  disabled={elizaCloudLoginBusy}
                 >
-                  {miladyCloudLoginBusy
+                  {elizaCloudLoginBusy
                     ? t("onboarding.connecting")
                     : t("onboarding.connectAccount")}
                 </button>
               )}
-              {miladyCloudLoginError &&
+              {elizaCloudLoginError &&
                 (() => {
-                  const urlMatch = miladyCloudLoginError.match(
+                  const urlMatch = elizaCloudLoginError.match(
                     /^Open this link to log in: (.+)$/,
                   );
                   if (urlMatch) {
@@ -934,7 +934,7 @@ export function ConnectionStep() {
                         marginTop: "0.5rem",
                       }}
                     >
-                      {miladyCloudLoginError}
+                      {elizaCloudLoginError}
                     </p>
                   );
                 })()}
@@ -943,7 +943,7 @@ export function ConnectionStep() {
           ) : (
             <div>
               <label
-                htmlFor="miladycloud-apikey"
+                htmlFor="elizacloud-apikey"
                 style={{
                   display: "block",
                   fontSize: "0.875rem",
@@ -954,7 +954,7 @@ export function ConnectionStep() {
                 {t("onboarding.apiKey")}
               </label>
               <input
-                id="miladycloud-apikey"
+                id="elizacloud-apikey"
                 type="password"
                 className="onboarding-input"
                 placeholder="ec-..."
@@ -964,7 +964,7 @@ export function ConnectionStep() {
               <p className="onboarding-desc">
                 {t("onboarding.useExistingKey")}{" "}
                 <a
-                  href="https://miladycloud.ai/dashboard/settings"
+                  href="https://elizacloud.ai/dashboard/settings"
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{ color: "var(--text)" }}
@@ -1339,7 +1339,7 @@ export function ConnectionStep() {
       {onboardingProvider &&
         onboardingProvider !== "anthropic-subscription" &&
         onboardingProvider !== "openai-subscription" &&
-        onboardingProvider !== "miladycloud" &&
+        onboardingProvider !== "elizacloud" &&
         onboardingProvider !== "ollama" &&
         onboardingProvider !== "pi-ai" && (
           <div style={{ textAlign: "left", width: "100%" }}>

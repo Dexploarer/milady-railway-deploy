@@ -16,6 +16,7 @@ interface ChatViewContextStub {
     agentName: string;
     state?: "starting" | "restarting" | "running" | "paused";
   } | null;
+  activeConversationId: string | null;
   chatInput: string;
   chatSending: boolean;
   chatFirstTokenReceived: boolean;
@@ -25,12 +26,13 @@ interface ChatViewContextStub {
   handleChatStop: () => void;
   handleChatRetry: (id: string) => void;
   handleChatEdit: (id: string, text: string) => Promise<boolean>;
+  handleNewConversation: () => Promise<void>;
   setState: (key: string, value: unknown) => void;
   droppedFiles: string[];
   shareIngestNotice: string;
   chatMode: "simple" | "power";
   chatAgentVoiceMuted: boolean;
-  miladyCloudConnected: boolean;
+  elizaCloudConnected: boolean;
   selectedVrmIndex: number;
   uiLanguage: "en" | "zh-CN";
   t: (k: string) => string;
@@ -79,6 +81,7 @@ function createContext(
 ): ChatViewContextStub {
   return {
     agentStatus: { agentName: "Milady", state: "running" },
+    activeConversationId: "conv-1",
     chatInput: "Hello",
     chatSending: false,
     chatFirstTokenReceived: false,
@@ -88,12 +91,13 @@ function createContext(
     handleChatStop: vi.fn(),
     handleChatRetry: vi.fn(),
     handleChatEdit: vi.fn(async () => true),
+    handleNewConversation: vi.fn(async () => {}),
     setState: vi.fn(),
     droppedFiles: [],
     shareIngestNotice: "",
     chatMode: "simple",
     chatAgentVoiceMuted: false,
-    miladyCloudConnected: false,
+    elizaCloudConnected: false,
     selectedVrmIndex: 0,
     uiLanguage: "en",
     chatPendingImages: [],
@@ -218,6 +222,45 @@ describe("ChatView game-modal variant", () => {
     expect(text).not.toContain("tell me a joke");
   });
 
+  it("queues assistant speech in companion mode while a response is streaming", async () => {
+    const queueAssistantSpeech = vi.fn();
+    mockUseVoiceChat.mockReturnValue({
+      supported: true,
+      isListening: false,
+      captureMode: "idle",
+      interimTranscript: "",
+      toggleListening: vi.fn(),
+      startListening: vi.fn(),
+      stopListening: vi.fn(),
+      mouthOpen: 0,
+      isSpeaking: false,
+      usingAudioAnalysis: false,
+      speak: vi.fn(),
+      queueAssistantSpeech,
+      stopSpeaking: vi.fn(),
+    });
+    mockUseApp.mockReturnValue(
+      createContext({
+        chatSending: true,
+        conversationMessages: [
+          { id: "assistant-1", role: "assistant", text: "hello", timestamp: 1 },
+        ],
+      }),
+    );
+
+    await act(async () => {
+      TestRenderer.create(
+        React.createElement(ChatView, { variant: "game-modal" }),
+      );
+    });
+
+    expect(queueAssistantSpeech).toHaveBeenCalledWith(
+      "assistant-1",
+      "hello",
+      false,
+    );
+  });
+
   it("hides companion messages older than the cutoff timestamp", async () => {
     mockUseApp.mockReturnValue(
       createContext({
@@ -319,7 +362,7 @@ describe("ChatView game-modal variant", () => {
   it("passes cloud auth into the voice hook for companion defaults", async () => {
     mockUseApp.mockReturnValue(
       createContext({
-        miladyCloudConnected: true,
+        elizaCloudConnected: true,
       }),
     );
 
@@ -335,6 +378,24 @@ describe("ChatView game-modal variant", () => {
         interruptOnSpeech: true,
       }),
     );
+  });
+
+  it("defaults companion voice back on when the shared chat state is muted", async () => {
+    const setState = vi.fn();
+    mockUseApp.mockReturnValue(
+      createContext({
+        chatAgentVoiceMuted: true,
+        setState,
+      }),
+    );
+
+    await act(async () => {
+      TestRenderer.create(
+        React.createElement(ChatView, { variant: "game-modal" }),
+      );
+    });
+
+    expect(setState).toHaveBeenCalledWith("chatAgentVoiceMuted", false);
   });
 
   it("disables composer controls while agent is starting", async () => {
@@ -497,6 +558,70 @@ describe("ChatView game-modal variant", () => {
     });
     expect(rows).toHaveLength(1);
     expect(textOf(rows[0]).toLowerCase()).toContain("new question");
+  });
+
+  it("clears companion carryover when a new conversation replaces the active thread", async () => {
+    vi.useFakeTimers();
+
+    let currentContext = createContext({
+      activeConversationId: "conv-1",
+      companionMessageCutoffTs: 10,
+      conversationMessages: [
+        { id: "user-1", role: "user", text: "hello", timestamp: 10 },
+        { id: "assistant-1", role: "assistant", text: "hi", timestamp: 11 },
+      ],
+    });
+    mockUseApp.mockImplementation(() => currentContext);
+
+    let tree: TestRenderer.ReactTestRenderer;
+    await act(async () => {
+      tree = TestRenderer.create(
+        React.createElement(ChatView, { variant: "game-modal" }),
+      );
+    });
+
+    currentContext = createContext({
+      activeConversationId: null,
+      companionMessageCutoffTs: 20,
+      conversationMessages: [],
+    });
+
+    await act(async () => {
+      tree.update(React.createElement(ChatView, { variant: "game-modal" }));
+    });
+
+    expect(
+      tree.root.findAllByProps({ "data-testid": "companion-message-row" }),
+    ).toHaveLength(0);
+    expect(
+      tree.root.findAllByProps({ "data-companion-carryover": "true" }),
+    ).toHaveLength(0);
+
+    currentContext = createContext({
+      activeConversationId: "conv-2",
+      companionMessageCutoffTs: 21,
+      conversationMessages: [
+        {
+          id: "greeting-1",
+          role: "assistant",
+          text: "Hey, I'm back.",
+          timestamp: 21,
+          source: "agent_greeting",
+        },
+      ],
+    });
+
+    await act(async () => {
+      tree.update(React.createElement(ChatView, { variant: "game-modal" }));
+    });
+
+    const rows = tree.root.findAllByProps({
+      "data-testid": "companion-message-row",
+    });
+    expect(rows).toHaveLength(1);
+    expect(textOf(rows[0]).toLowerCase()).toContain("hey, i'm back.");
+    expect(textOf(tree.root).toLowerCase()).not.toContain("hello");
+    expect(textOf(tree.root).toLowerCase()).not.toContain("hi");
   });
 
   it("routes transcript drags to companion camera while keeping the composer interactive", async () => {

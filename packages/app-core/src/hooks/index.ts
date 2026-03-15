@@ -1,5 +1,6 @@
 export * from "./useBugReport";
 export * from "./useCanvasWindow";
+export * from "./useChatAvatarVoice";
 export * from "./useContextMenu";
 export * from "./useKeyboardShortcuts";
 export * from "./useLifoSync";

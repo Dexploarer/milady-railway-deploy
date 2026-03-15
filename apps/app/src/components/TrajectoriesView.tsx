@@ -97,9 +97,7 @@ export function TrajectoriesView({
       setConfig(configResult);
     } catch (err) {
       setError(
-        err instanceof Error
-          ? err.message
-          : t("trajectoriesview.FailedToLoad"),
+        err instanceof Error ? err.message : t("trajectoriesview.FailedToLoad"),
       );
     } finally {
       setLoading(false);
@@ -144,7 +142,9 @@ export function TrajectoriesView({
       URL.revokeObjectURL(url);
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : t("trajectoriesview.FailedToExport"),
+        err instanceof Error
+          ? err.message
+          : t("trajectoriesview.FailedToExport"),
       );
     } finally {
       setExporting(false);
@@ -289,9 +289,7 @@ export function TrajectoriesView({
             <SelectItem value="all">
               {t("trajectoriesview.AllStatuses")}
             </SelectItem>
-            <SelectItem value="active">
-              {t("appsview.Active")}
-            </SelectItem>
+            <SelectItem value="active">{t("appsview.Active")}</SelectItem>
             <SelectItem value="completed">
               {t("trajectoriesview.Completed")}
             </SelectItem>
@@ -311,9 +309,7 @@ export function TrajectoriesView({
               <SelectValue placeholder={t("logsview.AllSources")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">
-                {t("logsview.AllSources")}
-              </SelectItem>
+              <SelectItem value="all">{t("logsview.AllSources")}</SelectItem>
               {sources.map((s) => (
                 <SelectItem key={s} value={s}>
                   {s}
@@ -355,9 +351,7 @@ export function TrajectoriesView({
                 className="h-auto min-h-[2rem] whitespace-normal break-words px-3 py-1.5 text-xs bg-card text-txt hover:text-txt shadow-sm text-left"
                 disabled={exporting || trajectories.length === 0}
               >
-                {exporting
-                  ? t("common.exporting")
-                  : t("common.export")}
+                {exporting ? t("common.exporting") : t("common.export")}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">

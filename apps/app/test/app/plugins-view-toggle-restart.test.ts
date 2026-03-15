@@ -23,7 +23,7 @@ vi.mock("@milady/app-core/api", () => ({
   },
 }));
 
-import { PluginsView } from "../../../../packages/app-core/src/components/PluginsView";
+import { PluginsView } from "@milady/app-core/components/PluginsView";
 
 function createDeferred<T>() {
   let resolve!: (value: T | PromiseLike<T>) => void;

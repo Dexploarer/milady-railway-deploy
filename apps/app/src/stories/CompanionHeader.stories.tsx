@@ -18,12 +18,11 @@ const meta = {
     restartBusy: false,
 
     handleRestart: fn(),
-    miladyCloudEnabled: true,
-    miladyCloudConnected: false,
-    miladyCloudCredits: 100,
+    elizaCloudEnabled: true,
+    elizaCloudConnected: false,
+    elizaCloudCredits: 100,
     creditColor: "text-ok border-ok",
-    miladyCloudTopUpUrl:
-      "https://www.miladycloud.ai/dashboard/settings?tab=billing",
+    elizaCloudTopUpUrl: "https://elizacloud.ai/dashboard/settings?tab=billing",
     evmShort: "0x12...34ab",
     solShort: null,
     handleSwitchToNativeShell: fn(),
@@ -44,18 +43,17 @@ export const Thinking: Story = {
   args: {
     agentState: "thinking",
     stateColor: "bg-blue-500",
-    miladyCloudEnabled: true,
-    miladyCloudConnected: true,
-    miladyCloudCredits: 100,
-    miladyCloudTopUpUrl:
-      "https://www.miladycloud.ai/dashboard/settings?tab=billing",
+    elizaCloudEnabled: true,
+    elizaCloudConnected: true,
+    elizaCloudCredits: 100,
+    elizaCloudTopUpUrl: "https://elizacloud.ai/dashboard/settings?tab=billing",
   },
 };
 
 export const DisconnectedWithoutCredits: Story = {
   args: {
-    miladyCloudConnected: false,
-    miladyCloudCredits: null,
+    elizaCloudConnected: false,
+    elizaCloudCredits: null,
   },
 };
 

@@ -128,7 +128,9 @@ type ProbeApi = {
   handleSelectConversation: (id: string) => Promise<void>;
   handleChatSend: () => Promise<void>;
   handleChatEdit: (messageId: string, text: string) => Promise<boolean>;
+  handleNewConversation: () => Promise<void>;
   snapshot: () => {
+    activeConversationId: string | null;
     chatSending: boolean;
     chatFirstTokenReceived: boolean;
     conversationMessages: Array<{
@@ -151,7 +153,9 @@ function Probe(props: { onReady: (api: ProbeApi) => void }) {
       handleSelectConversation: app.handleSelectConversation,
       handleChatSend: () => app.handleChatSend("simple"),
       handleChatEdit: app.handleChatEdit,
+      handleNewConversation: app.handleNewConversation,
       snapshot: () => ({
+        activeConversationId: app.activeConversationId,
         chatSending: app.chatSending,
         chatFirstTokenReceived: app.chatFirstTokenReceived,
         conversationMessages: app.conversationMessages.map((message) => ({
@@ -516,6 +520,63 @@ describe("chat send locking", () => {
     });
   });
 
+  it("drops empty assistant placeholders after silent action-only completions", async () => {
+    mockClient.sendConversationMessageStream.mockResolvedValue({
+      text: "",
+      agentName: "Milady",
+      completed: true,
+    });
+
+    let api: ProbeApi | null = null;
+    let tree: TestRenderer.ReactTestRenderer;
+
+    await act(async () => {
+      tree = TestRenderer.create(
+        React.createElement(
+          AppProvider,
+          null,
+          React.createElement(Probe, {
+            onReady: (nextApi) => {
+              api = nextApi;
+            },
+          }),
+        ),
+      );
+    });
+
+    expect(api).not.toBeNull();
+
+    await act(async () => {
+      await api?.handleSelectConversation("conv-1");
+      api?.setChatInput("just emote");
+    });
+
+    await act(async () => {
+      await api?.handleChatSend();
+    });
+
+    const snapshot = api?.snapshot();
+    expect(
+      snapshot?.conversationMessages.some((message) =>
+        message.id.startsWith("temp-resp-"),
+      ),
+    ).toBe(false);
+    expect(
+      snapshot?.conversationMessages.some(
+        (message) => message.role === "assistant" && !message.text.trim(),
+      ),
+    ).toBe(false);
+    expect(
+      snapshot?.conversationMessages.some(
+        (message) => message.role === "user" && message.text === "just emote",
+      ),
+    ).toBe(true);
+
+    await act(async () => {
+      tree?.unmount();
+    });
+  });
+
   it("replaces streamed assistant text when a later chunk is a full snapshot", async () => {
     const deferred = createDeferred<{ text: string; agentName: string }>();
     mockClient.sendConversationMessageStream.mockImplementation(
@@ -526,6 +587,69 @@ describe("chat send locking", () => {
       ) => {
         onToken("world");
         onToken("Hello world");
+        return deferred.promise;
+      },
+    );
+
+    let api: ProbeApi | null = null;
+    let tree: TestRenderer.ReactTestRenderer;
+
+    await act(async () => {
+      tree = TestRenderer.create(
+        React.createElement(
+          AppProvider,
+          null,
+          React.createElement(Probe, {
+            onReady: (nextApi) => {
+              api = nextApi;
+            },
+          }),
+        ),
+      );
+    });
+
+    expect(api).not.toBeNull();
+
+    await act(async () => {
+      await api?.handleSelectConversation("conv-1");
+      api?.setChatInput("stream me");
+    });
+
+    let sendPromise: Promise<void> | null = null;
+    await act(async () => {
+      sendPromise = api?.handleChatSend();
+      await Promise.resolve();
+    });
+
+    await vi.waitFor(() => {
+      const snapshot = api?.snapshot();
+      const streamedAssistant = snapshot.conversationMessages.find(
+        (message) =>
+          message.role === "assistant" && message.id.startsWith("temp-resp-"),
+      );
+      expect(streamedAssistant?.text).toBe("Hello world");
+    });
+
+    await act(async () => {
+      deferred.resolve({ text: "Hello world", agentName: "Milady" });
+      await sendPromise;
+    });
+
+    await act(async () => {
+      tree?.unmount();
+    });
+  });
+
+  it("prefers accumulated stream text from the client over re-merging raw chunks", async () => {
+    const deferred = createDeferred<{ text: string; agentName: string }>();
+    mockClient.sendConversationMessageStream.mockImplementation(
+      async (
+        _conversationId: string,
+        _text: string,
+        onToken: (token: string, accumulatedText?: string) => void,
+      ) => {
+        onToken("world", "world");
+        onToken("not-a-delta", "Hello world");
         return deferred.promise;
       },
     );
@@ -652,7 +776,8 @@ describe("chat send locking", () => {
 
     let edited = false;
     await act(async () => {
-      edited = (await api?.handleChatEdit("user-2", "edited question")) ?? false;
+      edited =
+        (await api?.handleChatEdit("user-2", "edited question")) ?? false;
     });
 
     expect(edited).toBe(true);
@@ -695,6 +820,111 @@ describe("chat send locking", () => {
         text: "replacement done",
       }),
     ]);
+
+    await act(async () => {
+      tree?.unmount();
+    });
+  });
+
+  it("clears the active thread immediately before replacing it with a new greeting", async () => {
+    const deferred = createDeferred<{
+      conversation: {
+        id: string;
+        title: string;
+        roomId: string;
+        createdAt: string;
+        updatedAt: string;
+      };
+      greeting: {
+        text: string;
+        persisted: boolean;
+      };
+    }>();
+    mockClient.createConversation.mockImplementation(() => deferred.promise);
+
+    let api: ProbeApi | null = null;
+    let tree: TestRenderer.ReactTestRenderer;
+
+    await act(async () => {
+      tree = TestRenderer.create(
+        React.createElement(
+          AppProvider,
+          null,
+          React.createElement(Probe, {
+            onReady: (nextApi) => {
+              api = nextApi;
+            },
+          }),
+        ),
+      );
+    });
+
+    expect(api).not.toBeNull();
+
+    await act(async () => {
+      await api?.handleSelectConversation("conv-1");
+    });
+
+    expect(api?.snapshot().conversationMessages).toEqual([
+      expect.objectContaining({
+        id: "msg-1",
+        role: "assistant",
+        text: "hello",
+      }),
+    ]);
+
+    let newConversationPromise: Promise<void> | undefined;
+    await act(async () => {
+      newConversationPromise = api?.handleNewConversation();
+      await Promise.resolve();
+    });
+
+    expect(api?.snapshot()).toEqual(
+      expect.objectContaining({
+        activeConversationId: null,
+        chatSending: false,
+        chatFirstTokenReceived: false,
+        conversationMessages: [],
+      }),
+    );
+    expect(mockClient.createConversation).toHaveBeenCalledWith(undefined, {
+      bootstrapGreeting: true,
+      lang: "en",
+    });
+
+    await act(async () => {
+      deferred.resolve({
+        conversation: {
+          id: "conv-fresh",
+          title: "Fresh chat",
+          roomId: "room-fresh",
+          createdAt: "2026-02-02T00:00:00.000Z",
+          updatedAt: "2026-02-02T00:00:00.000Z",
+        },
+        greeting: {
+          text: "Hey there.",
+          persisted: false,
+        },
+      });
+      await newConversationPromise;
+    });
+
+    expect(api?.snapshot()).toEqual(
+      expect.objectContaining({
+        activeConversationId: "conv-fresh",
+        conversationMessages: [
+          expect.objectContaining({
+            role: "assistant",
+            text: "Hey there.",
+            source: "agent_greeting",
+          }),
+        ],
+      }),
+    );
+    expect(mockClient.sendWsMessage).toHaveBeenCalledWith({
+      type: "active-conversation",
+      conversationId: "conv-fresh",
+    });
 
     await act(async () => {
       tree?.unmount();

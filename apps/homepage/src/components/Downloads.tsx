@@ -1,5 +1,8 @@
 import { releaseData } from "../generated/release-data";
 
+const ELIZA_CLOUD_LOGIN_URL =
+  "https://elizacloud.ai/login?returnTo=%2Fdashboard%2Fmilady";
+
 const shellCommand = releaseData.scripts.shell.command;
 const powershellCommand = releaseData.scripts.powershell.command;
 const checksumCommand = releaseData.release.checksum
@@ -27,7 +30,7 @@ export function Downloads() {
           </h2>
           <p className="mt-6 max-w-xl text-base leading-8 text-dark/70">
             Desktop buttons are generated from GitHub release assets instead of
-            hardcoded placeholders. Milady Cloud and remote self-hosting now sit
+            hardcoded placeholders. Eliza Cloud and remote self-hosting now sit
             alongside the download flow so users can either run local or attach
             to a hosted backend from the same frontend.
           </p>
@@ -90,9 +93,9 @@ export function Downloads() {
           <div className="grid gap-6 md:grid-cols-2">
             <InfoCard
               eyebrow="Managed hosting"
-              title="Milady Cloud"
-              body="Create managed Milady instances at cloud.milady.ai and connect the frontend to provisioned backend containers."
-              href="https://cloud.milady.ai"
+              title="Eliza Cloud"
+              body="Create managed Eliza Cloud instances at elizacloud.ai and connect the frontend to provisioned backend containers."
+              href={ELIZA_CLOUD_LOGIN_URL}
               action="Open cloud"
             />
             <InfoCard

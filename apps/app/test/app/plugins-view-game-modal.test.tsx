@@ -77,7 +77,7 @@ vi.mock("@milady/app-core/api", () => ({
   },
 }));
 
-import { PluginsView } from "../../../../packages/app-core/src/components/PluginsView";
+import { PluginsView } from "@milady/app-core/components/PluginsView";
 
 function hasClass(
   node: TestRenderer.ReactTestInstance,
@@ -235,7 +235,7 @@ describe("PluginsView game modal", () => {
     expect(
       tree?.root.findAll((node) => hasClass(node, "conn-master-detail")).length,
     ).toBe(0);
-    expect(text(tree?.root)).toContain("Channels");
+    expect(text(tree?.root)).toContain("Connectors");
   });
 
   it("uses list/detail mobile panes on narrow viewport", async () => {
@@ -372,7 +372,7 @@ describe("PluginsView game modal", () => {
     expect(text(tree?.root)).not.toContain("Discord");
   });
 
-  it("shows only social-chat connectors and keeps social search/filter controls", async () => {
+  it("shows all connectors in Connectors view and keeps connector search/filter controls", async () => {
     const state = baseContext([
       createPlugin("telegram", "Telegram", "connector", {
         tags: ["connector", "social", "social-chat", "messaging"],
@@ -383,6 +383,10 @@ describe("PluginsView game modal", () => {
       }),
       createPlugin("github", "GitHub", "connector", {
         tags: ["connector", "integration"],
+      }),
+      createPlugin("iq", "Iq", "connector", {
+        enabled: false,
+        tags: [],
       }),
       createPlugin("retake", "Retake.tv", "streaming", {
         tags: ["streaming", "broadcast"],
@@ -399,7 +403,8 @@ describe("PluginsView game modal", () => {
 
     expect(text(tree?.root)).toContain("Telegram");
     expect(text(tree?.root)).toContain("Signal");
-    expect(text(tree?.root)).not.toContain("GitHub");
+    expect(text(tree?.root)).toContain("GitHub");
+    expect(text(tree?.root)).toContain("Iq");
     expect(text(tree?.root)).not.toContain("Retake.tv");
 
     const addButtons = tree?.root.findAll(
@@ -414,16 +419,17 @@ describe("PluginsView game modal", () => {
         node.type === "input" && typeof node.props.placeholder === "string",
     );
     expect(searchInputs.length).toBe(1);
-    expect(searchInputs[0]?.props.placeholder).toBe("Search social...");
-    expect(text(tree?.root)).toContain("All (2)");
-    expect(text(tree?.root)).toContain("Enabled (1)");
+    expect(searchInputs[0]?.props.placeholder).toBe("Search...");
+    expect(text(tree?.root)).toContain("All (4)");
+    expect(text(tree?.root)).toContain("Enabled (2)");
 
-    state.pluginSearch = "Signal";
+    state.pluginSearch = "Iq";
     await act(async () => {
       tree?.update(React.createElement(PluginsView, { mode: "social" }));
     });
-    expect(text(tree?.root)).toContain("Signal");
+    expect(text(tree?.root)).toContain("Iq");
     expect(text(tree?.root)).not.toContain("Telegram");
+    expect(text(tree?.root)).not.toContain("GitHub");
 
     state.pluginSearch = "";
     mockUseApp.mockImplementation(() => ({
@@ -434,7 +440,40 @@ describe("PluginsView game modal", () => {
       tree?.update(React.createElement(PluginsView, { mode: "social" }));
     });
     expect(text(tree?.root)).toContain("Telegram");
+    expect(text(tree?.root)).toContain("GitHub");
     expect(text(tree?.root)).not.toContain("Signal");
+    expect(text(tree?.root)).not.toContain("Iq");
+  });
+
+  it("renders plugin type filters in a desktop sidebar for the main plugins view", async () => {
+    mockUseApp.mockReturnValue(
+      baseContext([
+        createPlugin("openai", "OpenAI", "ai-provider", {
+          tags: ["llm", "provider"],
+        }),
+        createPlugin("discord", "Discord", "connector", {
+          tags: ["connector", "messaging"],
+        }),
+        createPlugin("retake", "Retake.tv", "streaming", {
+          tags: ["streaming", "broadcast"],
+        }),
+      ]),
+    );
+
+    let tree: TestRenderer.ReactTestRenderer;
+    await act(async () => {
+      tree = TestRenderer.create(React.createElement(PluginsView));
+    });
+
+    const sidebar = tree?.root.findAllByProps({
+      "data-testid": "plugins-subgroup-sidebar",
+    })[0];
+    expect(sidebar).toBeDefined();
+    expect(text(sidebar)).toContain("Plugin Types");
+    expect(text(sidebar)).toContain("All");
+    expect(text(sidebar)).toContain("AI Providers");
+    expect(text(sidebar)).toContain("Connectors");
+    expect(text(sidebar)).toContain("Streaming Destinations");
   });
 
   it("renders setup links on cards and opens detail links via desktop IPC with browser fallback", async () => {

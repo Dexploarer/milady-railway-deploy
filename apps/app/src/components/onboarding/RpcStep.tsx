@@ -5,9 +5,9 @@ type RpcMode = "" | "cloud" | "byok";
 
 export function RpcStep() {
   const {
-    miladyCloudConnected,
-    miladyCloudLoginBusy,
-    miladyCloudLoginError,
+    elizaCloudConnected,
+    elizaCloudLoginBusy,
+    elizaCloudLoginError,
     onboardingRunMode,
     onboardingCloudProvider,
     onboardingApiKey,
@@ -19,12 +19,12 @@ export function RpcStep() {
     t,
   } = useApp();
 
-  const miladyCloudReady =
-    miladyCloudConnected ||
+  const elizaCloudReady =
+    elizaCloudConnected ||
     (onboardingRunMode === "cloud" &&
-      onboardingCloudProvider === "miladycloud" &&
+      onboardingCloudProvider === "elizacloud" &&
       onboardingApiKey.trim().length > 0);
-  const [mode, setMode] = useState<RpcMode>(miladyCloudReady ? "cloud" : "");
+  const [mode, setMode] = useState<RpcMode>(elizaCloudReady ? "cloud" : "");
 
   const rpcKeys = onboardingRpcKeys as Record<string, string>;
 
@@ -60,12 +60,12 @@ export function RpcStep() {
             margin: "0 auto",
           }}
         >
-          {/* Milady Cloud option */}
+          {/* Eliza Cloud option */}
           <button
             type="button"
             className="onboarding-provider-card onboarding-provider-card--recommended"
             onClick={() => {
-              if (miladyCloudConnected) {
+              if (elizaCloudConnected) {
                 // Already connected — just mark cloud and advance
                 setState("onboardingRpcSelections", {
                   evm: "eliza-cloud",
@@ -81,10 +81,10 @@ export function RpcStep() {
           >
             <div>
               <div className="onboarding-provider-name">
-                {t("onboarding.rpcMiladyCloud")}
+                {t("onboarding.rpcElizaCloud")}
               </div>
               <div className="onboarding-provider-desc">
-                {t("onboarding.rpcMiladyCloudDesc")}
+                {t("onboarding.rpcElizaCloudDesc")}
               </div>
             </div>
           </button>
@@ -127,7 +127,7 @@ export function RpcStep() {
     );
   }
 
-  // ── Milady Cloud mode ───────────────────────────────────────────────
+  // ── Eliza Cloud mode ───────────────────────────────────────────────
   if (mode === "cloud") {
     return (
       <>
@@ -139,7 +139,7 @@ export function RpcStep() {
         </div>
 
         <div style={{ width: "100%", textAlign: "center" }}>
-          {miladyCloudConnected ? (
+          {elizaCloudConnected ? (
             <div
               style={{
                 display: "flex",
@@ -175,17 +175,17 @@ export function RpcStep() {
                 type="button"
                 className="onboarding-confirm-btn"
                 onClick={handleCloudLogin}
-                disabled={miladyCloudLoginBusy || miladyCloudReady}
+                disabled={elizaCloudLoginBusy || elizaCloudReady}
               >
-                {miladyCloudLoginBusy
+                {elizaCloudLoginBusy
                   ? t("onboarding.connecting")
-                  : miladyCloudReady
+                  : elizaCloudReady
                     ? t("onboarding.connected")
                     : t("onboarding.connectAccount")}
               </button>
-              {miladyCloudLoginError &&
+              {elizaCloudLoginError &&
                 (() => {
-                  const urlMatch = miladyCloudLoginError.match(
+                  const urlMatch = elizaCloudLoginError.match(
                     /^Open this link to log in: (.+)$/,
                   );
                   if (urlMatch) {
@@ -220,7 +220,7 @@ export function RpcStep() {
                         marginTop: "0.5rem",
                       }}
                     >
-                      {miladyCloudLoginError}
+                      {elizaCloudLoginError}
                     </p>
                   );
                 })()}
@@ -247,7 +247,7 @@ export function RpcStep() {
               });
               void handleOnboardingNext();
             }}
-            disabled={!miladyCloudReady}
+            disabled={!elizaCloudReady}
             type="button"
           >
             {t("onboarding.next") ?? "Next"}

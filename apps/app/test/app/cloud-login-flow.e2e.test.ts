@@ -39,66 +39,49 @@ vi.mock("@milady/app-core/components", async () => {
   };
 });
 
-vi.mock("../../../../packages/app-core/src/components/ConfigPageView", () => ({
+vi.mock("@milady/app-core/components/ConfigPageView", () => ({
   ConfigPageView: () => React.createElement("div", null, "ConfigPageView"),
 }));
 
-vi.mock(
-  "../../../../packages/app-core/src/components/CodingAgentSettingsSection",
-  () => ({
-    CodingAgentSettingsSection: () =>
-      React.createElement("div", null, "CodingAgentSettingsSection"),
-  }),
-);
+vi.mock("@milady/app-core/components/CodingAgentSettingsSection", () => ({
+  CodingAgentSettingsSection: () =>
+    React.createElement("div", null, "CodingAgentSettingsSection"),
+}));
 
-vi.mock(
-  "../../../../packages/app-core/src/components/MediaSettingsSection",
-  () => ({
-    MediaSettingsSection: () =>
-      React.createElement("div", null, "MediaSettingsSection"),
-  }),
-);
+vi.mock("@milady/app-core/components/MediaSettingsSection", () => ({
+  MediaSettingsSection: () =>
+    React.createElement("div", null, "MediaSettingsSection"),
+}));
 
-vi.mock(
-  "../../../../packages/app-core/src/components/MiladyCloudDashboard",
-  () => ({
-    CloudDashboard: () =>
-      React.createElement("div", null, "MiladyCloudDashboard"),
-  }),
-);
+vi.mock("@milady/app-core/components/ElizaCloudDashboard", () => ({
+  CloudDashboard: () => React.createElement("div", null, "ElizaCloudDashboard"),
+}));
 
-vi.mock(
-  "../../../../packages/app-core/src/components/PermissionsSection",
-  () => ({
-    PermissionsSection: () =>
-      React.createElement("div", null, "PermissionsSection"),
-  }),
-);
+vi.mock("@milady/app-core/components/PermissionsSection", () => ({
+  PermissionsSection: () =>
+    React.createElement("div", null, "PermissionsSection"),
+}));
 
-vi.mock(
-  "../../../../packages/app-core/src/components/ProviderSwitcher",
-  () => ({
-    ProviderSwitcher: () =>
-      React.createElement("div", null, "ProviderSwitcher"),
-  }),
-);
+vi.mock("@milady/app-core/components/ProviderSwitcher", () => ({
+  ProviderSwitcher: () => React.createElement("div", null, "ProviderSwitcher"),
+}));
 
-vi.mock("../../../../packages/app-core/src/components/VoiceConfigView", () => ({
+vi.mock("@milady/app-core/components/VoiceConfigView", () => ({
   VoiceConfigView: () => React.createElement("div", null, "VoiceConfigView"),
 }));
 
-import { SettingsView } from "../../../../packages/app-core/src/components/SettingsView";
+import { SettingsView } from "@milady/app-core/components/SettingsView";
 
 type CloudState = {
-  miladyCloudEnabled: boolean;
-  miladyCloudConnected: boolean;
-  miladyCloudCredits: number;
-  miladyCloudCreditsLow: boolean;
-  miladyCloudCreditsCritical: boolean;
-  miladyCloudTopUpUrl: string;
-  miladyCloudUserId: string;
-  miladyCloudLoginBusy: boolean;
-  miladyCloudLoginError: string;
+  elizaCloudEnabled: boolean;
+  elizaCloudConnected: boolean;
+  elizaCloudCredits: number;
+  elizaCloudCreditsLow: boolean;
+  elizaCloudCreditsCritical: boolean;
+  elizaCloudTopUpUrl: string;
+  elizaCloudUserId: string;
+  elizaCloudLoginBusy: boolean;
+  elizaCloudLoginError: string;
   cloudDisconnecting: boolean;
   currentTheme: string;
   plugins: unknown[];
@@ -108,15 +91,15 @@ type CloudState = {
 
 function createCloudUIState(): CloudState {
   return {
-    miladyCloudEnabled: true,
-    miladyCloudConnected: false,
-    miladyCloudCredits: 0,
-    miladyCloudCreditsLow: false,
-    miladyCloudCreditsCritical: false,
-    miladyCloudTopUpUrl: "https://example.com/topup",
-    miladyCloudUserId: "",
-    miladyCloudLoginBusy: false,
-    miladyCloudLoginError: "",
+    elizaCloudEnabled: true,
+    elizaCloudConnected: false,
+    elizaCloudCredits: 0,
+    elizaCloudCreditsLow: false,
+    elizaCloudCreditsCritical: false,
+    elizaCloudTopUpUrl: "https://example.com/topup",
+    elizaCloudUserId: "",
+    elizaCloudLoginBusy: false,
+    elizaCloudLoginError: "",
     cloudDisconnecting: false,
     currentTheme: "milady",
     plugins: [],
@@ -192,15 +175,15 @@ describe("Cloud Login UI", () => {
       handlePluginConfigSave: vi.fn(),
       handleCloudLogin: async () => {
         _loginCalled = true;
-        state.miladyCloudConnected = true;
-        state.miladyCloudUserId = "user-123";
-        state.miladyCloudCredits = 1000;
+        state.elizaCloudConnected = true;
+        state.elizaCloudUserId = "user-123";
+        state.elizaCloudCredits = 1000;
       },
       handleCloudDisconnect: async () => {
         _disconnectCalled = true;
-        state.miladyCloudConnected = false;
-        state.miladyCloudUserId = "";
-        state.miladyCloudCredits = 0;
+        state.elizaCloudConnected = false;
+        state.elizaCloudUserId = "";
+        state.elizaCloudCredits = 0;
       },
       handleReset: vi.fn(),
       handleAgentExport: vi.fn(),
@@ -222,7 +205,7 @@ describe("Cloud Login UI", () => {
   });
 
   it("shows login state when not connected", async () => {
-    state.miladyCloudConnected = false;
+    state.elizaCloudConnected = false;
 
     await act(async () => {
       tree = TestRenderer.create(React.createElement(SettingsView));
@@ -233,9 +216,9 @@ describe("Cloud Login UI", () => {
   });
 
   it("shows connected state with user info", async () => {
-    state.miladyCloudConnected = true;
-    state.miladyCloudUserId = "user-123";
-    state.miladyCloudCredits = 500;
+    state.elizaCloudConnected = true;
+    state.elizaCloudUserId = "user-123";
+    state.elizaCloudCredits = 500;
 
     await act(async () => {
       tree = TestRenderer.create(React.createElement(SettingsView));
@@ -246,7 +229,7 @@ describe("Cloud Login UI", () => {
   });
 
   it("shows loading state during login", async () => {
-    state.miladyCloudLoginBusy = true;
+    state.elizaCloudLoginBusy = true;
 
     await act(async () => {
       tree = TestRenderer.create(React.createElement(SettingsView));
@@ -256,7 +239,7 @@ describe("Cloud Login UI", () => {
   });
 
   it("shows error when login fails", async () => {
-    state.miladyCloudLoginError = "Invalid token";
+    state.elizaCloudLoginError = "Invalid token";
 
     await act(async () => {
       tree = TestRenderer.create(React.createElement(SettingsView));
@@ -308,17 +291,17 @@ describe("Cloud Connection Integration", () => {
       loadUpdateStatus: vi.fn(),
       handlePluginConfigSave: vi.fn(),
       handleCloudLogin: async () => {
-        state.miladyCloudLoginBusy = true;
-        state.miladyCloudConnected = true;
-        state.miladyCloudUserId = "user-123";
-        state.miladyCloudCredits = 1000;
-        state.miladyCloudLoginBusy = false;
+        state.elizaCloudLoginBusy = true;
+        state.elizaCloudConnected = true;
+        state.elizaCloudUserId = "user-123";
+        state.elizaCloudCredits = 1000;
+        state.elizaCloudLoginBusy = false;
       },
       handleCloudDisconnect: async () => {
         state.cloudDisconnecting = true;
-        state.miladyCloudConnected = false;
-        state.miladyCloudUserId = "";
-        state.miladyCloudCredits = 0;
+        state.elizaCloudConnected = false;
+        state.elizaCloudUserId = "";
+        state.elizaCloudCredits = 0;
         state.cloudDisconnecting = false;
       },
       handleReset: vi.fn(),
@@ -335,23 +318,23 @@ describe("Cloud Connection Integration", () => {
   it("login updates connection state", async () => {
     const loginFn = mockUseApp().handleCloudLogin;
 
-    expect(state.miladyCloudConnected).toBe(false);
+    expect(state.elizaCloudConnected).toBe(false);
     await loginFn();
-    expect(state.miladyCloudConnected).toBe(true);
+    expect(state.elizaCloudConnected).toBe(true);
   });
 
   it("login sets user ID", async () => {
     const loginFn = mockUseApp().handleCloudLogin;
 
     await loginFn();
-    expect(state.miladyCloudUserId).toBe("user-123");
+    expect(state.elizaCloudUserId).toBe("user-123");
   });
 
   it("login sets credits", async () => {
     const loginFn = mockUseApp().handleCloudLogin;
 
     await loginFn();
-    expect(state.miladyCloudCredits).toBe(1000);
+    expect(state.elizaCloudCredits).toBe(1000);
   });
 
   it("disconnect clears connection state", async () => {
@@ -359,10 +342,10 @@ describe("Cloud Connection Integration", () => {
     const disconnectFn = mockUseApp().handleCloudDisconnect;
 
     await loginFn();
-    expect(state.miladyCloudConnected).toBe(true);
+    expect(state.elizaCloudConnected).toBe(true);
 
     await disconnectFn();
-    expect(state.miladyCloudConnected).toBe(false);
+    expect(state.elizaCloudConnected).toBe(false);
   });
 
   it("disconnect clears user ID and credits", async () => {
@@ -372,8 +355,8 @@ describe("Cloud Connection Integration", () => {
     await loginFn();
     await disconnectFn();
 
-    expect(state.miladyCloudUserId).toBe("");
-    expect(state.miladyCloudCredits).toBe(0);
+    expect(state.elizaCloudUserId).toBe("");
+    expect(state.elizaCloudCredits).toBe(0);
   });
 });
 
@@ -386,8 +369,8 @@ describe("Cloud Credits Display", () => {
 
   beforeEach(() => {
     state = createCloudUIState();
-    state.miladyCloudConnected = true;
-    state.miladyCloudUserId = "user-123";
+    state.elizaCloudConnected = true;
+    state.elizaCloudUserId = "user-123";
 
     globalThis.fetch = vi.fn().mockResolvedValue({
       ok: true,
@@ -421,30 +404,30 @@ describe("Cloud Credits Display", () => {
   });
 
   it("normal credits show without warning", () => {
-    state.miladyCloudCredits = 500;
-    state.miladyCloudCreditsLow = false;
-    state.miladyCloudCreditsCritical = false;
+    state.elizaCloudCredits = 500;
+    state.elizaCloudCreditsLow = false;
+    state.elizaCloudCreditsCritical = false;
 
-    expect(state.miladyCloudCreditsLow).toBe(false);
-    expect(state.miladyCloudCreditsCritical).toBe(false);
+    expect(state.elizaCloudCreditsLow).toBe(false);
+    expect(state.elizaCloudCreditsCritical).toBe(false);
   });
 
   it("low credits sets warning flag", () => {
-    state.miladyCloudCredits = 50;
-    state.miladyCloudCreditsLow = true;
+    state.elizaCloudCredits = 50;
+    state.elizaCloudCreditsLow = true;
 
-    expect(state.miladyCloudCreditsLow).toBe(true);
+    expect(state.elizaCloudCreditsLow).toBe(true);
   });
 
   it("critical credits sets critical flag", () => {
-    state.miladyCloudCredits = 5;
-    state.miladyCloudCreditsCritical = true;
+    state.elizaCloudCredits = 5;
+    state.elizaCloudCreditsCritical = true;
 
-    expect(state.miladyCloudCreditsCritical).toBe(true);
+    expect(state.elizaCloudCreditsCritical).toBe(true);
   });
 
   it("topup URL is available", () => {
-    expect(state.miladyCloudTopUpUrl).toBe("https://example.com/topup");
+    expect(state.elizaCloudTopUpUrl).toBe("https://example.com/topup");
   });
 });
 
@@ -477,9 +460,9 @@ describe("Cloud Error Handling", () => {
       loadUpdateStatus: vi.fn(),
       handlePluginConfigSave: vi.fn(),
       handleCloudLogin: async () => {
-        state.miladyCloudLoginBusy = true;
-        state.miladyCloudLoginError = "Authentication failed";
-        state.miladyCloudLoginBusy = false;
+        state.elizaCloudLoginBusy = true;
+        state.elizaCloudLoginError = "Authentication failed";
+        state.elizaCloudLoginBusy = false;
       },
       handleCloudDisconnect: vi.fn(),
       handleReset: vi.fn(),
@@ -498,7 +481,7 @@ describe("Cloud Error Handling", () => {
 
     await loginFn();
 
-    expect(state.miladyCloudLoginError).toBe("Authentication failed");
+    expect(state.elizaCloudLoginError).toBe("Authentication failed");
   });
 
   it("login failure keeps disconnected state", async () => {
@@ -506,6 +489,6 @@ describe("Cloud Error Handling", () => {
 
     await loginFn();
 
-    expect(state.miladyCloudConnected).toBe(false);
+    expect(state.elizaCloudConnected).toBe(false);
   });
 });

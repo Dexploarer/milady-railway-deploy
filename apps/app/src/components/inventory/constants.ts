@@ -2,8 +2,6 @@
  * Shared constants, types, and utility helpers for the Inventory feature.
  */
 
-import type { TrackedToken } from "../BscTradePanel";
-
 /* ── Constants ──────────────────────────────────────────────────────── */
 
 export const BSC_GAS_READY_THRESHOLD = 0.005;
@@ -39,6 +37,12 @@ export interface TrackedBscToken {
   symbol: string;
   name: string;
   logoUrl?: string;
+}
+
+export interface TrackedToken {
+  address: string;
+  symbol: string;
+  addedAt: number;
 }
 
 /* ── Chain helpers ───────────────────────────────────────────────────── */
@@ -145,7 +149,7 @@ export function removeTrackedBscToken(
   return next;
 }
 
-/* ── localStorage helpers for tracked tokens (BscTradePanel) ────────── */
+/* ── localStorage helpers for tracked tokens (TradePanel) ───────────── */
 
 export function loadTrackedTokens(): TrackedToken[] {
   try {

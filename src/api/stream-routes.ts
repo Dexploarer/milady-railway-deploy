@@ -12,7 +12,6 @@
 import fs from "node:fs";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { logger } from "@elizaos/core";
-import type { TtsConfig } from "../config/types.messages";
 import type { StreamConfig } from "../services/stream-manager";
 import { resolveTtsConfig } from "../services/tts-stream-bridge";
 import {
@@ -31,8 +30,10 @@ import {
   writeOverlayLayout,
   writeStreamSettings,
 } from "./stream-persistence";
+import type { StreamRouteState } from "./stream-route-state";
 import { handleStreamVoiceRoute } from "./stream-voice-routes";
 
+export type { StreamRouteState } from "./stream-route-state";
 // Re-export onAgentMessage so existing consumers (server.ts) keep working.
 export { onAgentMessage } from "./stream-voice-routes";
 
@@ -82,62 +83,9 @@ function pushFrameToSubscribers(frame: Buffer): void {
 export type {
   OverlayLayoutData,
   StreamingDestination,
-} from "../../packages/plugin-streaming-base/src/index";
+} from "@milady/plugin-streaming-base";
 
-import type { StreamingDestination } from "../../packages/plugin-streaming-base/src/index";
-
-/**
- * Subset of server state relevant to stream routes.
- */
-export interface StreamRouteState {
-  streamManager: {
-    isRunning(): boolean;
-    writeFrame(buf: Buffer): boolean;
-    start(config: StreamConfig): Promise<void>;
-    stop(): Promise<{ uptime: number }>;
-    getHealth(): {
-      running: boolean;
-      ffmpegAlive: boolean;
-      uptime: number;
-      frameCount: number;
-      volume: number;
-      muted: boolean;
-      audioSource: string;
-      inputMode: string | null;
-    };
-    getVolume(): number;
-    isMuted(): boolean;
-    setVolume(level: number): Promise<void>;
-    mute(): Promise<void>;
-    unmute(): Promise<void>;
-  };
-  /** Server port -- used for building the default capture URL. */
-  port?: number;
-  /** Explicit capture URL override. */
-  captureUrl?: string;
-  /** Optional screen capture manager (injected by Electron host). */
-  screenCapture?: {
-    isFrameCaptureActive(): boolean;
-    startFrameCapture(opts: {
-      fps?: number;
-      quality?: number;
-      endpoint?: string;
-      gameUrl?: string;
-    }): Promise<void>;
-    stopFrameCapture?(): void;
-  };
-  /** All configured streaming destinations keyed by platform ID. */
-  destinations: Map<string, StreamingDestination>;
-  /** Currently active destination ID (user-switchable). */
-  activeDestinationId?: string;
-  /** Active stream capture source (stream-tab, game, or custom URL). */
-  activeStreamSource: {
-    type: "stream-tab" | "game" | "custom-url";
-    url?: string;
-  };
-  /** Access to agent config for TTS settings. */
-  config?: { messages?: { tts?: TtsConfig } };
-}
+import type { StreamingDestination } from "@milady/plugin-streaming-base";
 
 /** Resolve the active streaming destination from the registry. */
 export function getActiveDestination(

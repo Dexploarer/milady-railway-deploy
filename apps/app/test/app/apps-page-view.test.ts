@@ -16,15 +16,15 @@ vi.mock("@milady/app-core/state", () => ({
   useApp: () => mockUseApp(),
 }));
 
-vi.mock("../../../../packages/app-core/src/components/AppsView", () => ({
+vi.mock("@milady/app-core/components/AppsView", () => ({
   AppsView: () => React.createElement("div", null, "APPS_VIEW"),
 }));
 
-vi.mock("../../../../packages/app-core/src/components/GameView", () => ({
+vi.mock("@milady/app-core/components/GameView", () => ({
   GameView: () => React.createElement("div", null, "GAME_VIEW"),
 }));
 
-import { AppsPageView } from "../../../../packages/app-core/src/components/AppsPageView";
+import { AppsPageView } from "@milady/app-core/components/AppsPageView";
 
 function createContext(
   overrides?: Partial<AppsPageContextStub>,

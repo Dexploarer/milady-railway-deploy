@@ -371,7 +371,7 @@ export async function buildBscTradePreflight(
 
   if (rpcUrls.length === 0) {
     reasons.push(
-      "BSC RPC not configured. Connect Milady Cloud or set NODEREAL_BSC_RPC_URL, QUICKNODE_BSC_RPC_URL, or BSC_RPC_URL.",
+      "BSC RPC not configured. Connect Eliza Cloud or set NODEREAL_BSC_RPC_URL, QUICKNODE_BSC_RPC_URL, or BSC_RPC_URL.",
     );
   } else {
     try {

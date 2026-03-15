@@ -27,7 +27,7 @@ vi.mock("@milady/app-core/api", () => ({
   client: mockClient,
 }));
 
-import { BugReportModal } from "../../../../packages/app-core/src/components/BugReportModal";
+import { BugReportModal } from "@milady/app-core/components/BugReportModal";
 
 // --- helpers ----------------------------------------------------------------
 

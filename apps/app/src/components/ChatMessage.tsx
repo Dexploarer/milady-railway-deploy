@@ -6,9 +6,10 @@ import type { ConversationMessage } from "@milady/app-core/api";
 import { useTimeout } from "@milady/app-core/hooks";
 import { useApp } from "@milady/app-core/state";
 import { Button } from "@milady/ui";
-import { Check, Copy, Pencil, RefreshCw, Trash2, Volume2 } from "lucide-react";
+import { Check, Copy, Pencil, Trash2, Volume2 } from "lucide-react";
 import {
   type KeyboardEvent,
+  type TouchEvent,
   useCallback,
   useEffect,
   useRef,
@@ -24,7 +25,6 @@ interface ChatMessageProps {
   onCopy?: (text: string) => void;
   onSpeak?: (messageId: string, text: string) => void;
   onEdit?: (messageId: string, text: string) => Promise<boolean> | boolean;
-  onRetry?: (messageId: string) => void;
   onDelete?: (messageId: string) => void;
 }
 
@@ -35,7 +35,6 @@ export function ChatMessage({
   onCopy,
   onSpeak,
   onEdit,
-  onRetry,
   onDelete,
 }: ChatMessageProps) {
   const { setTimeout } = useTimeout();
@@ -43,9 +42,15 @@ export function ChatMessage({
   const { copyToClipboard, t } = useApp();
   const [copied, setCopied] = useState(false);
   const [showActions, setShowActions] = useState(false);
+  const [supportsHover, setSupportsHover] = useState(() =>
+    typeof window !== "undefined" && typeof window.matchMedia === "function"
+      ? window.matchMedia("(hover: hover) and (pointer: fine)").matches
+      : true,
+  );
   const [isEditing, setIsEditing] = useState(false);
   const [draftText, setDraftText] = useState(message.text);
   const [savingEdit, setSavingEdit] = useState(false);
+  const articleRef = useRef<HTMLElement | null>(null);
   const editTextareaRef = useRef<HTMLTextAreaElement | null>(null);
   const isUser = message.role === "user";
   const canEdit =
@@ -53,7 +58,8 @@ export function ChatMessage({
     typeof onEdit === "function" &&
     message.source !== "local_command" &&
     !message.id.startsWith("temp-");
-  const canPlay = !isUser && typeof onSpeak === "function" && message.text.trim();
+  const canPlay =
+    !isUser && typeof onSpeak === "function" && message.text.trim();
 
   const handleCopy = useCallback(() => {
     if (onCopy) {
@@ -88,12 +94,27 @@ export function ChatMessage({
     }
 
     setSavingEdit(true);
-    const saved = await onEdit(message.id, nextText);
-    setSavingEdit(false);
-    if (saved !== false) {
-      setIsEditing(false);
+    try {
+      const saved = await onEdit(message.id, nextText);
+      if (saved !== false) {
+        setIsEditing(false);
+      }
+    } finally {
+      setSavingEdit(false);
     }
   }, [draftText, message.id, message.text, onEdit]);
+
+  const handleTapReveal = useCallback(
+    (event: TouchEvent<HTMLElement>) => {
+      if (supportsHover || isEditing) return;
+      const target = event.target as HTMLElement | null;
+      if (target?.closest("button, a, textarea, input")) {
+        return;
+      }
+      setShowActions((prev) => !prev);
+    },
+    [isEditing, supportsHover],
+  );
 
   const handleEditKeyDown = useCallback(
     (event: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -121,13 +142,63 @@ export function ChatMessage({
     textarea.setSelectionRange(textarea.value.length, textarea.value.length);
   }, [isEditing, message.text]);
 
+  useEffect(() => {
+    if (
+      typeof window === "undefined" ||
+      typeof window.matchMedia !== "function"
+    ) {
+      return;
+    }
+
+    const mediaQuery = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const syncSupportsHover = () => {
+      setSupportsHover(mediaQuery.matches);
+      if (mediaQuery.matches) {
+        setShowActions(false);
+      }
+    };
+    syncSupportsHover();
+
+    if (typeof mediaQuery.addEventListener === "function") {
+      mediaQuery.addEventListener("change", syncSupportsHover);
+      return () => mediaQuery.removeEventListener("change", syncSupportsHover);
+    }
+
+    mediaQuery.addListener(syncSupportsHover);
+    return () => mediaQuery.removeListener(syncSupportsHover);
+  }, []);
+
+  useEffect(() => {
+    if (supportsHover || !showActions || typeof document === "undefined") {
+      return;
+    }
+
+    const handlePointerDown = (event: PointerEvent) => {
+      const target = event.target;
+      if (!(target instanceof Node)) {
+        setShowActions(false);
+        return;
+      }
+      if (!articleRef.current?.contains(target)) {
+        setShowActions(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
+  }, [showActions, supportsHover]);
+
+  const actionsVisible = showActions;
+
   return (
     <article
+      ref={articleRef}
       className={`flex items-start gap-2 sm:gap-3 ${isUser ? "justify-end" : "justify-start"} ${isGrouped ? "mt-1" : "mt-4"}`}
       data-testid="chat-message"
       data-role={message.role}
-      onMouseEnter={() => setShowActions(true)}
-      onMouseLeave={() => setShowActions(false)}
+      onMouseEnter={supportsHover ? () => setShowActions(true) : undefined}
+      onMouseLeave={supportsHover ? () => setShowActions(false) : undefined}
+      onTouchEnd={handleTapReveal}
       aria-label={`${isUser ? "Your" : agentName} message`}
     >
       {/* Message Bubble */}
@@ -186,34 +257,27 @@ export function ChatMessage({
 
           {/* Stream interruption indicator */}
           {!isUser && message.interrupted && (
-            <div className="flex items-center gap-2 mt-2 pt-2 border-t border-danger/30">
+            <div className="mt-2 pt-2 border-t border-danger/30">
               <span className="text-xs text-danger">
                 {t("chatmessage.ResponseInterrupte")}
               </span>
-              {onRetry && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onRetry(message.id)}
-                  className="flex items-center gap-1 px-2 py-0.5 h-6 text-xs text-danger border-danger/40 rounded hover:bg-danger/10 hover:text-danger transition-colors"
-                >
-                  <RefreshCw className="w-3 h-3" />
-
-                  {t("common.retry")}
-                </Button>
-              )}
             </div>
           )}
 
-          {/* Message Actions (on hover) */}
+          {/* Message Actions */}
           {!isEditing && (
             <div
-              className={`absolute ${isUser ? "left-0 -translate-x-full" : "right-0 translate-x-full"} top-0 flex items-center gap-1 p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ${showActions ? "opacity-100" : ""}`}
+              className={`absolute ${isUser ? "left-0 -translate-x-full" : "right-0 translate-x-full"} top-0 flex items-center gap-1 p-1 transition-opacity duration-200 ${
+                actionsVisible ? "opacity-100" : "pointer-events-none opacity-0"
+              }`}
             >
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={handleCopy}
+                onClick={(event) => {
+                  event?.stopPropagation?.();
+                  handleCopy();
+                }}
                 className="w-7 h-7 rounded-md text-muted hover:text-txt hover:bg-bg-hover transition-colors"
                 title={copied ? "Copied!" : "Copy message"}
                 aria-label={copied ? "Copied to clipboard" : "Copy message"}
@@ -229,7 +293,10 @@ export function ChatMessage({
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => onSpeak?.(message.id, message.text)}
+                  onClick={(event) => {
+                    event?.stopPropagation?.();
+                    onSpeak?.(message.id, message.text);
+                  }}
                   className="w-7 h-7 rounded-md text-muted hover:text-txt hover:bg-bg-hover transition-colors"
                   title="Play message"
                   aria-label="Play message"
@@ -242,7 +309,10 @@ export function ChatMessage({
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={handleStartEditing}
+                  onClick={(event) => {
+                    event?.stopPropagation?.();
+                    handleStartEditing();
+                  }}
                   className="w-7 h-7 rounded-md text-muted hover:text-txt hover:bg-bg-hover transition-colors"
                   title="Edit message"
                   aria-label="Edit message"
@@ -251,24 +321,14 @@ export function ChatMessage({
                 </Button>
               )}
 
-              {!isUser && onRetry && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => onRetry(message.id)}
-                  className="w-7 h-7 rounded-md text-muted hover:text-txt hover:bg-bg-hover transition-colors"
-                  title={t("chatmessage.RetryMessage")}
-                  aria-label="Retry message"
-                >
-                  <RefreshCw className="w-3.5 h-3.5" />
-                </Button>
-              )}
-
               {onDelete && (
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => onDelete(message.id)}
+                  onClick={(event) => {
+                    event?.stopPropagation?.();
+                    onDelete(message.id);
+                  }}
                   className="w-7 h-7 rounded-md text-muted hover:text-danger hover:bg-danger/10 transition-colors"
                   title={t("chatmessage.DeleteMessage")}
                   aria-label="Delete message"

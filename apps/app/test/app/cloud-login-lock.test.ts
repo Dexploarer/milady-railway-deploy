@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import React, { useEffect } from "react";
 import TestRenderer, { act } from "react-test-renderer";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const { mockClient } = vi.hoisted(() => ({
   mockClient: {
@@ -89,6 +89,8 @@ type ProbeApi = {
   handleOnboardingNext: () => Promise<void>;
   handleOnboardingBack: () => void;
   handleCloudLogin: () => Promise<void>;
+  getCloudLoginBusy: () => boolean;
+  getCloudLoginError: () => string | null;
 };
 
 function Probe(props: { onReady: (api: ProbeApi) => void }) {
@@ -102,6 +104,8 @@ function Probe(props: { onReady: (api: ProbeApi) => void }) {
       handleOnboardingNext: app.handleOnboardingNext,
       handleOnboardingBack: app.handleOnboardingBack,
       handleCloudLogin: app.handleCloudLogin,
+      getCloudLoginBusy: () => app.elizaCloudLoginBusy,
+      getCloudLoginError: () => app.elizaCloudLoginError,
     });
   }, [app, onReady]);
 
@@ -109,6 +113,10 @@ function Probe(props: { onReady: (api: ProbeApi) => void }) {
 }
 
 describe("cloud login locking", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   beforeEach(() => {
     Object.assign(window.location, { protocol: "file:", pathname: "/chat" });
     Object.assign(window, {
@@ -268,6 +276,130 @@ describe("cloud login locking", () => {
     });
 
     expect(mockClient.cloudLogin).toHaveBeenCalledTimes(2);
+
+    await act(async () => {
+      tree?.unmount();
+    });
+  });
+
+  it("stops polling after repeated Eliza Cloud status errors and allows retry", async () => {
+    vi.useFakeTimers();
+    Object.assign(window, {
+      open: vi.fn(() => ({})),
+    });
+    const consoleErrorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+
+    mockClient.cloudLogin.mockResolvedValue({
+      ok: true,
+      browserUrl: "https://www.elizacloud.ai/auth/cli-login?session=session-1",
+      sessionId: "session-1",
+    });
+    mockClient.cloudLoginPoll.mockImplementation(async () => {
+      throw new Error("HTTP 502");
+    });
+
+    let api: ProbeApi | null = null;
+    let tree: TestRenderer.ReactTestRenderer;
+    await act(async () => {
+      tree = TestRenderer.create(
+        React.createElement(
+          AppProvider,
+          null,
+          React.createElement(Probe, {
+            onReady: (nextApi) => {
+              api = nextApi;
+            },
+          }),
+        ),
+      );
+    });
+
+    expect(api).not.toBeNull();
+
+    await act(async () => {
+      await api?.handleCloudLogin();
+    });
+    expect(api?.getCloudLoginBusy()).toBe(true);
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(3100);
+    });
+
+    expect(mockClient.cloudLoginPoll).toHaveBeenCalledTimes(3);
+    expect(api?.getCloudLoginBusy()).toBe(false);
+    expect(api?.getCloudLoginError()).toContain(
+      "Eliza Cloud login check failed after repeated errors.",
+    );
+    expect(api?.getCloudLoginError()).toContain("HTTP 502");
+
+    await act(async () => {
+      await api?.handleCloudLogin();
+    });
+
+    expect(mockClient.cloudLogin).toHaveBeenCalledTimes(2);
+
+    consoleErrorSpy.mockRestore();
+    await act(async () => {
+      tree?.unmount();
+    });
+  });
+
+  it("does not overlap Eliza Cloud status polls while a request is in flight", async () => {
+    vi.useFakeTimers();
+    Object.assign(window, {
+      open: vi.fn(() => ({})),
+    });
+
+    const firstPoll = createDeferred<{ status: "pending" }>();
+    mockClient.cloudLogin.mockResolvedValue({
+      ok: true,
+      browserUrl: "https://www.elizacloud.ai/auth/cli-login?session=session-1",
+      sessionId: "session-1",
+    });
+    mockClient.cloudLoginPoll
+      .mockReturnValueOnce(firstPoll.promise)
+      .mockResolvedValue({ status: "pending" });
+
+    let api: ProbeApi | null = null;
+    let tree: TestRenderer.ReactTestRenderer;
+    await act(async () => {
+      tree = TestRenderer.create(
+        React.createElement(
+          AppProvider,
+          null,
+          React.createElement(Probe, {
+            onReady: (nextApi) => {
+              api = nextApi;
+            },
+          }),
+        ),
+      );
+    });
+
+    expect(api).not.toBeNull();
+
+    await act(async () => {
+      await api?.handleCloudLogin();
+    });
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(3100);
+    });
+
+    expect(mockClient.cloudLoginPoll).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      firstPoll.resolve({ status: "pending" });
+      await firstPoll.promise;
+    });
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1000);
+    });
+
+    expect(mockClient.cloudLoginPoll).toHaveBeenCalledTimes(2);
 
     await act(async () => {
       tree?.unmount();
