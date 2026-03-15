@@ -1,219 +1,264 @@
+import { useCallback, useEffect, useRef } from "react";
 import { releaseData } from "../generated/release-data";
-
-const ELIZA_CLOUD_LOGIN_URL =
-  "https://elizacloud.ai/login?returnTo=%2Fdashboard%2Fmilady";
+import { AppleIcon, WindowsIcon, LinuxIcon } from "./Hero";
 
 const shellCommand = releaseData.scripts.shell.command;
 const powershellCommand = releaseData.scripts.powershell.command;
-const checksumCommand = releaseData.release.checksum
-  ? [
-      "cd ~/Downloads",
-      `curl -fsSLO ${releaseData.release.checksum.url}`,
-      "shasum -a 256 --check --ignore-missing SHA256SUMS.txt",
-    ].join("\n")
-  : "";
+
+function PlatformIcon({ id }: { id: string }) {
+  if (id.includes("macos")) return <AppleIcon />;
+  if (id.includes("windows")) return <WindowsIcon />;
+  return <LinuxIcon />;
+}
+
+function platformShortLabel(id: string): string {
+  if (id.includes("arm64")) return "Mac M1+";
+  if (id.includes("x64") && id.includes("macos")) return "Mac Intel";
+  if (id.includes("windows")) return "Windows";
+  return "Linux";
+}
+
+/* ── Code Rain Canvas ──────────────────────────────────────────────── */
+
+const CHARS = "MILADY".split("");
+const FONT_SIZE = 14;
+const RAIN_COLOR = "rgba(0,0,0,0.08)";
+const RAIN_HEAD_COLOR = "rgba(0,0,0,0.25)";
+
+function CodeRainBackground() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const columnsRef = useRef<number[]>([]);
+  const rafRef = useRef<number>(0);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const resize = () => {
+      canvas.width = canvas.offsetWidth * window.devicePixelRatio;
+      canvas.height = canvas.offsetHeight * window.devicePixelRatio;
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+      const cols = Math.floor(canvas.offsetWidth / FONT_SIZE);
+      columnsRef.current = Array.from({ length: cols }, () =>
+        Math.floor(Math.random() * canvas.offsetHeight / FONT_SIZE)
+      );
+    };
+
+    resize();
+    window.addEventListener("resize", resize);
+
+    let lastTime = 0;
+    const draw = (time: number) => {
+      if (time - lastTime < 50) {
+        rafRef.current = requestAnimationFrame(draw);
+        return;
+      }
+      lastTime = time;
+
+      const w = canvas.offsetWidth;
+      const h = canvas.offsetHeight;
+
+      // Fade existing content
+      ctx.fillStyle = "rgba(255,255,255,0.15)";
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.font = `${FONT_SIZE}px monospace`;
+
+      const columns = columnsRef.current;
+      for (let i = 0; i < columns.length; i++) {
+        const char = CHARS[Math.floor(Math.random() * CHARS.length)];
+        const x = i * FONT_SIZE;
+        const y = columns[i] * FONT_SIZE;
+
+        // Head character is darker
+        ctx.fillStyle = RAIN_HEAD_COLOR;
+        ctx.fillText(char, x, y);
+
+        // Trail characters lighter
+        if (columns[i] > 1) {
+          ctx.fillStyle = RAIN_COLOR;
+          const trailChar = CHARS[Math.floor(Math.random() * CHARS.length)];
+          ctx.fillText(trailChar, x, y - FONT_SIZE);
+        }
+
+        // Reset or advance
+        if (y > h && Math.random() > 0.975) {
+          columns[i] = 0;
+        }
+        columns[i]++;
+      }
+
+      rafRef.current = requestAnimationFrame(draw);
+    };
+
+    // Fill initial white
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
+
+    rafRef.current = requestAnimationFrame(draw);
+
+    return () => {
+      window.removeEventListener("resize", resize);
+      cancelAnimationFrame(rafRef.current);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="absolute inset-0 w-full h-full"
+      style={{ display: "block" }}
+    />
+  );
+}
+
+/* ── Reveal Mask (follows cursor) ──────────────────────────────────── */
+
+function RevealMask() {
+  const maskRef = useRef<HTMLDivElement>(null);
+
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    const el = maskRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    el.style.setProperty("--mx", `${x}px`);
+    el.style.setProperty("--my", `${y}px`);
+    el.style.setProperty("--reveal-opacity", "1");
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    const el = maskRef.current;
+    if (!el) return;
+    el.style.setProperty("--reveal-opacity", "0");
+  }, []);
+
+  useEffect(() => {
+    const el = maskRef.current;
+    if (!el) return;
+    const parent = el.parentElement;
+    if (!parent) return;
+    parent.addEventListener("mousemove", handleMouseMove);
+    parent.addEventListener("mouseleave", handleMouseLeave);
+    return () => {
+      parent.removeEventListener("mousemove", handleMouseMove);
+      parent.removeEventListener("mouseleave", handleMouseLeave);
+    };
+  }, [handleMouseMove, handleMouseLeave]);
+
+  return (
+    <div
+      ref={maskRef}
+      className="reveal-mask"
+      style={
+        {
+          "--mx": "50%",
+          "--my": "50%",
+          "--reveal-opacity": "0",
+        } as React.CSSProperties
+      }
+    />
+  );
+}
+
+/* ── Downloads Section ─────────────────────────────────────────────── */
 
 export function Downloads() {
   return (
     <section
       id="install"
-      className="relative overflow-hidden bg-white py-48 text-dark"
+      className="relative overflow-hidden py-32 text-dark"
     >
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(240,185,11,0.16),transparent_40%),radial-gradient(circle_at_bottom_right,rgba(11,53,241,0.1),transparent_40%)]" />
-      <div className="relative z-10 mx-auto grid max-w-7xl grid-cols-1 gap-16 px-6 md:px-12 lg:grid-cols-12">
-        <div className="lg:col-span-4">
-          <p className="mb-4 font-mono text-xs uppercase tracking-[0.2em] text-brand">
-            Distribution
+      {/* Code rain background */}
+      <CodeRainBackground />
+
+      {/* White overlay with cursor reveal hole */}
+      <RevealMask />
+
+      {/* Content */}
+      <div className="relative z-10 mx-auto max-w-4xl px-6 md:px-12">
+        {/* Header */}
+        <div className="text-center mb-16">
+          <p className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-brand">
+            Install
           </p>
-          <h2 className="text-5xl font-black uppercase tracking-tighter md:text-7xl">
-            Release-backed install paths.
+          <h2 className="text-3xl font-black uppercase tracking-tighter md:text-5xl">
+            Get Milady
           </h2>
-          <p className="mt-6 max-w-xl text-base leading-8 text-dark/70">
-            Desktop buttons are generated from GitHub release assets instead of
-            hardcoded placeholders. Eliza Cloud and remote self-hosting now sit
-            alongside the download flow so users can either run local or attach
-            to a hosted backend from the same frontend.
+          <p className="mx-auto mt-4 max-w-lg text-sm leading-7 text-dark/60">
+            Download the desktop app or bootstrap via terminal.
+            All artifacts pulled from GitHub Releases.
           </p>
-          <div className="mt-8 border border-dark/10 bg-black px-5 py-4 font-mono text-sm text-white">
-            <div className="text-[10px] uppercase tracking-[0.2em] text-white/50">
-              Current channel
+        </div>
+
+        {/* Download buttons — compact row */}
+        <div className="flex flex-wrap justify-center gap-3 mb-16">
+          {releaseData.release.downloads.map((download) => (
+            <a
+              key={download.id}
+              href={download.url}
+              target="_blank"
+              rel="noreferrer"
+              className="group flex items-center gap-2.5 border border-dark/10 bg-white px-5 py-3 font-mono text-sm transition-all duration-200 hover:border-dark hover:bg-black hover:text-white"
+            >
+              <PlatformIcon id={download.id} />
+              <span className="font-bold uppercase tracking-wide">
+                {platformShortLabel(download.id)}
+              </span>
+              <span className="text-[10px] text-dark/40 group-hover:text-white/40">
+                {download.sizeLabel}
+              </span>
+            </a>
+          ))}
+        </div>
+
+        {/* Install commands */}
+        <div className="grid gap-4 md:grid-cols-2 mb-12">
+          <div className="bg-black rounded-lg p-5 text-white">
+            <div className="flex items-center justify-between mb-3">
+              <span className="font-mono text-[11px] uppercase tracking-[0.15em] text-white/70 font-bold">
+                macOS / Linux / WSL
+              </span>
             </div>
-            <div className="mt-2 text-lg font-bold uppercase tracking-[0.08em]">
-              {releaseData.release.prerelease ? "Canary" : "Stable"} •{" "}
-              {releaseData.release.tagName}
+            <pre className="overflow-x-auto text-xs text-green-400 leading-relaxed">
+              <code>{shellCommand}</code>
+            </pre>
+          </div>
+
+          <div className="bg-black rounded-lg p-5 text-white">
+            <div className="flex items-center justify-between mb-3">
+              <span className="font-mono text-[11px] uppercase tracking-[0.15em] text-white/70 font-bold">
+                Windows PowerShell
+              </span>
             </div>
-            <div className="mt-1 text-[11px] uppercase tracking-[0.18em] text-white/50">
-              Published {releaseData.release.publishedAtLabel}
-            </div>
+            <pre className="overflow-x-auto text-xs text-blue-400 leading-relaxed">
+              <code>{powershellCommand}</code>
+            </pre>
           </div>
         </div>
 
-        <div className="space-y-6 lg:col-span-8">
-          <div className="grid gap-4 md:grid-cols-2">
-            {releaseData.release.downloads.map((download) => (
-              <a
-                key={download.id}
-                href={download.url}
-                target="_blank"
-                rel="noreferrer"
-                className="group border border-dark/10 bg-white p-6 transition-colors duration-300 hover:border-dark hover:bg-black hover:text-white"
-              >
-                <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-dark/45 group-hover:text-white/45">
-                  {download.note}
-                </div>
-                <div className="mt-3 text-2xl font-black uppercase tracking-tight">
-                  {download.label}
-                </div>
-                <div className="mt-3 break-all font-mono text-xs text-dark/60 group-hover:text-white/60">
-                  {download.fileName}
-                </div>
-                <div className="mt-5 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.18em] text-dark/45 group-hover:text-white/45">
-                  <span>{download.sizeLabel}</span>
-                  <span>Download</span>
-                </div>
-              </a>
-            ))}
-          </div>
-
-          <div className="grid gap-6 md:grid-cols-2">
-            <CommandCard
-              eyebrow="macOS / Linux / WSL"
-              title="Shell bootstrap"
-              description="Copies the current install.sh from the Pages root."
-              code={shellCommand}
-            />
-            <CommandCard
-              eyebrow="Windows PowerShell"
-              title="PowerShell bootstrap"
-              description="Uses the same script currently shipped on the Pages site."
-              code={powershellCommand}
-            />
-          </div>
-
-          <div className="grid gap-6 md:grid-cols-2">
-            <InfoCard
-              eyebrow="Managed hosting"
-              title="Eliza Cloud"
-              body="Create managed Eliza Cloud instances at elizacloud.ai and connect the frontend to provisioned backend containers."
-              href={ELIZA_CLOUD_LOGIN_URL}
-              action="Open cloud"
-            />
-            <InfoCard
-              eyebrow="Self-hosted"
-              title="Remote backend"
-              body="Run Milady on your own box, expose it securely, then connect from onboarding with the backend address and MILADY_API_TOKEN."
-              href="https://github.com/milady-ai/milady#remote-backend-deployment"
-              action="Read setup"
-            />
-          </div>
-
-          <div className="grid gap-6 md:grid-cols-2">
-            <InfoCard
-              eyebrow="GitHub Releases"
-              title="Release page"
-              body="Open the full asset list, release notes, and changelog for the currently selected release."
-              href={releaseData.release.url}
-              action="Open release"
-            />
-            <InfoCard
-              eyebrow="Network path"
-              title="Tailscale attach"
-              body="Keep a remote Milady backend private with Tailscale serve or funnel, then connect from the Milady frontend with the same access key."
-              href="https://github.com/milady-ai/milady#tailscale"
-              action="View flow"
-            />
-          </div>
-
-          <div className="grid gap-6 md:grid-cols-2">
-            {releaseData.release.checksum ? (
-              <CommandCard
-                eyebrow="Verification"
-                title="Checksum verification"
-                description={`Downloads ${releaseData.release.checksum.fileName} from the selected release.`}
-                code={checksumCommand}
-              />
-            ) : (
-              <InfoCard
-                eyebrow="Verification"
-                title="Checksums unavailable"
-                body="This release did not publish a SHA256 checksum file, so verification stays on the release page."
-                href={releaseData.release.url}
-                action="Inspect assets"
-              />
-            )}
-            <InfoCard
-              eyebrow="Install surface"
-              title="Pages root scripts"
-              body="The deploy workflow copies install.sh and install.ps1 into the Pages artifact so the website and bootstrap commands stay in sync."
-              href={releaseData.scripts.shell.url}
-              action="Open install.sh"
-            />
-          </div>
+        {/* Footer info */}
+        <div className="flex flex-wrap items-center justify-center gap-6 text-center font-mono text-[11px] uppercase tracking-[0.15em] text-dark/40">
+          <span>
+            {releaseData.release.prerelease ? "Canary" : "Stable"} •{" "}
+            {releaseData.release.tagName}
+          </span>
+          <span>•</span>
+          <span>Published {releaseData.release.publishedAtLabel}</span>
+          <span>•</span>
+          <a
+            href={releaseData.release.url}
+            target="_blank"
+            rel="noreferrer"
+            className="text-brand hover:underline"
+          >
+            All release assets →
+          </a>
         </div>
       </div>
     </section>
-  );
-}
-
-function CommandCard({
-  eyebrow,
-  title,
-  description,
-  code,
-}: {
-  eyebrow: string;
-  title: string;
-  description: string;
-  code: string;
-}) {
-  return (
-    <div className="border border-dark/10 bg-black p-6 text-white">
-      <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/45">
-        {eyebrow}
-      </div>
-      <div className="mt-3 text-2xl font-black uppercase tracking-tight">
-        {title}
-      </div>
-      <p className="mt-3 text-sm leading-7 text-white/70">{description}</p>
-      <pre className="mt-5 overflow-x-auto border border-white/10 bg-white/[0.03] p-4 text-xs text-white">
-        <code>{code}</code>
-      </pre>
-    </div>
-  );
-}
-
-function InfoCard({
-  eyebrow,
-  title,
-  body,
-  href,
-  action,
-}: {
-  eyebrow: string;
-  title: string;
-  body: string;
-  href: string;
-  action: string;
-}) {
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noreferrer"
-      className="group border border-dark/10 bg-white p-6 transition-colors duration-300 hover:border-dark hover:bg-black hover:text-white"
-    >
-      <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-dark/45 group-hover:text-white/45">
-        {eyebrow}
-      </div>
-      <div className="mt-3 text-2xl font-black uppercase tracking-tight">
-        {title}
-      </div>
-      <p className="mt-3 text-sm leading-7 text-dark/70 group-hover:text-white/70">
-        {body}
-      </p>
-      <div className="mt-5 font-mono text-[10px] uppercase tracking-[0.18em] text-brand">
-        {action}
-      </div>
-    </a>
   );
 }
