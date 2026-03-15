@@ -34,6 +34,19 @@ const animeCssPath = resolve(
   "anime.css",
 );
 
+const stylesCssPath = resolve(
+  __dirname,
+  "..",
+  "..",
+  "..",
+  "..",
+  "packages",
+  "app-core",
+  "src",
+  "styles",
+  "styles.css",
+);
+
 describe("settings control styles", () => {
   it("renders the cloud source toggle as a rounded segmented control", async () => {
     let tree!: TestRenderer.ReactTestRenderer;
@@ -111,5 +124,17 @@ describe("settings control styles", () => {
     const css = readFileSync(animeCssPath, "utf8");
 
     expect(css).toContain("--accent-foreground: #1a1f26;");
+  });
+
+  it("applies shared padding rules to settings page buttons and cards", () => {
+    const css = readFileSync(stylesCssPath, "utf8");
+
+    expect(css).toContain(".settings-page-content");
+    expect(css).toContain(
+      ":is(button.inline-flex, a.inline-flex, .btn):not(.settings-compact-button):not(",
+    );
+    expect(css).toContain("min-height: 2.625rem;");
+    expect(css).toContain(".settings-card-button");
+    expect(css).toContain("min-height: 5.5rem;");
   });
 });

@@ -78,9 +78,6 @@ export function ThemeToggle({
   variant: _variant = "native",
 }: ThemeToggleProps) {
   const isDark = uiTheme === "dark";
-  const label = isDark
-    ? (t?.("header.switchToLight") ?? "Switch to light mode")
-    : (t?.("header.switchToDark") ?? "Switch to dark mode");
 
   const handleToggle = useCallback(() => {
     setUiTheme(isDark ? "light" : "dark");
@@ -91,8 +88,6 @@ export function ThemeToggle({
       type="button"
       onClick={handleToggle}
       className={`inline-flex items-center justify-center w-11 h-11 min-w-[44px] min-h-[44px] border border-border/50 bg-bg/50 backdrop-blur-md cursor-pointer text-sm leading-none hover:border-accent hover:text-txt font-medium hover:-translate-y-0.5 transition-all duration-300 hover:shadow-[0_0_15px_rgba(var(--accent),0.5)] active:scale-95 rounded-xl text-txt shadow-sm ${className ?? ""}`}
-      title={label}
-      aria-label={label}
       data-testid="theme-toggle"
     >
       {isDark ? (

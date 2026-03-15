@@ -457,6 +457,25 @@ describe("SettingsView Sections", () => {
       expect(navButtons.length).toBeGreaterThan(0);
     });
 
+    it("keeps the jump rail large-screen only and uses a single shared search field", async () => {
+      let tree: TestRenderer.ReactTestRenderer | null = null;
+
+      await act(async () => {
+        tree = TestRenderer.create(React.createElement(SettingsView));
+      });
+
+      const aside = tree?.root.findByType("aside");
+      expect(aside?.props.className).toContain("hidden");
+      expect(aside?.props.className).toContain("xl:flex");
+
+      const searchInputs = tree?.root.findAll(
+        (node) =>
+          node.type === "input" &&
+          node.props?.placeholder === "settings.searchPlaceholder",
+      );
+      expect(searchInputs).toHaveLength(1);
+    });
+
     it("does not render a redundant settings heading", async () => {
       let tree: TestRenderer.ReactTestRenderer | null = null;
 

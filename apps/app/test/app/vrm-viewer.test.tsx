@@ -226,4 +226,73 @@ describe("VrmViewer", () => {
       renderer?.unmount();
     });
   });
+
+  it("does not reload the VRM when only the world changes", async () => {
+    let renderer: TestRenderer.ReactTestRenderer | null = null;
+
+    await act(async () => {
+      renderer = TestRenderer.create(
+        <VrmViewer
+          vrmPath="/vrms/milady-1.vrm"
+          worldUrl="/worlds/companion-day.spz"
+          mouthOpen={0}
+        />,
+        {
+          createNodeMock: (element) => {
+            if (element.type === "canvas") {
+              return {
+                getBoundingClientRect: () => ({
+                  width: 640,
+                  height: 480,
+                  top: 0,
+                  left: 0,
+                  bottom: 480,
+                  right: 640,
+                  x: 0,
+                  y: 0,
+                  toJSON: () => ({}),
+                }),
+              };
+            }
+            return null;
+          },
+        },
+      );
+    });
+
+    const [instance] = getMockInstances();
+    expect(instance).toBeTruthy();
+
+    await act(async () => {
+      instance?.resolveReady();
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    expect(instance?.loadVrmFromUrl).toHaveBeenCalledTimes(1);
+    expect(instance?.setWorldUrl).toHaveBeenCalledWith(
+      "/worlds/companion-day.spz",
+    );
+
+    await act(async () => {
+      renderer?.update(
+        <VrmViewer
+          vrmPath="/vrms/milady-1.vrm"
+          worldUrl="/worlds/companion-night.spz"
+          mouthOpen={0}
+        />,
+      );
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    expect(instance?.loadVrmFromUrl).toHaveBeenCalledTimes(1);
+    expect(instance?.setWorldUrl).toHaveBeenLastCalledWith(
+      "/worlds/companion-night.spz",
+    );
+
+    await act(async () => {
+      renderer?.unmount();
+    });
+  });
 });

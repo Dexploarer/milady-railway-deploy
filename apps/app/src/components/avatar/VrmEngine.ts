@@ -850,8 +850,9 @@ export class VrmEngine {
       syncToTeleport: options.syncToTeleport ?? false,
     };
     incoming.mesh.opacity = 1;
-    reveal.outgoing?.mesh.parent?.add(reveal.outgoing.mesh);
-    reveal.outgoing && (reveal.outgoing.mesh.opacity = 1);
+    if (reveal.outgoing) {
+      reveal.outgoing.mesh.opacity = 1;
+    }
     this.worldReveal = reveal;
     this.setWorldRevealProgress(incoming, reveal.progress);
     if (reveal.outgoing) {
@@ -1061,12 +1062,12 @@ export class VrmEngine {
     ) {
       this.headLookTarget.set(
         THREE.MathUtils.clamp(
-          THREE.MathUtils.degToRad(lookAtYawDegrees),
+          THREE.MathUtils.degToRad(lookAtYawDegrees || 0),
           -0.55,
           0.55,
         ),
         THREE.MathUtils.clamp(
-          THREE.MathUtils.degToRad(lookAtPitchDegrees),
+          THREE.MathUtils.degToRad(lookAtPitchDegrees || 0),
           -0.3,
           0.24,
         ),
@@ -1626,30 +1627,38 @@ export class VrmEngine {
       -worldCenterBottom.y * COMPANION_WORLD_SCALE + worldFloorOffsetY,
       -worldCenterBottom.z * COMPANION_WORLD_SCALE,
     );
-    const worldReveal = this.createWorldRevealController(spark, splat, {
-      origin: worldCenterBottom,
-      radius: Math.max(
-        worldRevealRadius * COMPANION_WORLD_SCALE,
-        getRobustSplatRadialExtent(splat, worldCenterBottom) *
-          COMPANION_WORLD_SCALE,
-      ),
-    }, "reveal");
+    const worldReveal = this.createWorldRevealController(
+      spark,
+      splat,
+      {
+        origin: worldCenterBottom,
+        radius: Math.max(
+          worldRevealRadius * COMPANION_WORLD_SCALE,
+          getRobustSplatRadialExtent(splat, worldCenterBottom) *
+            COMPANION_WORLD_SCALE,
+        ),
+      },
+      "reveal",
+    );
     this.worldMesh = splat;
     if (worldReveal) {
       const syncToTeleport =
         this.revealStarted && this.teleportProgress < 0.999;
       const waitingForVrm = !outgoingWorld && !this.vrmReady;
+      const outgoingAnchor = outgoingWorld
+        ? getRobustSplatAnchor(outgoingWorld)
+        : null;
       const outgoingReveal =
-        outgoingWorld && !waitingForVrm
+        outgoingWorld && outgoingAnchor && !waitingForVrm
           ? this.createWorldRevealController(
               spark,
               outgoingWorld,
               {
-                origin: worldCenterBottom,
+                origin: outgoingAnchor,
                 radius: Math.max(
-                  worldRevealRadius * COMPANION_WORLD_SCALE,
-                  getRobustSplatRadialExtent(outgoingWorld, worldCenterBottom) *
+                  getRobustSplatRadialExtent(outgoingWorld, outgoingAnchor) *
                     COMPANION_WORLD_SCALE,
+                  worldRevealRadius * COMPANION_WORLD_SCALE,
                 ),
               },
               "hide",

@@ -67,6 +67,7 @@ export function VrmViewer(props: VrmViewerProps) {
     props.interactiveMode ?? "free",
   );
   const pointerParallaxRef = useRef<boolean>(props.pointerParallax ?? false);
+  const worldUrlRef = useRef<string>(props.worldUrl ?? "");
   const prefersWorldRendererRef = useRef<boolean>(Boolean(props.worldUrl));
   const lastStateEmitMsRef = useRef<number>(0);
   const mountedRef = useRef(true);
@@ -99,6 +100,7 @@ export function VrmViewer(props: VrmViewerProps) {
   cameraProfileRef.current = props.cameraProfile ?? "chat";
   interactionModeRef.current = props.interactiveMode ?? "free";
   pointerParallaxRef.current = props.pointerParallax ?? false;
+  worldUrlRef.current = props.worldUrl ?? "";
   prefersWorldRendererRef.current = Boolean(props.worldUrl);
   onEngineReadyRef.current = props.onEngineReady;
   onEngineStateRef.current = props.onEngineState;
@@ -262,7 +264,7 @@ export function VrmViewer(props: VrmViewerProps) {
       try {
         await engine.whenReady();
         if (!mountedRef.current || abortController.signal.aborted) return;
-        const worldUrl = props.worldUrl ?? "";
+        const worldUrl = worldUrlRef.current;
         if (worldUrl) {
           if (worldUrl !== currentWorldPathRef.current) {
             currentWorldPathRef.current = worldUrl;
@@ -308,7 +310,7 @@ export function VrmViewer(props: VrmViewerProps) {
         currentVrmPathRef.current = "";
       }
     };
-  }, [props.vrmPath, props.worldUrl]);
+  }, [props.vrmPath]);
 
   useEffect(() => {
     const engine = engineRef.current;

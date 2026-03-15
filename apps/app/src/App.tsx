@@ -25,7 +25,7 @@ import type { Tab } from "@milady/app-core/navigation";
 import { APPS_ENABLED, COMPANION_ENABLED } from "@milady/app-core/navigation";
 import { isLifoPopoutValue } from "@milady/app-core/platform";
 import { useApp } from "@milady/app-core/state";
-import { useCallback, useEffect, useState } from "react";
+import { type ReactNode, useCallback, useEffect, useState } from "react";
 import { AdvancedPageView } from "./components/AdvancedPageView";
 import { AvatarLoader } from "./components/avatar/AvatarLoader";
 import { CharacterView } from "./components/CharacterView";
@@ -62,6 +62,25 @@ function useIsPopout(): boolean {
   return popout;
 }
 
+function TabScrollView({ children }: { children: ReactNode }) {
+  return (
+    <div
+      data-shell-scroll-region="true"
+      className="flex-1 min-h-0 min-w-0 w-full overflow-y-auto"
+    >
+      {children}
+    </div>
+  );
+}
+
+function TabContentView({ children }: { children: ReactNode }) {
+  return (
+    <div className="flex-1 min-h-0 min-w-0 w-full overflow-hidden">
+      {children}
+    </div>
+  );
+}
+
 function ViewRouter() {
   const { tab } = useApp();
   const view = (() => {
@@ -74,26 +93,58 @@ function ViewRouter() {
         return <StreamView />;
       case "apps":
         // Apps disabled in production builds; fall through to chat
-        return APPS_ENABLED ? <AppsPageView /> : <ChatView />;
+        return APPS_ENABLED ? (
+          <TabScrollView>
+            <AppsPageView />
+          </TabScrollView>
+        ) : (
+          <ChatView />
+        );
       case "character":
       case "character-select":
-        return <CharacterView />;
+        return (
+          <TabScrollView>
+            <CharacterView />
+          </TabScrollView>
+        );
       case "wallets":
-        return <InventoryView />;
+        return (
+          <TabScrollView>
+            <InventoryView />
+          </TabScrollView>
+        );
       case "knowledge":
-        return <KnowledgeView />;
+        return (
+          <TabScrollView>
+            <KnowledgeView />
+          </TabScrollView>
+        );
       case "connectors":
-        return <ConnectorsPageView />;
+        return (
+          <TabScrollView>
+            <ConnectorsPageView />
+          </TabScrollView>
+        );
       case "triggers":
         return (
-          <section className="mx-auto w-full max-w-5xl">
-            <HeartbeatsView />
-          </section>
+          <TabScrollView>
+            <section className="mx-auto w-full max-w-5xl">
+              <HeartbeatsView />
+            </section>
+          </TabScrollView>
         );
       case "voice":
-        return <SettingsView key="settings-voice" initialSection="voice" />;
+        return (
+          <TabContentView>
+            <SettingsView key="settings-voice" initialSection="voice" />
+          </TabContentView>
+        );
       case "settings":
-        return <SettingsView key="settings-root" />;
+        return (
+          <TabContentView>
+            <SettingsView key="settings-root" />
+          </TabContentView>
+        );
       case "advanced":
       case "plugins":
       case "skills":
@@ -105,7 +156,11 @@ function ViewRouter() {
       case "lifo":
       case "logs":
       case "security":
-        return <AdvancedPageView />;
+        return (
+          <TabContentView>
+            <AdvancedPageView />
+          </TabContentView>
+        );
       default:
         return <ChatView />;
     }
@@ -159,18 +214,6 @@ export function App() {
   const [mobileConversationsOpen, setMobileConversationsOpen] = useState(false);
 
   const isChat = tab === "chat";
-  const isAdvancedTab =
-    tab === "advanced" ||
-    tab === "plugins" ||
-    tab === "skills" ||
-    tab === "actions" ||
-    tab === "fine-tuning" ||
-    tab === "trajectories" ||
-    tab === "runtime" ||
-    tab === "database" ||
-    tab === "lifo" ||
-    tab === "logs" ||
-    tab === "security";
   const unreadCount = unreadConversations?.size ?? 0;
   const mobileChatControls = isChatMobileLayout ? (
     <div className="flex items-center gap-2 w-max">
@@ -333,9 +376,7 @@ export function App() {
     ) : (
       <div className="flex flex-col flex-1 min-h-0 w-full font-body text-txt bg-bg">
         <Header />
-        <main
-          className={`flex-1 min-h-0 py-4 px-3 xl:py-6 xl:px-5 ${isAdvancedTab ? "overflow-hidden" : "overflow-y-auto"}`}
-        >
+        <main className="flex flex-1 min-h-0 min-w-0 overflow-hidden py-4 px-3 xl:py-6 xl:px-5">
           <ViewRouter />
         </main>
       </div>

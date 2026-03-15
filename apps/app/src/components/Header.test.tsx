@@ -104,9 +104,12 @@ describe("Header", () => {
     });
     expect(shellToggle).toBeDefined();
     expect(String(shellToggle.props.className)).toContain("border-border/60");
-    expect(String(shellToggle.props.className)).toContain("bg-bg-muted/90");
+    expect(String(shellToggle.props.className)).toContain("bg-transparent");
     expect(String(activeNativeToggle.props.className)).toContain(
       "text-[#8a6500]",
+    );
+    expect(String(activeNativeToggle.props.className)).toContain(
+      "bg-bg-muted/85",
     );
     expect(String(activeNativeToggle.props.className)).toContain(
       "dark:text-[#f0b232]",

@@ -1,3 +1,11 @@
+import { Button, Input } from "@milady/ui";
+import {
+  type CSSProperties,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import type {
   CreateTriggerRequest,
   TriggerSummary,
@@ -7,8 +15,6 @@ import { useApp } from "../state";
 import { confirmDesktopAction } from "../utils";
 import { formatDateTime, formatDurationMs } from "./format";
 import { StatCard, StatusBadge, StatusDot } from "./ui-badges";
-import { Button, Input } from "@milady/ui";
-import { type CSSProperties, useEffect, useMemo, useState } from "react";
 
 type TriggerType = "interval" | "once" | "cron";
 type TriggerWakeMode = "inject_now" | "next_autonomy_cycle";
@@ -164,6 +170,7 @@ export function HeartbeatsView() {
   const [expandedInstructions, setExpandedInstructions] = useState<Set<string>>(
     new Set(),
   );
+  const rootRef = useRef<HTMLDivElement | null>(null);
 
   const selectedRuns = useMemo(() => {
     if (!selectedRunsId) return [];
@@ -211,8 +218,19 @@ export function HeartbeatsView() {
     });
   };
 
+  const scrollToTop = () => {
+    const scrollContainer = rootRef.current?.closest<HTMLElement>(
+      "[data-shell-scroll-region='true']",
+    );
+    if (scrollContainer) {
+      scrollContainer.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
-    <div className="space-y-4">
+    <div ref={rootRef} className="space-y-4">
       <section className="rounded-xl border border-border bg-card p-4">
         <p className="text-xs text-muted">
           {t("triggersview.TriggersScheduleAu")}
@@ -522,7 +540,7 @@ export function HeartbeatsView() {
                           setEditingId(trigger.id);
                           setForm(formFromTrigger(trigger));
                           setFormError(null);
-                          window.scrollTo({ top: 0, behavior: "smooth" });
+                          scrollToTop();
                         }}
                       >
                         {t("triggersview.Edit")}
