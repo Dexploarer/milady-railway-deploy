@@ -319,7 +319,8 @@ export function VrmViewer(props: VrmViewerProps) {
     currentWorldPathRef.current = worldUrl;
     const abortController = new AbortController();
 
-    const worldLoadPromise = (async () => {
+    let worldLoadPromise: Promise<void> | null = null;
+    worldLoadPromise = (async () => {
       try {
         await engine.whenReady();
         if (!mountedRef.current || abortController.signal.aborted) return;

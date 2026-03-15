@@ -2,8 +2,27 @@
   "name": "@milady/app-core",
   "version": "1.0.0",
   "private": true,
+  "description": "Shared application core for Milady shells and white-label apps.",
   "type": "module",
+  "license": "MIT",
+  "homepage": "https://github.com/milady-ai/milady",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/milady-ai/milady.git",
+    "directory": "packages/app-core"
+  },
+  "keywords": [
+    "milady",
+    "app-core",
+    "react",
+    "elizaos"
+  ],
   "main": "src/index.ts",
+  "scripts": {
+    "clean": "rimraf dist",
+    "build:dist": "rimraf dist && tsc -p tsconfig.build.json && node ../../scripts/copy-package-assets.mjs packages/app-core src/styles src/i18n/locales && node ../../scripts/prepare-package-dist.mjs packages/app-core",
+    "pack:dry-run": "cd dist && npm pack --dry-run"
+  },
   "exports": {
     ".": "./src/index.ts",
     "./api": "./src/api/index.ts",
