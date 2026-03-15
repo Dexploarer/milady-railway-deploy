@@ -469,6 +469,7 @@ describe("SettingsView Sections", () => {
         .find((node) => node.props.className?.includes("settings-shell"));
       expect(shell?.props.className).toContain("min-h-full");
       expect(shell?.props.className).not.toContain("overflow-y-auto");
+      expect(shell?.props.className).not.toContain("overflow-x-hidden");
 
       const aside = tree?.root.findByType("aside");
       expect(aside?.props.className).toContain("hidden");

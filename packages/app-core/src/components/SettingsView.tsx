@@ -828,7 +828,7 @@ export function SettingsView({
   return (
     <div
       ref={shellRef}
-      className={`settings-shell flex min-h-full min-w-0 w-full flex-row items-start overflow-x-hidden ${inModal ? "h-full min-h-0 overflow-y-auto bg-transparent" : "bg-bg"}`}
+      className={`settings-shell flex min-h-full min-w-0 w-full flex-row items-start ${inModal ? "h-full min-h-0 overflow-y-auto bg-transparent" : "bg-bg"}`}
     >
       <SettingsSidebar
         sections={visibleSections}
@@ -840,7 +840,7 @@ export function SettingsView({
         className={`settings-page-content flex-1 min-w-0 scroll-smooth ${inModal ? "px-4 py-4 sm:px-6 sm:py-5 lg:px-8 lg:py-6" : "px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8"}`}
       >
         <div className={`${inModal ? "max-w-5xl" : "max-w-5xl"} mx-auto`}>
-          <div className="sticky top-0 z-20 -mx-1 mb-5 rounded-[1.35rem] border border-border/50 bg-bg/80 px-3 py-3 shadow-[0_18px_40px_rgba(0,0,0,0.2)] backdrop-blur-xl">
+          <div className="sticky top-0 z-20 mb-5 rounded-[1.35rem] border border-border/50 bg-bg/80 px-3 py-3 shadow-[0_18px_40px_rgba(0,0,0,0.2)] backdrop-blur-xl">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
               <div className="relative min-w-0 flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted" />
