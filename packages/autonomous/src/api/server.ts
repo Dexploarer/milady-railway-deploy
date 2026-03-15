@@ -126,7 +126,7 @@ import { handleAgentAdminRoutes } from "./agent-admin-routes";
 import { handleAgentLifecycleRoutes } from "./agent-lifecycle-routes";
 import { detectRuntimeModel, resolveProviderFromModel } from "./agent-model";
 import { handleAgentTransferRoutes } from "./agent-transfer-routes";
-import { handleAppsHyperscapeRoutes } from "../../../../../plugins/app-hyperscape/src/routes";
+import { handleAppsHyperscapeRoutes } from "@elizaos/app-hyperscape/routes";
 import { handleAppsRoutes } from "./apps-routes";
 import { handleAuthRoutes } from "./auth-routes";
 

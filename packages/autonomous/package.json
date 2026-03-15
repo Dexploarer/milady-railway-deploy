@@ -1,7 +1,6 @@
 {
   "name": "@milady/autonomous",
   "version": "1.0.0",
-  "private": true,
   "description": "Standalone Milady agent runtime and backend server package.",
   "type": "module",
   "license": "MIT",
@@ -24,7 +23,7 @@
   },
   "scripts": {
     "clean": "rimraf dist",
-    "build:dist": "rimraf dist && tsc -p tsconfig.build.json && node ../../scripts/prepare-package-dist.mjs packages/autonomous --compiled-prefix=milady/packages/autonomous/src",
+    "build:dist": "rimraf dist && tsc -p tsconfig.build.json && node ../../scripts/prepare-package-dist.mjs packages/autonomous --compiled-prefix=packages/autonomous/src",
     "pack:dry-run": "cd dist && npm pack --dry-run"
   },
   "exports": {
@@ -151,6 +150,9 @@
   },
   "peerDependencies": {
     "@elizaos/core": "next"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "devDependencies": {
     "typescript": "^5.9.3"

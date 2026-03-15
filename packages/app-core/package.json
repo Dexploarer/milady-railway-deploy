@@ -1,7 +1,6 @@
 {
   "name": "@milady/app-core",
   "version": "1.0.0",
-  "private": true,
   "description": "Shared application core for Milady shells and white-label apps.",
   "type": "module",
   "license": "MIT",
@@ -57,24 +56,27 @@
     "react-dom": "^19.0.0"
   },
   "dependencies": {
-    "@milady/autonomous": "workspace:*",
+    "@milady/autonomous": "^1.0.0",
     "@capacitor/core": "8.0.2",
     "@capacitor/haptics": "8.0.0",
     "@capacitor/preferences": "^8.0.1",
     "@pixiv/three-vrm": "^3.4.5",
     "@sparkjsdev/spark": "^0.1.10",
-    "@milady/capacitor-camera": "workspace:*",
-    "@milady/capacitor-canvas": "workspace:*",
-    "@milady/capacitor-desktop": "workspace:*",
-    "@milady/capacitor-gateway": "workspace:*",
-    "@milady/capacitor-location": "workspace:*",
-    "@milady/capacitor-screencapture": "workspace:*",
-    "@milady/capacitor-swabble": "workspace:*",
-    "@milady/capacitor-talkmode": "workspace:*",
-    "@milady/ui": "workspace:*",
+    "@milady/capacitor-camera": "^1.0.0",
+    "@milady/capacitor-canvas": "^1.0.0",
+    "@milady/capacitor-desktop": "^1.0.0",
+    "@milady/capacitor-gateway": "^1.0.0",
+    "@milady/capacitor-location": "^1.0.0",
+    "@milady/capacitor-screencapture": "^1.0.0",
+    "@milady/capacitor-swabble": "^1.0.0",
+    "@milady/capacitor-talkmode": "^1.0.0",
+    "@milady/ui": "^1.0.0",
     "three": "^0.182.0",
     "lucide-react": "^0.575.0",
     "zod": "^4.3.6"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "devDependencies": {
     "@types/react": "^19.0.0",
