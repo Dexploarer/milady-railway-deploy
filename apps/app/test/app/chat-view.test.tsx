@@ -589,6 +589,45 @@ describe("ChatView", () => {
     expect(sendButton?.props.disabled).toBe(true);
   });
 
+  it("uses vertical-only overflow for the native transcript pane", async () => {
+    mockUseApp.mockReturnValue(
+      createContext({
+        conversationMessages: [
+          { id: "assistant-1", role: "assistant", text: "hello", timestamp: 1 },
+        ],
+      }),
+    );
+
+    let tree: TestRenderer.ReactTestRenderer | undefined;
+    await act(async () => {
+      tree = TestRenderer.create(React.createElement(ChatView));
+    });
+    await flush();
+
+    const scrollRegion = tree?.root.findByProps({
+      "data-testid": "chat-messages-scroll",
+    });
+    expect(String(scrollRegion?.props.className)).toContain("overflow-y-auto");
+    expect(String(scrollRegion?.props.className)).toContain(
+      "overflow-x-hidden",
+    );
+  });
+
+  it("keeps the native composer action button level with the input row", async () => {
+    mockUseApp.mockReturnValue(createContext({ chatInput: "hello" }));
+
+    let tree: TestRenderer.ReactTestRenderer | undefined;
+    await act(async () => {
+      tree = TestRenderer.create(React.createElement(ChatView));
+    });
+    await flush();
+
+    const actionButton = tree?.root.findByProps({
+      "data-testid": "chat-composer-action",
+    });
+    expect(String(actionButton?.props.className)).not.toContain("mb-1.5");
+  });
+
   it("renders a labeled pending-image remove button that stays visible on mobile", async () => {
     mockUseApp.mockReturnValue(
       createContext({

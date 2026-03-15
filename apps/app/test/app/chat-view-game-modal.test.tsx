@@ -326,7 +326,7 @@ describe("ChatView game-modal variant", () => {
     expect(micButton.props.disabled).toBe(true);
   });
 
-  it("renders the game-modal composer unfocused with compact textarea sizing", async () => {
+  it("renders the game-modal composer unfocused with level control sizing", async () => {
     const focus = vi.fn();
 
     mockUseApp.mockReturnValue(createContext({ chatInput: "" }));
@@ -355,10 +355,14 @@ describe("ChatView game-modal variant", () => {
     });
 
     const textarea = tree?.root.findByType("textarea");
+    const actionButton = tree?.root.findByProps({
+      "data-testid": "chat-composer-action",
+    });
     expect(focus).not.toHaveBeenCalled();
-    expect(String(textarea.props.className)).toContain("h-[38px]");
+    expect(String(textarea.props.className)).toContain("h-[46px]");
     expect(String(textarea.props.className)).toContain("py-2");
     expect(String(textarea.props.className)).toContain("focus:ring-0");
+    expect(String(actionButton.props.className)).not.toContain("mb-1.5");
   });
 
   it("keeps only the latest two rendered companion rows", async () => {

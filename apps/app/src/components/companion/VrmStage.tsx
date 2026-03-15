@@ -13,7 +13,6 @@ import type {
   VrmEngineState,
 } from "../avatar/VrmEngine";
 import { VrmViewer } from "../avatar/VrmViewer";
-import { BubbleEmote } from "../BubbleEmote";
 import type { TranslatorFn } from "./walletUtils";
 
 export const VrmStage = memo(function VrmStage({
@@ -154,13 +153,6 @@ export const VrmStage = memo(function VrmStage({
         />
       )}
       {!vrmLoaded && !showVrmFallback && <AvatarLoader />}
-      <div className="absolute top-[15%] left-1/2 -translate-x-1/2 z-[5] pointer-events-none">
-        <BubbleEmote
-          moodTier="neutral"
-          activeAction={null}
-          visible={vrmLoaded}
-        />
-      </div>
     </div>
   );
 });

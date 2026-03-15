@@ -49,6 +49,7 @@ vi.mock("lucide-react", () => ({
   Menu: () => React.createElement("span", null, "☰"),
   Monitor: () => React.createElement("span", null, "🖥"),
   Smartphone: () => React.createElement("span", null, "📱"),
+  UserRound: () => React.createElement("span", null, "👤"),
   X: () => React.createElement("span", null, "✕"),
 }));
 

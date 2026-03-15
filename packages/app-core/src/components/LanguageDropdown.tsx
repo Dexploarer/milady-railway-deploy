@@ -30,6 +30,8 @@ export interface LanguageDropdownProps {
   t?: TranslatorFn;
   /** Optional extra className on the root */
   className?: string;
+  /** Optional extra className on the trigger button */
+  triggerClassName?: string;
   variant?: "native" | "companion";
 }
 
@@ -38,6 +40,7 @@ export function LanguageDropdown({
   setUiLanguage,
   t,
   className,
+  triggerClassName,
   variant = "native",
 }: LanguageDropdownProps) {
   const [open, setOpen] = useState(false);
@@ -88,7 +91,7 @@ export function LanguageDropdown({
   }, [open, updateMenuPos]);
 
   const current = LANGUAGES.find((l) => l.id === uiLanguage) ?? LANGUAGES[0];
-  const triggerClass = `inline-flex items-center gap-1.5 h-9 px-2 sm:px-3 border border-border/50 bg-bg/50 backdrop-blur-md text-[11px] sm:text-xs font-medium cursor-pointer transition-all duration-300 text-txt hover:border-accent hover:text-txt rounded-md shadow-sm ${open ? "border-accent text-txt bg-accent/5" : ""}`;
+  const triggerClass = `inline-flex items-center gap-1.5 h-9 px-2 sm:px-3 border border-border/50 bg-bg/50 backdrop-blur-md text-[11px] sm:text-xs font-medium cursor-pointer transition-all duration-300 text-txt hover:border-accent hover:text-txt rounded-md shadow-sm ${open ? "border-accent text-txt bg-accent/5" : ""} ${triggerClassName ?? ""}`;
   const optionClass = (selected: boolean) =>
     `w-full flex items-center justify-between px-3 py-2 text-sm transition-colors hover:bg-bg-hover cursor-pointer ${selected ? "text-txt bg-accent/5 font-medium" : "text-txt"}`;
 

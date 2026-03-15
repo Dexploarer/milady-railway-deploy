@@ -122,6 +122,19 @@ type TeleportFallbackShader = {
   };
 };
 
+type WorldDissolveController = {
+  mesh: SparkSplatMesh;
+  progressUniform: { value: number };
+};
+
+type WorldTransitionState = {
+  incoming: WorldDissolveController;
+  outgoing: SparkSplatMesh | null;
+  progress: number;
+  duration: number;
+  syncToTeleport: boolean;
+};
+
 const DEFAULT_CAMERA_ANIMATION: CameraAnimationConfig = {
   enabled: false,
   swayAmplitude: 0.06,
@@ -132,6 +145,8 @@ const DEFAULT_CAMERA_ANIMATION: CameraAnimationConfig = {
 const COMPANION_WORLD_SCALE = 3;
 const COMPANION_DARK_WORLD_FLOOR_OFFSET_Y = -0.95;
 const COMPANION_LIGHT_WORLD_FLOOR_OFFSET_Y = -0.35;
+const COMPANION_WORLD_DISSOLVE_DURATION = 0.8;
+const COMPANION_WORLD_DISSOLVE_EDGE = 0.28;
 const COMPANION_DOF_APERTURE_SIZE = 0.04;
 const COMPANION_WORLD_MAX_SPLATS = 1_000_000;
 const COMPANION_WORLD_BEHIND_CAMERA_PADDING = 0.75;
@@ -287,6 +302,34 @@ function getRobustSplatAnchor(splat: SparkSplatMesh): THREE.Vector3 {
   });
 }
 
+function getRobustPackedSplatYExtents(splatSource: {
+  numSplats?: number;
+  forEachSplat: SparkSplatMesh["forEachSplat"];
+}): { minY: number; maxY: number } {
+  const maxSamples = 4096;
+  const ySamples: number[] = [];
+  const splatCount = splatSource.numSplats ?? maxSamples;
+  const sampleStep =
+    splatCount > maxSamples
+      ? Math.max(1, Math.floor(splatCount / maxSamples))
+      : 1;
+
+  splatSource.forEachSplat((index, center) => {
+    if (sampleStep > 1 && index % sampleStep !== 0) return;
+    ySamples.push(center.y);
+  });
+
+  if (ySamples.length === 0) {
+    return { minY: 0, maxY: 1 };
+  }
+
+  ySamples.sort((a, b) => a - b);
+  return {
+    minY: quantileSorted(ySamples, 0.02),
+    maxY: quantileSorted(ySamples, 0.98),
+  };
+}
+
 function getCompanionWorldFloorOffsetY(url: string): number {
   const normalizedUrl = url.toLowerCase();
   return normalizedUrl.includes("night") ||
@@ -433,6 +476,8 @@ export class VrmEngine {
   private cameraProfile: CameraProfile = "chat";
   private worldUrl: string | null = null;
   private worldMesh: SparkSplatMesh | null = null;
+  private worldTransition: WorldTransitionState | null = null;
+  private worldRevealCompleted = false;
   private sparkRenderer: SparkRendererType | null = null;
   private worldLoadRequestId = 0;
   private pointerParallaxEnabled = false;
@@ -523,6 +568,169 @@ export class VrmEngine {
     this.sparkRenderer = sparkRenderer;
   }
 
+  private createWorldDissolveController(
+    spark: typeof import("@sparkjsdev/spark"),
+    mesh: SparkSplatMesh,
+    bounds: { minY: number; maxY: number },
+  ): WorldDissolveController | null {
+    const dyno = (
+      "dyno" in spark ? Reflect.get(spark as object, "dyno") : undefined
+    ) as
+      | {
+          Gsplat: unknown;
+          dynoBlock: (
+            inTypes: Record<string, unknown>,
+            outTypes: Record<string, unknown>,
+            construct: (
+              inputs: Record<string, unknown>,
+            ) => Record<string, unknown>,
+          ) => unknown;
+          dynoFloat: (value?: number, key?: string) => { value: number };
+          dynoConst: (type: string, value: number) => unknown;
+          splitGsplat: (gsplat: unknown) => {
+            outputs: { y: unknown; opacity: unknown };
+          };
+          combineGsplat: (value: Record<string, unknown>) => unknown;
+          add: (a: unknown, b: unknown) => unknown;
+          sub: (a: unknown, b: unknown) => unknown;
+          mul: (a: unknown, b: unknown) => unknown;
+          div: (a: unknown, b: unknown) => unknown;
+          clamp: (a: unknown, min: unknown, max: unknown) => unknown;
+        }
+      | undefined;
+    if (
+      !dyno?.Gsplat ||
+      !dyno.dynoBlock ||
+      !dyno.dynoFloat ||
+      !dyno.dynoConst ||
+      !dyno.splitGsplat ||
+      !dyno.combineGsplat ||
+      !dyno.add ||
+      !dyno.sub ||
+      !dyno.mul ||
+      !dyno.div ||
+      !dyno.clamp ||
+      !("SplatModifier" in spark)
+    ) {
+      return null;
+    }
+
+    const minYUniform = dyno.dynoFloat(bounds.minY, "uWorldDissolveMinY");
+    const maxYUniform = dyno.dynoFloat(bounds.maxY, "uWorldDissolveMaxY");
+    const edgeUniform = dyno.dynoFloat(
+      COMPANION_WORLD_DISSOLVE_EDGE,
+      "uWorldDissolveEdge",
+    );
+    const progressUniform = dyno.dynoFloat(1, "uWorldDissolveProgress");
+    const zero = dyno.dynoConst("float", 0);
+    const one = dyno.dynoConst("float", 1);
+    const two = dyno.dynoConst("float", 2);
+
+    const modifier = new spark.SplatModifier(
+      dyno.dynoBlock(
+        { gsplat: dyno.Gsplat },
+        { gsplat: dyno.Gsplat },
+        ({ gsplat }) => {
+          if (!gsplat) {
+            throw new Error("Missing gsplat input for world dissolve");
+          }
+          const { y, opacity } = dyno.splitGsplat(gsplat).outputs;
+          const threshold = dyno.add(
+            dyno.sub(minYUniform, edgeUniform),
+            dyno.mul(
+              dyno.add(
+                dyno.sub(maxYUniform, minYUniform),
+                dyno.mul(edgeUniform, two),
+              ),
+              progressUniform,
+            ),
+          );
+          const revealAlpha = dyno.clamp(
+            dyno.div(dyno.sub(threshold, y), edgeUniform),
+            zero,
+            one,
+          );
+          return {
+            gsplat: dyno.combineGsplat({
+              gsplat,
+              opacity: dyno.mul(opacity, revealAlpha),
+            }),
+          };
+        },
+      ),
+    );
+
+    mesh.worldModifier = modifier;
+    mesh.updateGenerator();
+
+    return {
+      mesh,
+      progressUniform,
+    };
+  }
+
+  private setWorldDissolveProgress(
+    controller: WorldDissolveController,
+    progress: number,
+  ): void {
+    controller.progressUniform.value = THREE.MathUtils.clamp(progress, 0, 1);
+  }
+
+  private beginWorldTransition(
+    transition: WorldTransitionState,
+    initialProgress = 0,
+  ): void {
+    transition.progress = THREE.MathUtils.clamp(initialProgress, 0, 1);
+    if (transition.outgoing) {
+      transition.outgoing.opacity = 1;
+    }
+    transition.incoming.mesh.opacity = 1;
+    this.setWorldDissolveProgress(transition.incoming, transition.progress);
+    this.worldTransition = transition;
+  }
+
+  private disposeSplatMesh(mesh: SparkSplatMesh | null): void {
+    if (!mesh) return;
+    mesh.parent?.remove(mesh);
+    mesh.dispose();
+  }
+
+  private cancelWorldTransition(): void {
+    if (!this.worldTransition) return;
+    this.setWorldDissolveProgress(this.worldTransition.incoming, 1);
+    this.worldTransition.incoming.mesh.opacity = 1;
+    this.disposeSplatMesh(this.worldTransition.outgoing);
+    this.worldTransition = null;
+  }
+
+  private updateWorldTransition(stableDelta: number): void {
+    const transition = this.worldTransition;
+    if (!transition) return;
+
+    const nextProgress = transition.syncToTeleport
+      ? this.revealStarted
+        ? this.teleportProgress
+        : this.vrmReady
+          ? 1
+          : 0
+      : Math.min(1, transition.progress + stableDelta / transition.duration);
+
+    transition.progress = nextProgress;
+    this.setWorldDissolveProgress(transition.incoming, nextProgress);
+
+    if (transition.outgoing) {
+      transition.outgoing.opacity = Math.max(0, 1 - nextProgress);
+    }
+
+    if (nextProgress < 1) return;
+
+    transition.incoming.mesh.opacity = 1;
+    this.setWorldDissolveProgress(transition.incoming, 1);
+    this.disposeSplatMesh(transition.outgoing);
+    this.worldTransition = null;
+    this.worldRevealCompleted = true;
+  }
+
   private updateSparkDepthOfField(camera: THREE.PerspectiveCamera): void {
     const sparkRenderer = this.sparkRenderer;
     if (!sparkRenderer) return;
@@ -610,17 +818,23 @@ export class VrmEngine {
     this.headLookCurrent.set(0, 0);
   }
 
-  private updateAvatarLookTarget(camera: THREE.PerspectiveCamera): void {
+  private updateAvatarLookTarget(
+    camera: THREE.PerspectiveCamera,
+    stableDelta: number,
+  ): void {
     const target = this.avatarLookTarget;
     if (!target) return;
     this.tempAvatarLookTarget.copy(camera.position);
-    this.tempAvatarLookTarget.y -= 0.06;
-    target.position.set(
-      this.tempAvatarLookTarget.x,
-      this.tempAvatarLookTarget.y,
-      this.tempAvatarLookTarget.z,
-    );
+    const follow = Math.min(1, stableDelta * 24);
+    target.position.lerp(this.tempAvatarLookTarget, follow);
     target.updateMatrixWorld(true);
+  }
+
+  private refreshAvatarEyeTracking(): void {
+    const vrm = this.vrm;
+    if (!vrm?.lookAt || !this.avatarLookTarget) return;
+    vrm.lookAt.update(0);
+    vrm.expressionManager?.update();
   }
 
   private applyAvatarHeadTracking(
@@ -665,7 +879,7 @@ export class VrmEngine {
     } else {
       headBone.getWorldPosition(this.tempAvatarHeadWorld);
       this.tempAvatarLocalTarget.copy(camera.position);
-      this.tempAvatarLocalTarget.y -= 0.06;
+      this.tempAvatarLocalTarget.y -= 0.04;
       headParent.worldToLocal(this.tempAvatarLocalTarget);
       headParent.worldToLocal(
         this.tempAvatarLocalAnchor.copy(this.tempAvatarHeadWorld),
@@ -1240,17 +1454,24 @@ export class VrmEngine {
 
     const requestId = ++this.worldLoadRequestId;
     this.worldUrl = normalizedUrl;
-    this.disposeWorld();
-    if (!normalizedUrl) return;
+    this.cancelWorldTransition();
+    const outgoingWorld = this.worldMesh;
+    if (!normalizedUrl) {
+      this.disposeWorld();
+      return;
+    }
 
     await this.ensureSparkRenderer();
-    const { SplatMesh } = await this.loadSparkModule();
+    const spark = await this.loadSparkModule();
+    const { SplatMesh } = spark;
     let worldAnchor = new THREE.Vector3(0, 0, 0);
+    let worldYExtents = { minY: 0, maxY: 1 };
     const splat = new SplatMesh({
       url: normalizedUrl,
       maxSplats: COMPANION_WORLD_MAX_SPLATS,
       constructSplats: (packedSplats) => {
         worldAnchor = getRobustPackedSplatAnchor(packedSplats);
+        worldYExtents = getRobustPackedSplatYExtents(packedSplats);
         this.compactWorldSplatsToCameraFront(
           packedSplats,
           normalizedUrl,
@@ -1284,7 +1505,27 @@ export class VrmEngine {
       -worldCenterBottom.y * COMPANION_WORLD_SCALE + worldFloorOffsetY,
       -worldCenterBottom.z * COMPANION_WORLD_SCALE,
     );
+    const worldDissolve = this.createWorldDissolveController(spark, splat, {
+      minY: worldYExtents.minY * COMPANION_WORLD_SCALE + splat.position.y,
+      maxY: worldYExtents.maxY * COMPANION_WORLD_SCALE + splat.position.y,
+    });
+    const isInitialReveal = !outgoingWorld && !this.worldRevealCompleted;
     this.worldMesh = splat;
+    if (worldDissolve) {
+      this.beginWorldTransition(
+        {
+          incoming: worldDissolve,
+          outgoing: outgoingWorld,
+          progress: 0,
+          duration: COMPANION_WORLD_DISSOLVE_DURATION,
+          syncToTeleport: isInitialReveal,
+        },
+        isInitialReveal && this.revealStarted ? this.teleportProgress : 0,
+      );
+    } else {
+      this.disposeSplatMesh(outgoingWorld);
+      this.worldRevealCompleted = true;
+    }
   }
   async playEmote(
     path: string,
@@ -1695,6 +1936,7 @@ if (teleportNoise < teleportRatio) discard;
       const blinkValue = this.blinkController.update(rawDelta);
       this.vrm.expressionManager?.setValue("blink", blinkValue);
     }
+    this.updateWorldTransition(stableDelta);
 
     // Process camera transition
     if (this.isCameraTransitioning) {
@@ -1809,9 +2051,10 @@ if (teleportNoise < teleportRatio) discard;
       camera.lookAt(this.pointerParallaxLookAt);
     }
     if (this.vrm) {
-      this.updateAvatarLookTarget(camera);
+      this.updateAvatarLookTarget(camera, stableDelta);
       this.vrm.update(stableDelta);
       this.applyAvatarHeadTracking(camera, stableDelta);
+      this.refreshAvatarEyeTracking();
       this.footShadow.update(this.vrm);
     }
     this.updateSparkDepthOfField(camera);
@@ -1822,12 +2065,8 @@ if (teleportNoise < teleportRatio) discard;
     if (this.sparkRenderer) {
       this.sparkRenderer.apertureAngle = 0;
     }
-    if (!this.worldMesh) {
-      this.worldMesh = null;
-      return;
-    }
-    this.worldMesh.parent?.remove(this.worldMesh);
-    this.worldMesh.dispose();
+    this.cancelWorldTransition();
+    this.disposeSplatMesh(this.worldMesh);
     this.worldMesh = null;
   }
   private async loadAndPlayIdle(vrm: VRM): Promise<void> {

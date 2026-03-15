@@ -1,13 +1,50 @@
 import { LanguageDropdown, ThemeToggle } from "@milady/app-core/components";
 import type { UiLanguage } from "@milady/app-core/i18n";
 import type { UiShellMode, UiTheme } from "@milady/app-core/state";
-import { CircleUserRound, Monitor } from "lucide-react";
-import type { ReactNode } from "react";
+import { type LucideIcon, Monitor, Smartphone, UserRound } from "lucide-react";
+import { type ReactNode, useEffect, useState } from "react";
 
 export const HEADER_ICON_BUTTON_CLASSNAME =
   "inline-flex items-center justify-center w-11 h-11 min-w-[44px] min-h-[44px] border border-border/50 bg-bg/50 backdrop-blur-md cursor-pointer text-sm leading-none hover:border-accent hover:text-txt font-medium hover:-translate-y-0.5 transition-all duration-300 hover:shadow-[0_0_15px_rgba(var(--accent),0.5)] active:scale-95 rounded-xl text-txt shadow-sm";
 
 type ShellHeaderTranslator = (key: string) => string;
+
+const SHELL_MODE_MOBILE_BREAKPOINT = 768;
+
+function useIsMobileShellViewport(): boolean {
+  const [isMobileViewport, setIsMobileViewport] = useState(() =>
+    typeof window !== "undefined"
+      ? window.innerWidth <= SHELL_MODE_MOBILE_BREAKPOINT
+      : false,
+  );
+
+  useEffect(() => {
+    if (
+      typeof window === "undefined" ||
+      typeof window.matchMedia !== "function"
+    ) {
+      return;
+    }
+
+    const mediaQuery = window.matchMedia(
+      `(max-width: ${SHELL_MODE_MOBILE_BREAKPOINT}px)`,
+    );
+    const syncViewport = () => {
+      setIsMobileViewport(mediaQuery.matches);
+    };
+    syncViewport();
+
+    if (typeof mediaQuery.addEventListener === "function") {
+      mediaQuery.addEventListener("change", syncViewport);
+      return () => mediaQuery.removeEventListener("change", syncViewport);
+    }
+
+    mediaQuery.addListener(syncViewport);
+    return () => mediaQuery.removeListener(syncViewport);
+  }, []);
+
+  return isMobileViewport;
+}
 
 interface ShellHeaderControlsProps {
   shellMode: UiShellMode | null | undefined;
@@ -36,21 +73,22 @@ export function ShellHeaderControls({
   className,
   controlsVariant = "native",
 }: ShellHeaderControlsProps) {
+  const isMobileViewport = useIsMobileShellViewport();
   const activeShellMode = shellMode ?? "companion";
   const shellOptions: Array<{
     mode: UiShellMode;
     label: string;
-    Icon: typeof CircleUserRound;
+    Icon: LucideIcon;
   }> = [
     {
       mode: "companion",
       label: t("header.companionMode"),
-      Icon: CircleUserRound,
+      Icon: UserRound,
     },
     {
       mode: "native",
       label: t("header.nativeMode"),
-      Icon: Monitor,
+      Icon: isMobileViewport ? Smartphone : Monitor,
     },
   ];
 
@@ -60,7 +98,7 @@ export function ShellHeaderControls({
     >
       <div className="flex shrink-0 items-center">
         <fieldset
-          className="inline-flex items-center gap-1 rounded-full border border-white/25 bg-white/70 p-1 shadow-[0_10px_24px_rgba(15,23,42,0.16)] backdrop-blur-md dark:border-white/12 dark:bg-white/10"
+          className="inline-flex items-center gap-1 rounded-[18px] border border-white/25 bg-white/70 p-1 shadow-[0_10px_24px_rgba(15,23,42,0.16)] backdrop-blur-md dark:border-white/12 dark:bg-white/10"
           data-testid="ui-shell-toggle"
           aria-label={t("header.switchToNative")}
         >
@@ -69,8 +107,8 @@ export function ShellHeaderControls({
             const selected = activeShellMode === mode;
             const segmentShapeClass =
               index === 0
-                ? "rounded-l-full rounded-r-md"
-                : "rounded-l-md rounded-r-full";
+                ? "rounded-l-[14px] rounded-r-[10px]"
+                : "rounded-l-[10px] rounded-r-[14px]";
             return (
               <button
                 key={mode}
@@ -102,12 +140,14 @@ export function ShellHeaderControls({
           setUiLanguage={setUiLanguage}
           t={t}
           variant={controlsVariant}
+          triggerClassName="!h-10 !min-h-10 !rounded-xl !px-3.5 sm:!px-3.5 leading-none"
         />
         <ThemeToggle
           uiTheme={uiTheme}
           setUiTheme={setUiTheme}
           t={t}
           variant={controlsVariant}
+          className="!h-10 !w-10 !min-h-10 !min-w-10"
         />
       </div>
     </div>

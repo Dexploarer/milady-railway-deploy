@@ -346,6 +346,12 @@ vi.mock("@sparkjsdev/spark", () => ({
       hoisted.mockSparkRendererOptions.push(options ?? {});
     }
   },
+  SplatModifier: class MockSplatModifier {
+    modifier: unknown;
+    constructor(modifier: unknown) {
+      this.modifier = modifier;
+    }
+  },
   SplatGenerator: class MockSplatGenerator {},
   SplatMesh: class MockSplatMesh {
     initialized = Promise.resolve();
@@ -354,10 +360,12 @@ vi.mock("@sparkjsdev/spark", () => ({
     frustumCulled = false;
     renderOrder = 0;
     visible = true;
+    opacity = 1;
     children: unknown[] = [];
-    position = { set: vi.fn() };
+    position = { set: vi.fn(), y: 0 };
     quaternion = { set: vi.fn(), identity: vi.fn() };
     scale = { setScalar: vi.fn() };
+    worldModifier: unknown = null;
     getBoundingBox = vi.fn(() => ({
       min: { y: 0 },
       getCenter: vi.fn(() => ({ x: 0, y: 0, z: 0 })),
@@ -365,10 +373,24 @@ vi.mock("@sparkjsdev/spark", () => ({
     }));
     forEachSplat = vi.fn();
     update = vi.fn();
+    updateGenerator = vi.fn();
     dispose = vi.fn();
     constructor(options?: unknown) {
       hoisted.mockSplatMeshOptions.push(options ?? {});
     }
+  },
+  dyno: {
+    Gsplat: { type: "Gsplat" },
+    dynoBlock: vi.fn(() => ({ kind: "dynoBlock" })),
+    dynoFloat: vi.fn((value = 0) => ({ value })),
+    dynoConst: vi.fn((_type: string, value: number) => ({ value })),
+    splitGsplat: vi.fn(() => ({ outputs: { y: {}, opacity: {} } })),
+    combineGsplat: vi.fn((value: unknown) => value),
+    add: vi.fn(() => ({})),
+    sub: vi.fn(() => ({})),
+    mul: vi.fn(() => ({})),
+    div: vi.fn(() => ({})),
+    clamp: vi.fn(() => ({})),
   },
 }));
 
@@ -911,6 +933,72 @@ describe("VrmEngine", () => {
       expect(nightPosition[0]).toBeCloseTo(0, 5);
       expect(nightPosition[1]).toBeCloseTo(-0.95, 5);
       expect(nightPosition[2]).toBeCloseTo(0, 5);
+    });
+
+    it("syncs the first companion world reveal to the avatar teleport dissolve", async () => {
+      const canvas = createMockCanvas();
+      engine.setup(canvas, vi.fn());
+      await waitForEngineReady(engine);
+
+      await engine.setWorldUrl("/worlds/companion-day.spz");
+
+      const engineAny = engine as unknown as {
+        worldTransition: {
+          syncToTeleport: boolean;
+          incoming: {
+            mesh: {
+              worldModifier: unknown;
+              updateGenerator: ReturnType<typeof vi.fn>;
+            };
+          };
+        } | null;
+      };
+
+      expect(engineAny.worldTransition?.syncToTeleport).toBe(true);
+      expect(
+        engineAny.worldTransition?.incoming.mesh.worldModifier,
+      ).toBeTruthy();
+      expect(
+        engineAny.worldTransition?.incoming.mesh.updateGenerator,
+      ).toHaveBeenCalled();
+    });
+
+    it("dissolves only the world on theme swaps", async () => {
+      const canvas = createMockCanvas();
+      engine.setup(canvas, vi.fn());
+      await waitForEngineReady(engine);
+
+      await engine.setWorldUrl("/worlds/companion-day.spz");
+
+      const engineAny = engine as unknown as {
+        worldMesh: {
+          opacity: number;
+          dispose: ReturnType<typeof vi.fn>;
+        } | null;
+        worldTransition: {
+          syncToTeleport: boolean;
+          outgoing: {
+            opacity: number;
+            dispose: ReturnType<typeof vi.fn>;
+          } | null;
+        } | null;
+        updateWorldTransition: (stableDelta: number) => void;
+      };
+
+      const firstWorld = engineAny.worldMesh;
+      expect(firstWorld).toBeTruthy();
+
+      await engine.setWorldUrl("/worlds/companion-night.spz");
+
+      expect(engineAny.worldTransition?.syncToTeleport).toBe(false);
+      expect(engineAny.worldTransition?.outgoing).toBe(firstWorld);
+
+      engineAny.updateWorldTransition(0.4);
+      expect(firstWorld?.opacity).toBeLessThan(1);
+
+      engineAny.updateWorldTransition(0.4);
+      expect(firstWorld?.dispose).toHaveBeenCalled();
+      expect(engineAny.worldTransition).toBeNull();
     });
   });
 

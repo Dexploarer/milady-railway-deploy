@@ -23,8 +23,6 @@ import {
   type VoicePlaybackStartEvent,
 } from "@milady/app-core/hooks";
 import { getVrmPreviewUrl, useApp } from "@milady/app-core/state";
-import { Button, Textarea } from "@milady/ui";
-import { Mic, Paperclip, Send, Square } from "lucide-react";
 import {
   type ChangeEvent,
   type DragEvent,
@@ -36,6 +34,7 @@ import {
   useState,
 } from "react";
 import { AgentActivityBox } from "./AgentActivityBox";
+import { ChatComposer } from "./ChatComposer";
 import { ChatEmptyState, ChatMessage, TypingIndicator } from "./ChatMessage";
 import { MessageContent } from "./MessageContent";
 
@@ -43,13 +42,13 @@ function nowMs(): number {
   return typeof performance !== "undefined" ? performance.now() : Date.now();
 }
 
-const CHAT_INPUT_MIN_HEIGHT_PX = 38;
+const CHAT_INPUT_MIN_HEIGHT_PX = 46;
 const CHAT_INPUT_MAX_HEIGHT_PX = 200;
 const COMPANION_VISIBLE_MESSAGE_LIMIT = 2;
 const COMPANION_HISTORY_HOLD_MS = 30_000;
 const COMPANION_HISTORY_FADE_MS = 5_000;
 const COMPANION_MESSAGE_LAYER_TOP = "calc(-100% + 1.5rem)";
-const COMPANION_MESSAGE_LAYER_BOTTOM = "6.5rem";
+const COMPANION_MESSAGE_LAYER_BOTTOM = "4rem";
 const COMPANION_MESSAGE_LAYER_MASK =
   "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.28) 6%, rgba(0,0,0,0.82) 12%, black 17%, black 100%)";
 
@@ -509,7 +508,7 @@ export function ChatView({ variant = "default" }: ChatViewProps) {
         className={
           isGameModal
             ? "absolute inset-x-0 overflow-hidden select-none pointer-events-none"
-            : "chat-native-scrollbar flex-1 overflow-y-auto py-2 relative flex flex-col"
+            : "chat-native-scrollbar relative flex flex-1 flex-col overflow-x-hidden overflow-y-auto py-2"
         }
         style={
           isGameModal
@@ -553,7 +552,7 @@ export function ChatView({ variant = "default" }: ChatViewProps) {
                   style={{ opacity: gameModalCarryoverOpacity }}
                 >
                   <div
-                    className={`max-w-[85%] rounded-2xl px-4 py-3 text-[15px] leading-relaxed shadow-[0_12px_36px_rgba(0,0,0,0.22)] ${
+                    className={`max-w-[85%] rounded-2xl px-4 py-3 text-[15px] leading-relaxed ${
                       isUser
                         ? "bg-accent/85 text-white rounded-br-sm"
                         : "border border-white/10 bg-black/45 text-white/95 rounded-bl-sm backdrop-blur-md"
@@ -578,7 +577,7 @@ export function ChatView({ variant = "default" }: ChatViewProps) {
                   className={`flex w-full ${isUser ? "justify-end" : "justify-start"}`}
                 >
                   <div
-                    className={`max-w-[85%] rounded-2xl px-4 py-3 text-[15px] leading-relaxed shadow-[0_12px_36px_rgba(0,0,0,0.22)] ${
+                    className={`max-w-[85%] rounded-2xl px-4 py-3 text-[15px] leading-relaxed ${
                       isUser
                         ? "bg-accent/85 text-white rounded-br-sm"
                         : "border border-white/10 bg-black/45 text-white/95 rounded-bl-sm backdrop-blur-md"
@@ -728,78 +727,29 @@ export function ChatView({ variant = "default" }: ChatViewProps) {
           data-no-camera-drag="true"
           style={{ zIndex: 1 }}
         >
-          <div className="relative flex items-end min-h-[52px] gap-1 transition-all">
-            {/* Mic button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className={`flex shrink-0 items-center justify-center w-[46px] h-[46px] mb-1.5 rounded-full transition-all ${
-                voice.isListening
-                  ? "bg-accent/20 text-txt"
-                  : "bg-transparent text-white/50 hover:bg-white/10 hover:text-white"
-              } ${isComposerLocked ? "opacity-50" : ""}`}
-              onClick={voice.toggleListening}
-              aria-label={
-                isAgentStarting
-                  ? t("chat.agentStarting")
-                  : voice.isListening
-                    ? t("chat.stopListening")
-                    : t("chat.voiceInput")
-              }
-              disabled={isComposerLocked}
-            >
-              <Mic
-                className={`w-5 h-5 ${voice.isListening ? "animate-pulse" : ""}`}
-              />
-            </Button>
-
-            {/* Input */}
-            {voice.isListening && voice.interimTranscript ? (
-              <div className="flex-1 min-w-0 px-4 py-3 text-[15px] leading-relaxed text-white/80 italic font-[var(--font-chat)] bg-black/40 rounded-2xl min-h-[52px] flex items-center">
-                {voice.interimTranscript}
-              </div>
-            ) : (
-              <div className="flex-1 relative flex items-center bg-black/40 rounded-2xl transition-all min-h-[52px]">
-                <Textarea
-                  ref={textareaRef}
-                  className="w-full min-w-0 min-h-0 h-[38px] px-4 py-2 bg-transparent border-none text-[15px] leading-relaxed text-white resize-none overflow-y-hidden max-h-[150px] outline-none ring-0 shadow-none focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-white/30 font-[var(--font-chat)] disabled:opacity-50"
-                  rows={1}
-                  aria-label="Chat message"
-                  placeholder={
-                    isAgentStarting
-                      ? t("chat.agentStarting")
-                      : t("chat.inputPlaceholder")
-                  }
-                  value={chatInput}
-                  onChange={(e) => setState("chatInput", e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  disabled={isComposerLocked}
-                />
-              </div>
-            )}
-
-            {/* Send / Stop */}
-            {chatSending ? (
-              <Button
-                variant="destructive"
-                size="icon"
-                className="flex shrink-0 items-center justify-center w-[46px] h-[46px] mb-1.5 rounded-full bg-danger/20 text-danger hover:bg-danger/30 transition-all ml-1"
-                onClick={handleChatStop}
-              >
-                <Square className="w-4 h-4 fill-current" />
-              </Button>
-            ) : (
-              <Button
-                variant="default"
-                size="icon"
-                className="flex shrink-0 items-center justify-center w-[46px] h-[46px] mb-1.5 rounded-full bg-accent text-accent-fg transition-all disabled:opacity-40 ml-1 hover:shadow-[0_0_15px_rgba(240,178,50,0.4)]"
-                onClick={() => void handleChatSend()}
-                disabled={isComposerLocked || !chatInput.trim()}
-              >
-                <Send className="w-5 h-5" />
-              </Button>
-            )}
-          </div>
+          <ChatComposer
+            variant="game-modal"
+            textareaRef={textareaRef}
+            chatInput={chatInput}
+            chatPendingImagesCount={chatPendingImages.length}
+            isComposerLocked={isComposerLocked}
+            isAgentStarting={isAgentStarting}
+            chatSending={chatSending}
+            voice={{
+              supported: voice.supported,
+              isListening: voice.isListening,
+              interimTranscript: voice.interimTranscript,
+              isSpeaking: voice.isSpeaking,
+              toggleListening: voice.toggleListening,
+            }}
+            t={t}
+            onAttachImage={() => fileInputRef.current?.click()}
+            onChatInputChange={(value) => setState("chatInput", value)}
+            onKeyDown={handleKeyDown}
+            onSend={() => void handleChatSend()}
+            onStop={handleChatStop}
+            onStopSpeaking={stopSpeaking}
+          />
         </div>
       ) : (
         /* ── Default composer ─────────────────────────────────────────── */
@@ -807,130 +757,29 @@ export function ChatView({ variant = "default" }: ChatViewProps) {
           className="border-t border-border pt-3 pb-3 sm:pb-4 px-2 sm:px-3 relative"
           style={{ zIndex: 1 }}
         >
-          <div className="flex gap-1.5 sm:gap-2 items-end">
-            {/* Paperclip / image attach button */}
-            <Button
-              variant={chatPendingImages.length > 0 ? "secondary" : "ghost"}
-              size="icon"
-              className={`h-[38px] w-[38px] shrink-0 ${
-                chatPendingImages.length > 0
-                  ? "bg-accent/10 sm:hover:bg-accent/20 border-accent/20 text-txt/80 hover:text-txt shadow-sm"
-                  : "text-muted hover:bg-black/5 hover:text-txt"
-              }`}
-              onClick={() => fileInputRef.current?.click()}
-              aria-label="Attach image"
-              title={t("chatview.AttachImage")}
-              disabled={isComposerLocked}
-            >
-              <Paperclip className="w-4 h-4" />
-            </Button>
-
-            {/* Mic button — user voice input */}
-            {voice.supported && (
-              <Button
-                variant={voice.isListening ? "default" : "ghost"}
-                size="icon"
-                className={`h-[38px] w-[38px] shrink-0 ${
-                  voice.isListening
-                    ? "bg-accent shadow-[0_0_10px_rgba(124,58,237,0.4)] animate-pulse"
-                    : "text-muted hover:bg-black/5 hover:text-txt"
-                }`}
-                onClick={voice.toggleListening}
-                aria-label={
-                  isAgentStarting
-                    ? t("chat.agentStarting")
-                    : voice.isListening
-                      ? t("chat.stopListening")
-                      : t("chat.voiceInput")
-                }
-                aria-pressed={voice.isListening}
-                title={
-                  isAgentStarting
-                    ? t("chat.agentStarting")
-                    : voice.isListening
-                      ? t("chat.stopListening")
-                      : t("chat.voiceInput")
-                }
-                disabled={isComposerLocked}
-              >
-                {voice.isListening ? (
-                  <Mic className="w-4 h-4 fill-current" />
-                ) : (
-                  <Mic className="w-4 h-4" />
-                )}
-              </Button>
-            )}
-
-            {/* Textarea / live transcript */}
-            {voice.isListening && voice.interimTranscript ? (
-              <div
-                className="flex-1 min-w-0 px-3 py-2 border border-accent bg-card text-txt text-[15px] leading-[1.7] min-h-[38px] flex items-center rounded-md"
-                style={{ fontFamily: "var(--font-chat)" }}
-              >
-                <span className="text-muted italic">
-                  {voice.interimTranscript}
-                </span>
-              </div>
-            ) : (
-              <Textarea
-                ref={textareaRef}
-                className="flex-1 min-w-0 px-3 py-2 bg-card/60 backdrop-blur-md border border-border/40 text-txt text-[15px] leading-[1.7] resize-none overflow-y-hidden min-h-[38px] max-h-[200px] outline-none ring-0 shadow-none focus:border-border/40 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
-                style={{ fontFamily: "var(--font-chat)" }}
-                rows={1}
-                aria-label="Chat message"
-                placeholder={
-                  isAgentStarting
-                    ? t("chat.agentStarting")
-                    : voice.isListening
-                      ? t("chat.listening")
-                      : t("chat.inputPlaceholder")
-                }
-                value={chatInput}
-                onChange={(e) => setState("chatInput", e.target.value)}
-                onKeyDown={handleKeyDown}
-                disabled={isComposerLocked}
-              />
-            )}
-
-            {/* Send / Stop */}
-            {chatSending ? (
-              <Button
-                variant="destructive"
-                className="flex shrink-0 items-center justify-center w-[46px] h-[46px] mb-1.5 rounded-full bg-danger/20 text-danger hover:bg-danger/30 transition-all ml-1"
-                onClick={handleChatStop}
-                size="icon"
-                title={t("chat.stopGeneration")}
-                aria-label={t("chat.stopGeneration")}
-              >
-                <Square className="w-4 h-4 fill-current" />
-              </Button>
-            ) : voice.isSpeaking ? (
-              <Button
-                variant="destructive"
-                className="flex shrink-0 items-center justify-center w-[46px] h-[46px] mb-1.5 rounded-full bg-danger/20 text-danger hover:bg-danger/30 transition-all ml-1"
-                onClick={stopSpeaking}
-                size="icon"
-                title={t("chat.stopSpeaking")}
-                aria-label={t("chat.stopSpeaking")}
-              >
-                <Square className="w-4 h-4 fill-current" />
-              </Button>
-            ) : (
-              <Button
-                variant="default"
-                size="icon"
-                className="flex shrink-0 items-center justify-center w-[46px] h-[46px] mb-1.5 rounded-full bg-accent text-accent-fg transition-all disabled:opacity-40 ml-1 hover:shadow-[0_0_15px_rgba(240,178,50,0.4)]"
-                onClick={() => void handleChatSend()}
-                disabled={isComposerLocked || !chatInput.trim()}
-                aria-label={t("chat.send")}
-                title={
-                  isAgentStarting ? t("chat.agentStarting") : t("chat.send")
-                }
-              >
-                <Send className="w-5 h-5" />
-              </Button>
-            )}
-          </div>
+          <ChatComposer
+            variant="default"
+            textareaRef={textareaRef}
+            chatInput={chatInput}
+            chatPendingImagesCount={chatPendingImages.length}
+            isComposerLocked={isComposerLocked}
+            isAgentStarting={isAgentStarting}
+            chatSending={chatSending}
+            voice={{
+              supported: voice.supported,
+              isListening: voice.isListening,
+              interimTranscript: voice.interimTranscript,
+              isSpeaking: voice.isSpeaking,
+              toggleListening: voice.toggleListening,
+            }}
+            t={t}
+            onAttachImage={() => fileInputRef.current?.click()}
+            onChatInputChange={(value) => setState("chatInput", value)}
+            onKeyDown={handleKeyDown}
+            onSend={() => void handleChatSend()}
+            onStop={handleChatStop}
+            onStopSpeaking={stopSpeaking}
+          />
         </div>
       )}
     </section>
