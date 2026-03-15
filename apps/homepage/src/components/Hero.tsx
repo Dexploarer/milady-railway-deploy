@@ -1,9 +1,6 @@
 import { motion, type Variants } from "framer-motion";
 import { releaseData } from "../generated/release-data";
 
-const ELIZA_CLOUD_LOGIN_URL =
-  "https://elizacloud.ai/login?returnTo=%2Fdashboard%2Fmilady";
-
 const heroDownloads = releaseData.release.downloads.slice(0, 4);
 const releaseChannelLabel = releaseData.release.prerelease
   ? "Latest published canary"
@@ -88,9 +85,9 @@ export function HeroForeground() {
   };
 
   return (
-    <section className="absolute inset-0 flex flex-col items-center justify-end px-6 md:px-12 pointer-events-none overflow-hidden pb-32">
+    <section className="absolute inset-0 flex flex-col items-center justify-end px-6 md:px-12 pointer-events-none overflow-hidden pb-12">
       <motion.div
-        className="relative z-10 w-full flex flex-col items-center gap-8 translate-y-8"
+        className="relative z-10 w-full flex flex-col items-center gap-6"
         initial="hidden"
         animate="visible"
         variants={{
@@ -99,129 +96,84 @@ export function HeroForeground() {
           },
         }}
       >
-        <motion.div
-          variants={itemVariants}
-          className="w-full max-w-3xl text-center pointer-events-auto"
-        >
-          <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.24em] text-white/45">
-            Desktop releases, CLI bootstrap, no hardcoded fake links
-          </p>
-          <h2 className="text-3xl font-black uppercase tracking-tighter text-white md:text-5xl">
-            GitHub release downloads, deployed into the real homepage.
-          </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-white/70 md:text-base">
-            Run Milady locally, or point the same frontend at Eliza Cloud or a
-            remote self-hosted backend. Signed desktop artifacts still ship
-            straight from GitHub Releases.
-          </p>
-          <p className="mt-4 font-mono text-[11px] uppercase tracking-[0.2em] text-brand">
-            {releaseChannelLabel} • {releaseData.release.tagName} •{" "}
-            {releaseData.release.publishedAtLabel}
-          </p>
-        </motion.div>
-
+        {/* ── Download Dock Bar ─────────────────────────────────────── */}
         <motion.div
           id="download"
           variants={itemVariants}
-          className="grid w-full max-w-5xl grid-cols-1 gap-3 pointer-events-auto md:grid-cols-2 xl:grid-cols-3"
+          className="pointer-events-auto flex flex-col items-center gap-3"
         >
-          {heroDownloads.map((download, index) => (
+          <div className="hero-dock">
+            <p className="hero-dock-title">Run locally. Swap providers. Own your runtime.</p>
+            <div className="hero-dock-icons">
+            {heroDownloads.map((download) => (
+              <a
+                key={download.id}
+                href={download.url}
+                target="_blank"
+                rel="noreferrer"
+                className="hero-dock-item group"
+                title={`${download.label} — ${download.sizeLabel}`}
+              >
+                <div className="hero-dock-icon">
+                  <DownloadIcon platform={download.id} />
+                </div>
+                <span className="hero-dock-label">
+                  {download.id.includes("arm64")
+                    ? "Mac M1+"
+                    : download.id.includes("x64") && download.id.includes("macos")
+                      ? "Mac Intel"
+                      : download.id.includes("windows")
+                        ? "Windows"
+                        : download.id.includes("linux")
+                          ? "Linux"
+                          : download.label.split("(")[0].trim()}
+                </span>
+                <span className="hero-dock-tooltip">
+                  {download.label}<br />{download.sizeLabel}
+                </span>
+              </a>
+            ))}
+
+            {/* Divider */}
+            <div className="hero-dock-divider" />
+
             <a
-              key={download.id}
-              href={download.url}
+              href="#install"
+              className="hero-dock-item group"
+              title="Install Scripts — Shell + PowerShell"
+            >
+              <div className="hero-dock-icon">
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M21 2H3a1 1 0 00-1 1v18a1 1 0 001 1h18a1 1 0 001-1V3a1 1 0 00-1-1zm-1 18H4V4h16v16zM7 15l4-4-4-4 1.5-1.5L14 11l-5.5 5.5L7 15zm5 2h5v-1.5h-5V17z" /></svg>
+              </div>
+              <span className="hero-dock-label">Scripts</span>
+              <span className="hero-dock-tooltip">Install Scripts<br />Shell + PowerShell</span>
+            </a>
+
+            <a
+              href={releaseData.release.url}
               target="_blank"
               rel="noreferrer"
-              className={`group relative flex items-center gap-3 border px-4 py-4 font-mono transition-colors duration-300 ${
-                index === 0
-                  ? "border-brand bg-brand text-dark hover:border-white hover:bg-white"
-                  : "border-white/20 bg-black/80 text-white backdrop-blur-md hover:border-white hover:bg-white hover:text-dark"
-              }`}
+              className="hero-dock-item group"
+              title={`All Release Assets — ${releaseData.release.tagName}`}
             >
-              <DownloadIcon platform={download.id} />
-              <div className="min-w-0 flex-1">
-                <div className="text-[10px] uppercase tracking-[0.2em] opacity-60">
-                  {download.note}
-                </div>
-                <div className="mt-1 truncate text-sm font-bold uppercase tracking-[0.08em]">
-                  {download.label}
-                </div>
-                <div className="mt-1 truncate text-[10px] opacity-60">
-                  {download.fileName}
-                </div>
+              <div className="hero-dock-icon">
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.009-.866-.013-1.7-2.782.603-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z" /></svg>
               </div>
-              <div className="text-right text-[10px] uppercase tracking-[0.2em] opacity-60">
-                {download.sizeLabel}
-              </div>
+              <span className="hero-dock-label">GitHub</span>
+              <span className="hero-dock-tooltip">All Releases<br />{releaseData.release.tagName}</span>
             </a>
-          ))}
 
-          <a
-            href="#install"
-            className="group relative flex items-center justify-between gap-3 border border-white/20 bg-black/80 px-4 py-4 font-mono text-white backdrop-blur-md transition-colors duration-300 hover:border-white hover:bg-white hover:text-dark"
-          >
-            <div>
-              <div className="text-[10px] uppercase tracking-[0.2em] opacity-60">
-                Bootstrap
+            <div
+              className="hero-dock-item is-disabled"
+              title="iOS + Android — Coming Soon"
+            >
+              <div className="hero-dock-icon">
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z" /></svg>
               </div>
-              <div className="mt-1 text-sm font-bold uppercase tracking-[0.08em]">
-                Install Scripts
-              </div>
+              <span className="hero-dock-label">Mobile</span>
+              <span className="hero-dock-tooltip">iOS + Android<br />Coming Soon</span>
             </div>
-            <span className="text-[10px] uppercase tracking-[0.2em] opacity-60">
-              Shell + PowerShell
-            </span>
-          </a>
-
-          <a
-            href={ELIZA_CLOUD_LOGIN_URL}
-            target="_blank"
-            rel="noreferrer"
-            className="group relative flex items-center justify-between gap-3 border border-white/20 bg-black/80 px-4 py-4 font-mono text-white backdrop-blur-md transition-colors duration-300 hover:border-white hover:bg-white hover:text-dark"
-          >
-            <div>
-              <div className="text-[10px] uppercase tracking-[0.2em] opacity-60">
-                Managed
-              </div>
-              <div className="mt-1 text-sm font-bold uppercase tracking-[0.08em]">
-                Eliza Cloud
-              </div>
-            </div>
-            <span className="text-[10px] uppercase tracking-[0.2em] opacity-60">
-              elizacloud.ai
-            </span>
-          </a>
-
-          <a
-            href={releaseData.release.url}
-            target="_blank"
-            rel="noreferrer"
-            className="group relative flex items-center justify-between gap-3 border border-white/20 bg-black/80 px-4 py-4 font-mono text-white backdrop-blur-md transition-colors duration-300 hover:border-white hover:bg-white hover:text-dark"
-          >
-            <div>
-              <div className="text-[10px] uppercase tracking-[0.2em] opacity-60">
-                GitHub
-              </div>
-              <div className="mt-1 text-sm font-bold uppercase tracking-[0.08em]">
-                All Release Assets
-              </div>
-            </div>
-            <span className="text-[10px] uppercase tracking-[0.2em] opacity-60">
-              {releaseData.release.tagName}
-            </span>
-          </a>
-
-          <div className="group relative flex items-center justify-between gap-3 border border-white/10 bg-white/5 px-4 py-4 font-mono text-white/75 backdrop-blur-md">
-            <div>
-              <div className="text-[10px] uppercase tracking-[0.2em] opacity-60">
-                Self-host
-              </div>
-              <div className="mt-1 text-sm font-bold uppercase tracking-[0.08em]">
-                Remote Backend
-              </div>
-            </div>
-            <span className="text-[10px] uppercase tracking-[0.2em] opacity-60">
-              URL + access key
-            </span>
+            </div>{/* end hero-dock-icons */}
           </div>
         </motion.div>
       </motion.div>
@@ -231,10 +183,10 @@ export function HeroForeground() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1, duration: 1 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4 text-white/30 font-mono text-[10px] tracking-widest uppercase pointer-events-auto"
+        className="mt-6 flex flex-col items-center gap-3 text-white/30 font-mono text-[10px] tracking-widest uppercase pointer-events-auto"
       >
-        <span>Scroll For Install Details</span>
-        <div className="w-[1px] h-8 bg-gradient-to-b from-white/30 to-transparent" />
+        <span>Scroll For Details</span>
+        <div className="w-[1px] h-6 bg-gradient-to-b from-white/30 to-transparent" />
       </motion.div>
     </section>
   );
