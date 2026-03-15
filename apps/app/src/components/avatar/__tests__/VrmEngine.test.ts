@@ -1020,7 +1020,9 @@ describe("VrmEngine", () => {
       engineAny.updateWorldReveal(0.4);
       expect(engineAny.worldReveal?.progress ?? 0).toBeGreaterThan(0);
       expect(engineAny.worldReveal?.progress ?? 1).toBeLessThan(1);
-      engineAny.updateWorldReveal(4);
+      for (let i = 0; i < 32 && engineAny.worldReveal; i++) {
+        engineAny.updateWorldReveal(0.4);
+      }
       expect(engineAny.worldReveal).toBeNull();
       expect(secondWorld?.opacity).toBe(1);
     });

@@ -38,11 +38,11 @@ import { CompanionView } from "./components/CompanionView";
 import { ConversationsSidebar } from "./components/ConversationsSidebar";
 import { CustomActionEditor } from "./components/CustomActionEditor";
 import { CustomActionsPanel } from "./components/CustomActionsPanel";
+import { SharedCompanionScene } from "./components/companion/CompanionSceneHost";
 import { Header } from "./components/Header";
 import { InventoryView } from "./components/InventoryView";
 import { KnowledgeView } from "./components/KnowledgeView";
 import { OnboardingWizard } from "./components/OnboardingWizard";
-import { SharedCompanionScene } from "./components/companion/CompanionSceneHost";
 import { ShellOverlays } from "./components/ShellOverlays";
 import { StreamView } from "./components/StreamView";
 
@@ -139,10 +139,9 @@ export function App() {
       ? "chat"
       : shellMode === "companion" && tab === "chat"
         ? "companion"
-      : tab;
+        : tab;
   const companionSceneActive =
-    COMPANION_ENABLED &&
-    (effectiveTab === "companion" || tab === "companion");
+    COMPANION_ENABLED && (effectiveTab === "companion" || tab === "companion");
   const contextMenu = useContextMenu();
 
   useStreamPopoutNavigation(setTab);

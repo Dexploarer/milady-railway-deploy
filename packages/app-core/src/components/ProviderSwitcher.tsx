@@ -476,7 +476,7 @@ export function ProviderSwitcher({
           <Button
             variant="link"
             size="sm"
-            className="text-txt underline p-0 h-auto"
+            className="settings-compact-button text-txt underline p-0 h-auto"
             onClick={() => {
               setTab("plugins");
             }}

@@ -25,6 +25,11 @@ import { useApp } from "@milady/app-core/state";
 import { confirmDesktopAction } from "@milady/app-core/utils";
 import { Button, Input } from "@milady/ui";
 import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  isKnowledgeImageFile,
+  MAX_KNOWLEDGE_IMAGE_PROCESSING_BYTES,
+  maybeCompressKnowledgeUploadImage,
+} from "./knowledge-upload-image";
 
 const MAX_UPLOAD_REQUEST_BYTES = 32 * 1_048_576; // Must match server knowledge route limit
 const BULK_UPLOAD_TARGET_BYTES = 24 * 1_048_576;
@@ -143,7 +148,7 @@ function UploadZone({
 
   return (
     <fieldset
-      className="min-w-[min(22rem,100%)] flex-[1_1_26rem]"
+      className="w-full min-w-[min(22rem,100%)] flex-[1_1_26rem] sm:w-auto sm:flex-none"
       onDragOver={(e) => {
         e.preventDefault();
         setDragOver(true);
@@ -160,7 +165,7 @@ function UploadZone({
         accept=".txt,.md,.pdf,.docx,.json,.csv,.xml,.html,.png,.jpg,.jpeg,.webp,.gif"
         onChange={handleFileSelect}
       />
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+      <div className="flex flex-wrap items-center justify-end gap-x-2 gap-y-1">
         <Button
           variant="default"
           size="sm"
@@ -192,7 +197,7 @@ function UploadZone({
       </div>
       {(dragOver || uploading || showUrlInput) && (
         <div
-          className={`mt-2 rounded-xl border px-3 py-2.5 transition-colors ${
+          className={`mt-2 rounded-xl border px-3 py-2.5 transition-colors sm:min-w-[24rem] ${
             dragOver
               ? "border-border/50 bg-card/30"
               : "border-border/30 bg-card/15"
@@ -660,16 +665,27 @@ export function KnowledgeView({ inModal }: { inModal?: boolean } = {}) {
 
   const buildKnowledgeUploadRequest = useCallback(
     async (file: KnowledgeUploadFile, options: KnowledgeUploadOptions) => {
-      const uploadFilename = getKnowledgeUploadFilename(file);
-      const content = await readKnowledgeFile(file);
+      const optimizedImage = await maybeCompressKnowledgeUploadImage(file);
+      const uploadFile = optimizedImage.file as KnowledgeUploadFile;
+      if (
+        isKnowledgeImageFile(uploadFile) &&
+        uploadFile.size > MAX_KNOWLEDGE_IMAGE_PROCESSING_BYTES
+      ) {
+        throw new Error(
+          `Image could not be compressed below ${formatByteSize(MAX_KNOWLEDGE_IMAGE_PROCESSING_BYTES)} for processing.`,
+        );
+      }
+
+      const uploadFilename = getKnowledgeUploadFilename(uploadFile);
+      const content = await readKnowledgeFile(uploadFile);
 
       const request = {
         content,
         filename: uploadFilename,
-        contentType: file.type || "application/octet-stream",
+        contentType: uploadFile.type || "application/octet-stream",
         metadata: {
           includeImageDescriptions: options.includeImageDescriptions,
-          relativePath: file.webkitRelativePath || undefined,
+          relativePath: uploadFile.webkitRelativePath || undefined,
         },
       };
       const requestBytes = new TextEncoder().encode(
@@ -986,13 +1002,7 @@ export function KnowledgeView({ inModal }: { inModal?: boolean } = {}) {
   );
 
   return (
-    <div
-      className={
-        inModal
-          ? "h-full w-full overflow-y-auto pb-8"
-          : "w-full"
-      }
-    >
+    <div className={inModal ? "h-full w-full overflow-y-auto pb-8" : "w-full"}>
       {isServiceLoading && (
         <div className="flex items-center gap-2 mb-4 px-3 py-2 rounded border border-[var(--border)] bg-[var(--card)] text-sm text-[var(--muted)]">
           <span className="w-4 h-4 border-2 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
@@ -1014,9 +1024,9 @@ export function KnowledgeView({ inModal }: { inModal?: boolean } = {}) {
         </div>
       )}
 
-      <div className="mb-6 flex flex-wrap items-start gap-2">
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-2">
         <form
-          className="min-w-[min(28rem,100%)] flex-[2_1_34rem]"
+          className="w-full max-w-[500px] flex-[1_1_500px]"
           onSubmit={handleSearchSubmit}
         >
           <div className="flex items-stretch gap-2">

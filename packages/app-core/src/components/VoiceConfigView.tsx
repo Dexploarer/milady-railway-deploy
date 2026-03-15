@@ -207,7 +207,7 @@ function WakeWordSection({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="leading-none hover:bg-transparent hover:opacity-70 cursor-pointer h-4 w-4 ml-1"
+                  className="settings-compact-button settings-icon-button leading-none hover:bg-transparent hover:opacity-70 cursor-pointer h-4 w-4 ml-1"
                   onClick={() => removeTrigger(t)}
                   aria-label={`Remove trigger "${t}"`}
                 >

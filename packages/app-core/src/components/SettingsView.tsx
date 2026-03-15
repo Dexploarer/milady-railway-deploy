@@ -1,15 +1,5 @@
 /**
- * Settings view — reorganized with sidebar navigation for better UX.
- *
- * Categories:
- *   1. Appearance — theme picker
- *   2. AI Model — provider selection + config
- *   3. Integrations — GitHub, Coding Agents, Secrets
- *   4. Media — image, video, audio, vision providers
- *   5. Voice — TTS / STT configuration
- *   6. Permissions — capabilities
- *   7. Updates — software updates
- *   8. Advanced — export/import, extension, danger zone
+ * Settings view — full-page settings sections with a large-screen jump rail.
  */
 
 import {
@@ -131,38 +121,25 @@ function matchesSettingsSection(
 /* ── Settings Sidebar ────────────────────────────────────────────────── */
 
 function SettingsSidebar({
+  sections,
   activeSection,
   onSectionChange,
-  searchQuery,
-  onSearchChange,
 }: {
+  sections: SettingsSectionDef[];
   activeSection: string;
   onSectionChange: (id: string) => void;
-  searchQuery: string;
-  onSearchChange: (query: string) => void;
 }) {
   const { t } = useApp();
 
-  const filteredSections = SETTINGS_SECTIONS.filter((section) =>
-    matchesSettingsSection(section, searchQuery, t),
-  );
-
   return (
-    <aside className="flex h-full min-h-0 w-[4.75rem] shrink-0 flex-col border-r border-border/50 bg-bg/50 backdrop-blur-xl sm:w-72">
-      <div className="flex min-h-0 flex-1 flex-col p-3 sm:p-4">
-        <div className="relative mb-4 hidden sm:block">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted" />
-          <Input
-            type="text"
-            placeholder={t("settings.searchPlaceholder")}
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full pl-10 rounded-xl bg-bg/50 border-border/50 h-10 text-sm shadow-inner"
-          />
+    <aside className="hidden h-full min-h-0 w-80 shrink-0 border-r border-border/50 bg-bg/35 backdrop-blur-xl xl:flex">
+      <div className="flex min-h-0 flex-1 flex-col p-5">
+        <div className="mb-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted/80">
+          {t("settingsview.JumpToSection", { defaultValue: "Jump to section" })}
         </div>
 
-        <nav className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto pr-1">
-          {filteredSections.map((section) => {
+        <nav className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto pr-1">
+          {sections.map((section) => {
             const Icon = section.icon;
             const isActive = activeSection === section.id;
             return (
@@ -171,28 +148,25 @@ function SettingsSidebar({
                 type="button"
                 onClick={() => onSectionChange(section.id)}
                 aria-current={isActive ? "page" : undefined}
-                className={`flex items-center justify-center gap-3 px-2.5 py-3 rounded-xl text-left transition-all duration-300 whitespace-normal break-words h-auto group sm:justify-start sm:px-3 sm:rounded-2xl ${
+                className={`flex w-full items-center gap-3 rounded-2xl border px-4 py-3 text-left transition-all duration-200 ${
                   isActive
-                    ? "bg-accent text-accent-fg shadow-[0_0_15px_rgba(var(--accent),0.2)] scale-[1.01]"
-                    : "text-txt hover:bg-bg-hover hover:border-border/50 border border-transparent"
+                    ? "border-accent/40 bg-accent/12 text-txt shadow-[0_10px_30px_rgba(var(--accent),0.08)]"
+                    : "border-transparent text-muted hover:border-border/60 hover:bg-card/55 hover:text-txt"
                 }`}
               >
                 <span
-                  className={`w-9 h-9 flex items-center justify-center shrink-0 rounded-lg ${
-                    isActive ? "bg-accent-foreground/20" : "bg-bg-accent"
+                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${
+                    isActive
+                      ? "border-accent/30 bg-accent/18 text-txt-strong"
+                      : "border-border/50 bg-bg-accent/80 text-muted"
                   }`}
                 >
                   <Icon className="w-4 h-4" />
                 </span>
-                <div className="hidden min-w-0 flex-1 sm:block">
-                  <div className={`text-sm font-semibold`}>
+                <div className="min-w-0 flex-1">
+                  <div className="text-sm font-semibold leading-snug text-current">
                     {t(section.label)}
                   </div>
-                  {section.description && (
-                    <div className="mt-0.5 hidden truncate text-[11px] opacity-80 lg:block">
-                      {t(section.description)}
-                    </div>
-                  )}
                 </div>
               </button>
             );
@@ -227,7 +201,7 @@ function UpdatesSection() {
         <Button
           variant="default"
           size="sm"
-          className="rounded-xl shadow-sm h-auto whitespace-normal break-words text-left"
+          className="rounded-xl shadow-sm whitespace-normal text-left"
           onClick={() => void loadUpdateStatus(true)}
           disabled={updateLoading}
         >
@@ -327,7 +301,7 @@ function AdvancedSection() {
           <button
             type="button"
             onClick={openExportModal}
-            className="flex items-center gap-4 p-5 border border-border/50 bg-card/60 backdrop-blur-md rounded-2xl hover:border-accent hover:shadow-[0_4px_20px_rgba(var(--accent),0.1)] transition-all text-left group hover:-translate-y-0.5 cursor-pointer h-auto min-h-[5rem] whitespace-normal break-words"
+            className="settings-card-button flex items-center gap-4 border border-border/50 bg-card/60 text-left backdrop-blur-md transition-all group hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_4px_20px_rgba(var(--accent),0.1)]"
             aria-haspopup="dialog"
           >
             <div className="w-12 h-12 rounded-xl bg-bg-accent border border-border/50 flex items-center justify-center group-hover:bg-accent group-hover:border-accent transition-all shadow-sm">
@@ -346,7 +320,7 @@ function AdvancedSection() {
           <button
             type="button"
             onClick={openImportModal}
-            className="flex items-center gap-4 p-5 border border-border/50 bg-card/60 backdrop-blur-md rounded-2xl hover:border-accent hover:shadow-[0_4px_20px_rgba(var(--accent),0.1)] transition-all text-left group hover:-translate-y-0.5 cursor-pointer h-auto min-h-[5rem] whitespace-normal break-words"
+            className="settings-card-button flex items-center gap-4 border border-border/50 bg-card/60 text-left backdrop-blur-md transition-all group hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_4px_20px_rgba(var(--accent),0.1)]"
             aria-haspopup="dialog"
           >
             <div className="w-12 h-12 rounded-xl bg-bg-accent border border-border/50 flex items-center justify-center group-hover:bg-accent group-hover:border-accent transition-all shadow-sm">
@@ -384,7 +358,7 @@ function AdvancedSection() {
               <Button
                 variant="destructive"
                 size="sm"
-                className="rounded-xl shadow-sm h-auto whitespace-normal break-words text-left"
+                className="rounded-xl shadow-sm whitespace-normal text-left"
                 onClick={() => {
                   void handleReset();
                 }}
@@ -450,7 +424,7 @@ function AdvancedSection() {
               <Button
                 variant="outline"
                 size="sm"
-                className="rounded-lg"
+                className="settings-button rounded-lg"
                 onClick={closeExportModal}
               >
                 {t("common.cancel")}
@@ -458,7 +432,7 @@ function AdvancedSection() {
               <Button
                 variant="default"
                 size="sm"
-                className="rounded-lg"
+                className="settings-button rounded-lg"
                 disabled={exportBusy}
                 onClick={() => void handleAgentExport()}
               >
@@ -497,7 +471,7 @@ function AdvancedSection() {
               </div>
               <button
                 type="button"
-                className="flex w-full items-center justify-between gap-3 rounded-lg border border-border bg-bg px-3 py-3 text-left transition-colors hover:bg-bg-hover h-auto min-h-[3rem] whitespace-normal break-words"
+                className="settings-button flex w-full items-center justify-between gap-3 rounded-lg border border-border bg-bg text-left transition-colors hover:bg-bg-hover"
                 onClick={() => importFileInputRef.current?.click()}
               >
                 <span className="min-w-0 flex-1 truncate text-sm text-txt">
@@ -543,7 +517,7 @@ function AdvancedSection() {
               <Button
                 variant="outline"
                 size="sm"
-                className="rounded-lg"
+                className="settings-button rounded-lg"
                 onClick={closeImportModal}
               >
                 {t("common.cancel")}
@@ -551,7 +525,7 @@ function AdvancedSection() {
               <Button
                 variant="default"
                 size="sm"
-                className="rounded-lg"
+                className="settings-button rounded-lg"
                 disabled={importBusy}
                 onClick={() => void handleAgentImport()}
               >
@@ -828,7 +802,7 @@ export function SettingsView({
         >
           <button
             type="button"
-            className="inline-flex items-center rounded-lg border border-border px-4 py-2 text-sm font-medium text-txt transition-colors hover:bg-bg-hover"
+            className="settings-button inline-flex items-center rounded-lg border border-border text-sm font-medium text-txt transition-colors hover:bg-bg-hover"
             onClick={() => setSearchQuery("")}
           >
             {t("settingsview.ClearSearch")}
@@ -839,24 +813,23 @@ export function SettingsView({
   );
   return (
     <div
-      className={`flex h-full min-h-0 min-w-0 flex-row overflow-hidden ${inModal ? "bg-transparent" : "bg-bg"}`}
+      className={`settings-shell flex h-full min-h-0 min-w-0 flex-row overflow-hidden ${inModal ? "bg-transparent" : "bg-bg"}`}
     >
       <SettingsSidebar
+        sections={visibleSections}
         activeSection={activeSection}
         onSectionChange={handleSectionChange}
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
       />
 
       <div
         ref={contentRef}
-        className={`flex-1 min-w-0 overflow-y-auto scroll-smooth ${inModal ? "px-4 py-4 sm:px-6 sm:py-5 lg:px-8 lg:py-6" : "px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8"}`}
+        className={`settings-page-content flex-1 min-w-0 overflow-y-auto scroll-smooth ${inModal ? "px-4 py-4 sm:px-6 sm:py-5 lg:px-8 lg:py-6" : "px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8"}`}
       >
-        <div className={`${inModal ? "max-w-5xl" : "max-w-4xl"} mx-auto`}>
+        <div className={`${inModal ? "max-w-5xl" : "max-w-5xl"} mx-auto`}>
           <div className="flex justify-end">
             <button
               type="button"
-              className="inline-flex size-10 shrink-0 items-center justify-center rounded-full border border-border bg-card text-muted transition-all hover:border-accent hover:text-txt hover:shadow-sm"
+              className="settings-icon-button inline-flex size-10 shrink-0 items-center justify-center rounded-full border border-border bg-card text-muted transition-all hover:border-accent hover:text-txt hover:shadow-sm"
               onClick={handleClose}
               aria-label="Close settings"
               title={t("settingsview.CloseSettings")}
@@ -865,18 +838,18 @@ export function SettingsView({
             </button>
           </div>
 
-          <div className="relative mt-3 sm:hidden">
+          <div className="relative mt-4">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted" />
-            <input
+            <Input
               type="text"
               placeholder={t("settings.searchPlaceholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-lg border border-border bg-bg py-2.5 pl-10 pr-3 text-sm transition-all placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent/50"
+              className="h-11 w-full rounded-xl border-border/60 bg-card/70 pl-10 pr-3 text-sm shadow-sm"
             />
           </div>
 
-          <div className="space-y-6 pb-20 pt-4 sm:space-y-8 sm:pt-6">
+          <div className="space-y-6 pb-20 pt-5 sm:space-y-8 sm:pt-6">
             {sectionsContent}
           </div>
         </div>

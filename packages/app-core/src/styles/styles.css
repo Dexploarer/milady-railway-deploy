@@ -205,6 +205,37 @@
   cursor: not-allowed;
 }
 
+/* ── Settings page controls ─────────────────────────────────────────── */
+
+.settings-page-content :is(button.inline-flex, a.inline-flex, .btn):not(
+    .settings-compact-button
+  ):not(.settings-icon-button) {
+  min-height: 2.625rem;
+  padding-inline: 1rem;
+  border-radius: calc(var(--radius-lg) + 2px);
+}
+
+.settings-button {
+  min-height: 2.625rem;
+  padding-inline: 1rem;
+  border-radius: calc(var(--radius-lg) + 2px);
+}
+
+.settings-card-button {
+  min-height: 5.5rem;
+  padding: 1.25rem;
+  border-radius: calc(var(--radius-xl) + 2px);
+}
+
+.settings-compact-button {
+  min-height: auto;
+  padding-inline: 0;
+}
+
+.settings-icon-button {
+  padding-inline: 0;
+}
+
 /* ── Loading screen ───────────────────────────────────────────────── */
 
 /* ── NieR: Automata–style loading screen ─────────────────────────── */
@@ -599,6 +630,27 @@ kbd {
 [data-theme="dark"] :focus-visible {
   outline: 2px solid hsl(217 91% 60%);
   outline-offset: 2px;
+}
+
+/* Advanced subtab buttons stay clickable without Chrome tap/focus flash or text selection */
+.advanced-subtab-btn,
+.advanced-subtab-btn * {
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.advanced-subtab-btn {
+  -webkit-touch-callout: none;
+}
+
+.advanced-subtab-btn:focus,
+.advanced-subtab-btn:focus-visible,
+[data-theme="dark"] .advanced-subtab-btn:focus-visible {
+  outline: none;
+  outline-offset: 0;
 }
 
 /* Reduced motion - !important is intentional for accessibility override */

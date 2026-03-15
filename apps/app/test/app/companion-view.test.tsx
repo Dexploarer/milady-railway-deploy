@@ -279,6 +279,7 @@ describe("CompanionView", () => {
         | ((value: unknown) => void)
         | undefined;
       ready?.({
+        setPaused: vi.fn(),
         setCameraAnimation: vi.fn(),
         setPointerParallaxEnabled: vi.fn(),
         setDragOrbitTarget,
@@ -349,6 +350,7 @@ describe("CompanionView", () => {
         | ((value: unknown) => void)
         | undefined;
       ready?.({
+        setPaused: vi.fn(),
         setCameraAnimation: vi.fn(),
         setPointerParallaxEnabled: vi.fn(),
         setDragOrbitTarget,
@@ -406,6 +408,7 @@ describe("CompanionView", () => {
         | ((value: unknown) => void)
         | undefined;
       ready?.({
+        setPaused: vi.fn(),
         setCameraAnimation: vi.fn(),
         setPointerParallaxEnabled: vi.fn(),
         setDragOrbitTarget: vi.fn(),
@@ -452,6 +455,7 @@ describe("CompanionView", () => {
         | ((value: unknown) => void)
         | undefined;
       ready?.({
+        setPaused: vi.fn(),
         setCameraAnimation: vi.fn(),
         setPointerParallaxEnabled: vi.fn(),
         setDragOrbitTarget: vi.fn(),
@@ -507,6 +511,7 @@ describe("CompanionView", () => {
         | ((value: unknown) => void)
         | undefined;
       ready?.({
+        setPaused: vi.fn(),
         setCameraAnimation: vi.fn(),
         setPointerParallaxEnabled: vi.fn(),
         setDragOrbitTarget: vi.fn(),
@@ -568,6 +573,7 @@ describe("CompanionView", () => {
         | ((value: unknown) => void)
         | undefined;
       ready?.({
+        setPaused: vi.fn(),
         setCameraAnimation: vi.fn(),
         setPointerParallaxEnabled: vi.fn(),
         setDragOrbitTarget: vi.fn(),

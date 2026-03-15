@@ -96,7 +96,24 @@ describe("Header", () => {
 
     // Check shell toggle button
     const shellToggle = root.findByProps({ "data-testid": "ui-shell-toggle" });
+    const activeNativeToggle = root.findByProps({
+      "data-testid": "ui-shell-toggle-native",
+    });
+    const inactiveCompanionToggle = root.findByProps({
+      "data-testid": "ui-shell-toggle-companion",
+    });
     expect(shellToggle).toBeDefined();
+    expect(String(shellToggle.props.className)).toContain("border-border/60");
+    expect(String(shellToggle.props.className)).toContain("bg-bg-muted/90");
+    expect(String(activeNativeToggle.props.className)).toContain(
+      "text-[#8a6500]",
+    );
+    expect(String(activeNativeToggle.props.className)).toContain(
+      "dark:text-[#f0b232]",
+    );
+    expect(String(inactiveCompanionToggle.props.className)).toContain(
+      "text-muted-strong",
+    );
     expect(mockUseApp.setState).toHaveBeenCalledWith("chatMode", "power");
   });
 });

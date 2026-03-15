@@ -584,7 +584,7 @@ export function ConfigPageView({ embedded = false }: { embedded?: boolean }) {
           </div>
           <button
             type="button"
-            className="flex items-center gap-1.5 px-2.5 py-1.5 text-[12px] text-[var(--muted)] hover:text-[var(--txt)] bg-transparent border border-[var(--border)] rounded cursor-pointer transition-colors hover:border-[var(--accent)]"
+            className="settings-button flex items-center gap-1.5 text-[12px] text-[var(--muted)] hover:text-[var(--txt)] bg-transparent border border-[var(--border)] rounded cursor-pointer transition-colors hover:border-[var(--accent)]"
             onClick={() => setSecretsOpen(true)}
             title={t("configpageview.SecretsVault1")}
           >

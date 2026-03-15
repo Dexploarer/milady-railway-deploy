@@ -326,6 +326,32 @@ describe("Advanced trajectories/fine-tuning integration", () => {
     }
   });
 
+  it("applies the advanced subtab button class in both layouts", async () => {
+    let tree!: TestRenderer.ReactTestRenderer;
+
+    await act(async () => {
+      tree = TestRenderer.create(React.createElement(AdvancedPageView));
+    });
+
+    const standardSubtabButtons = tree.root.findAll(
+      (node) =>
+        node.type === "button" &&
+        String(node.props.className ?? "").includes("advanced-subtab-btn"),
+    );
+    expect(standardSubtabButtons.length).toBeGreaterThan(0);
+
+    await act(async () => {
+      tree.update(React.createElement(AdvancedPageView, { inModal: true }));
+    });
+
+    const modalSubtabButtons = tree.root.findAll(
+      (node) =>
+        node.type === "button" &&
+        String(node.props.className ?? "").includes("advanced-subtab-btn"),
+    );
+    expect(modalSubtabButtons.length).toBeGreaterThan(0);
+  });
+
   it("shows the same trajectory in Trajectories detail and Fine-Tuning list", async () => {
     let tree!: TestRenderer.ReactTestRenderer;
 

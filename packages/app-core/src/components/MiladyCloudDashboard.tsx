@@ -120,7 +120,7 @@ function CloudAgentCard({
         <Button
           variant="outline"
           size="sm"
-          className="rounded-xl h-8 text-xs border-danger/30 text-danger hover:bg-danger/10"
+          className="settings-icon-button rounded-xl h-8 text-xs border-danger/30 text-danger hover:bg-danger/10"
           onClick={() => onDelete(agent.agent_id)}
           disabled={deleting}
         >
@@ -550,7 +550,7 @@ export function CloudDashboard() {
 
                   <Button
                     variant="link"
-                    className="w-full text-xs text-txt justify-start px-3 h-auto"
+                    className="settings-compact-button w-full text-xs text-txt justify-start px-3 h-auto"
                     onClick={() =>
                       void openExternalUrl("https://miladycloud.ai/dashboard")
                     }

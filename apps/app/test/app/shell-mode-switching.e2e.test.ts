@@ -15,7 +15,7 @@ import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { mockUseApp, noop } = vi.hoisted(() => ({
+const { mockUseApp, noop, sceneHostState } = vi.hoisted(() => ({
   mockUseApp: vi.fn(),
   noop: vi.fn(),
   sceneHostState: {

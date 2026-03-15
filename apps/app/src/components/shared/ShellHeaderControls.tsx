@@ -98,7 +98,7 @@ export function ShellHeaderControls({
     >
       <div className="flex shrink-0 items-center">
         <fieldset
-          className="inline-flex items-center gap-0.5 rounded-xl bg-transparent p-0.5"
+          className="inline-flex items-center gap-0.5 rounded-xl border border-border/60 bg-bg-muted/90 p-0.5 shadow-sm dark:border-border/70 dark:bg-bg-accent/60"
           data-testid="ui-shell-toggle"
           aria-label={t("header.switchToNative")}
         >
@@ -116,8 +116,8 @@ export function ShellHeaderControls({
                 onClick={() => onShellModeChange(mode)}
                 className={`inline-flex h-9 min-w-[44px] items-center justify-center px-3 transition-all duration-200 ${edgeClass} ${
                   selected
-                    ? "bg-bg/85 text-[#f0b232]"
-                    : "bg-bg-accent/70 text-muted hover:text-txt"
+                    ? "border border-[#d8a108]/45 bg-bg text-[#8a6500] shadow-sm dark:border-accent/25 dark:bg-bg/85 dark:text-[#f0b232]"
+                    : "border border-transparent bg-transparent text-muted-strong hover:border-border/70 hover:bg-bg/85 hover:text-txt dark:text-muted dark:hover:border-border/60 dark:hover:bg-bg-hover/80 dark:hover:text-txt"
                 }`}
                 aria-label={label}
                 aria-pressed={selected}

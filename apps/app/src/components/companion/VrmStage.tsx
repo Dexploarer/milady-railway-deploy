@@ -134,9 +134,37 @@ export const VrmStage = memo(function VrmStage({
   }, [vrmLoaded]);
 
   return (
-    <div className="fixed inset-0 z-0">
+    <div className="fixed inset-0 z-0 overflow-hidden bg-[#030711]">
+      <div className="pointer-events-none absolute inset-0">
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(circle at 50% 18%, rgba(44, 188, 255, 0.18) 0%, rgba(44, 188, 255, 0.04) 24%, rgba(3, 7, 17, 0) 52%), linear-gradient(180deg, #06101d 0%, #040913 48%, #02050c 100%)",
+          }}
+        />
+        <div
+          className="absolute inset-x-[-14%] bottom-[-24%] h-[74%] opacity-70"
+          style={{
+            transform: "perspective(1200px) rotateX(80deg)",
+            transformOrigin: "center bottom",
+            backgroundImage:
+              "linear-gradient(rgba(118, 232, 255, 0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(118, 232, 255, 0.18) 1px, transparent 1px)",
+            backgroundSize: "68px 68px",
+            boxShadow: "0 -24px 90px rgba(40, 184, 255, 0.14)",
+          }}
+        />
+        <div
+          className="absolute inset-x-0 top-[39%] h-px opacity-55"
+          style={{
+            background:
+              "linear-gradient(90deg, transparent 0%, rgba(118, 232, 255, 0.12) 18%, rgba(118, 232, 255, 0.58) 50%, rgba(118, 232, 255, 0.12) 82%, transparent 100%)",
+            boxShadow: "0 0 20px rgba(118, 232, 255, 0.18)",
+          }}
+        />
+      </div>
       <div
-        className="absolute inset-0"
+        className="absolute inset-0 z-10"
         style={{
           opacity: 1,
           transition: "opacity 400ms ease",

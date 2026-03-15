@@ -96,9 +96,11 @@ describe("VrmStage", () => {
 
   it("disables canvas parallax and forwards the ready engine callback", async () => {
     const handleEngineReady = vi.fn();
+    const setPaused = vi.fn();
     const setCameraAnimation = vi.fn();
     const setPointerParallaxEnabled = vi.fn();
     const engine = {
+      setPaused,
       setCameraAnimation,
       setPointerParallaxEnabled,
     };
@@ -124,6 +126,7 @@ describe("VrmStage", () => {
       ready?.(engine);
     });
 
+    expect(setPaused).toHaveBeenCalledWith(false);
     expect(setCameraAnimation).toHaveBeenCalledTimes(1);
     expect(setPointerParallaxEnabled).toHaveBeenCalledWith(false);
     expect(handleEngineReady).toHaveBeenCalledWith(engine);

@@ -34,30 +34,33 @@ export const CompanionView = memo(function CompanionView() {
     setState("chatMode", "simple");
   }, [setState]);
 
-  return (
-    <>
-      {!hasSharedCompanionScene && <CompanionSceneHost active />}
-      <div className="absolute inset-0 z-10 flex flex-col pointer-events-none">
-        <CompanionHeader
-          shellMode="companion"
-          onShellModeChange={handleShellModeChange}
-          uiLanguage={uiLanguage}
-          setUiLanguage={setUiLanguage}
-          uiTheme={uiTheme}
-          setUiTheme={setUiTheme}
-          t={t}
-        />
+  const overlay = (
+    <div className="absolute inset-0 z-10 flex flex-col pointer-events-none">
+      <CompanionHeader
+        shellMode="companion"
+        onShellModeChange={handleShellModeChange}
+        uiLanguage={uiLanguage}
+        setUiLanguage={setUiLanguage}
+        uiTheme={uiTheme}
+        setUiTheme={setUiTheme}
+        t={t}
+      />
 
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-full max-w-3xl h-[45%] z-20 pointer-events-auto">
-          <ChatModalView variant="companion-dock" />
-        </div>
-
-        {/* Main Content Area */}
-        <div className="flex-1 grid grid-cols-[1fr_auto] gap-6 min-h-0 relative">
-          {/* Center (Empty to show character) */}
-          <div className="w-full h-full" />
-        </div>
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-full max-w-3xl h-[45%] z-20 pointer-events-auto">
+        <ChatModalView variant="companion-dock" />
       </div>
-    </>
+
+      {/* Main Content Area */}
+      <div className="flex-1 grid grid-cols-[1fr_auto] gap-6 min-h-0 relative">
+        {/* Center (Empty to show character) */}
+        <div className="w-full h-full" />
+      </div>
+    </div>
+  );
+
+  return hasSharedCompanionScene ? (
+    overlay
+  ) : (
+    <CompanionSceneHost active>{overlay}</CompanionSceneHost>
   );
 });

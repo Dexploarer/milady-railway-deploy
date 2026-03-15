@@ -1,3 +1,5 @@
+import { releaseData } from "../generated/release-data";
+
 export function Footer() {
   return (
     <footer className="pt-24 pb-8 px-6 md:px-12 bg-dark border-t border-sharp overflow-hidden">
@@ -5,23 +7,56 @@ export function Footer() {
         <div className="flex flex-col md:flex-row justify-between items-start gap-12 mb-20">
           <div>
             <span className="text-3xl font-black tracking-tighter uppercase flex items-center gap-2">
-              <span className="w-4 h-4 rounded-full bg-brand"></span>
+              <span className="w-4 h-4 rounded-full bg-brand" />
               MILADY
             </span>
             <p className="text-sm text-text-muted mt-4 max-w-xs font-mono">
-              Your local AI companion, natively on BSC.
+              Local-first agent runtime with desktop releases, CLI install
+              scripts, and public GitHub artifacts.
             </p>
           </div>
 
           <div className="flex gap-6">
-            <SocialLink href="https://github.com/milady-ai/milady" label="GitHub" >
-              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+            <SocialLink
+              href="https://github.com/milady-ai/milady"
+              label="GitHub"
+            >
+              <svg
+                aria-hidden="true"
+                className="w-6 h-6"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <title>GitHub</title>
                 <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
               </svg>
             </SocialLink>
-            <SocialLink href="https://x.com/milady_bsc" label="X">
-              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+            <SocialLink href={releaseData.release.url} label="Releases">
+              <svg
+                aria-hidden="true"
+                className="w-6 h-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={1.8}
+              >
+                <title>Releases</title>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 16.5V4.5m0 12 4.5-4.5M12 16.5 7.5 12M4.5 19.5h15"
+                />
+              </svg>
+            </SocialLink>
+            <SocialLink href="https://discord.gg/milady" label="Discord">
+              <svg
+                aria-hidden="true"
+                className="w-6 h-6"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <title>Discord</title>
+                <path d="M20.317 4.369A19.791 19.791 0 0 0 15.885 3c-.191.344-.404.804-.553 1.17a18.27 18.27 0 0 0-5.29 0A12.64 12.64 0 0 0 9.49 3a19.736 19.736 0 0 0-4.433 1.369C2.252 8.555 1.489 12.638 1.87 16.664a19.99 19.99 0 0 0 5.45 2.79c.44-.6.832-1.235 1.17-1.902-.644-.24-1.257-.536-1.84-.88.153-.113.303-.23.446-.35 3.548 1.657 7.39 1.657 10.896 0 .145.12.295.237.447.35-.585.345-1.2.642-1.845.882.338.666.73 1.301 1.17 1.902a19.96 19.96 0 0 0 5.452-2.79c.446-4.663-.762-8.709-3.635-12.295ZM8.02 14.248c-1.06 0-1.932-.978-1.932-2.18 0-1.203.85-2.181 1.932-2.181 1.09 0 1.95.988 1.932 2.18 0 1.203-.85 2.181-1.932 2.181Zm7.96 0c-1.06 0-1.931-.978-1.931-2.18 0-1.203.849-2.181 1.931-2.181 1.09 0 1.95.988 1.932 2.18 0 1.203-.842 2.181-1.932 2.181Z" />
               </svg>
             </SocialLink>
           </div>
@@ -56,7 +91,8 @@ export function Footer() {
 
         <div className="text-center">
           <p className="text-xs font-mono text-text-muted uppercase tracking-widest">
-            &copy; {new Date().getFullYear()} Milady. All rights reserved.
+            &copy; {new Date().getFullYear()} Milady. Latest surfaced release:{" "}
+            {releaseData.release.tagName}.
           </p>
         </div>
       </div>

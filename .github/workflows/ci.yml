@@ -209,3 +209,8 @@ jobs:
 
       - name: Build project
         run: bun run build
+
+      - name: Build homepage
+        run: bun run build:homepage
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

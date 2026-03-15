@@ -123,10 +123,12 @@ type TeleportFallbackShader = {
 type WorldRevealController = {
   mesh: SparkSplatMesh;
   progressUniform: { value: number };
+  mode: "reveal" | "hide";
 };
 
 type WorldRevealState = {
-  controller: WorldRevealController;
+  incoming: WorldRevealController;
+  outgoing: WorldRevealController | null;
   progress: number;
   duration: number;
   waitingForVrm: boolean;
@@ -599,6 +601,7 @@ export class VrmEngine {
       originDistance: 1,
       clipXY: SPARK_CLIP_XY,
       maxStdDev: SPARK_MAX_STD_DEV,
+      maxPixelRadius: SPARK_MAX_PIXEL_RADIUS,
       minAlpha: SPARK_MIN_ALPHA,
       view: {
         depthBias: 1,
@@ -612,10 +615,56 @@ export class VrmEngine {
     this.sparkRenderer = sparkRenderer;
   }
 
+  private updateSparkPerformanceProfile(): void {
+    const sparkRenderer = this.sparkRenderer;
+    if (!sparkRenderer) return;
+    if (!this.worldMesh) {
+      sparkRenderer.maxPixelRadius = SPARK_MAX_PIXEL_RADIUS;
+      sparkRenderer.maxStdDev = SPARK_MAX_STD_DEV;
+      sparkRenderer.minAlpha = SPARK_MIN_ALPHA;
+      sparkRenderer.clipXY = SPARK_CLIP_XY;
+      sparkRenderer.defaultView.sortDistance = SPARK_SORT_DISTANCE;
+      return;
+    }
+    const isCompanionProfile =
+      this.cameraProfile === "companion" ||
+      this.cameraProfile === "companion_close";
+    const closeZoomFactor = isCompanionProfile
+      ? THREE.MathUtils.smoothstep(this.companionZoomCurrent, 0.3, 1)
+      : 0;
+
+    sparkRenderer.maxPixelRadius = THREE.MathUtils.lerp(
+      SPARK_MAX_PIXEL_RADIUS,
+      SPARK_MAX_PIXEL_RADIUS_NEAR,
+      closeZoomFactor,
+    );
+    sparkRenderer.maxStdDev = THREE.MathUtils.lerp(
+      SPARK_MAX_STD_DEV,
+      SPARK_MAX_STD_DEV_NEAR,
+      closeZoomFactor,
+    );
+    sparkRenderer.minAlpha = THREE.MathUtils.lerp(
+      SPARK_MIN_ALPHA,
+      SPARK_MIN_ALPHA_NEAR,
+      closeZoomFactor,
+    );
+    sparkRenderer.clipXY = THREE.MathUtils.lerp(
+      SPARK_CLIP_XY,
+      1.03,
+      closeZoomFactor,
+    );
+    sparkRenderer.defaultView.sortDistance = THREE.MathUtils.lerp(
+      SPARK_SORT_DISTANCE,
+      SPARK_SORT_DISTANCE_NEAR,
+      closeZoomFactor,
+    );
+  }
+
   private createWorldRevealController(
     spark: typeof import("@sparkjsdev/spark"),
     mesh: SparkSplatMesh,
     reveal: { origin: THREE.Vector3; radius: number },
+    mode: "reveal" | "hide",
   ): WorldRevealController | null {
     const dyno = (
       "dyno" in spark ? Reflect.get(spark as object, "dyno") : undefined
@@ -715,7 +764,7 @@ export class VrmEngine {
           dyno.swizzle(dyno.sub(center, originUniform), "xz"),
         );
         const currentRadius = dyno.mul(radiusUniform, progressUniform);
-        const revealBody = dyno.sub(
+        const bodyMask = dyno.sub(
           one,
           dyno.smoothstep(
             dyno.sub(currentRadius, edgeUniform),
@@ -724,27 +773,29 @@ export class VrmEngine {
           ),
         );
         const ringDistance = dyno.abs(dyno.sub(radialDistance, currentRadius));
-        const revealRing = dyno.pow(
+        const ringMask = dyno.pow(
           dyno.sub(
             one,
             dyno.smoothstep(zero, dyno.mul(edgeUniform, two), ringDistance),
           ),
           two,
         );
+        const visibleMask =
+          mode === "hide" ? dyno.sub(one, bodyMask) : bodyMask;
         const wireFactor = dyno.clamp(
-          dyno.max(revealBody, dyno.mul(revealRing, wireAlphaUniform)),
+          dyno.max(visibleMask, dyno.mul(ringMask, wireAlphaUniform)),
           zero,
           one,
         );
         const brightenedRgb = dyno.mul(
           rgb,
-          dyno.add(one, dyno.mul(revealRing, wireBoostUniform)),
+          dyno.add(one, dyno.mul(ringMask, wireBoostUniform)),
         );
         return {
           gsplat: dyno.combineGsplat({
             gsplat,
             scales: dyno.mix(wireScaleUniform, scales, wireFactor),
-            rgb: dyno.mix(brightenedRgb, rgb, revealBody),
+            rgb: dyno.mix(brightenedRgb, rgb, visibleMask),
             opacity: dyno.mul(opacity, wireFactor),
           }),
         };
@@ -757,6 +808,7 @@ export class VrmEngine {
     return {
       mesh,
       progressUniform,
+      mode,
     };
   }
 
@@ -780,8 +832,9 @@ export class VrmEngine {
   }
 
   private queueWorldReveal(
-    controller: WorldRevealController,
+    incoming: WorldRevealController,
     options: {
+      outgoing?: WorldRevealController | null;
       duration?: number;
       waitingForVrm?: boolean;
       syncToTeleport?: boolean;
@@ -789,15 +842,21 @@ export class VrmEngine {
     } = {},
   ): void {
     const reveal: WorldRevealState = {
-      controller,
+      incoming,
+      outgoing: options.outgoing ?? null,
       progress: THREE.MathUtils.clamp(options.initialProgress ?? 0, 0, 1),
       duration: options.duration ?? COMPANION_WORLD_REVEAL_DURATION,
       waitingForVrm: options.waitingForVrm ?? false,
       syncToTeleport: options.syncToTeleport ?? false,
     };
-    controller.mesh.opacity = 1;
+    incoming.mesh.opacity = 1;
+    reveal.outgoing?.mesh.parent?.add(reveal.outgoing.mesh);
+    reveal.outgoing && (reveal.outgoing.mesh.opacity = 1);
     this.worldReveal = reveal;
-    this.setWorldRevealProgress(controller, reveal.progress);
+    this.setWorldRevealProgress(incoming, reveal.progress);
+    if (reveal.outgoing) {
+      this.setWorldRevealProgress(reveal.outgoing, reveal.progress);
+    }
   }
 
   private disposeSplatMesh(mesh: SparkSplatMesh | null): void {
@@ -807,10 +866,14 @@ export class VrmEngine {
   }
 
   private completeWorldReveal(reveal: WorldRevealState): void {
-    this.setWorldRevealProgress(reveal.controller, 1);
-    reveal.controller.mesh.opacity = 1;
-    reveal.controller.mesh.objectModifier = undefined;
-    this.refreshSplatMesh(reveal.controller.mesh);
+    this.setWorldRevealProgress(reveal.incoming, 1);
+    reveal.incoming.mesh.opacity = 1;
+    reveal.incoming.mesh.objectModifier = undefined;
+    this.refreshSplatMesh(reveal.incoming.mesh);
+    if (reveal.outgoing) {
+      reveal.outgoing.mesh.objectModifier = undefined;
+      this.disposeSplatMesh(reveal.outgoing.mesh);
+    }
     if (this.worldReveal === reveal) {
       this.worldReveal = null;
     }
@@ -827,7 +890,10 @@ export class VrmEngine {
     reveal.waitingForVrm = false;
     reveal.syncToTeleport = syncToTeleport;
     reveal.progress = syncToTeleport ? this.teleportProgress : 0;
-    this.setWorldRevealProgress(reveal.controller, reveal.progress);
+    this.setWorldRevealProgress(reveal.incoming, reveal.progress);
+    if (reveal.outgoing) {
+      this.setWorldRevealProgress(reveal.outgoing, reveal.progress);
+    }
   }
 
   private updateWorldReveal(stableDelta: number): void {
@@ -842,7 +908,10 @@ export class VrmEngine {
         : Math.min(1, reveal.progress + stableDelta / reveal.duration);
 
     reveal.progress = nextProgress;
-    this.setWorldRevealProgress(reveal.controller, nextProgress);
+    this.setWorldRevealProgress(reveal.incoming, nextProgress);
+    if (reveal.outgoing) {
+      this.setWorldRevealProgress(reveal.outgoing, nextProgress);
+    }
 
     if (nextProgress >= 1) {
       this.completeWorldReveal(reveal);
@@ -861,12 +930,20 @@ export class VrmEngine {
       0.5,
       camera.position.distanceTo(this.pointerParallaxLookAt),
     );
+    const isCompanionProfile =
+      this.cameraProfile === "companion" ||
+      this.cameraProfile === "companion_close";
+    const closeZoomFactor = isCompanionProfile
+      ? THREE.MathUtils.smoothstep(this.companionZoomCurrent, 0.3, 1)
+      : 0;
+    const apertureSize = THREE.MathUtils.lerp(
+      COMPANION_DOF_APERTURE_SIZE,
+      COMPANION_DOF_APERTURE_SIZE * COMPANION_DOF_NEAR_ZOOM_APERTURE_FACTOR,
+      closeZoomFactor,
+    );
     sparkRenderer.focalDistance = focalDistance;
     sparkRenderer.apertureAngle =
-      2 *
-      Math.atan(
-        (0.5 * COMPANION_DOF_APERTURE_SIZE) / sparkRenderer.focalDistance,
-      );
+      2 * Math.atan((0.5 * apertureSize) / sparkRenderer.focalDistance);
   }
 
   private applyCompanionZoom(
@@ -1556,19 +1633,40 @@ export class VrmEngine {
         getRobustSplatRadialExtent(splat, worldCenterBottom) *
           COMPANION_WORLD_SCALE,
       ),
-    });
+    }, "reveal");
     this.worldMesh = splat;
-    this.disposeSplatMesh(outgoingWorld);
     if (worldReveal) {
       const syncToTeleport =
         this.revealStarted && this.teleportProgress < 0.999;
       const waitingForVrm = !outgoingWorld && !this.vrmReady;
+      const outgoingReveal =
+        outgoingWorld && !waitingForVrm
+          ? this.createWorldRevealController(
+              spark,
+              outgoingWorld,
+              {
+                origin: worldCenterBottom,
+                radius: Math.max(
+                  worldRevealRadius * COMPANION_WORLD_SCALE,
+                  getRobustSplatRadialExtent(outgoingWorld, worldCenterBottom) *
+                    COMPANION_WORLD_SCALE,
+                ),
+              },
+              "hide",
+            )
+          : null;
+      if (outgoingWorld && !waitingForVrm && !outgoingReveal) {
+        this.disposeSplatMesh(outgoingWorld);
+      }
       this.queueWorldReveal(worldReveal, {
+        outgoing: outgoingReveal,
         duration: COMPANION_WORLD_REVEAL_DURATION,
         waitingForVrm,
         syncToTeleport,
         initialProgress: syncToTeleport ? this.teleportProgress : 0,
       });
+    } else {
+      this.disposeSplatMesh(outgoingWorld);
     }
   }
   async playEmote(
@@ -1727,12 +1825,13 @@ export class VrmEngine {
         this.vrmReady = true;
         await this.playTeleportReveal(vrm);
         vrm.scene.visible = true;
+        this.startPendingWorldReveal(true);
       }
     } catch {
       if (!this.loadingAborted && this.vrm === vrm) {
         this.vrmReady = true;
-        this.startPendingWorldReveal(false);
         vrm.scene.visible = true;
+        this.startPendingWorldReveal(false);
       }
     }
   }
@@ -1740,7 +1839,6 @@ export class VrmEngine {
   private async playTeleportReveal(vrm: VRM): Promise<void> {
     this.teleportProgress = 0.0;
     this.revealStarted = true;
-    this.startPendingWorldReveal(true);
     this.cleanupTeleportDissolve();
     let appliedNodeDissolve = false;
 
@@ -2066,6 +2164,7 @@ if (teleportNoise < teleportRatio) discard;
       }
     }
     this.applyCompanionZoom(camera, stableDelta);
+    this.updateSparkPerformanceProfile();
     if (this.pointerParallaxEnabled) {
       const follow = Math.min(1, stableDelta * 7.5);
       this.pointerParallaxCurrent.lerp(this.pointerParallaxTarget, follow);

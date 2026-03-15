@@ -23,6 +23,7 @@ vi.mock("../../src/components/avatar/VrmEngine", () => {
     setInteractionEnabled = vi.fn();
     setCameraProfile = vi.fn();
     setInteractionMode = vi.fn();
+    setPaused = vi.fn();
     setPointerParallaxEnabled = vi.fn();
     setPointerParallaxTarget = vi.fn();
     resetPointerParallax = vi.fn();

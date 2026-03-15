@@ -4,8 +4,8 @@ import { resolveAppAssetUrl } from "@milady/app-core/utils";
 import {
   createContext,
   memo,
-  type PointerEvent as ReactPointerEvent,
   type ReactNode,
+  type PointerEvent as ReactPointerEvent,
   type WheelEvent as ReactWheelEvent,
   useCallback,
   useContext,
@@ -107,7 +107,13 @@ function persistCompanionZoom(value: number): void {
   }
 }
 
-function CompanionSceneSurface({ active }: { active: boolean }) {
+function CompanionSceneSurface({
+  active,
+  children,
+}: {
+  active: boolean;
+  children?: ReactNode;
+}) {
   useRenderGuard("CompanionSceneHost");
   const { selectedVrmIndex, customVrmUrl, uiTheme, t } = useApp();
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -361,10 +367,7 @@ function CompanionSceneSurface({ active }: { active: boolean }) {
     <div
       ref={rootRef}
       data-testid="companion-root"
-      aria-hidden={!active}
-      className={`fixed inset-0 z-0 overflow-hidden rounded-2xl bg-[radial-gradient(circle_at_50%_120%,#212942_0%,#12151e_80%)] text-white font-display transition-opacity duration-200 ${
-        active ? "opacity-100" : "pointer-events-none opacity-0"
-      }`}
+      className="relative text-white font-display"
       onWheelCapture={handleRootWheelCapture}
       onPointerDownCapture={handlePointerDownCapture}
       onPointerMoveCapture={handlePointerMoveCapture}
@@ -373,31 +376,42 @@ function CompanionSceneSurface({ active }: { active: boolean }) {
       onLostPointerCaptureCapture={releaseCameraDrag}
       style={{
         overscrollBehavior: "none",
-        visibility: active ? "visible" : "hidden",
       }}
     >
-      <div className="absolute inset-0 z-0 bg-cover opacity-60 bg-[radial-gradient(circle_at_10%_20%,rgba(255,255,255,0.03)_0%,transparent_40%),radial-gradient(circle_at_80%_80%,rgba(0,225,255,0.05)_0%,transparent_40%)] pointer-events-none" />
-
-      <VrmStage
-        active={active}
-        vrmPath={vrmPath}
-        worldUrl={worldUrl}
-        fallbackPreviewUrl={fallbackPreviewUrl}
-        cameraProfile="companion"
-        onEngineReady={handleStageEngineReady}
-        t={t}
-      />
-
       <div
-        aria-hidden="true"
-        data-testid="companion-camera-drag-surface"
-        className="absolute inset-0 z-[1] cursor-grab select-none"
+        aria-hidden={!active}
+        className={`fixed inset-0 z-0 overflow-hidden rounded-2xl bg-[radial-gradient(circle_at_50%_120%,#212942_0%,#12151e_80%)] transition-opacity duration-200 ${
+          active ? "opacity-100" : "pointer-events-none opacity-0"
+        }`}
         style={{
-          touchAction: "none",
-          userSelect: "none",
-          WebkitUserSelect: "none",
+          visibility: active ? "visible" : "hidden",
         }}
-      />
+      >
+        <div className="absolute inset-0 z-0 bg-cover opacity-60 bg-[radial-gradient(circle_at_10%_20%,rgba(255,255,255,0.03)_0%,transparent_40%),radial-gradient(circle_at_80%_80%,rgba(0,225,255,0.05)_0%,transparent_40%)] pointer-events-none" />
+
+        <VrmStage
+          active={active}
+          vrmPath={vrmPath}
+          worldUrl={worldUrl}
+          fallbackPreviewUrl={fallbackPreviewUrl}
+          cameraProfile="companion"
+          onEngineReady={handleStageEngineReady}
+          t={t}
+        />
+
+        <div
+          aria-hidden="true"
+          data-testid="companion-camera-drag-surface"
+          className="absolute inset-0 z-[1] cursor-grab select-none"
+          style={{
+            touchAction: "none",
+            userSelect: "none",
+            WebkitUserSelect: "none",
+          }}
+        />
+      </div>
+
+      {children}
     </div>
   );
 }
@@ -417,8 +431,7 @@ export function SharedCompanionScene({
 }) {
   return (
     <SharedCompanionSceneContext.Provider value={true}>
-      <CompanionSceneHost active={active} />
-      {children}
+      <CompanionSceneHost active={active}>{children}</CompanionSceneHost>
     </SharedCompanionSceneContext.Provider>
   );
 }
