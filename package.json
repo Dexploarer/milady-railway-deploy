@@ -116,6 +116,7 @@
     "dev:win": "node scripts/dev-win.mjs"
   },
   "dependencies": {
+    "@milady/autonomous": "workspace:*",
     "@ai-sdk/anthropic": "^3.0.13",
     "@ai-sdk/gateway": "^3.0.12",
     "@ai-sdk/provider": "^3.0.2",
@@ -125,6 +126,7 @@
     "@clack/prompts": "^1.0.0",
     "@electric-sql/pglite": "^0.3.3",
     "@elizaos/core": "next",
+    "@elizaos/app-hyperscape": "file:../plugins/app-hyperscape",
     "@elizaos/plugin-agent-orchestrator": "0.3.14",
     "@elizaos/plugin-agent-skills": "next",
     "@elizaos/plugin-anthropic": "next",

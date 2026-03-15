@@ -20,10 +20,10 @@ import type {
   VideoProvider,
   VisionConfig,
   VisionProvider,
-} from "../../../../src/config/types.milady";
-import type { DropStatus, MintResult } from "../../../../src/contracts/drop";
-import type { StylePreset } from "../../../../src/contracts/onboarding";
-import type { VerificationResult } from "../../../../src/contracts/verification";
+} from "@milady/autonomous/contracts/config";
+import type { DropStatus, MintResult } from "@milady/autonomous/contracts/drop";
+import type { StylePreset } from "@milady/autonomous/contracts/onboarding";
+import type { VerificationResult } from "@milady/autonomous/contracts/verification";
 import type {
   BscTradeExecuteRequest,
   BscTradeExecuteResponse,
@@ -46,14 +46,14 @@ import type {
   WalletTradingProfileResponse,
   WalletTradingProfileSourceFilter,
   WalletTradingProfileWindow,
-} from "../../../../src/contracts/wallet";
+} from "@milady/autonomous/contracts/wallet";
 import type {
   AllPermissionsState,
   PermissionState,
   PermissionStatus,
   SystemPermissionDefinition,
   SystemPermissionId,
-} from "../../../../src/permissions/types";
+} from "@milady/autonomous/contracts/permissions";
 import type { ConfigUiHint } from "../types";
 import { stripAssistantStageDirections } from "../utils/assistant-text";
 import { mergeStreamingText } from "../utils/streaming-text";

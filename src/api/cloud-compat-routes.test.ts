@@ -13,17 +13,21 @@ vi.mock("@elizaos/core", () => ({
   logger: { warn: vi.fn(), info: vi.fn() },
 }));
 
-vi.mock("../cloud/validate-url", () => ({
+vi.mock("@milady/autonomous/cloud/validate-url", () => ({
   validateCloudBaseUrl: vi.fn(() => Promise.resolve(null)),
 }));
 
-vi.mock("./http-helpers", () => ({
+vi.mock("@milady/autonomous/api/http-helpers", () => ({
   sendJson: vi.fn(),
   sendJsonError: vi.fn(),
 }));
 
-const { sendJson, sendJsonError } = await import("./http-helpers");
-const { validateCloudBaseUrl } = await import("../cloud/validate-url");
+const { sendJson, sendJsonError } = await import(
+  "@milady/autonomous/api/http-helpers"
+);
+const { validateCloudBaseUrl } = await import(
+  "@milady/autonomous/cloud/validate-url"
+);
 
 function makeState(
   overrides?: Partial<MiladyConfig["cloud"]>,
