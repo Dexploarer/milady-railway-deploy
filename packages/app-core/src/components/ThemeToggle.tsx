@@ -73,7 +73,7 @@ function MoonIcon({ className }: { className?: string }) {
 export function ThemeToggle({
   uiTheme,
   setUiTheme,
-  t,
+  t: _t,
   className,
   variant: _variant = "native",
 }: ThemeToggleProps) {
