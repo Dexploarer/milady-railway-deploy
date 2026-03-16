@@ -607,7 +607,7 @@ describe("CharacterView UI", () => {
 
     expect(
       tree?.root.findAll(
-        (node) => node.props["data-testid"] === "character-customize-grid",
+        (node) => node.props["data-testid"] === "character-notebook",
       ) ?? [],
     ).toHaveLength(0);
     expect(state.characterDraft?.name).toBe("Reimu");
@@ -627,7 +627,7 @@ describe("CharacterView UI", () => {
 
     expect(
       tree?.root.findAll(
-        (node) => node.props["data-testid"] === "character-customize-grid",
+        (node) => node.props["data-testid"] === "character-notebook",
       ) ?? [],
     ).toHaveLength(1);
     expect(
@@ -685,12 +685,32 @@ describe("CharacterView UI", () => {
       tree?.root.findAll(
         (node) => node.props["data-testid"] === "character-voice-picker",
       ) ?? [],
-    ).toHaveLength(0);
+    ).toHaveLength(1);
     expect(
       tree?.root.findAll(
-        (node) => node.props["data-testid"] === "character-customize-grid",
+        (node) => node.props["data-testid"] === "character-notebook",
       ) ?? [],
     ).toHaveLength(1);
+  });
+
+  it("shows style sections when navigating to the styleRules sidebar tab", async () => {
+    state.tab = "character";
+
+    let tree: TestRenderer.ReactTestRenderer | null = null;
+
+    await act(async () => {
+      tree = TestRenderer.create(React.createElement(CharacterView));
+    });
+
+    // Click the Style Rules sidebar tab
+    const styleTab = tree?.root.find(
+      (node) => node.props["data-testid"] === "notebook-tab-styleRules",
+    );
+
+    await act(async () => {
+      styleTab?.props.onClick();
+    });
+
     expect(
       tree?.root.findAll(
         (node) =>
@@ -730,7 +750,7 @@ describe("CharacterView UI", () => {
     expect(state.selectedVrmIndex).toBe(1);
     expect(
       tree?.root.findAll(
-        (node) => node.props["data-testid"] === "character-customize-grid",
+        (node) => node.props["data-testid"] === "character-notebook",
       ) ?? [],
     ).toHaveLength(0);
     expect(
@@ -917,7 +937,7 @@ describe("CharacterView UI", () => {
 
     expect(
       tree?.root.findAll(
-        (node) => node.props["data-testid"] === "character-customize-grid",
+        (node) => node.props["data-testid"] === "character-notebook",
       ) ?? [],
     ).toHaveLength(0);
     expect(
