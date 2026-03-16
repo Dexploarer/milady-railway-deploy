@@ -17,7 +17,7 @@ export default defineConfig({
         replacement: path.join(repoRoot, "src", "plugin-sdk", "index.ts"),
       },
       {
-        find: "@milady/capacitor-gateway",
+        find: "@miladyai/capacitor-gateway",
         replacement: path.join(
           repoRoot,
           "apps",
@@ -29,7 +29,7 @@ export default defineConfig({
         ),
       },
       {
-        find: "@milady/capacitor-swabble",
+        find: "@miladyai/capacitor-swabble",
         replacement: path.join(
           repoRoot,
           "apps",
@@ -41,7 +41,7 @@ export default defineConfig({
         ),
       },
       {
-        find: "@milady/capacitor-talkmode",
+        find: "@miladyai/capacitor-talkmode",
         replacement: path.join(
           repoRoot,
           "apps",
@@ -53,7 +53,7 @@ export default defineConfig({
         ),
       },
       {
-        find: "@milady/capacitor-camera",
+        find: "@miladyai/capacitor-camera",
         replacement: path.join(
           repoRoot,
           "apps",
@@ -65,7 +65,7 @@ export default defineConfig({
         ),
       },
       {
-        find: "@milady/capacitor-location",
+        find: "@miladyai/capacitor-location",
         replacement: path.join(
           repoRoot,
           "apps",
@@ -77,7 +77,7 @@ export default defineConfig({
         ),
       },
       {
-        find: "@milady/capacitor-screencapture",
+        find: "@miladyai/capacitor-screencapture",
         replacement: path.join(
           repoRoot,
           "apps",
@@ -89,7 +89,7 @@ export default defineConfig({
         ),
       },
       {
-        find: "@milady/capacitor-canvas",
+        find: "@miladyai/capacitor-canvas",
         replacement: path.join(
           repoRoot,
           "apps",
@@ -101,7 +101,7 @@ export default defineConfig({
         ),
       },
       {
-        find: "@milady/capacitor-desktop",
+        find: "@miladyai/capacitor-desktop",
         replacement: path.join(
           repoRoot,
           "apps",
@@ -113,7 +113,7 @@ export default defineConfig({
         ),
       },
       {
-        find: "@milady/capacitor-agent",
+        find: "@miladyai/capacitor-agent",
         replacement: path.join(
           repoRoot,
           "apps",
@@ -125,7 +125,7 @@ export default defineConfig({
         ),
       },
       {
-        find: "@milady/plugin-streaming-base",
+        find: "@miladyai/plugin-streaming-base",
         replacement: path.join(
           repoRoot,
           "packages",
@@ -137,7 +137,7 @@ export default defineConfig({
       {
         // workspace plugin not built in CI (--ignore-scripts); resolve from
         // source so dynamic imports don't fail on missing dist/.
-        find: "@milady/plugin-retake",
+        find: "@miladyai/plugin-retake",
         replacement: path.join(
           repoRoot,
           "packages",
@@ -149,7 +149,7 @@ export default defineConfig({
       {
         // workspace plugin not built in CI (--ignore-scripts); resolve from
         // source so dynamic imports don't fail on missing dist/.
-        find: "@milady/plugin-twitch-streaming",
+        find: "@miladyai/plugin-twitch-streaming",
         replacement: path.join(
           repoRoot,
           "packages",
@@ -161,7 +161,7 @@ export default defineConfig({
       {
         // workspace plugin not built in CI (--ignore-scripts); resolve from
         // source so dynamic imports don't fail on missing dist/.
-        find: "@milady/plugin-youtube-streaming",
+        find: "@miladyai/plugin-youtube-streaming",
         replacement: path.join(
           repoRoot,
           "packages",
@@ -173,7 +173,7 @@ export default defineConfig({
       {
         // workspace plugin not built in CI (--ignore-scripts); resolve from
         // source so vi.mock() and dynamic import() don't fail on missing dist/.
-        find: "@milady/plugin-bnb-identity",
+        find: "@miladyai/plugin-bnb-identity",
         replacement: path.join(
           repoRoot,
           "packages",

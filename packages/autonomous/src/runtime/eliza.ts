@@ -695,9 +695,9 @@ export const CHANNEL_PLUGIN_MAP: Readonly<Record<string, string>> = {
   slack: "@elizaos/plugin-slack",
   twitter: "@elizaos/plugin-twitter",
   // Internal connector built from src/plugins/whatsapp (not an npm package).
-  whatsapp: "@milady/plugin-whatsapp",
+  whatsapp: "@miladyai/plugin-whatsapp",
   // Internal connector built from src/plugins/signal (not an npm package).
-  signal: "@milady/plugin-signal",
+  signal: "@miladyai/plugin-signal",
   imessage: "@elizaos/plugin-imessage",
   bluebubbles: "@elizaos/plugin-bluebubbles",
   farcaster: "@elizaos/plugin-farcaster",
@@ -764,7 +764,7 @@ const OPTIONAL_PLUGIN_MAP: Readonly<Record<string, string>> = {
   "streaming-base": "@elizaos/plugin-streaming-base",
   "twitch-streaming": "@elizaos/plugin-twitch-streaming",
   "youtube-streaming": "@elizaos/plugin-youtube-streaming",
-  "custom-rtmp": "@milady/plugin-custom-rtmp",
+  "custom-rtmp": "@miladyai/plugin-custom-rtmp",
   "pumpfun-streaming": "@elizaos/plugin-pumpfun-streaming",
   "x-streaming": "@elizaos/plugin-x-streaming",
 };
@@ -1085,7 +1085,7 @@ export function collectPluginNames(config: MiladyConfig): Set<string> {
   // NOT in PROVIDER_PLUGIN_MAP because it is a feature plugin, not a model
   // provider, and would be incorrectly removed during provider precedence.
   if (process.env.OPINION_API_KEY?.trim()) {
-    pluginsToLoad.add("@milady/plugin-opinion");
+    pluginsToLoad.add("@miladyai/plugin-opinion");
   }
 
   // User-installed plugins from config.plugins.installs
@@ -1258,11 +1258,11 @@ export function resolveMiladyPluginImportSpecifier(
   pluginName: string,
   runtimeModuleUrl = import.meta.url,
 ): string {
-  if (!pluginName.startsWith("@milady/plugin-")) {
+  if (!pluginName.startsWith("@miladyai/plugin-")) {
     return pluginName;
   }
 
-  const shortName = pluginName.replace("@milady/plugin-", "");
+  const shortName = pluginName.replace("@miladyai/plugin-", "");
   const thisDir = path.dirname(fileURLToPath(runtimeModuleUrl));
   const distRoot = thisDir.endsWith("runtime")
     ? path.resolve(thisDir, "..")
@@ -1537,7 +1537,7 @@ async function resolvePlugins(
             }
           }
         }
-      } else if (pluginName.startsWith("@milady/plugin-")) {
+      } else if (pluginName.startsWith("@miladyai/plugin-")) {
         // Milady plugins can resolve either from bundled local wrappers
         // under milady-dist/plugins/* or from packaged node_modules.
         mod = (await import(
