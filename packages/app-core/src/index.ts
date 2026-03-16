@@ -1,3 +1,4 @@
+export * from "./App";
 export * from "./api/client";
 export * from "./events";
 export * from "./navigation";

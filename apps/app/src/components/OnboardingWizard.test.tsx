@@ -14,6 +14,13 @@ vi.mock("@milady/app-core/state", () => ({
   applyUiTheme: (theme: "light" | "dark") => mockApplyUiTheme(theme),
   getVrmPreviewUrl: () => "/vrms/previews/milady-1.png",
   getVrmUrl: () => "/vrms/milady-1.vrm.gz",
+  ONBOARDING_STEPS: [
+    {
+      id: "wakeUp",
+      name: "onboarding.wakeUp.title",
+      subtitle: "onboarding.wakeUp.subtitle",
+    },
+  ],
   useApp: () => mockUseApp(),
 }));
 
@@ -25,37 +32,37 @@ vi.mock("@milady/app-core/utils", () => ({
   resolveAppAssetUrl: (path: string) => path,
 }));
 
-vi.mock("./companion/VrmStage", () => ({
+vi.mock("@milady/app-core/components/companion/VrmStage", () => ({
   VrmStage: (props: unknown) => mockVrmStage(props),
 }));
 
-vi.mock("./onboarding/ActivateStep", () => ({
+vi.mock("@milady/app-core/components/onboarding/ActivateStep", () => ({
   ActivateStep: () => React.createElement("div", null, "ActivateStep"),
 }));
 
-vi.mock("./onboarding/ConnectionStep", () => ({
+vi.mock("@milady/app-core/components/onboarding/ConnectionStep", () => ({
   ConnectionStep: () => React.createElement("div", null, "ConnectionStep"),
 }));
 
-vi.mock("./onboarding/OnboardingPanel", () => ({
+vi.mock("@milady/app-core/components/onboarding/OnboardingPanel", () => ({
   OnboardingPanel: ({ children }: { children: React.ReactNode }) =>
     React.createElement("div", null, children),
 }));
 
-vi.mock("./onboarding/OnboardingStepNav", () => ({
+vi.mock("@milady/app-core/components/onboarding/OnboardingStepNav", () => ({
   OnboardingStepNav: () =>
     React.createElement("div", null, "OnboardingStepNav"),
 }));
 
-vi.mock("./onboarding/PermissionsStep", () => ({
+vi.mock("@milady/app-core/components/onboarding/PermissionsStep", () => ({
   PermissionsStep: () => React.createElement("div", null, "PermissionsStep"),
 }));
 
-vi.mock("./onboarding/RpcStep", () => ({
+vi.mock("@milady/app-core/components/onboarding/RpcStep", () => ({
   RpcStep: () => React.createElement("div", null, "RpcStep"),
 }));
 
-vi.mock("./onboarding/WakeUpStep", () => ({
+vi.mock("@milady/app-core/components/onboarding/WakeUpStep", () => ({
   WakeUpStep: () => React.createElement("div", null, "WakeUpStep"),
 }));
 

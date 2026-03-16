@@ -1,2 +1,1 @@
-export type { VrmStageAvatarEntry } from "@milady/app-core/components";
-export { VrmStage } from "@milady/app-core/components";
+export * from "@milady/app-core/components/companion/VrmStage";

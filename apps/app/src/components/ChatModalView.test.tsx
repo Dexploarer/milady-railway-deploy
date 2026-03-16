@@ -10,7 +10,7 @@ vi.mock("@milady/app-core/state", () => ({
   useApp: vi.fn(),
 }));
 
-vi.mock("./ChatView.js", () => ({
+vi.mock("@milady/app-core/components/ChatView", () => ({
   ChatView: ({ variant }: { variant?: string }) =>
     React.createElement("div", {
       "data-testid": "chat-view",
@@ -18,7 +18,7 @@ vi.mock("./ChatView.js", () => ({
     }),
 }));
 
-vi.mock("./ConversationsSidebar.js", () => ({
+vi.mock("@milady/app-core/components/ConversationsSidebar", () => ({
   ConversationsSidebar: ({
     mobile,
     variant,
@@ -52,6 +52,13 @@ describe("ChatModalView", () => {
     // @ts-expect-error - test only relies on the active conversation field.
     vi.spyOn(AppContext, "useApp").mockReturnValue({
       activeConversationId: null,
+      conversations: [],
+      unreadConversations: new Set(),
+      handleNewConversation: vi.fn(),
+      handleSelectConversation: vi.fn(),
+      handleDeleteConversation: vi.fn(),
+      handleRenameConversation: vi.fn(),
+      t: (key: string) => key,
     });
 
     let testRenderer: ReactTestRenderer | null = null;
@@ -76,6 +83,13 @@ describe("ChatModalView", () => {
     // @ts-expect-error - test only relies on the active conversation field.
     vi.spyOn(AppContext, "useApp").mockReturnValue({
       activeConversationId: null,
+      conversations: [],
+      unreadConversations: new Set(),
+      handleNewConversation: vi.fn(),
+      handleSelectConversation: vi.fn(),
+      handleDeleteConversation: vi.fn(),
+      handleRenameConversation: vi.fn(),
+      t: (key: string) => key,
     });
 
     let testRenderer: ReactTestRenderer | null = null;
