@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/api/knowledge-routes";
+export * from "@miladyai/autonomous/api/knowledge-routes";

@@ -1,1 +1,1 @@
-export * from "@milady/app-core/components/inventory/NftGrid";
+export * from "@miladyai/app-core/components/inventory/NftGrid";

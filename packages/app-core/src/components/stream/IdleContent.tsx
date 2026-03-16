@@ -1,6 +1,6 @@
-import type { StreamEventEnvelope } from "@milady/app-core/api";
-import { formatTime } from "@milady/app-core/components";
-import { useApp } from "@milady/app-core/state";
+import type { StreamEventEnvelope } from "@miladyai/app-core/api";
+import { formatTime } from "@miladyai/app-core/components";
+import { useApp } from "@miladyai/app-core/state";
 import { useMemo } from "react";
 import { getEventText } from "./helpers";
 

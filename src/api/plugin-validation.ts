@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/api/plugin-validation";
+export * from "@miladyai/autonomous/api/plugin-validation";

@@ -497,7 +497,7 @@ describe("Plugin Stress Test", () => {
     "@elizaos/plugin-discord",
     "@elizaos/plugin-telegram",
     "@elizaos/plugin-slack",
-    "@milady/plugin-whatsapp",
+    "@miladyai/plugin-whatsapp",
     "@elizaos/plugin-signal",
     "@elizaos/plugin-imessage",
     "@elizaos/plugin-bluebubbles",

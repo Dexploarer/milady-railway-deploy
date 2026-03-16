@@ -13,9 +13,9 @@ import type {
   BscTradeQuoteRequest,
   BscTradeQuoteResponse,
   BscTradeTxStatusResponse,
-} from "@milady/app-core/api";
-import { useApp } from "@milady/app-core/state";
-import { Button, Input } from "@milady/ui";
+} from "@miladyai/app-core/api";
+import { useApp } from "@miladyai/app-core/state";
+import { Button, Input } from "@miladyai/ui";
 import { useCallback, useState } from "react";
 import { HEX_ADDRESS_RE } from "./companion/walletUtils";
 import { formatBalance, type TrackedToken } from "./inventory/constants";

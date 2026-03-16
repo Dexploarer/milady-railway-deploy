@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/services/fallback-training-service";
+export * from "@miladyai/autonomous/services/fallback-training-service";

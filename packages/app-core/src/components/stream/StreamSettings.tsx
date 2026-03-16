@@ -7,8 +7,8 @@
  *   3. Stream source selector (stream-tab, game, custom-url)
  */
 
-import { useApp } from "@milady/app-core/state";
-import { Button, Checkbox, Input, Switch } from "@milady/ui";
+import { useApp } from "@miladyai/app-core/state";
+import { Button, Checkbox, Input, Switch } from "@miladyai/ui";
 import { useState } from "react";
 import type { StreamSourceType } from "./helpers";
 import { isSupportedStreamUrl, STREAM_SOURCE_LABELS } from "./helpers";

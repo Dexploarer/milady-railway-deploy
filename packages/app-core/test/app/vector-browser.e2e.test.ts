@@ -263,12 +263,12 @@ const { mockUseApp } = vi.hoisted(() => ({
   mockUseApp: vi.fn(),
 }));
 
-vi.mock("@milady/app-core/state", () => ({
+vi.mock("@miladyai/app-core/state", () => ({
   useApp: () => mockUseApp(),
 }));
 
 // Mock renderer wrapper to avoid WebGL issues in tests.
-vi.mock("@milady/app-core/components/vector-browser-three", () => {
+vi.mock("@miladyai/app-core/components/vector-browser-three", () => {
   const mockVector2 = class {
     x = 0;
     y = 0;
@@ -360,15 +360,15 @@ vi.mock("@milady/app-core/components/vector-browser-three", () => {
 });
 
 // Mock api-client
-vi.mock("@milady/app-core/api", () => ({
+vi.mock("@miladyai/app-core/api", () => ({
   client: {
     getDatabaseTables: vi.fn(),
     executeDatabaseQuery: vi.fn(),
   },
 }));
 
-import { client } from "@milady/app-core/api";
-import { VectorBrowserView } from "@milady/app-core/components/VectorBrowserView";
+import { client } from "@miladyai/app-core/api";
+import { VectorBrowserView } from "@miladyai/app-core/components/VectorBrowserView";
 
 // ── Component Tests ────────────────────────────────────────────────────
 

@@ -5,8 +5,8 @@
  * require switching to native (advanced) mode via the header toggle.
  */
 
-import { useRenderGuard } from "@milady/app-core/hooks";
-import type { Tab } from "@milady/app-core/navigation";
+import { useRenderGuard } from "@miladyai/app-core/hooks";
+import type { Tab } from "@miladyai/app-core/navigation";
 import { memo } from "react";
 import { CompanionView } from "./CompanionView";
 

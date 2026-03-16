@@ -1,6 +1,6 @@
-import { isElectrobunRuntime } from "@milady/app-core/bridge";
-import { useApp } from "@milady/app-core/state";
-import { Button, Input, Slider } from "@milady/ui";
+import { isElectrobunRuntime } from "@miladyai/app-core/bridge";
+import { useApp } from "@miladyai/app-core/state";
+import { Button, Input, Slider } from "@miladyai/ui";
 import {
   ChevronDown,
   ExternalLink,

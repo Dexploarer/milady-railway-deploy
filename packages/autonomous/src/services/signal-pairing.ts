@@ -1,7 +1,7 @@
 /**
  * Signal pairing service — manages device linking via QR code.
  *
- * Mirrors whatsapp-pairing.ts but uses @milady/signal-native instead of
+ * Mirrors whatsapp-pairing.ts but uses @miladyai/signal-native instead of
  * Baileys. Signal linking produces a single provisioning URL (not a refresh
  * loop) — if it times out, restart the session.
  */
@@ -10,7 +10,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 const LOG_PREFIX = "[signal-pairing]";
-const SIGNAL_NATIVE_MODULE_ID = "@milady/signal-native";
+const SIGNAL_NATIVE_MODULE_ID = "@miladyai/signal-native";
 
 /** Validate accountId to prevent path traversal. */
 export function sanitizeAccountId(raw: string): string {
@@ -68,7 +68,7 @@ export class SignalPairingSession {
     this.aborted = false;
     this.setStatus("initializing");
 
-    let native: typeof import("@milady/signal-native");
+    let native: typeof import("@miladyai/signal-native");
     let qrCode: QrCodeModule;
     try {
       native = await import(/* @vite-ignore */ SIGNAL_NATIVE_MODULE_ID);

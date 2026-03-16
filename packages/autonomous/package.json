@@ -1,5 +1,5 @@
 {
-  "name": "@milady/autonomous",
+  "name": "@miladyai/autonomous",
   "version": "1.0.0",
   "description": "Standalone Milady agent runtime and backend server package.",
   "type": "module",
@@ -170,6 +170,7 @@
     "./runtime/custom-actions": "./src/runtime/custom-actions.ts",
     "./runtime/milady-plugin": "./src/runtime/milady-plugin.ts",
     "./runtime/onboarding-names": "./src/runtime/onboarding-names.ts",
+    "./runtime/cloud-onboarding": "./src/runtime/cloud-onboarding.ts",
     "./runtime/restart": "./src/runtime/restart.ts",
     "./runtime/release-plugin-policy": "./src/runtime/release-plugin-policy.ts",
     "./runtime/trajectory-persistence": "./src/runtime/trajectory-persistence.ts",
@@ -259,10 +260,10 @@
     "zod": "^4.3.6"
   },
   "peerDependencies": {
-    "@milady/signal-native": "*"
+    "@miladyai/signal-native": "*"
   },
   "peerDependenciesMeta": {
-    "@milady/signal-native": {
+    "@miladyai/signal-native": {
       "optional": true
     }
   },

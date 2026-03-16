@@ -1,10 +1,10 @@
-import { type CustomActionDef, client } from "@milady/app-core/api";
-import { useApp } from "@milady/app-core/state";
+import { type CustomActionDef, client } from "@miladyai/app-core/api";
+import { useApp } from "@miladyai/app-core/state";
 import {
   alertDesktopMessage,
   confirmDesktopAction,
-} from "@milady/app-core/utils";
-import { Button, Input } from "@milady/ui";
+} from "@miladyai/app-core/utils";
+import { Button, Input } from "@miladyai/ui";
 import { useCallback, useEffect, useState } from "react";
 import { CustomActionEditor } from "./CustomActionEditor";
 

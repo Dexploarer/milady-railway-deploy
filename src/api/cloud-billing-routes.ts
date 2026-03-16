@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/api/cloud-billing-routes";
+export * from "@miladyai/autonomous/api/cloud-billing-routes";

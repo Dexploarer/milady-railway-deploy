@@ -3,7 +3,7 @@
  * Follows the ChatTicker pattern.
  */
 
-import { useApp } from "@milady/app-core/state";
+import { useApp } from "@miladyai/app-core/state";
 import { useMemo } from "react";
 import { getEventText } from "../../helpers";
 import { registerWidget } from "../registry";

@@ -260,15 +260,15 @@ const { mockUseApp } = vi.hoisted(() => ({
   mockUseApp: vi.fn(),
 }));
 
-vi.mock("@milady/app-core/state", async () => {
-  const actual = await vi.importActual("@milady/app-core/state");
+vi.mock("@miladyai/app-core/state", async () => {
+  const actual = await vi.importActual("@miladyai/app-core/state");
   return {
     ...actual,
     useApp: () => mockUseApp(),
   };
 });
 
-vi.mock("@milady/app-core/api", () => ({
+vi.mock("@miladyai/app-core/api", () => ({
   client: {
     getCharacter: vi.fn().mockResolvedValue({
       name: "TestAgent",
@@ -316,12 +316,12 @@ vi.mock("../../src/components/AvatarSelector", () => ({
     ),
 }));
 
-vi.mock("@milady/app-core/config", () => ({
+vi.mock("@miladyai/app-core/config", () => ({
   ConfigRenderer: () => React.createElement("div", null, "ConfigRenderer"),
   defaultRegistry: {},
 }));
 
-import { client } from "@milady/app-core/api";
+import { client } from "@miladyai/app-core/api";
 import { CharacterView } from "../../src/components/CharacterView";
 
 type CharacterData = {

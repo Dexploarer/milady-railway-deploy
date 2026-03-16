@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { useRetakeCapture } from "@milady/app-core/hooks";
+import { useRetakeCapture } from "@miladyai/app-core/hooks";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";

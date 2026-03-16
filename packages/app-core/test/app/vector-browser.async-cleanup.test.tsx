@@ -19,7 +19,7 @@ const {
   executeDatabaseQueryMock: vi.fn(),
 }));
 
-vi.mock("@milady/app-core/components/vector-browser-three", () => {
+vi.mock("@miladyai/app-core/components/vector-browser-three", () => {
   class MockVector2 {
     x = 0;
     y = 0;
@@ -145,15 +145,15 @@ vi.mock("@milady/app-core/components/vector-browser-three", () => {
   };
 });
 
-vi.mock("@milady/app-core/api", () => ({
+vi.mock("@miladyai/app-core/api", () => ({
   client: {
     getDatabaseTables: getDatabaseTablesMock,
     executeDatabaseQuery: executeDatabaseQueryMock,
   },
 }));
 
-import { client } from "@milady/app-core/api";
-import { VectorBrowserView } from "@milady/app-core/components/VectorBrowserView";
+import { client } from "@miladyai/app-core/api";
+import { VectorBrowserView } from "@miladyai/app-core/components/VectorBrowserView";
 
 async function flush(times = 4): Promise<void> {
   for (let i = 0; i < times; i++) {

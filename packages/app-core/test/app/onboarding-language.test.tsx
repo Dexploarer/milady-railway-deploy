@@ -6,9 +6,9 @@ const { mockUseApp } = vi.hoisted(() => ({
   mockUseApp: vi.fn(),
 }));
 
-vi.mock("@milady/app-core/state", async () => {
-  const actual = await vi.importActual<typeof import("@milady/app-core/state")>(
-    "@milady/app-core/state",
+vi.mock("@miladyai/app-core/state", async () => {
+  const actual = await vi.importActual<typeof import("@miladyai/app-core/state")>(
+    "@miladyai/app-core/state",
   );
   return {
     ...actual,
@@ -20,10 +20,10 @@ vi.mock("@milady/app-core/state", async () => {
   };
 });
 
-vi.mock("@milady/app-core/components", async () => {
+vi.mock("@miladyai/app-core/components", async () => {
   const actual = await vi.importActual<
-    typeof import("@milady/app-core/components")
-  >("@milady/app-core/components");
+    typeof import("@miladyai/app-core/components")
+  >("@miladyai/app-core/components");
   return {
     ...actual,
     PermissionsOnboardingSection: () => null,
@@ -38,7 +38,7 @@ vi.mock("../../src/components/companion/VrmStage", () => ({
   VrmStage: () => null,
 }));
 
-vi.mock("@milady/app-core/api", () => ({
+vi.mock("@miladyai/app-core/api", () => ({
   client: {
     startAnthropicLogin: vi.fn(),
     exchangeAnthropicCode: vi.fn(),

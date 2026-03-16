@@ -41,21 +41,21 @@ function resolvePackageDir(packageName: string): string {
 }
 
 const PLUGINS = [
-  { name: "@milady/capacitor-gateway", exportName: "Gateway" },
-  { name: "@milady/capacitor-camera", exportName: "Camera" },
-  { name: "@milady/capacitor-canvas", exportName: "Canvas" },
-  { name: "@milady/capacitor-desktop", exportName: "Desktop" },
+  { name: "@miladyai/capacitor-gateway", exportName: "Gateway" },
+  { name: "@miladyai/capacitor-camera", exportName: "Camera" },
+  { name: "@miladyai/capacitor-canvas", exportName: "Canvas" },
+  { name: "@miladyai/capacitor-desktop", exportName: "Desktop" },
   {
-    name: "@milady/capacitor-location",
+    name: "@miladyai/capacitor-location",
     exportName: "Location",
   },
   {
-    name: "@milady/capacitor-screencapture",
+    name: "@miladyai/capacitor-screencapture",
     exportName: "ScreenCapture",
   },
-  { name: "@milady/capacitor-swabble", exportName: "Swabble" },
+  { name: "@miladyai/capacitor-swabble", exportName: "Swabble" },
   {
-    name: "@milady/capacitor-talkmode",
+    name: "@miladyai/capacitor-talkmode",
     exportName: "TalkMode",
   },
 ];

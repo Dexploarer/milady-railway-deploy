@@ -14,11 +14,11 @@ const { mockUseApp, mockIsNativeFn } = vi.hoisted(() => ({
   mockIsNativeFn: { value: false },
 }));
 
-vi.mock("@milady/app-core/state", () => ({
+vi.mock("@miladyai/app-core/state", () => ({
   useApp: () => mockUseApp(),
 }));
 
-vi.mock("@milady/app-core/api", () => ({
+vi.mock("@miladyai/app-core/api", () => ({
   client: {
     importAgent: vi.fn(),
     startAnthropicLogin: vi.fn(),
@@ -28,17 +28,17 @@ vi.mock("@milady/app-core/api", () => ({
   },
 }));
 
-vi.mock("@milady/app-core/providers", async () => {
+vi.mock("@miladyai/app-core/providers", async () => {
   const actual = await vi.importActual<
-    typeof import("@milady/app-core/providers")
-  >("@milady/app-core/providers");
+    typeof import("@miladyai/app-core/providers")
+  >("@miladyai/app-core/providers");
   return {
     ...actual,
     getProviderLogo: () => "/logos/placeholder.png",
   };
 });
 
-vi.mock("@milady/app-core/platform", () => ({
+vi.mock("@miladyai/app-core/platform", () => ({
   get isNative() {
     return mockIsNativeFn.value;
   },

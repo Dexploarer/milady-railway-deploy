@@ -11,7 +11,7 @@
  */
 
 import http from "node:http";
-import { client } from "@milady/app-core/api";
+import { client } from "@miladyai/app-core/api";
 // @vitest-environment jsdom
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
@@ -324,15 +324,15 @@ const { mockUseApp } = vi.hoisted(() => ({
   mockUseApp: vi.fn(),
 }));
 
-vi.mock("@milady/app-core/state", async () => {
-  const actual = await vi.importActual("@milady/app-core/state");
+vi.mock("@miladyai/app-core/state", async () => {
+  const actual = await vi.importActual("@miladyai/app-core/state");
   return {
     ...actual,
     useApp: () => mockUseApp(),
   };
 });
 
-vi.mock("@milady/app-core/api", () => ({
+vi.mock("@miladyai/app-core/api", () => ({
   client: {
     getKnowledgeStats: vi.fn().mockResolvedValue({
       documentCount: 5,

@@ -4,7 +4,7 @@
  * Extracted from SettingsView.tsx for decomposition (P2 §10).
  */
 
-import { Button, Input } from "@milady/ui";
+import { Button, Input } from "@miladyai/ui";
 import { useCallback, useRef, useState } from "react";
 import { client } from "../api";
 import { useTimeout } from "../hooks";

@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/services/whatsapp-pairing";
+export * from "@miladyai/autonomous/services/whatsapp-pairing";

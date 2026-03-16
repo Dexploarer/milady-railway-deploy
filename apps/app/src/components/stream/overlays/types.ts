@@ -1,1 +1,1 @@
-export * from "@milady/app-core/components/stream/overlays/types";
+export * from "@miladyai/app-core/components/stream/overlays/types";

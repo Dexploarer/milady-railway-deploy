@@ -3,7 +3,7 @@ import {
   pathForTab,
   tabFromPath,
   titleForTab,
-} from "@milady/app-core/navigation";
+} from "@miladyai/app-core/navigation";
 import { describe, expect, it } from "vitest";
 
 describe("navigation", () => {

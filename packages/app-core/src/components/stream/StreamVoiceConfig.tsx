@@ -5,10 +5,10 @@
  * provider + API key status, and a test button to speak sample text.
  */
 
-import { client } from "@milady/app-core/api";
-import { useTimeout } from "@milady/app-core/hooks";
-import { useApp } from "@milady/app-core/state";
-import { Button } from "@milady/ui";
+import { client } from "@miladyai/app-core/api";
+import { useTimeout } from "@miladyai/app-core/hooks";
+import { useApp } from "@miladyai/app-core/state";
+import { Button } from "@miladyai/ui";
 import { Volume2, VolumeX } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 

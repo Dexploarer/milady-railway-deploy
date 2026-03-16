@@ -5,7 +5,7 @@
  * we test the underlying browser APIs and integration patterns directly.
  */
 
-import { nextIdleMouthOpen } from "@milady/app-core/hooks";
+import { nextIdleMouthOpen } from "@miladyai/app-core/hooks";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // ---------------------------------------------------------------------------

@@ -1,8 +1,8 @@
 import type {
   ConversationMessage,
   StreamEventEnvelope,
-} from "@milady/app-core/api";
-import { useApp } from "@milady/app-core/state";
+} from "@miladyai/app-core/api";
+import { useApp } from "@miladyai/app-core/state";
 import { useEffect, useMemo, useRef } from "react";
 import { CHANNEL_COLORS, getEventSource, getEventText } from "./helpers";
 

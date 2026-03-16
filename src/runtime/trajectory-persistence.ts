@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/runtime/trajectory-persistence";
+export * from "@miladyai/autonomous/runtime/trajectory-persistence";

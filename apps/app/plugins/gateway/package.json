@@ -1,5 +1,5 @@
 {
-  "name": "@milady/capacitor-gateway",
+  "name": "@miladyai/capacitor-gateway",
   "version": "1.0.0",
   "description": "Connects the app to a Milady Gateway with discovery, RPC, and realtime events.",
   "keywords": [

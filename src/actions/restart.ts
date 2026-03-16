@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/actions/restart";
+export * from "@miladyai/autonomous/actions/restart";

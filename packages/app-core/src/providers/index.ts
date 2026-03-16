@@ -19,7 +19,7 @@ export {
   SUBSCRIPTION_PROVIDER_SELECTIONS,
   type SubscriptionProviderSelectionId,
   sortOnboardingProviders,
-} from "@milady/autonomous/contracts/onboarding";
+} from "@miladyai/autonomous/contracts/onboarding";
 
 import { resolveAppAssetUrl } from "../utils/asset-url";
 

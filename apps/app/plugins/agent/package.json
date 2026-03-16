@@ -1,5 +1,5 @@
 {
-  "name": "@milady/capacitor-agent",
+  "name": "@miladyai/capacitor-agent",
   "version": "1.0.0",
   "description": "Starts, stops, and monitors the embedded Milady agent runtime.",
   "keywords": [

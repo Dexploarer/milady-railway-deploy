@@ -1,1 +1,1 @@
-export * from "@milady/app-core/components/inventory/constants";
+export * from "@miladyai/app-core/components/inventory/constants";

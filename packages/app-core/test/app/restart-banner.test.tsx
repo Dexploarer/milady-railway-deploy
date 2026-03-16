@@ -13,9 +13,9 @@ interface RestartBannerContextStub {
 
 const mockUseApp = vi.fn<() => RestartBannerContextStub>();
 
-vi.mock("@milady/app-core/state", async () => {
-  const actual = await vi.importActual<typeof import("@milady/app-core/state")>(
-    "@milady/app-core/state",
+vi.mock("@miladyai/app-core/state", async () => {
+  const actual = await vi.importActual<typeof import("@miladyai/app-core/state")>(
+    "@miladyai/app-core/state",
   );
   return {
     ...actual,
@@ -23,7 +23,7 @@ vi.mock("@milady/app-core/state", async () => {
   };
 });
 
-import { RestartBanner } from "@milady/app-core/components";
+import { RestartBanner } from "@miladyai/app-core/components";
 
 function makeContext(
   overrides: Partial<RestartBannerContextStub> = {},

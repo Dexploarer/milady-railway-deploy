@@ -1,4 +1,4 @@
-import { sanitizeLinkHref } from "@milady/app-core/config";
+import { sanitizeLinkHref } from "@miladyai/app-core/config";
 import { describe, expect, it } from "vitest";
 
 describe("sanitizeLinkHref", () => {

@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/services/signing-policy";
+export * from "@miladyai/autonomous/services/signing-policy";

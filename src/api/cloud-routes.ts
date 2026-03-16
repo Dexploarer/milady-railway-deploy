@@ -3,8 +3,8 @@ import type { AgentRuntime } from "@elizaos/core";
 import {
   type CloudRouteState as AutonomousCloudRouteState,
   handleCloudRoute as handleAutonomousCloudRoute,
-} from "@milady/autonomous/api/cloud-routes";
-import type { CloudManager } from "@milady/autonomous/cloud/cloud-manager";
+} from "@miladyai/autonomous/api/cloud-routes";
+import type { CloudManager } from "@miladyai/autonomous/cloud/cloud-manager";
 import type { MiladyConfig } from "../config/config";
 import { saveMiladyConfig } from "../config/config";
 import { createIntegrationTelemetrySpan } from "../diagnostics/integration-observability";

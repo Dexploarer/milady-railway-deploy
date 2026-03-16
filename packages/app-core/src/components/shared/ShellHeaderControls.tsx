@@ -1,6 +1,6 @@
-import { LanguageDropdown, ThemeToggle } from "@milady/app-core/components";
-import type { UiLanguage } from "@milady/app-core/i18n";
-import type { ShellView, UiTheme } from "@milady/app-core/state";
+import { LanguageDropdown, ThemeToggle } from "@miladyai/app-core/components";
+import type { UiLanguage } from "@miladyai/app-core/i18n";
+import type { ShellView, UiTheme } from "@miladyai/app-core/state";
 import {
   type LucideIcon,
   Monitor,

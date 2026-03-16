@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/api/merkle-tree";
+export * from "@miladyai/autonomous/api/merkle-tree";

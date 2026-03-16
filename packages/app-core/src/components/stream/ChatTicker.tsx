@@ -1,5 +1,5 @@
-import type { StreamEventEnvelope } from "@milady/app-core/api";
-import { useApp } from "@milady/app-core/state";
+import type { StreamEventEnvelope } from "@miladyai/app-core/api";
+import { useApp } from "@miladyai/app-core/state";
 import { useMemo } from "react";
 import { CHANNEL_COLORS } from "./helpers";
 

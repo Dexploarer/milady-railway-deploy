@@ -12,7 +12,7 @@ import type {
   WalletBalancesResponse,
   WalletConfigStatus,
   WalletNftsResponse,
-} from "@milady/app-core/api";
+} from "@miladyai/app-core/api";
 import { useMemo } from "react";
 import {
   CHAIN_CONFIGS,

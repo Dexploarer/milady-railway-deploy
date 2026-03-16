@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { openExternalUrl } from "@milady/app-core/utils";
+import { openExternalUrl } from "@miladyai/app-core/utils";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 type TestWindow = Window & {

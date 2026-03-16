@@ -6,7 +6,7 @@
  *   Content 0 | Widgets 10-39 | Alerts 40-49 | GameViewOverlay 50+
  */
 
-import type { StreamEventEnvelope } from "@milady/app-core/api";
+import type { StreamEventEnvelope } from "@miladyai/app-core/api";
 import { useMemo } from "react";
 import type { AgentMode } from "../helpers";
 import { getWidget } from "./registry";

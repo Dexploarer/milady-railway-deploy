@@ -1,5 +1,5 @@
 {
-  "name": "@milady/capacitor-canvas",
+  "name": "@miladyai/capacitor-canvas",
   "version": "1.0.0",
   "description": "Creates interactive canvases with layers, drawing primitives, and A2UI integration.",
   "keywords": [

@@ -1,5 +1,5 @@
 {
-  "name": "@milady/capacitor-talkmode",
+  "name": "@miladyai/capacitor-talkmode",
   "version": "1.0.0",
   "description": "Runs voice conversations with live transcription, chat orchestration, and spoken replies.",
   "keywords": [

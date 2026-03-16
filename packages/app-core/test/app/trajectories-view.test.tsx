@@ -16,21 +16,21 @@ const hoisted = vi.hoisted(() => ({
   mockConfirmDesktopAction: vi.fn(),
 }));
 
-vi.mock("@milady/app-core/state", () => ({
+vi.mock("@miladyai/app-core/state", () => ({
   useApp: () => hoisted.mockUseApp(),
 }));
 
-vi.mock("@milady/app-core/api", () => ({
+vi.mock("@miladyai/app-core/api", () => ({
   client: hoisted.mockClient,
 }));
 
-vi.mock("@milady/app-core/utils", () => ({
+vi.mock("@miladyai/app-core/utils", () => ({
   confirmDesktopAction: (
     ...args: Parameters<typeof hoisted.mockConfirmDesktopAction>
   ) => hoisted.mockConfirmDesktopAction(...args),
 }));
 
-vi.mock("@milady/ui", () => ({
+vi.mock("@miladyai/ui", () => ({
   Button: ({
     children,
     onClick,
@@ -90,7 +90,7 @@ import type {
   TrajectoryConfig,
   TrajectoryListResult,
   TrajectoryStats,
-} from "@milady/app-core/api";
+} from "@miladyai/app-core/api";
 import { TrajectoriesView } from "../../src/components/TrajectoriesView";
 
 const { mockClient, mockConfirmDesktopAction, mockUseApp } = hoisted;

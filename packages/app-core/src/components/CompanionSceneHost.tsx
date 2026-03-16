@@ -1,11 +1,11 @@
-import { useRenderGuard } from "@milady/app-core/hooks";
+import { useRenderGuard } from "@miladyai/app-core/hooks";
 import {
   getVrmPreviewUrl,
   getVrmUrl,
   useApp,
   VRM_COUNT,
-} from "@milady/app-core/state";
-import { resolveAppAssetUrl } from "@milady/app-core/utils";
+} from "@miladyai/app-core/state";
+import { resolveAppAssetUrl } from "@miladyai/app-core/utils";
 import {
   memo,
   type ReactNode,

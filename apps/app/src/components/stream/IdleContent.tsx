@@ -1,1 +1,1 @@
-export * from "@milady/app-core/components/stream/IdleContent";
+export * from "@miladyai/app-core/components/stream/IdleContent";

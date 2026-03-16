@@ -2,7 +2,7 @@ import {
   type BuildCommandsArgs,
   buildCommands,
   NAV_COMMANDS,
-} from "@milady/app-core/chat";
+} from "@miladyai/app-core/chat";
 import { describe, expect, it, vi } from "vitest";
 
 function makeArgs(overrides?: Partial<BuildCommandsArgs>): BuildCommandsArgs {

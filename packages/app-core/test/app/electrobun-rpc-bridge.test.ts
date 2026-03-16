@@ -4,7 +4,7 @@ import {
   type ElectrobunRendererRpc,
   invokeDesktopBridgeRequest,
   subscribeDesktopBridgeEvent,
-} from "@milady/app-core/bridge";
+} from "@miladyai/app-core/bridge";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 type TestWindow = Window & {

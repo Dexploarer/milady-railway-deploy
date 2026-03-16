@@ -12,7 +12,7 @@ vi.mock("@elizaos/core", () => ({
   logger: { info: vi.fn(), warn: vi.fn(), debug: vi.fn(), error: vi.fn() },
 }));
 
-vi.mock("@milady/autonomous/config/config", () => ({
+vi.mock("@miladyai/autonomous/config/config", () => ({
   loadMiladyConfig: vi.fn(() => ({ customActions: [] })),
   saveMiladyConfig: vi.fn(),
 }));
@@ -22,14 +22,14 @@ vi.mock("node:dns/promises", () => ({
 }));
 
 import type { IAgentRuntime } from "@elizaos/core";
-import { loadMiladyConfig } from "@milady/autonomous/config/config";
+import { loadMiladyConfig } from "@miladyai/autonomous/config/config";
 import {
   __setPinnedFetchImplForTests,
   buildTestHandler,
   loadCustomActions,
   registerCustomActionLive,
   setCustomActionsRuntime,
-} from "@milady/autonomous/runtime/custom-actions";
+} from "@miladyai/autonomous/runtime/custom-actions";
 import type { CustomActionDef, MiladyConfig } from "../config/types.milady";
 
 // ---------------------------------------------------------------------------

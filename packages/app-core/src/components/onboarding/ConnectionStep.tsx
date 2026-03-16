@@ -2,12 +2,12 @@ import type {
   OpenRouterModelOption,
   PiAiModelOption,
   ProviderOption,
-} from "@milady/app-core/api";
-import { client } from "@milady/app-core/api";
-import { isNative } from "@milady/app-core/platform";
-import { getProviderLogo } from "@milady/app-core/providers";
-import { useApp } from "@milady/app-core/state";
-import { openExternalUrl } from "@milady/app-core/utils";
+} from "@miladyai/app-core/api";
+import { client } from "@miladyai/app-core/api";
+import { isNative } from "@miladyai/app-core/platform";
+import { getProviderLogo } from "@miladyai/app-core/providers";
+import { useApp } from "@miladyai/app-core/state";
+import { openExternalUrl } from "@miladyai/app-core/utils";
 import { useState } from "react";
 
 function formatRequestError(err: unknown): string {

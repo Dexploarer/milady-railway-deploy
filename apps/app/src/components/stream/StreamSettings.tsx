@@ -1,1 +1,1 @@
-export * from "@milady/app-core/components/stream/StreamSettings";
+export * from "@miladyai/app-core/components/stream/StreamSettings";

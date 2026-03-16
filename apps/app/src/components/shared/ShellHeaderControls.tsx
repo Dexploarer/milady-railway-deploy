@@ -1,1 +1,1 @@
-export * from "@milady/app-core/components/shared/ShellHeaderControls";
+export * from "@miladyai/app-core/components/shared/ShellHeaderControls";

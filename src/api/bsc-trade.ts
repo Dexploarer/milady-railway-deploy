@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/api/bsc-trade";
+export * from "@miladyai/autonomous/api/bsc-trade";

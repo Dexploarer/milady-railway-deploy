@@ -23,7 +23,7 @@ const mockOpenPermissionSettings = vi.fn();
 const mockRefreshPermissions = vi.fn();
 const mockSetShellEnabled = vi.fn();
 
-vi.mock("@milady/app-core/api", () => ({
+vi.mock("@miladyai/app-core/api", () => ({
   client: {
     getPermissions: mockGetPermissions,
     isShellEnabled: mockIsShellEnabled,
@@ -36,7 +36,7 @@ vi.mock("@milady/app-core/api", () => ({
 
 // Mock AppContext
 const mockUseApp = vi.fn();
-vi.mock("@milady/app-core/state", () => ({
+vi.mock("@miladyai/app-core/state", () => ({
   useApp: () => mockUseApp(),
 }));
 

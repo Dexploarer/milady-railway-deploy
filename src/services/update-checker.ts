@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/services/update-checker";
+export * from "@miladyai/autonomous/services/update-checker";

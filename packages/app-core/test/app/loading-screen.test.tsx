@@ -1,4 +1,4 @@
-import { AvatarLoader } from "@milady/app-core/components/AvatarLoader";
+import { AvatarLoader } from "@miladyai/app-core/components/AvatarLoader";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { describe, expect, it } from "vitest";

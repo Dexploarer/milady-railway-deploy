@@ -1,1 +1,1 @@
-export * from "@milady/app-core/components/stream/overlays/built-in/ViewerCountWidget";
+export * from "@miladyai/app-core/components/stream/overlays/built-in/ViewerCountWidget";

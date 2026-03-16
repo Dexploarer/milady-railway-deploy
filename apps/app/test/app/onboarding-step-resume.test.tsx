@@ -88,13 +88,13 @@ const { mockClient } = vi.hoisted(() => ({
   },
 }));
 
-vi.mock("@milady/app-core/api", () => ({
+vi.mock("@miladyai/app-core/api", () => ({
   client: mockClient,
   SkillScanReportSummary: {},
 }));
 
-import type { OnboardingStep } from "@milady/app-core/state";
-import { AppProvider, useApp } from "@milady/app-core/state";
+import type { OnboardingStep } from "@miladyai/app-core/state";
+import { AppProvider, useApp } from "@miladyai/app-core/state";
 
 type ProbeApi = {
   getSnapshot: () => {

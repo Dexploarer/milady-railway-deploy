@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/api/zip-utils";
+export * from "@miladyai/autonomous/api/zip-utils";

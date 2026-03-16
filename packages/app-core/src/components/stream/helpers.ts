@@ -2,8 +2,8 @@
  * Shared helpers, constants, and types for StreamView sub-components.
  */
 
-import type { StreamEventEnvelope } from "@milady/app-core/api";
-import { invokeDesktopBridgeRequest } from "@milady/app-core/bridge";
+import type { StreamEventEnvelope } from "@miladyai/app-core/api";
+import { invokeDesktopBridgeRequest } from "@miladyai/app-core/bridge";
 
 // ---------------------------------------------------------------------------
 // Constants

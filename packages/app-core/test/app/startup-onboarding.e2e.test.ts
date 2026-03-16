@@ -127,18 +127,18 @@ const { companionOverlayTabs, mockUseApp } = vi.hoisted(() => ({
   mockUseApp: vi.fn(),
 }));
 
-vi.mock("@milady/app-core/state", async () => {
-  const actual = await vi.importActual("@milady/app-core/state");
+vi.mock("@miladyai/app-core/state", async () => {
+  const actual = await vi.importActual("@miladyai/app-core/state");
   return {
     ...actual,
     useApp: () => mockUseApp(),
   };
 });
 
-vi.mock("@milady/app-core/components", async () => {
+vi.mock("@miladyai/app-core/components", async () => {
   const actual = await vi.importActual<
-    typeof import("@milady/app-core/components")
-  >("@milady/app-core/components");
+    typeof import("@miladyai/app-core/components")
+  >("@miladyai/app-core/components");
   return {
     ...actual,
     AdvancedPageView: () =>
@@ -318,7 +318,7 @@ vi.mock("../../../packages/app-core/src/components/PairingView", () => ({
 vi.mock("../../../packages/app-core/src/components/ChatView", () => ({
   ChatView: () => React.createElement("div", null, "ChatView"),
 }));
-vi.mock("@milady/app-core/components/AvatarLoader", () => ({
+vi.mock("@miladyai/app-core/components/AvatarLoader", () => ({
   AvatarLoader: () => React.createElement("div", null, "AvatarLoader"),
 }));
 vi.mock("../../../packages/app-core/src/components/CompanionView", () => ({

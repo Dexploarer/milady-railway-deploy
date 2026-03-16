@@ -340,8 +340,8 @@ const { mockUseApp } = vi.hoisted(() => ({
   mockUseApp: vi.fn(),
 }));
 
-vi.mock("@milady/app-core/state", async () => {
-  const actual = await vi.importActual("@milady/app-core/state");
+vi.mock("@miladyai/app-core/state", async () => {
+  const actual = await vi.importActual("@miladyai/app-core/state");
   return {
     ...actual,
     useApp: () => mockUseApp(),

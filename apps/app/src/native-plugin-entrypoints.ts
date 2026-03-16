@@ -1,7 +1,7 @@
-import "@milady/capacitor-camera";
-import "@milady/capacitor-canvas";
-import "@milady/capacitor-gateway";
-import "@milady/capacitor-location";
-import "@milady/capacitor-screencapture";
-import "@milady/capacitor-swabble";
-import "@milady/capacitor-talkmode";
+import "@miladyai/capacitor-camera";
+import "@miladyai/capacitor-canvas";
+import "@miladyai/capacitor-gateway";
+import "@miladyai/capacitor-location";
+import "@miladyai/capacitor-screencapture";
+import "@miladyai/capacitor-swabble";
+import "@miladyai/capacitor-talkmode";

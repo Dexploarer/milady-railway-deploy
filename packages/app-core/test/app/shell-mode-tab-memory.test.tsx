@@ -58,14 +58,14 @@ const { mockClient } = vi.hoisted(() => ({
   },
 }));
 
-vi.mock("@milady/app-core/api", () => ({
+vi.mock("@miladyai/app-core/api", () => ({
   client: mockClient,
   SkillScanReportSummary: {},
 }));
 
-import type { Tab } from "@milady/app-core/navigation";
-import type { ShellView, UiShellMode } from "@milady/app-core/state";
-import { AppProvider, useApp } from "@milady/app-core/state";
+import type { Tab } from "@miladyai/app-core/navigation";
+import type { ShellView, UiShellMode } from "@miladyai/app-core/state";
+import { AppProvider, useApp } from "@miladyai/app-core/state";
 
 type ProbeApi = {
   getSnapshot: () => { tab: Tab; uiShellMode: UiShellMode };

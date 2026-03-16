@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { MiladyClient } from "@milady/app-core/api";
+import { MiladyClient } from "@miladyai/app-core/api";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 class ControlledWebSocket {

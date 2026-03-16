@@ -2,7 +2,7 @@ import type { AgentRuntime } from "@elizaos/core";
 import {
   type PermissionRouteState as AutonomousPermissionRouteState,
   handlePermissionRoutes as handleAutonomousPermissionRoutes,
-} from "@milady/autonomous/api/permissions-routes";
+} from "@miladyai/autonomous/api/permissions-routes";
 import type { MiladyConfig } from "../config/config";
 import type { RouteRequestContext } from "./route-helpers";
 

@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/api/wallet-evm-balance";
+export * from "@miladyai/autonomous/api/wallet-evm-balance";

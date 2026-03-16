@@ -6,11 +6,11 @@ const { mockUseApp } = vi.hoisted(() => ({
   mockUseApp: vi.fn(),
 }));
 
-vi.mock("@milady/app-core/state", () => ({
+vi.mock("@miladyai/app-core/state", () => ({
   useApp: () => mockUseApp(),
 }));
 
-import { PairingView } from "@milady/app-core/components/PairingView";
+import { PairingView } from "@miladyai/app-core/components/PairingView";
 
 function createContext(overrides?: Record<string, unknown>) {
   return {

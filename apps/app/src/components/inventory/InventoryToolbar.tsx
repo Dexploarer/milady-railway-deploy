@@ -1,1 +1,1 @@
-export * from "@milady/app-core/components/inventory/InventoryToolbar";
+export * from "@miladyai/app-core/components/inventory/InventoryToolbar";

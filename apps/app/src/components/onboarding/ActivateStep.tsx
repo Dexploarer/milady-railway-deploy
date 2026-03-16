@@ -1,1 +1,1 @@
-export * from "@milady/app-core/components/onboarding/ActivateStep";
+export * from "@miladyai/app-core/components/onboarding/ActivateStep";

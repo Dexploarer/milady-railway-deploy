@@ -1,13 +1,13 @@
-import { LanguageDropdown } from "@milady/app-core/components";
-import type { UiLanguage } from "@milady/app-core/i18n";
-import { normalizeLanguage } from "@milady/app-core/i18n";
+import { LanguageDropdown } from "@miladyai/app-core/components";
+import type { UiLanguage } from "@miladyai/app-core/i18n";
+import { normalizeLanguage } from "@miladyai/app-core/i18n";
 import {
   applyUiTheme,
   getVrmPreviewUrl,
   getVrmUrl,
   useApp,
-} from "@milady/app-core/state";
-import { resolveAppAssetUrl } from "@milady/app-core/utils";
+} from "@miladyai/app-core/state";
+import { resolveAppAssetUrl } from "@miladyai/app-core/utils";
 import { useEffect } from "react";
 import { VrmStage } from "./companion/VrmStage";
 import { ActivateStep } from "./onboarding/ActivateStep";

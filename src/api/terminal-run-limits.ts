@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/api/terminal-run-limits";
+export * from "@miladyai/autonomous/api/terminal-run-limits";

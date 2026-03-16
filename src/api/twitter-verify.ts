@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/api/twitter-verify";
+export * from "@miladyai/autonomous/api/twitter-verify";

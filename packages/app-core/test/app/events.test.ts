@@ -17,7 +17,7 @@ import {
   STOP_EMOTE_EVENT,
   TRAY_ACTION_EVENT,
   VOICE_CONFIG_UPDATED_EVENT,
-} from "@milady/app-core/events";
+} from "@miladyai/app-core/events";
 import { describe, expect, expectTypeOf, it, vi } from "vitest";
 
 describe("event constants", () => {

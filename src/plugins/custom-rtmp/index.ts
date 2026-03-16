@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/plugins/custom-rtmp";
+export * from "@miladyai/autonomous/plugins/custom-rtmp";

@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
-import { ShortcutsOverlay } from "@milady/app-core/components";
-import { COMMON_SHORTCUTS } from "@milady/app-core/hooks";
+import { ShortcutsOverlay } from "@miladyai/app-core/components";
+import { COMMON_SHORTCUTS } from "@miladyai/app-core/hooks";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { beforeEach, describe, expect, it, vi } from "vitest";

@@ -14,7 +14,7 @@ function findByTestId(
 }
 
 const mockSetActionNotice = vi.fn();
-vi.mock("@milady/app-core/state", () => ({
+vi.mock("@miladyai/app-core/state", () => ({
   useApp: () => ({
     t: (_k: string) => "Latest quote",
     setActionNotice: mockSetActionNotice,

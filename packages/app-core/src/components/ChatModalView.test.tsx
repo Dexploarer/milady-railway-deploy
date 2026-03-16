@@ -1,12 +1,12 @@
 // @vitest-environment jsdom
-import * as AppContext from "@milady/app-core/state";
+import * as AppContext from "@miladyai/app-core/state";
 import React from "react";
 import { act, create, type ReactTestRenderer } from "react-test-renderer";
 import { describe, expect, it, vi } from "vitest";
 
 import { ChatModalView } from "./ChatModalView";
 
-vi.mock("@milady/app-core/state", () => ({
+vi.mock("@miladyai/app-core/state", () => ({
   useApp: vi.fn(),
 }));
 

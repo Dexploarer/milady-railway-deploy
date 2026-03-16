@@ -5,7 +5,7 @@
  * inside the ./inventory/ directory.
  */
 
-import { useApp } from "@milady/app-core/state";
+import { useApp } from "@miladyai/app-core/state";
 import { useCallback, useState } from "react";
 import { TradePanel } from "./BscTradePanel";
 import {

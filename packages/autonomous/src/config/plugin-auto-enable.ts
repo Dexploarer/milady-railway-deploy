@@ -17,9 +17,9 @@ export const CONNECTOR_PLUGINS: Record<string, string> = {
   slack: "@elizaos/plugin-slack",
   twitter: "@elizaos/plugin-twitter",
   // Internal connector built from src/plugins/whatsapp (not an npm package).
-  whatsapp: "@milady/plugin-whatsapp",
+  whatsapp: "@miladyai/plugin-whatsapp",
   // Internal connector built from src/plugins/signal (not an npm package).
-  signal: "@milady/plugin-signal",
+  signal: "@miladyai/plugin-signal",
   bluebubbles: "@elizaos/plugin-bluebubbles",
   imessage: "@elizaos/plugin-imessage",
   farcaster: "@elizaos/plugin-farcaster",
@@ -39,7 +39,7 @@ export const STREAMING_PLUGINS: Record<string, string> = {
   retake: "@elizaos/plugin-retake",
   twitch: "@elizaos/plugin-twitch-streaming",
   youtube: "@elizaos/plugin-youtube-streaming",
-  customRtmp: "@milady/plugin-custom-rtmp",
+  customRtmp: "@miladyai/plugin-custom-rtmp",
   pumpfun: "@elizaos/plugin-pumpfun-streaming",
   x: "@elizaos/plugin-x-streaming",
 };

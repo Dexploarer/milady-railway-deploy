@@ -1,7 +1,7 @@
-import { type CustomActionDef, client } from "@milady/app-core/api";
-import { useApp } from "@milady/app-core/state";
-import { confirmDesktopAction } from "@milady/app-core/utils";
-import { Button, Input } from "@milady/ui";
+import { type CustomActionDef, client } from "@miladyai/app-core/api";
+import { useApp } from "@miladyai/app-core/state";
+import { confirmDesktopAction } from "@miladyai/app-core/utils";
+import { Button, Input } from "@miladyai/ui";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 interface CustomActionsPanelProps {

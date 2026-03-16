@@ -44,11 +44,11 @@ const {
   },
 }));
 
-vi.mock("@milady/app-core/state", () => ({
+vi.mock("@miladyai/app-core/state", () => ({
   useApp: () => mockUseApp(),
 }));
 
-vi.mock("@milady/app-core/platform", () => ({
+vi.mock("@miladyai/app-core/platform", () => ({
   hasRequiredOnboardingPermissions: vi.fn(() => true),
   isWebPlatform: () => mockIsWeb(),
   isElectronPlatform: () => mockIsElectron(),
@@ -60,7 +60,7 @@ vi.mock("@milady/app-core/platform", () => ({
   platform: "web",
 }));
 
-vi.mock("@milady/app-core/api", () => ({
+vi.mock("@miladyai/app-core/api", () => ({
   client: {
     getPermissions: mockGetPermissions,
     isShellEnabled: mockIsShellEnabled,
@@ -71,21 +71,21 @@ vi.mock("@milady/app-core/api", () => ({
   },
 }));
 
-vi.mock("@milady/app-core/bridge", () => ({
+vi.mock("@miladyai/app-core/bridge", () => ({
   invokeDesktopBridgeRequest: mockInvokeDesktopBridgeRequest,
   subscribeDesktopBridgeEvent: mockSubscribeDesktopBridgeEvent,
 }));
 
-vi.mock("@milady/app-core/components/ui-badges", () => ({
+vi.mock("@miladyai/app-core/components/ui-badges", () => ({
   StatusBadge: ({ label }: { label: string }) =>
     React.createElement("span", { "data-testid": "status-badge" }, label),
 }));
 
-vi.mock("@milady/app-core/components/ui-switch", () => ({
+vi.mock("@miladyai/app-core/components/ui-switch", () => ({
   Switch: () => React.createElement("span", null, "switch"),
 }));
 
-vi.mock("@milady/ui", () => ({
+vi.mock("@miladyai/ui", () => ({
   Button: ({
     children,
     onClick,
@@ -114,7 +114,7 @@ vi.mock("lucide-react", () => ({
   Terminal: () => React.createElement("span", null, "💻"),
 }));
 
-import { PermissionsSection } from "@milady/app-core/components/PermissionsSection";
+import { PermissionsSection } from "@miladyai/app-core/components/PermissionsSection";
 
 // ── Helpers ───────────────────────────────────────────────────────────
 

@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/services/signal-pairing";
+export * from "@miladyai/autonomous/services/signal-pairing";

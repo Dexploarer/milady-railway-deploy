@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/providers/session-utils";
+export * from "@miladyai/autonomous/providers/session-utils";

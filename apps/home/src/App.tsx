@@ -4,8 +4,8 @@ import {
   LoadingScreen,
   StartupFailureView,
   SystemWarningBanner,
-} from "@milady/app-core/components";
-import { useApp } from "@milady/app-core/state";
+} from "@miladyai/app-core/components";
+import { useApp } from "@miladyai/app-core/state";
 
 export function App() {
   const { startupError, startupPhase, retryStartup } = useApp();

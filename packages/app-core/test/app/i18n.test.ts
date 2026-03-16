@@ -6,7 +6,7 @@ import {
   normalizeLanguage,
   t,
   UI_LANGUAGES,
-} from "@milady/app-core/i18n";
+} from "@miladyai/app-core/i18n";
 import { describe, expect, it } from "vitest";
 
 describe("i18n helpers", () => {

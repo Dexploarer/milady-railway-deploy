@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/shared/ui-catalog-prompt";
+export * from "@miladyai/autonomous/shared/ui-catalog-prompt";

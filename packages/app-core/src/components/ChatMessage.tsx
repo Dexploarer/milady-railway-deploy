@@ -2,10 +2,10 @@
  * Enhanced chat message component with actions and better UX.
  */
 
-import type { ConversationMessage } from "@milady/app-core/api";
-import { useTimeout } from "@milady/app-core/hooks";
-import { useApp } from "@milady/app-core/state";
-import { Button } from "@milady/ui";
+import type { ConversationMessage } from "@miladyai/app-core/api";
+import { useTimeout } from "@miladyai/app-core/hooks";
+import { useApp } from "@miladyai/app-core/state";
+import { Button } from "@miladyai/ui";
 import { Check, Copy, Pencil, Trash2, Volume2 } from "lucide-react";
 import {
   type KeyboardEvent,

@@ -1,5 +1,5 @@
-import { useRenderGuard } from "@milady/app-core/hooks";
-import { useApp } from "@milady/app-core/state";
+import { useRenderGuard } from "@miladyai/app-core/hooks";
+import { useApp } from "@miladyai/app-core/state";
 import { memo, useEffect, useState } from "react";
 import { ChatView } from "./ChatView.js";
 import { ConversationsSidebar } from "./ConversationsSidebar.js";

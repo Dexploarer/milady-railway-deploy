@@ -1,10 +1,10 @@
-import "@milady/app-core/styles/styles.css";
+import "@miladyai/app-core/styles/styles.css";
 
 import {
   initializeCapacitorBridge,
   initializeStorageBridge,
-} from "@milady/app-core/bridge";
-import { AppProvider } from "@milady/app-core/state";
+} from "@miladyai/app-core/bridge";
+import { AppProvider } from "@miladyai/app-core/state";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App";

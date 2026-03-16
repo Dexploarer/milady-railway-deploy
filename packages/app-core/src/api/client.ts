@@ -20,9 +20,9 @@ import type {
   VideoProvider,
   VisionConfig,
   VisionProvider,
-} from "@milady/autonomous/contracts/config";
-import type { DropStatus, MintResult } from "@milady/autonomous/contracts/drop";
-import type { VerificationResult } from "@milady/autonomous/contracts/verification";
+} from "@miladyai/autonomous/contracts/config";
+import type { DropStatus, MintResult } from "@miladyai/autonomous/contracts/drop";
+import type { VerificationResult } from "@miladyai/autonomous/contracts/verification";
 import type {
   CloudProviderOption,
   ConnectorConfig,
@@ -40,7 +40,7 @@ import type {
   StylePreset,
   SubscriptionProviderStatus,
   SubscriptionStatusResponse,
-} from "@milady/autonomous/contracts/onboarding";
+} from "@miladyai/autonomous/contracts/onboarding";
 import type {
   BscTradeExecuteRequest,
   BscTradeExecuteResponse,
@@ -67,20 +67,20 @@ import type {
   WalletTradingProfileResponse,
   WalletTradingProfileSourceFilter,
   WalletTradingProfileWindow,
-} from "@milady/autonomous/contracts/wallet";
+} from "@miladyai/autonomous/contracts/wallet";
 import {
   DEFAULT_WALLET_RPC_SELECTIONS,
   normalizeWalletRpcProviderId,
   normalizeWalletRpcSelections,
   WALLET_RPC_PROVIDER_OPTIONS,
-} from "@milady/autonomous/contracts/wallet";
+} from "@miladyai/autonomous/contracts/wallet";
 import type {
   AllPermissionsState,
   PermissionState,
   PermissionStatus,
   SystemPermissionDefinition,
   SystemPermissionId,
-} from "@milady/autonomous/contracts/permissions";
+} from "@miladyai/autonomous/contracts/permissions";
 import type { ConfigUiHint } from "../types";
 import { stripAssistantStageDirections } from "../utils/assistant-text";
 import { mergeStreamingText } from "../utils/streaming-text";

@@ -1,1 +1,1 @@
-export * from "@milady/app-core/components/onboarding/WakeUpStep";
+export * from "@miladyai/app-core/components/onboarding/WakeUpStep";

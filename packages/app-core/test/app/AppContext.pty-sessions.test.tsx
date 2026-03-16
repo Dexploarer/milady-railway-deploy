@@ -2,7 +2,7 @@ import {
   mapServerTasksToSessions,
   type ServerTask,
   TERMINAL_STATUSES,
-} from "@milady/app-core/coding";
+} from "@miladyai/app-core/coding";
 import { describe, expect, it } from "vitest";
 
 /**

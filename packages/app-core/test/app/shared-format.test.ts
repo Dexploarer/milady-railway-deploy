@@ -5,7 +5,7 @@ import {
   formatDurationMs,
   formatShortDate,
   formatTime,
-} from "@milady/app-core/components";
+} from "@miladyai/app-core/components";
 import { describe, expect, it } from "vitest";
 
 describe("shared format helpers", () => {

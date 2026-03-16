@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/runtime/version";
+export * from "@miladyai/autonomous/runtime/version";

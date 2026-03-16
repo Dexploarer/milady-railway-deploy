@@ -1,4 +1,4 @@
-import { buildCommands as buildCommandPaletteCommands } from "@milady/app-core/chat";
+import { buildCommands as buildCommandPaletteCommands } from "@miladyai/app-core/chat";
 import { describe, expect, it, vi } from "vitest";
 
 function buildArgs(

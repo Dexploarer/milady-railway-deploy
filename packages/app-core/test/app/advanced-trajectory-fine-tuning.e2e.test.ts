@@ -20,7 +20,7 @@ import type {
   TrajectoryDetailResult,
   TrajectoryListResult,
   TrajectoryStats,
-} from "@milady/app-core/api";
+} from "@miladyai/app-core/api";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -46,15 +46,15 @@ const { mockUseApp, mockClientFns } = vi.hoisted(() => ({
   },
 }));
 
-vi.mock("@milady/app-core/state", () => ({
+vi.mock("@miladyai/app-core/state", () => ({
   useApp: () => mockUseApp(),
 }));
 
-vi.mock("@milady/app-core/api", () => ({
+vi.mock("@miladyai/app-core/api", () => ({
   client: mockClientFns,
 }));
 
-vi.mock("@milady/app-core/components", () => {
+vi.mock("@miladyai/app-core/components", () => {
   const R = require("react");
   return {
     DatabasePageView: () => R.createElement("div", null, "stub"),
@@ -129,8 +129,8 @@ vi.mock("../../src/components/TrajectoryDetailView", () => {
   };
 });
 
-// Mock @milady/ui to avoid Radix DOM issues
-vi.mock("@milady/ui", () => {
+// Mock @miladyai/ui to avoid Radix DOM issues
+vi.mock("@miladyai/ui", () => {
   const R = require("react");
   // biome-ignore lint/suspicious/noExplicitAny: test mock factory
   const passthrough = (props: any) =>

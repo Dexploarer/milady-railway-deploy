@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/contracts/permissions";
+export * from "@miladyai/autonomous/contracts/permissions";

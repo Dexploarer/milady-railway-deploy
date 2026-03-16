@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import type { AppViewerAuthMessage } from "@milady/app-core/api";
+import type { AppViewerAuthMessage } from "@miladyai/app-core/api";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -43,14 +43,14 @@ const { mockClientFns, mockUseApp } = vi.hoisted(() => ({
   mockUseApp: vi.fn(),
 }));
 
-vi.mock("@milady/app-core/api", () => ({
+vi.mock("@miladyai/app-core/api", () => ({
   client: mockClientFns,
 }));
-vi.mock("@milady/app-core/state", () => ({
+vi.mock("@miladyai/app-core/state", () => ({
   useApp: () => mockUseApp(),
 }));
 
-import { GameView } from "@milady/app-core/components/GameView";
+import { GameView } from "@miladyai/app-core/components/GameView";
 
 function createContext(overrides?: Partial<GameContextStub>): GameContextStub {
   return {

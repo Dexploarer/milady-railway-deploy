@@ -1,4 +1,4 @@
-import { Button, Textarea } from "@milady/ui";
+import { Button, Textarea } from "@miladyai/ui";
 import { Mic, Paperclip, Send, Square, Volume2, VolumeX } from "lucide-react";
 import {
   type KeyboardEvent,

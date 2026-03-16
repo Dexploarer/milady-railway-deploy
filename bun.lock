@@ -63,7 +63,7 @@
         "@lunchtable/plugin-ltcg": "^0.1.0",
         "@mariozechner/pi-ai": "0.52.12",
         "@mariozechner/pi-tui": "0.54.0",
-        "@milady/autonomous": "^1.0.0",
+        "@miladyai/autonomous": "^1.0.0",
         "@noble/curves": "^2.0.1",
         "@opinion-labs/opinion-clob-sdk": "0.5.2",
         "@tensorflow-models/coco-ssd": "^2.2.3",
@@ -120,7 +120,7 @@
       },
     },
     "apps/app": {
-      "name": "@milady/app",
+      "name": "@miladyai/app",
       "version": "2.0.0-alpha.87",
       "dependencies": {
         "@capacitor/android": "^8.0.2",
@@ -131,17 +131,17 @@
         "@capacitor/keyboard": "8.0.0",
         "@capacitor/preferences": "^8.0.1",
         "@capacitor/status-bar": "^8.0.1",
-        "@milady/app-core": "^1.0.0",
-        "@milady/capacitor-agent": "^1.0.0",
-        "@milady/capacitor-camera": "^1.0.0",
-        "@milady/capacitor-canvas": "^1.0.0",
-        "@milady/capacitor-desktop": "^1.0.0",
-        "@milady/capacitor-gateway": "^1.0.0",
-        "@milady/capacitor-location": "^1.0.0",
-        "@milady/capacitor-screencapture": "^1.0.0",
-        "@milady/capacitor-swabble": "^1.0.0",
-        "@milady/capacitor-talkmode": "^1.0.0",
-        "@milady/ui": "^1.0.0",
+        "@miladyai/app-core": "^1.0.0",
+        "@miladyai/capacitor-agent": "^1.0.0",
+        "@miladyai/capacitor-camera": "^1.0.0",
+        "@miladyai/capacitor-canvas": "^1.0.0",
+        "@miladyai/capacitor-desktop": "^1.0.0",
+        "@miladyai/capacitor-gateway": "^1.0.0",
+        "@miladyai/capacitor-location": "^1.0.0",
+        "@miladyai/capacitor-screencapture": "^1.0.0",
+        "@miladyai/capacitor-swabble": "^1.0.0",
+        "@miladyai/capacitor-talkmode": "^1.0.0",
+        "@miladyai/ui": "^1.0.0",
         "@noble/curves": "^2.0.1",
         "@pixiv/three-vrm": "^3.4.5",
         "@sparkjsdev/spark": "^0.1.10",
@@ -173,7 +173,7 @@
       },
     },
     "apps/app/electrobun": {
-      "name": "@milady/electrobun",
+      "name": "@miladyai/electrobun",
       "version": "2.0.0-alpha.87",
       "dependencies": {
         "bonjour-service": "1.3.0",
@@ -187,7 +187,7 @@
       },
     },
     "apps/app/plugins/agent": {
-      "name": "@milady/capacitor-agent",
+      "name": "@miladyai/capacitor-agent",
       "version": "1.0.0",
       "devDependencies": {
         "@capacitor/core": "^8.0.0",
@@ -200,7 +200,7 @@
       },
     },
     "apps/app/plugins/camera": {
-      "name": "@milady/capacitor-camera",
+      "name": "@miladyai/capacitor-camera",
       "version": "1.0.0",
       "devDependencies": {
         "@capacitor/android": "^8.0.0",
@@ -216,7 +216,7 @@
       },
     },
     "apps/app/plugins/canvas": {
-      "name": "@milady/capacitor-canvas",
+      "name": "@miladyai/capacitor-canvas",
       "version": "1.0.0",
       "devDependencies": {
         "@capacitor/android": "^8.0.0",
@@ -232,7 +232,7 @@
       },
     },
     "apps/app/plugins/desktop": {
-      "name": "@milady/capacitor-desktop",
+      "name": "@miladyai/capacitor-desktop",
       "version": "1.0.0",
       "devDependencies": {
         "@capacitor/core": "^8.0.0",
@@ -246,7 +246,7 @@
       },
     },
     "apps/app/plugins/gateway": {
-      "name": "@milady/capacitor-gateway",
+      "name": "@miladyai/capacitor-gateway",
       "version": "1.0.0",
       "devDependencies": {
         "@capacitor/android": "^8.0.0",
@@ -268,7 +268,7 @@
       },
     },
     "apps/app/plugins/location": {
-      "name": "@milady/capacitor-location",
+      "name": "@miladyai/capacitor-location",
       "version": "1.0.0",
       "devDependencies": {
         "@capacitor/cli": "^8.0.0",
@@ -283,7 +283,7 @@
       },
     },
     "apps/app/plugins/screencapture": {
-      "name": "@milady/capacitor-screencapture",
+      "name": "@miladyai/capacitor-screencapture",
       "version": "1.0.0",
       "devDependencies": {
         "@capacitor/android": "^8.0.0",
@@ -299,7 +299,7 @@
       },
     },
     "apps/app/plugins/swabble": {
-      "name": "@milady/capacitor-swabble",
+      "name": "@miladyai/capacitor-swabble",
       "version": "1.0.0",
       "devDependencies": {
         "@capacitor/android": "^8.0.0",
@@ -315,7 +315,7 @@
       },
     },
     "apps/app/plugins/talkmode": {
-      "name": "@milady/capacitor-talkmode",
+      "name": "@miladyai/capacitor-talkmode",
       "version": "1.0.0",
       "devDependencies": {
         "@capacitor/cli": "^8.0.0",
@@ -330,10 +330,10 @@
       },
     },
     "apps/home": {
-      "name": "@milady/home",
+      "name": "@miladyai/home",
       "version": "1.0.0",
       "dependencies": {
-        "@milady/app-core": "^1.0.0",
+        "@miladyai/app-core": "^1.0.0",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
       },
@@ -348,7 +348,7 @@
       },
     },
     "apps/homepage": {
-      "name": "@milady/homepage",
+      "name": "@miladyai/homepage",
       "version": "1.0.0",
       "dependencies": {
         "@pixiv/three-vrm": "^3.5.0",
@@ -380,15 +380,15 @@
       },
     },
     "packages/app-core": {
-      "name": "@milady/app-core",
+      "name": "@miladyai/app-core",
       "version": "1.0.0",
       "dependencies": {
         "@capacitor/core": "8.0.2",
         "@capacitor/haptics": "8.0.0",
         "@capacitor/keyboard": "8.0.0",
         "@capacitor/preferences": "^8.0.1",
-        "@milady/autonomous": "^1.0.0",
-        "@milady/ui": "^1.0.0",
+        "@miladyai/autonomous": "^1.0.0",
+        "@miladyai/ui": "^1.0.0",
         "@sparkjsdev/spark": "^0.1.10",
         "lucide-react": "^0.575.0",
         "three": "^0.182.0",
@@ -413,7 +413,7 @@
       },
     },
     "packages/autonomous": {
-      "name": "@milady/autonomous",
+      "name": "@miladyai/autonomous",
       "version": "1.0.0",
       "bin": {
         "milady-autonomous": "./src/bin.ts",
@@ -471,10 +471,10 @@
         "vitest": "^4.0.18",
       },
       "peerDependencies": {
-        "@milady/signal-native": "*",
+        "@miladyai/signal-native": "*",
       },
       "optionalPeers": [
-        "@milady/signal-native",
+        "@miladyai/signal-native",
       ],
     },
     "packages/mldy": {
@@ -488,7 +488,7 @@
       },
     },
     "packages/plugin-bnb-identity": {
-      "name": "@milady/plugin-bnb-identity",
+      "name": "@miladyai/plugin-bnb-identity",
       "version": "0.1.0",
       "dependencies": {
         "@elizaos/core": "next",
@@ -499,7 +499,7 @@
       },
     },
     "packages/plugin-streaming-base": {
-      "name": "@milady/plugin-streaming-base",
+      "name": "@miladyai/plugin-streaming-base",
       "version": "0.1.0",
       "dependencies": {
         "@elizaos/core": "next",
@@ -516,7 +516,7 @@
       },
     },
     "packages/ui": {
-      "name": "@milady/ui",
+      "name": "@miladyai/ui",
       "version": "1.0.0",
       "dependencies": {
         "@radix-ui/react-checkbox": "^1.3.3",
@@ -560,9 +560,9 @@
   "overrides": {
     "@elizaos/core": "next",
     "@elizaos/prompts": "next",
-    "@milady/plugin-retake": "npm:@elizaos/plugin-retake@2.0.0-alpha.1",
-    "@milady/plugin-twitch-streaming": "npm:@elizaos/plugin-twitch-streaming@2.0.0-alpha.1",
-    "@milady/plugin-youtube-streaming": "npm:@elizaos/plugin-youtube-streaming@2.0.0-alpha.1",
+    "@miladyai/plugin-retake": "npm:@elizaos/plugin-retake@2.0.0-alpha.1",
+    "@miladyai/plugin-twitch-streaming": "npm:@elizaos/plugin-twitch-streaming@2.0.0-alpha.1",
+    "@miladyai/plugin-youtube-streaming": "npm:@elizaos/plugin-youtube-streaming@2.0.0-alpha.1",
     "ai": "6.0.30",
     "drizzle-orm": "0.45.1",
     "libsignal": "git+https://github.com/whiskeysockets/libsignal-node.git#1c30d7d7e76a3b0aa120b04dc6a26f5a12dccf67",
@@ -1157,47 +1157,47 @@
 
     "@mediapipe/pose": ["@mediapipe/pose@0.5.1675469404", "", {}, "sha512-DFZsNWTsSphRIZppnUCuunzBiHP2FdJXR9ehc7mMi4KG+oPaOH0Em3d6kr7Py+TSyTXC1doH88KcF28k2sBxsQ=="],
 
-    "@milady/app": ["@milady/app@workspace:apps/app"],
+    "@miladyai/app": ["@miladyai/app@workspace:apps/app"],
 
-    "@milady/app-core": ["@milady/app-core@workspace:packages/app-core"],
+    "@miladyai/app-core": ["@miladyai/app-core@workspace:packages/app-core"],
 
-    "@milady/autonomous": ["@milady/autonomous@workspace:packages/autonomous"],
+    "@miladyai/autonomous": ["@miladyai/autonomous@workspace:packages/autonomous"],
 
-    "@milady/capacitor-agent": ["@milady/capacitor-agent@workspace:apps/app/plugins/agent"],
+    "@miladyai/capacitor-agent": ["@miladyai/capacitor-agent@workspace:apps/app/plugins/agent"],
 
-    "@milady/capacitor-camera": ["@milady/capacitor-camera@workspace:apps/app/plugins/camera"],
+    "@miladyai/capacitor-camera": ["@miladyai/capacitor-camera@workspace:apps/app/plugins/camera"],
 
-    "@milady/capacitor-canvas": ["@milady/capacitor-canvas@workspace:apps/app/plugins/canvas"],
+    "@miladyai/capacitor-canvas": ["@miladyai/capacitor-canvas@workspace:apps/app/plugins/canvas"],
 
-    "@milady/capacitor-desktop": ["@milady/capacitor-desktop@workspace:apps/app/plugins/desktop"],
+    "@miladyai/capacitor-desktop": ["@miladyai/capacitor-desktop@workspace:apps/app/plugins/desktop"],
 
-    "@milady/capacitor-gateway": ["@milady/capacitor-gateway@workspace:apps/app/plugins/gateway"],
+    "@miladyai/capacitor-gateway": ["@miladyai/capacitor-gateway@workspace:apps/app/plugins/gateway"],
 
-    "@milady/capacitor-location": ["@milady/capacitor-location@workspace:apps/app/plugins/location"],
+    "@miladyai/capacitor-location": ["@miladyai/capacitor-location@workspace:apps/app/plugins/location"],
 
-    "@milady/capacitor-screencapture": ["@milady/capacitor-screencapture@workspace:apps/app/plugins/screencapture"],
+    "@miladyai/capacitor-screencapture": ["@miladyai/capacitor-screencapture@workspace:apps/app/plugins/screencapture"],
 
-    "@milady/capacitor-swabble": ["@milady/capacitor-swabble@workspace:apps/app/plugins/swabble"],
+    "@miladyai/capacitor-swabble": ["@miladyai/capacitor-swabble@workspace:apps/app/plugins/swabble"],
 
-    "@milady/capacitor-talkmode": ["@milady/capacitor-talkmode@workspace:apps/app/plugins/talkmode"],
+    "@miladyai/capacitor-talkmode": ["@miladyai/capacitor-talkmode@workspace:apps/app/plugins/talkmode"],
 
-    "@milady/electrobun": ["@milady/electrobun@workspace:apps/app/electrobun"],
+    "@miladyai/electrobun": ["@miladyai/electrobun@workspace:apps/app/electrobun"],
 
-    "@milady/home": ["@milady/home@workspace:apps/home"],
+    "@miladyai/home": ["@miladyai/home@workspace:apps/home"],
 
-    "@milady/homepage": ["@milady/homepage@workspace:apps/homepage"],
+    "@miladyai/homepage": ["@miladyai/homepage@workspace:apps/homepage"],
 
-    "@milady/plugin-bnb-identity": ["@milady/plugin-bnb-identity@workspace:packages/plugin-bnb-identity"],
+    "@miladyai/plugin-bnb-identity": ["@miladyai/plugin-bnb-identity@workspace:packages/plugin-bnb-identity"],
 
-    "@milady/plugin-retake": ["@elizaos/plugin-retake@2.0.0-alpha.1", "", { "dependencies": { "@elizaos/core": "alpha", "@elizaos/plugin-streaming-base": "alpha" } }, "sha512-eYrW9Qbv4loWsJGmr6MYDg8DNYySJ3hz531C8HYxpc9iVtWY3PmxVzhMd6ZMu0zhPxFjX6zxVshR+nSxO4dLMA=="],
+    "@miladyai/plugin-retake": ["@elizaos/plugin-retake@2.0.0-alpha.1", "", { "dependencies": { "@elizaos/core": "alpha", "@elizaos/plugin-streaming-base": "alpha" } }, "sha512-eYrW9Qbv4loWsJGmr6MYDg8DNYySJ3hz531C8HYxpc9iVtWY3PmxVzhMd6ZMu0zhPxFjX6zxVshR+nSxO4dLMA=="],
 
-    "@milady/plugin-streaming-base": ["@milady/plugin-streaming-base@workspace:packages/plugin-streaming-base"],
+    "@miladyai/plugin-streaming-base": ["@miladyai/plugin-streaming-base@workspace:packages/plugin-streaming-base"],
 
-    "@milady/plugin-twitch-streaming": ["@elizaos/plugin-twitch-streaming@2.0.0-alpha.1", "", { "dependencies": { "@elizaos/core": "alpha", "@elizaos/plugin-streaming-base": "alpha" } }, "sha512-S326/DcYEwRsuXo19faKh4WK6Ah7sbIZ1T9jaBet1BS54Pky/X/LazI6/QtdSGvaFcB6jkpGYBWm/09nHjLoVw=="],
+    "@miladyai/plugin-twitch-streaming": ["@elizaos/plugin-twitch-streaming@2.0.0-alpha.1", "", { "dependencies": { "@elizaos/core": "alpha", "@elizaos/plugin-streaming-base": "alpha" } }, "sha512-S326/DcYEwRsuXo19faKh4WK6Ah7sbIZ1T9jaBet1BS54Pky/X/LazI6/QtdSGvaFcB6jkpGYBWm/09nHjLoVw=="],
 
-    "@milady/plugin-youtube-streaming": ["@elizaos/plugin-youtube-streaming@2.0.0-alpha.1", "", { "dependencies": { "@elizaos/core": "alpha", "@elizaos/plugin-streaming-base": "alpha" } }, "sha512-WHQCLmsmDyBZ0xV5ObCvxPg9jO4S3Crclv/VmKb+Qjvh5LhLqWOL+Doef/NnekHV61j6Y+fBVBWi+qmvptm0Tw=="],
+    "@miladyai/plugin-youtube-streaming": ["@elizaos/plugin-youtube-streaming@2.0.0-alpha.1", "", { "dependencies": { "@elizaos/core": "alpha", "@elizaos/plugin-streaming-base": "alpha" } }, "sha512-WHQCLmsmDyBZ0xV5ObCvxPg9jO4S3Crclv/VmKb+Qjvh5LhLqWOL+Doef/NnekHV61j6Y+fBVBWi+qmvptm0Tw=="],
 
-    "@milady/ui": ["@milady/ui@workspace:packages/ui"],
+    "@miladyai/ui": ["@miladyai/ui@workspace:packages/ui"],
 
     "@mistralai/mistralai": ["@mistralai/mistralai@1.10.0", "", { "dependencies": { "zod": "^3.20.0", "zod-to-json-schema": "^3.24.1" } }, "sha512-tdIgWs4Le8vpvPiUEWne6tK0qbVc+jMenujnvTqOjogrJUsCSQhus0tHTU1avDDh5//Rq2dFgP9mWRAdIEoBqg=="],
 
@@ -3071,7 +3071,7 @@
 
     "milady-cloud-agent": ["milady-cloud-agent@workspace:deploy/cloud-agent-template"],
 
-    "miladyai": ["miladyai@2.0.0-alpha.76", "", { "dependencies": { "@ai-sdk/anthropic": "^3.0.13", "@ai-sdk/gateway": "^3.0.12", "@ai-sdk/provider": "^3.0.2", "@ai-sdk/provider-utils": "^4.0.5", "@anthropic-ai/claude-agent-sdk": "^0.2.5", "@bufbuild/protobuf": "^2.11.0", "@capacitor-community/electron": "^5.0.1", "@clack/prompts": "^1.0.0", "@electric-sql/pglite": "^0.3.3", "@elizaos/core": "next", "@elizaos/plugin-agent-orchestrator": "next", "@elizaos/plugin-agent-skills": "next", "@elizaos/plugin-anthropic": "next", "@elizaos/plugin-browser": "next", "@elizaos/plugin-claude-code-workbench": "next", "@elizaos/plugin-cli": "next", "@elizaos/plugin-coding-agent": "next", "@elizaos/plugin-computeruse": "next", "@elizaos/plugin-cron": "next", "@elizaos/plugin-discord": "next", "@elizaos/plugin-edge-tts": "next", "@elizaos/plugin-elevenlabs": "next", "@elizaos/plugin-elizacloud": "next", "@elizaos/plugin-experience": "next", "@elizaos/plugin-form": "next", "@elizaos/plugin-google-genai": "next", "@elizaos/plugin-groq": "next", "@elizaos/plugin-knowledge": "next", "@elizaos/plugin-local-embedding": "next", "@elizaos/plugin-ollama": "next", "@elizaos/plugin-openai": "next", "@elizaos/plugin-openrouter": "next", "@elizaos/plugin-pdf": "next", "@elizaos/plugin-personality": "next", "@elizaos/plugin-pi-ai": "next", "@elizaos/plugin-plugin-manager": "next", "@elizaos/plugin-rolodex": "next", "@elizaos/plugin-secrets-manager": "next", "@elizaos/plugin-shell": "next", "@elizaos/plugin-sql": "next", "@elizaos/plugin-telegram": "next", "@elizaos/plugin-todo": "next", "@elizaos/plugin-trajectory-logger": "next", "@elizaos/plugin-trust": "next", "@elizaos/plugin-twitch": "2.0.0-alpha.8", "@elizaos/plugin-vision": "next", "@elizaos/prompts": "next", "@elizaos/sweagent-root": "next", "@elizaos/tui": "next", "@hapi/boom": "^10.0.1", "@huggingface/transformers": "^3.4.1", "@langchain/core": "^1.1.12", "@langchain/textsplitters": "^1.0.1", "@lunchtable/plugin-ltcg": "^0.1.0", "@mariozechner/pi-ai": "0.52.12", "@mariozechner/pi-tui": "0.54.0", "@milady/plugin-retake": "workspace:*", "@milady/plugin-streaming-base": "workspace:*", "@milady/plugin-twitch-streaming": "workspace:*", "@milady/plugin-youtube-streaming": "workspace:*", "@noble/curves": "^2.0.1", "@opentelemetry/api": "1.9.0", "@tensorflow-models/coco-ssd": "^2.2.3", "@tensorflow-models/mobilenet": "^2.1.0", "@tensorflow-models/pose-detection": "^2.1.0", "@tensorflow/tfjs-core": "^4.22.0", "@tensorflow/tfjs-node": "^4.22.0", "@vercel/oidc": "^3.1.0", "@whiskeysockets/baileys": "7.0.0-rc.9", "adze": "^2.2.5", "ai": "6.0.30", "bonjour-service": "^1.3.0", "canvas": "^3.1.0", "chalk": "^5.4.1", "chokidar": "~3.5.3", "cli-highlight": "^2.1.11", "coding-agent-adapters": "0.8.0", "commander": "^14.0.0", "croner": "^9.0.0", "cross-spawn": "^7.0.6", "crypto-browserify": "^3.12.0", "dedent": "^1.7.1", "dotenv": "^17.2.3", "drizzle-orm": "0.45.1", "electron-is-dev": "~2.0.0", "electron-serve": "~1.1.0", "electron-unhandled": "~4.0.1", "electron-updater": "^6.8.3", "electron-window-state": "^5.0.3", "ethers": "^6.16.0", "face-api.js": "^0.22.2", "fast-redact": "^3.5.0", "file-type": "^21.3.0", "git-workspace-service": "0.4.3", "glob": "^13.0.0", "handlebars": "^4.7.8", "json5": "^2.2.3", "lucide-react": "^0.575.0", "mammoth": "^1.9.0", "markdown-it": "^14.1.0", "node-llama-cpp": "^3.15.1", "node-pty": "^1.1.0", "pdfjs-dist": "^5.4.530", "pg": "^8.16.3", "pino": "^10.3.1", "pty-manager": "1.9.0", "puppeteer-core": "^24.37.5", "qrcode": "^1.5.4", "sharp": "^0.33.5", "telegraf": "^4.16.3", "tesseract.js": "^6.0.1", "unique-names-generator": "^4.7.1", "unpdf": "^1.4.0", "uuid": "^13.0.0", "whisper-node": "^1.1.1", "ws": "^8.19.0", "zod": "^4.3.6" }, "bin": { "milady.ai": "milady.mjs", "milady-ai": "milady.mjs", "miladyai": "milady.mjs", "milaidy": "milady.mjs" } }, "sha512-pGThWIRLAoN5U5nbUBXZUsRUKIlRJgM4P8Wyag0vi7qnxABHPzRV5f7v2st/9rtQ/a3pM5TZ+gMD3UkGD0YHRg=="],
+    "miladyai": ["miladyai@2.0.0-alpha.76", "", { "dependencies": { "@ai-sdk/anthropic": "^3.0.13", "@ai-sdk/gateway": "^3.0.12", "@ai-sdk/provider": "^3.0.2", "@ai-sdk/provider-utils": "^4.0.5", "@anthropic-ai/claude-agent-sdk": "^0.2.5", "@bufbuild/protobuf": "^2.11.0", "@capacitor-community/electron": "^5.0.1", "@clack/prompts": "^1.0.0", "@electric-sql/pglite": "^0.3.3", "@elizaos/core": "next", "@elizaos/plugin-agent-orchestrator": "next", "@elizaos/plugin-agent-skills": "next", "@elizaos/plugin-anthropic": "next", "@elizaos/plugin-browser": "next", "@elizaos/plugin-claude-code-workbench": "next", "@elizaos/plugin-cli": "next", "@elizaos/plugin-coding-agent": "next", "@elizaos/plugin-computeruse": "next", "@elizaos/plugin-cron": "next", "@elizaos/plugin-discord": "next", "@elizaos/plugin-edge-tts": "next", "@elizaos/plugin-elevenlabs": "next", "@elizaos/plugin-elizacloud": "next", "@elizaos/plugin-experience": "next", "@elizaos/plugin-form": "next", "@elizaos/plugin-google-genai": "next", "@elizaos/plugin-groq": "next", "@elizaos/plugin-knowledge": "next", "@elizaos/plugin-local-embedding": "next", "@elizaos/plugin-ollama": "next", "@elizaos/plugin-openai": "next", "@elizaos/plugin-openrouter": "next", "@elizaos/plugin-pdf": "next", "@elizaos/plugin-personality": "next", "@elizaos/plugin-pi-ai": "next", "@elizaos/plugin-plugin-manager": "next", "@elizaos/plugin-rolodex": "next", "@elizaos/plugin-secrets-manager": "next", "@elizaos/plugin-shell": "next", "@elizaos/plugin-sql": "next", "@elizaos/plugin-telegram": "next", "@elizaos/plugin-todo": "next", "@elizaos/plugin-trajectory-logger": "next", "@elizaos/plugin-trust": "next", "@elizaos/plugin-twitch": "2.0.0-alpha.8", "@elizaos/plugin-vision": "next", "@elizaos/prompts": "next", "@elizaos/sweagent-root": "next", "@elizaos/tui": "next", "@hapi/boom": "^10.0.1", "@huggingface/transformers": "^3.4.1", "@langchain/core": "^1.1.12", "@langchain/textsplitters": "^1.0.1", "@lunchtable/plugin-ltcg": "^0.1.0", "@mariozechner/pi-ai": "0.52.12", "@mariozechner/pi-tui": "0.54.0", "@miladyai/plugin-retake": "workspace:*", "@miladyai/plugin-streaming-base": "workspace:*", "@miladyai/plugin-twitch-streaming": "workspace:*", "@miladyai/plugin-youtube-streaming": "workspace:*", "@noble/curves": "^2.0.1", "@opentelemetry/api": "1.9.0", "@tensorflow-models/coco-ssd": "^2.2.3", "@tensorflow-models/mobilenet": "^2.1.0", "@tensorflow-models/pose-detection": "^2.1.0", "@tensorflow/tfjs-core": "^4.22.0", "@tensorflow/tfjs-node": "^4.22.0", "@vercel/oidc": "^3.1.0", "@whiskeysockets/baileys": "7.0.0-rc.9", "adze": "^2.2.5", "ai": "6.0.30", "bonjour-service": "^1.3.0", "canvas": "^3.1.0", "chalk": "^5.4.1", "chokidar": "~3.5.3", "cli-highlight": "^2.1.11", "coding-agent-adapters": "0.8.0", "commander": "^14.0.0", "croner": "^9.0.0", "cross-spawn": "^7.0.6", "crypto-browserify": "^3.12.0", "dedent": "^1.7.1", "dotenv": "^17.2.3", "drizzle-orm": "0.45.1", "electron-is-dev": "~2.0.0", "electron-serve": "~1.1.0", "electron-unhandled": "~4.0.1", "electron-updater": "^6.8.3", "electron-window-state": "^5.0.3", "ethers": "^6.16.0", "face-api.js": "^0.22.2", "fast-redact": "^3.5.0", "file-type": "^21.3.0", "git-workspace-service": "0.4.3", "glob": "^13.0.0", "handlebars": "^4.7.8", "json5": "^2.2.3", "lucide-react": "^0.575.0", "mammoth": "^1.9.0", "markdown-it": "^14.1.0", "node-llama-cpp": "^3.15.1", "node-pty": "^1.1.0", "pdfjs-dist": "^5.4.530", "pg": "^8.16.3", "pino": "^10.3.1", "pty-manager": "1.9.0", "puppeteer-core": "^24.37.5", "qrcode": "^1.5.4", "sharp": "^0.33.5", "telegraf": "^4.16.3", "tesseract.js": "^6.0.1", "unique-names-generator": "^4.7.1", "unpdf": "^1.4.0", "uuid": "^13.0.0", "whisper-node": "^1.1.1", "ws": "^8.19.0", "zod": "^4.3.6" }, "bin": { "milady.ai": "milady.mjs", "milady-ai": "milady.mjs", "miladyai": "milady.mjs", "milaidy": "milady.mjs" } }, "sha512-pGThWIRLAoN5U5nbUBXZUsRUKIlRJgM4P8Wyag0vi7qnxABHPzRV5f7v2st/9rtQ/a3pM5TZ+gMD3UkGD0YHRg=="],
 
     "miller-rabin": ["miller-rabin@4.0.1", "", { "dependencies": { "bn.js": "^4.0.0", "brorand": "^1.0.1" }, "bin": { "miller-rabin": "bin/miller-rabin" } }, "sha512-115fLhvZVqWwHPbClyntxEVfVDfl9DLLTuJvq3g2O/Oxi8AiNouAHvDSzHS0viUJc+V5vm3eq91Xwqn9dp4jRA=="],
 
@@ -4195,11 +4195,11 @@
 
     "@mapbox/node-pre-gyp/rimraf": ["rimraf@3.0.2", "", { "dependencies": { "glob": "^7.1.3" }, "bin": { "rimraf": "bin.js" } }, "sha512-JZkJMZkAGFFPP2YqXZXPbMlMBgsxzE8ILs4lMIX/2o0L9UBw9O/Y3o6wFw/i9YLapcUJWwqbi3kdxIPdC62TIA=="],
 
-    "@milady/app/vitest": ["vitest@2.1.9", "", { "dependencies": { "@vitest/expect": "2.1.9", "@vitest/mocker": "2.1.9", "@vitest/pretty-format": "^2.1.9", "@vitest/runner": "2.1.9", "@vitest/snapshot": "2.1.9", "@vitest/spy": "2.1.9", "@vitest/utils": "2.1.9", "chai": "^5.1.2", "debug": "^4.3.7", "expect-type": "^1.1.0", "magic-string": "^0.30.12", "pathe": "^1.1.2", "std-env": "^3.8.0", "tinybench": "^2.9.0", "tinyexec": "^0.3.1", "tinypool": "^1.0.1", "tinyrainbow": "^1.2.0", "vite": "^5.0.0", "vite-node": "2.1.9", "why-is-node-running": "^2.3.0" }, "peerDependencies": { "@edge-runtime/vm": "*", "@types/node": "^18.0.0 || >=20.0.0", "@vitest/browser": "2.1.9", "@vitest/ui": "2.1.9", "happy-dom": "*", "jsdom": "*" }, "optionalPeers": ["@edge-runtime/vm", "@types/node", "@vitest/browser", "@vitest/ui", "happy-dom", "jsdom"], "bin": { "vitest": "vitest.mjs" } }, "sha512-MSmPM9REYqDGBI8439mA4mWhV5sKmDlBKWIYbA3lRb2PTHACE0mgKwA8yQ2xq9vxDTuk4iPrECBAEW2aoFXY0Q=="],
+    "@miladyai/app/vitest": ["vitest@2.1.9", "", { "dependencies": { "@vitest/expect": "2.1.9", "@vitest/mocker": "2.1.9", "@vitest/pretty-format": "^2.1.9", "@vitest/runner": "2.1.9", "@vitest/snapshot": "2.1.9", "@vitest/spy": "2.1.9", "@vitest/utils": "2.1.9", "chai": "^5.1.2", "debug": "^4.3.7", "expect-type": "^1.1.0", "magic-string": "^0.30.12", "pathe": "^1.1.2", "std-env": "^3.8.0", "tinybench": "^2.9.0", "tinyexec": "^0.3.1", "tinypool": "^1.0.1", "tinyrainbow": "^1.2.0", "vite": "^5.0.0", "vite-node": "2.1.9", "why-is-node-running": "^2.3.0" }, "peerDependencies": { "@edge-runtime/vm": "*", "@types/node": "^18.0.0 || >=20.0.0", "@vitest/browser": "2.1.9", "@vitest/ui": "2.1.9", "happy-dom": "*", "jsdom": "*" }, "optionalPeers": ["@edge-runtime/vm", "@types/node", "@vitest/browser", "@vitest/ui", "happy-dom", "jsdom"], "bin": { "vitest": "vitest.mjs" } }, "sha512-MSmPM9REYqDGBI8439mA4mWhV5sKmDlBKWIYbA3lRb2PTHACE0mgKwA8yQ2xq9vxDTuk4iPrECBAEW2aoFXY0Q=="],
 
-    "@milady/homepage/@types/three": ["@types/three@0.183.1", "", { "dependencies": { "@dimforge/rapier3d-compat": "~0.12.0", "@tweenjs/tween.js": "~23.1.3", "@types/stats.js": "*", "@types/webxr": ">=0.5.17", "@webgpu/types": "*", "fflate": "~0.8.2", "meshoptimizer": "~1.0.1" } }, "sha512-f2Pu5Hrepfgavttdye3PsH5RWyY/AvdZQwIVhrc4uNtvF7nOWJacQKcoVJn0S4f0yYbmAE6AR+ve7xDcuYtMGw=="],
+    "@miladyai/homepage/@types/three": ["@types/three@0.183.1", "", { "dependencies": { "@dimforge/rapier3d-compat": "~0.12.0", "@tweenjs/tween.js": "~23.1.3", "@types/stats.js": "*", "@types/webxr": ">=0.5.17", "@webgpu/types": "*", "fflate": "~0.8.2", "meshoptimizer": "~1.0.1" } }, "sha512-f2Pu5Hrepfgavttdye3PsH5RWyY/AvdZQwIVhrc4uNtvF7nOWJacQKcoVJn0S4f0yYbmAE6AR+ve7xDcuYtMGw=="],
 
-    "@milady/homepage/three": ["three@0.183.2", "", {}, "sha512-di3BsL2FEQ1PA7Hcvn4fyJOlxRRgFYBpMTcyOgkwJIaDOdJMebEFPA+t98EvjuljDx4hNulAGwF6KIjtwI5jgQ=="],
+    "@miladyai/homepage/three": ["three@0.183.2", "", {}, "sha512-di3BsL2FEQ1PA7Hcvn4fyJOlxRRgFYBpMTcyOgkwJIaDOdJMebEFPA+t98EvjuljDx4hNulAGwF6KIjtwI5jgQ=="],
 
     "@mistralai/mistralai/zod": ["zod@3.25.76", "", {}, "sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ=="],
 
@@ -4885,31 +4885,31 @@
 
     "@mapbox/node-pre-gyp/rimraf/glob": ["glob@7.2.3", "", { "dependencies": { "fs.realpath": "^1.0.0", "inflight": "^1.0.4", "inherits": "2", "minimatch": "^3.1.1", "once": "^1.3.0", "path-is-absolute": "^1.0.0" } }, "sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q=="],
 
-    "@milady/app/vitest/@vitest/expect": ["@vitest/expect@2.1.9", "", { "dependencies": { "@vitest/spy": "2.1.9", "@vitest/utils": "2.1.9", "chai": "^5.1.2", "tinyrainbow": "^1.2.0" } }, "sha512-UJCIkTBenHeKT1TTlKMJWy1laZewsRIzYighyYiJKZreqtdxSos/S1t+ktRMQWu2CKqaarrkeszJx1cgC5tGZw=="],
+    "@miladyai/app/vitest/@vitest/expect": ["@vitest/expect@2.1.9", "", { "dependencies": { "@vitest/spy": "2.1.9", "@vitest/utils": "2.1.9", "chai": "^5.1.2", "tinyrainbow": "^1.2.0" } }, "sha512-UJCIkTBenHeKT1TTlKMJWy1laZewsRIzYighyYiJKZreqtdxSos/S1t+ktRMQWu2CKqaarrkeszJx1cgC5tGZw=="],
 
-    "@milady/app/vitest/@vitest/mocker": ["@vitest/mocker@2.1.9", "", { "dependencies": { "@vitest/spy": "2.1.9", "estree-walker": "^3.0.3", "magic-string": "^0.30.12" }, "peerDependencies": { "msw": "^2.4.9", "vite": "^5.0.0" }, "optionalPeers": ["msw", "vite"] }, "sha512-tVL6uJgoUdi6icpxmdrn5YNo3g3Dxv+IHJBr0GXHaEdTcw3F+cPKnsXFhli6nO+f/6SDKPHEK1UN+k+TQv0Ehg=="],
+    "@miladyai/app/vitest/@vitest/mocker": ["@vitest/mocker@2.1.9", "", { "dependencies": { "@vitest/spy": "2.1.9", "estree-walker": "^3.0.3", "magic-string": "^0.30.12" }, "peerDependencies": { "msw": "^2.4.9", "vite": "^5.0.0" }, "optionalPeers": ["msw", "vite"] }, "sha512-tVL6uJgoUdi6icpxmdrn5YNo3g3Dxv+IHJBr0GXHaEdTcw3F+cPKnsXFhli6nO+f/6SDKPHEK1UN+k+TQv0Ehg=="],
 
-    "@milady/app/vitest/@vitest/pretty-format": ["@vitest/pretty-format@2.1.9", "", { "dependencies": { "tinyrainbow": "^1.2.0" } }, "sha512-KhRIdGV2U9HOUzxfiHmY8IFHTdqtOhIzCpd8WRdJiE7D/HUcZVD0EgQCVjm+Q9gkUXWgBvMmTtZgIG48wq7sOQ=="],
+    "@miladyai/app/vitest/@vitest/pretty-format": ["@vitest/pretty-format@2.1.9", "", { "dependencies": { "tinyrainbow": "^1.2.0" } }, "sha512-KhRIdGV2U9HOUzxfiHmY8IFHTdqtOhIzCpd8WRdJiE7D/HUcZVD0EgQCVjm+Q9gkUXWgBvMmTtZgIG48wq7sOQ=="],
 
-    "@milady/app/vitest/@vitest/runner": ["@vitest/runner@2.1.9", "", { "dependencies": { "@vitest/utils": "2.1.9", "pathe": "^1.1.2" } }, "sha512-ZXSSqTFIrzduD63btIfEyOmNcBmQvgOVsPNPe0jYtESiXkhd8u2erDLnMxmGrDCwHCCHE7hxwRDCT3pt0esT4g=="],
+    "@miladyai/app/vitest/@vitest/runner": ["@vitest/runner@2.1.9", "", { "dependencies": { "@vitest/utils": "2.1.9", "pathe": "^1.1.2" } }, "sha512-ZXSSqTFIrzduD63btIfEyOmNcBmQvgOVsPNPe0jYtESiXkhd8u2erDLnMxmGrDCwHCCHE7hxwRDCT3pt0esT4g=="],
 
-    "@milady/app/vitest/@vitest/snapshot": ["@vitest/snapshot@2.1.9", "", { "dependencies": { "@vitest/pretty-format": "2.1.9", "magic-string": "^0.30.12", "pathe": "^1.1.2" } }, "sha512-oBO82rEjsxLNJincVhLhaxxZdEtV0EFHMK5Kmx5sJ6H9L183dHECjiefOAdnqpIgT5eZwT04PoggUnW88vOBNQ=="],
+    "@miladyai/app/vitest/@vitest/snapshot": ["@vitest/snapshot@2.1.9", "", { "dependencies": { "@vitest/pretty-format": "2.1.9", "magic-string": "^0.30.12", "pathe": "^1.1.2" } }, "sha512-oBO82rEjsxLNJincVhLhaxxZdEtV0EFHMK5Kmx5sJ6H9L183dHECjiefOAdnqpIgT5eZwT04PoggUnW88vOBNQ=="],
 
-    "@milady/app/vitest/@vitest/spy": ["@vitest/spy@2.1.9", "", { "dependencies": { "tinyspy": "^3.0.2" } }, "sha512-E1B35FwzXXTs9FHNK6bDszs7mtydNi5MIfUWpceJ8Xbfb1gBMscAnwLbEu+B44ed6W3XjL9/ehLPHR1fkf1KLQ=="],
+    "@miladyai/app/vitest/@vitest/spy": ["@vitest/spy@2.1.9", "", { "dependencies": { "tinyspy": "^3.0.2" } }, "sha512-E1B35FwzXXTs9FHNK6bDszs7mtydNi5MIfUWpceJ8Xbfb1gBMscAnwLbEu+B44ed6W3XjL9/ehLPHR1fkf1KLQ=="],
 
-    "@milady/app/vitest/@vitest/utils": ["@vitest/utils@2.1.9", "", { "dependencies": { "@vitest/pretty-format": "2.1.9", "loupe": "^3.1.2", "tinyrainbow": "^1.2.0" } }, "sha512-v0psaMSkNJ3A2NMrUEHFRzJtDPFn+/VWZ5WxImB21T9fjucJRmS7xCS3ppEnARb9y11OAzaD+P2Ps+b+BGX5iQ=="],
+    "@miladyai/app/vitest/@vitest/utils": ["@vitest/utils@2.1.9", "", { "dependencies": { "@vitest/pretty-format": "2.1.9", "loupe": "^3.1.2", "tinyrainbow": "^1.2.0" } }, "sha512-v0psaMSkNJ3A2NMrUEHFRzJtDPFn+/VWZ5WxImB21T9fjucJRmS7xCS3ppEnARb9y11OAzaD+P2Ps+b+BGX5iQ=="],
 
-    "@milady/app/vitest/pathe": ["pathe@1.1.2", "", {}, "sha512-whLdWMYL2TwI08hn8/ZqAbrVemu0LNaNNJZX73O6qaIdCTfXutsLhMkjdENX0qhsQ9uIimo4/aQOmXkoon2nDQ=="],
+    "@miladyai/app/vitest/pathe": ["pathe@1.1.2", "", {}, "sha512-whLdWMYL2TwI08hn8/ZqAbrVemu0LNaNNJZX73O6qaIdCTfXutsLhMkjdENX0qhsQ9uIimo4/aQOmXkoon2nDQ=="],
 
-    "@milady/app/vitest/std-env": ["std-env@3.10.0", "", {}, "sha512-5GS12FdOZNliM5mAOxFRg7Ir0pWz8MdpYm6AY6VPkGpbA7ZzmbzNcBJQ0GPvvyWgcY7QAhCgf9Uy89I03faLkg=="],
+    "@miladyai/app/vitest/std-env": ["std-env@3.10.0", "", {}, "sha512-5GS12FdOZNliM5mAOxFRg7Ir0pWz8MdpYm6AY6VPkGpbA7ZzmbzNcBJQ0GPvvyWgcY7QAhCgf9Uy89I03faLkg=="],
 
-    "@milady/app/vitest/tinyexec": ["tinyexec@0.3.2", "", {}, "sha512-KQQR9yN7R5+OSwaK0XQoj22pwHoTlgYqmUscPYoknOoWCWfj/5/ABTMRi69FrKU5ffPVh5QcFikpWJI/P1ocHA=="],
+    "@miladyai/app/vitest/tinyexec": ["tinyexec@0.3.2", "", {}, "sha512-KQQR9yN7R5+OSwaK0XQoj22pwHoTlgYqmUscPYoknOoWCWfj/5/ABTMRi69FrKU5ffPVh5QcFikpWJI/P1ocHA=="],
 
-    "@milady/app/vitest/tinyrainbow": ["tinyrainbow@1.2.0", "", {}, "sha512-weEDEq7Z5eTHPDh4xjX789+fHfF+P8boiFB+0vbWzpbnbsEr/GRaohi/uMKxg8RZMXnl1ItAi/IUHWMsjDV7kQ=="],
+    "@miladyai/app/vitest/tinyrainbow": ["tinyrainbow@1.2.0", "", {}, "sha512-weEDEq7Z5eTHPDh4xjX789+fHfF+P8boiFB+0vbWzpbnbsEr/GRaohi/uMKxg8RZMXnl1ItAi/IUHWMsjDV7kQ=="],
 
-    "@milady/homepage/@types/three/@webgpu/types": ["@webgpu/types@0.1.69", "", {}, "sha512-RPmm6kgRbI8e98zSD3RVACvnuktIja5+yLgDAkTmxLr90BEwdTXRQWNLF3ETTTyH/8mKhznZuN5AveXYFEsMGQ=="],
+    "@miladyai/homepage/@types/three/@webgpu/types": ["@webgpu/types@0.1.69", "", {}, "sha512-RPmm6kgRbI8e98zSD3RVACvnuktIja5+yLgDAkTmxLr90BEwdTXRQWNLF3ETTTyH/8mKhznZuN5AveXYFEsMGQ=="],
 
-    "@milady/homepage/@types/three/meshoptimizer": ["meshoptimizer@1.0.1", "", {}, "sha512-Vix+QlA1YYT3FwmBBZ+49cE5y/b+pRrcXKqGpS5ouh33d3lSp2PoTpCw19E0cKDFWalembrHnIaZetf27a+W2g=="],
+    "@miladyai/homepage/@types/three/meshoptimizer": ["meshoptimizer@1.0.1", "", {}, "sha512-Vix+QlA1YYT3FwmBBZ+49cE5y/b+pRrcXKqGpS5ouh33d3lSp2PoTpCw19E0cKDFWalembrHnIaZetf27a+W2g=="],
 
     "@neondatabase/serverless/@types/node/undici-types": ["undici-types@6.21.0", "", {}, "sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ=="],
 

@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/runtime/embedding-presets";
+export * from "@miladyai/autonomous/runtime/embedding-presets";

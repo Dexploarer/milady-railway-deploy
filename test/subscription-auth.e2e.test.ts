@@ -11,8 +11,8 @@ import {
   it,
   vi,
 } from "vitest";
-import { startApiServer } from "@milady/autonomous/api/server";
-import type { OAuthCredentials } from "@milady/autonomous/auth/types";
+import { startApiServer } from "@miladyai/autonomous/api/server";
+import type { OAuthCredentials } from "@miladyai/autonomous/auth/types";
 
 const getSubscriptionStatus = vi.fn(() => [{ id: "openai-codex" }]);
 const startAnthropicLogin = vi.fn();

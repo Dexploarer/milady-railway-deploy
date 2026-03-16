@@ -2,10 +2,10 @@ import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("@milady/app-core/components", async () => {
+vi.mock("@miladyai/app-core/components", async () => {
   const actual = await vi.importActual<
-    typeof import("@milady/app-core/components")
-  >("@milady/app-core/components");
+    typeof import("@miladyai/app-core/components")
+  >("@miladyai/app-core/components");
   return {
     ...actual,
     BugReportModal: () => React.createElement("div", null, "BugReportModal"),

@@ -1,5 +1,5 @@
-import { client } from "@milady/app-core/api";
-import { useApp } from "@milady/app-core/state";
+import { client } from "@miladyai/app-core/api";
+import { useApp } from "@miladyai/app-core/state";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 interface TerminalLine {

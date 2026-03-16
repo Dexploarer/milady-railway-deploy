@@ -1,1 +1,1 @@
-export * from "@milady/app-core/components/ChatModalView";
+export * from "@miladyai/app-core/components/ChatModalView";

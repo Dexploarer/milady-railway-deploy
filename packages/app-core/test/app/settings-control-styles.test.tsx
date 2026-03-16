@@ -5,11 +5,11 @@ import {
   CloudConnectionStatus,
   CloudSourceModeToggle,
   ConfigSaveFooter,
-} from "@milady/app-core/components";
+} from "@miladyai/app-core/components";
 import TestRenderer, { act } from "react-test-renderer";
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("@milady/app-core/state", () => ({
+vi.mock("@miladyai/app-core/state", () => ({
   useApp: () => ({
     t: (key: string) => key,
   }),

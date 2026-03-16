@@ -5,7 +5,7 @@ import type {
   TrainingJobRecord,
   TrainingModelRecord,
   TrainingTrajectoryList,
-} from "@milady/app-core/api";
+} from "@miladyai/app-core/api";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -47,10 +47,10 @@ const { mockClientFns, mockUseApp } = vi.hoisted(() => ({
   mockUseApp: vi.fn(),
 }));
 
-vi.mock("@milady/app-core/api", () => ({
+vi.mock("@miladyai/app-core/api", () => ({
   client: mockClientFns,
 }));
-vi.mock("@milady/app-core/state", () => ({
+vi.mock("@miladyai/app-core/state", () => ({
   useApp: () => mockUseApp(),
 }));
 

@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/triggers/scheduling";
+export * from "@miladyai/autonomous/triggers/scheduling";

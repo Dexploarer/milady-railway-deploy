@@ -18,9 +18,9 @@ import {
   PluginsPageView,
   RuntimeView,
   SkillsView,
-} from "@milady/app-core/components";
-import type { Tab } from "@milady/app-core/navigation";
-import { useApp } from "@milady/app-core/state";
+} from "@miladyai/app-core/components";
+import type { Tab } from "@miladyai/app-core/navigation";
+import { useApp } from "@miladyai/app-core/state";
 import React, { type ReactNode, useState } from "react";
 import { CustomActionsView } from "./CustomActionsView";
 import { FineTuningView } from "./FineTuningView";

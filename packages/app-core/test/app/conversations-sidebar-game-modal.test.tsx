@@ -27,16 +27,16 @@ const { mockUseApp } = vi.hoisted(() => ({
   mockUseApp: vi.fn(),
 }));
 
-vi.mock("@milady/app-core/state", () => ({
+vi.mock("@miladyai/app-core/state", () => ({
   useApp: () => mockUseApp(),
   getVrmPreviewUrl: (index: number) => `mock-vrm-${index}.png`,
   VRM_COUNT: 8,
 }));
 
-vi.mock("@milady/ui", async () => {
+vi.mock("@miladyai/ui", async () => {
   const React = await import("react");
   const actual =
-    await vi.importActual<typeof import("@milady/ui")>("@milady/ui");
+    await vi.importActual<typeof import("@miladyai/ui")>("@miladyai/ui");
 
   return {
     ...actual,
@@ -58,7 +58,7 @@ vi.mock("@milady/ui", async () => {
   };
 });
 
-vi.mock("@milady/app-core/api", () => ({
+vi.mock("@miladyai/app-core/api", () => ({
   client: {
     getAgentSelfStatus: vi.fn(async () => null),
     onWsEvent: vi.fn(() => () => {}),

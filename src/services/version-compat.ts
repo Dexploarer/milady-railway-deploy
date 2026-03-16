@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/services/version-compat";
+export * from "@miladyai/autonomous/services/version-compat";

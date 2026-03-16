@@ -1,4 +1,4 @@
-import { Button } from "@milady/ui";
+import { Button } from "@miladyai/ui";
 import type { SandboxBrowserEndpoints, SandboxWindowInfo } from "../api/client";
 import { useApp } from "../state";
 

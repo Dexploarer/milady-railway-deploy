@@ -5,7 +5,7 @@
  * OverlayLayer (renders all enabled instances).
  */
 
-import type { StreamEventEnvelope } from "@milady/app-core/api";
+import type { StreamEventEnvelope } from "@miladyai/app-core/api";
 import type { ComponentType } from "react";
 import type { AgentMode } from "../helpers";
 

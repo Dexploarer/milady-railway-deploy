@@ -9,8 +9,8 @@ import {
   client,
   type TrajectoryDetailResult,
   type TrajectoryLlmCall,
-} from "@milady/app-core/api";
-import { useApp } from "@milady/app-core/state";
+} from "@miladyai/app-core/api";
+import { useApp } from "@miladyai/app-core/state";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import {

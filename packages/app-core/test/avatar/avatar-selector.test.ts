@@ -8,7 +8,7 @@ import {
   getVrmTitle,
   getVrmUrl,
   VRM_COUNT,
-} from "@milady/app-core/state";
+} from "@miladyai/app-core/state";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 describe("Avatar VRM Utilities", () => {

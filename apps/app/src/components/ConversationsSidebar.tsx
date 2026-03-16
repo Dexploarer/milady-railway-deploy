@@ -1,1 +1,1 @@
-export * from "@milady/app-core/components/ConversationsSidebar";
+export * from "@miladyai/app-core/components/ConversationsSidebar";

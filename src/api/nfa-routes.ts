@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/api/nfa-routes";
+export * from "@miladyai/autonomous/api/nfa-routes";

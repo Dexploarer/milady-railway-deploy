@@ -4,7 +4,7 @@ import {
   alertDesktopMessage,
   confirmDesktopAction,
   copyTextToClipboard,
-} from "@milady/app-core/utils";
+} from "@miladyai/app-core/utils";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 type TestWindow = Window & {

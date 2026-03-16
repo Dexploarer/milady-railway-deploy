@@ -1,1 +1,1 @@
-export * from "@milady/app-core/components/inventory/media-url";
+export * from "@miladyai/app-core/components/inventory/media-url";

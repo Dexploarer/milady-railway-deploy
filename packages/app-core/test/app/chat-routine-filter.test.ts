@@ -1,4 +1,4 @@
-import { isRoutineCodingAgentMessage } from "@milady/app-core/chat";
+import { isRoutineCodingAgentMessage } from "@miladyai/app-core/chat";
 import { describe, expect, it } from "vitest";
 
 describe("isRoutineCodingAgentMessage", () => {

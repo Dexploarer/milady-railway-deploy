@@ -11,9 +11,9 @@ import {
   type TrajectoryListResult,
   type TrajectoryRecord,
   type TrajectoryStats,
-} from "@milady/app-core/api";
-import { useApp } from "@milady/app-core/state";
-import { confirmDesktopAction } from "@milady/app-core/utils";
+} from "@miladyai/app-core/api";
+import { useApp } from "@miladyai/app-core/state";
+import { confirmDesktopAction } from "@miladyai/app-core/utils";
 import {
   Button,
   DropdownMenu,
@@ -26,7 +26,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@milady/ui";
+} from "@miladyai/ui";
 import { useCallback, useEffect, useState } from "react";
 import {
   formatTrajectoryDuration,

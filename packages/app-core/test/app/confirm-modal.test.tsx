@@ -8,7 +8,7 @@ import {
   PromptModal,
   useConfirm,
   usePrompt,
-} from "@milady/app-core/components";
+} from "@miladyai/app-core/components";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";

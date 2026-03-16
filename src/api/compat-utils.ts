@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/api/compat-utils";
+export * from "@miladyai/autonomous/api/compat-utils";

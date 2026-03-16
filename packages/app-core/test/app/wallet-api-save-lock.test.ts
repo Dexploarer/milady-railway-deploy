@@ -2,7 +2,7 @@
 import React, { useEffect } from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { WalletConfigUpdateRequest } from "@milady/autonomous/contracts/wallet";
+import type { WalletConfigUpdateRequest } from "@miladyai/autonomous/contracts/wallet";
 
 const { mockClient } = vi.hoisted(() => ({
   mockClient: {
@@ -75,12 +75,12 @@ const { mockClient } = vi.hoisted(() => ({
   },
 }));
 
-vi.mock("@milady/app-core/api", () => ({
+vi.mock("@miladyai/app-core/api", () => ({
   client: mockClient,
   SkillScanReportSummary: {},
 }));
 
-import { AppProvider, useApp } from "@milady/app-core/state";
+import { AppProvider, useApp } from "@miladyai/app-core/state";
 
 function createDeferred<T>() {
   let resolve!: (value: T | PromiseLike<T>) => void;

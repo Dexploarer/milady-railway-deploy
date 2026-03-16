@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/api/stream-routes";
+export * from "@miladyai/autonomous/api/stream-routes";

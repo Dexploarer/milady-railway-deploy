@@ -1,4 +1,4 @@
-import { ApiError, MiladyClient } from "@milady/app-core/api";
+import { ApiError, MiladyClient } from "@miladyai/app-core/api";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 describe("MiladyClient request timeout handling", () => {

@@ -95,7 +95,7 @@ const onboardingOptions = {
       style: { all: ["be concise"], chat: ["friendly"], post: ["playful"] },
       adjectives: ["curious", "playful"],
       postExamples: ["hello world"],
-      messageExamples: [[{ name: "User", content: { text: "hello" } }]],
+      messageExamples: [[{ user: "User", content: { text: "hello" } }]],
     },
     {
       catchphrase: "serious",
@@ -105,7 +105,7 @@ const onboardingOptions = {
       style: { all: ["clear"], chat: ["direct"], post: ["brief"] },
       adjectives: ["focused"],
       postExamples: [],
-      messageExamples: [[{ name: "User", content: { text: "status?" } }]],
+      messageExamples: [[{ user: "User", content: { text: "status?" } }]],
     },
   ],
   providers: [

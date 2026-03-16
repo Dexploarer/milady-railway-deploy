@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/hooks/discovery";
+export * from "@miladyai/autonomous/hooks/discovery";

@@ -1772,7 +1772,7 @@ function deriveMiladyRepositoryUrl(
   npmName: string | undefined,
   dirName: string | undefined,
 ): string | undefined {
-  if (!npmName?.startsWith("@milady/")) return undefined;
+  if (!npmName?.startsWith("@miladyai/")) return undefined;
   if (!dirName?.startsWith("plugin-")) return undefined;
   return `${MILADY_REPO_ROOT}/tree/main/packages/${dirName}`;
 }

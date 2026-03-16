@@ -1,4 +1,4 @@
-import { Button } from "@milady/ui";
+import { Button } from "@miladyai/ui";
 import { Check, Cloud } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useApp } from "../../state";

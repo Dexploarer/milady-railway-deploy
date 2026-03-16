@@ -2,9 +2,9 @@
  * Token balance table with per-chain error notices.
  */
 
-import type { EvmChainBalance } from "@milady/app-core/api";
-import type { createTranslator } from "@milady/app-core/i18n";
-import { Button } from "@milady/ui";
+import type { EvmChainBalance } from "@miladyai/app-core/api";
+import type { createTranslator } from "@miladyai/app-core/i18n";
+import { Button } from "@miladyai/ui";
 import { chainIcon, formatBalance, type TokenRow } from "./constants";
 import { TokenLogo } from "./TokenLogo";
 

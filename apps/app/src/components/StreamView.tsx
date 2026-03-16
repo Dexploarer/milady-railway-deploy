@@ -1,1 +1,1 @@
-export * from "@milady/app-core/components/StreamView";
+export * from "@miladyai/app-core/components/StreamView";

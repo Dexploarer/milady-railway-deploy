@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/runtime/custom-actions";
+export * from "@miladyai/autonomous/runtime/custom-actions";

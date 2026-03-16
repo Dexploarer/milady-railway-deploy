@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/onboarding-presets";
+export * from "@miladyai/autonomous/onboarding-presets";

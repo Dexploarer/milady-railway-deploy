@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/services/skill-marketplace";
+export * from "@miladyai/autonomous/services/skill-marketplace";

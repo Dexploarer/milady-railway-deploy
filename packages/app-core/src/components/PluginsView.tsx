@@ -4,7 +4,7 @@
  * Renders a unified plugin list with searchable/filterable cards and per-plugin settings.
  */
 
-import { Button, Input } from "@milady/ui";
+import { Button, Input } from "@miladyai/ui";
 import type { LucideIcon } from "lucide-react";
 import {
   Binary,

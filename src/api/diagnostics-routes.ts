@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import {
   type DiagnosticsRouteContext as AutonomousDiagnosticsRouteContext,
   handleDiagnosticsRoutes as handleAutonomousDiagnosticsRoutes,
-} from "@milady/autonomous/api/diagnostics-routes";
+} from "@miladyai/autonomous/api/diagnostics-routes";
 import {
   AUDIT_EVENT_TYPES,
   AUDIT_SEVERITIES,

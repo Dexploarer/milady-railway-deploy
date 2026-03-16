@@ -1,4 +1,4 @@
-import { useApp } from "@milady/app-core/state";
+import { useApp } from "@miladyai/app-core/state";
 import { useState } from "react";
 
 type RpcMode = "" | "cloud" | "byok";

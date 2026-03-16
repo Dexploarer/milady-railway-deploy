@@ -3,7 +3,7 @@
 import {
   APP_EMOTE_EVENT,
   type AppEmoteEventDetail,
-} from "@milady/app-core/events";
+} from "@miladyai/app-core/events";
 import React, { useEffect } from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -121,12 +121,12 @@ const { mockClient } = vi.hoisted(() => ({
   },
 }));
 
-vi.mock("@milady/app-core/api", () => ({
+vi.mock("@miladyai/app-core/api", () => ({
   client: mockClient,
   SkillScanReportSummary: {},
 }));
 
-import { AppProvider, useApp } from "@milady/app-core/state";
+import { AppProvider, useApp } from "@miladyai/app-core/state";
 
 const UI_SHELL_MODE_STORAGE_KEY = "milady:ui-shell-mode";
 

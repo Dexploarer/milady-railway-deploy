@@ -1,4 +1,4 @@
-import { __voiceChatInternals } from "@milady/app-core/hooks";
+import { __voiceChatInternals } from "@miladyai/app-core/hooks";
 import { describe, expect, it } from "vitest";
 
 const {

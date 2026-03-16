@@ -1,4 +1,4 @@
-import { MiladyClient } from "@milady/app-core/api";
+import { MiladyClient } from "@miladyai/app-core/api";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 function buildSseDoneResponse(): Response {

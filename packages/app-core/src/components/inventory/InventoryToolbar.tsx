@@ -5,10 +5,10 @@
 import type {
   WalletBalancesResponse,
   WalletNftsResponse,
-} from "@milady/app-core/api";
-import type { createTranslator } from "@milady/app-core/i18n";
-import type { AppState } from "@milady/app-core/state";
-import { Button } from "@milady/ui";
+} from "@miladyai/app-core/api";
+import type { createTranslator } from "@miladyai/app-core/i18n";
+import type { AppState } from "@miladyai/app-core/state";
+import { Button } from "@miladyai/ui";
 import { CHAIN_CONFIGS, PRIMARY_CHAIN_KEYS } from "../chainConfig";
 
 type InventoryToolbarStateKey = "inventoryView" | "inventorySort";

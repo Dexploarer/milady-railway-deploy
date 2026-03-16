@@ -1,1 +1,1 @@
-export * from "@milady/app-core/components/companion/VrmStage";
+export * from "@miladyai/app-core/components/companion/VrmStage";

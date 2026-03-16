@@ -52,11 +52,11 @@ vi.stubGlobal(
 );
 
 // Mock contract modules that api-client.ts imports from autonomous.
-vi.mock("@milady/autonomous/contracts/drop", () => ({}));
-vi.mock("@milady/autonomous/contracts/onboarding", () => ({}));
-vi.mock("@milady/autonomous/contracts/verification", () => ({}));
-vi.mock("@milady/autonomous/contracts/wallet", () => ({}));
-vi.mock("@milady/autonomous/contracts/permissions", () => ({}));
+vi.mock("@miladyai/autonomous/contracts/drop", () => ({}));
+vi.mock("@miladyai/autonomous/contracts/onboarding", () => ({}));
+vi.mock("@miladyai/autonomous/contracts/verification", () => ({}));
+vi.mock("@miladyai/autonomous/contracts/wallet", () => ({}));
+vi.mock("@miladyai/autonomous/contracts/permissions", () => ({}));
 
 // Provide window.location so connectWs() can build a WS URL
 vi.stubGlobal("window", {
@@ -70,7 +70,7 @@ vi.stubGlobal("window", {
 // Import the real MiladyClient
 // ---------------------------------------------------------------------------
 
-const { MiladyClient } = await import("@milady/app-core/api");
+const { MiladyClient } = await import("@miladyai/app-core/api");
 
 describe("MiladyClient WS reconnect", () => {
   let client: InstanceType<typeof MiladyClient>;

@@ -1,20 +1,20 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import "@milady/app-core/styles/xterm.css";
+import "@miladyai/app-core/styles/xterm.css";
 import {
   client,
   type SandboxBrowserEndpoints,
   type SandboxWindowInfo,
-} from "@milady/app-core/api";
-import { LifoMonitorPanel } from "@milady/app-core/components";
-import { useLifoSync } from "@milady/app-core/hooks";
+} from "@miladyai/app-core/api";
+import { LifoMonitorPanel } from "@miladyai/app-core/components";
+import { useLifoSync } from "@miladyai/app-core/hooks";
 import {
   createLifoRuntime,
   generateLifoSessionId,
   isSafeEndpointUrl,
   type LifoRuntime,
   normalizeTerminalText,
-} from "@milady/app-core/platform";
-import { useApp } from "@milady/app-core/state";
+} from "@miladyai/app-core/platform";
+import { useApp } from "@miladyai/app-core/state";
 
 interface TerminalOutputEvent {
   event?: unknown;

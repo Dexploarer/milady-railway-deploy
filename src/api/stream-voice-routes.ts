@@ -2,7 +2,7 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import {
   handleStreamVoiceRoute as handleAutonomousStreamVoiceRoute,
   onAgentMessage as onAutonomousAgentMessage,
-} from "@milady/autonomous/api/stream-voice-routes";
+} from "@miladyai/autonomous/api/stream-voice-routes";
 import {
   getTtsProviderStatus,
   resolveTtsConfig,

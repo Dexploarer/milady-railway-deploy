@@ -20,7 +20,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockUseApp = vi.fn();
 
-vi.mock("@milady/app-core/state", () => ({
+vi.mock("@miladyai/app-core/state", () => ({
   useApp: () => mockUseApp(),
   THEMES: [
     { id: "milady", label: "Milady" },
@@ -30,26 +30,26 @@ vi.mock("@milady/app-core/state", () => ({
   ],
 }));
 
-vi.mock("@milady/app-core/components", async () => {
+vi.mock("@miladyai/app-core/components", async () => {
   const actual = await vi.importActual<
-    typeof import("@milady/app-core/components")
-  >("@milady/app-core/components");
+    typeof import("@miladyai/app-core/components")
+  >("@miladyai/app-core/components");
   return {
     ...actual,
   };
 });
 
-vi.mock("@milady/app-core/components/ConfigPageView", () => ({
+vi.mock("@miladyai/app-core/components/ConfigPageView", () => ({
   ConfigPageView: () =>
     React.createElement("div", { "data-testid": "config-page" }, "ConfigPage"),
 }));
 
-vi.mock("@milady/app-core/components/CodingAgentSettingsSection", () => ({
+vi.mock("@miladyai/app-core/components/CodingAgentSettingsSection", () => ({
   CodingAgentSettingsSection: () =>
     React.createElement("div", null, "CodingAgentSettingsSection"),
 }));
 
-vi.mock("@milady/app-core/components/MediaSettingsSection", () => ({
+vi.mock("@miladyai/app-core/components/MediaSettingsSection", () => ({
   MediaSettingsSection: () =>
     React.createElement(
       "div",
@@ -58,11 +58,11 @@ vi.mock("@milady/app-core/components/MediaSettingsSection", () => ({
     ),
 }));
 
-vi.mock("@milady/app-core/components/ElizaCloudDashboard", () => ({
+vi.mock("@miladyai/app-core/components/ElizaCloudDashboard", () => ({
   CloudDashboard: () => React.createElement("div", null, "ElizaCloudDashboard"),
 }));
 
-vi.mock("@milady/app-core/components/PermissionsSection", () => ({
+vi.mock("@miladyai/app-core/components/PermissionsSection", () => ({
   PermissionsSection: () =>
     React.createElement(
       "div",
@@ -71,7 +71,7 @@ vi.mock("@milady/app-core/components/PermissionsSection", () => ({
     ),
 }));
 
-vi.mock("@milady/app-core/components/ProviderSwitcher", () => ({
+vi.mock("@miladyai/app-core/components/ProviderSwitcher", () => ({
   ProviderSwitcher: () =>
     React.createElement(
       "div",
@@ -80,7 +80,7 @@ vi.mock("@milady/app-core/components/ProviderSwitcher", () => ({
     ),
 }));
 
-vi.mock("@milady/app-core/components/VoiceConfigView", () => ({
+vi.mock("@miladyai/app-core/components/VoiceConfigView", () => ({
   VoiceConfigView: () =>
     React.createElement(
       "div",
@@ -89,7 +89,7 @@ vi.mock("@milady/app-core/components/VoiceConfigView", () => ({
     ),
 }));
 
-import { SettingsView } from "@milady/app-core/components/SettingsView";
+import { SettingsView } from "@miladyai/app-core/components/SettingsView";
 
 type SettingsState = {
   // Cloud

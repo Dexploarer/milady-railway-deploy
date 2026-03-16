@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/actions/stream-control";
+export * from "@miladyai/autonomous/actions/stream-control";

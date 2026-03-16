@@ -1,9 +1,9 @@
-import { StartupFailureView } from "@milady/app-core/components";
+import { StartupFailureView } from "@miladyai/app-core/components";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("@milady/app-core/state", () => ({
+vi.mock("@miladyai/app-core/state", () => ({
   useApp: () => ({
     uiLanguage: "en",
     t: (k: string) => {

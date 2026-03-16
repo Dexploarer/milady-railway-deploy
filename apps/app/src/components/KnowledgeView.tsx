@@ -1,1 +1,1 @@
-export * from "@milady/app-core/components/KnowledgeView";
+export * from "@miladyai/app-core/components/KnowledgeView";

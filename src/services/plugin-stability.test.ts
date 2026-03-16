@@ -178,7 +178,7 @@ describe("Plugin Enumeration", () => {
     for (const name of ALL_KNOWN_PLUGINS) {
       expect(
         name.startsWith("@elizaos/plugin-") ||
-          name.startsWith("@milady/plugin-"),
+          name.startsWith("@miladyai/plugin-"),
       ).toBe(true);
     }
     expect(knownPackages.size).toBeGreaterThan(0);

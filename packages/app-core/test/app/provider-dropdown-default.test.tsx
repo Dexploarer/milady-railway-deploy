@@ -17,7 +17,7 @@ const mockGetSubscriptionStatus = vi.fn();
 const mockUpdateConfig = vi.fn();
 const mockSwitchProvider = vi.fn();
 
-vi.mock("@milady/app-core/api", () => ({
+vi.mock("@miladyai/app-core/api", () => ({
   client: {
     getConfig: (...args: unknown[]) => mockGetConfig(...args),
     getOnboardingOptions: (...args: unknown[]) =>
@@ -29,22 +29,22 @@ vi.mock("@milady/app-core/api", () => ({
   },
 }));
 
-vi.mock("@milady/app-core/components", async () => {
+vi.mock("@miladyai/app-core/components", async () => {
   const actual = await vi.importActual<
-    typeof import("@milady/app-core/components")
-  >("@milady/app-core/components");
+    typeof import("@miladyai/app-core/components")
+  >("@miladyai/app-core/components");
   return {
     ...actual,
     ApiKeyConfig: () => null,
     SubscriptionStatus: () => null,
   };
 });
-vi.mock("@milady/app-core/config", () => ({
+vi.mock("@miladyai/app-core/config", () => ({
   ConfigRenderer: () => null,
   defaultRegistry: {},
 }));
 
-import { ProviderSwitcher } from "@milady/app-core/components";
+import { ProviderSwitcher } from "@miladyai/app-core/components";
 
 // ---------------------------------------------------------------------------
 // Helpers

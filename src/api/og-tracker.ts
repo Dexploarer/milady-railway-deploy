@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/api/og-tracker";
+export * from "@miladyai/autonomous/api/og-tracker";

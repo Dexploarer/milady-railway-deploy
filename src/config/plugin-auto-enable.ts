@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/config/plugin-auto-enable";
+export * from "@miladyai/autonomous/config/plugin-auto-enable";

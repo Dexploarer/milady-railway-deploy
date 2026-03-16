@@ -1,6 +1,6 @@
-import { LanguageDropdown, ThemeToggle } from "@milady/app-core/components";
-import { getTabGroups, type TabGroup } from "@milady/app-core/navigation";
-import { useApp } from "@milady/app-core/state";
+import { LanguageDropdown, ThemeToggle } from "@miladyai/app-core/components";
+import { getTabGroups, type TabGroup } from "@miladyai/app-core/navigation";
+import { useApp } from "@miladyai/app-core/state";
 import { AlertTriangle, CircleDollarSign, Menu } from "lucide-react";
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";

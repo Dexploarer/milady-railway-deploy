@@ -1,6 +1,6 @@
 /** @vitest-environment jsdom */
 
-import type { StreamEventEnvelope } from "@milady/app-core/api";
+import type { StreamEventEnvelope } from "@miladyai/app-core/api";
 import React, { useEffect } from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -123,12 +123,12 @@ const { fetchMock, mockClient, wsHandlers } = vi.hoisted(() => {
   };
 });
 
-vi.mock("@milady/app-core/api", () => ({
+vi.mock("@miladyai/app-core/api", () => ({
   client: mockClient,
   SkillScanReportSummary: {},
 }));
 
-import { AppProvider, useApp } from "@milady/app-core/state";
+import { AppProvider, useApp } from "@miladyai/app-core/state";
 
 type ProbeApi = {
   snapshot: () => {

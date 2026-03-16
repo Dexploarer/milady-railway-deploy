@@ -11,8 +11,8 @@ import {
   getVrmTitle,
   useApp,
   VRM_COUNT,
-} from "@milady/app-core/state";
-import { alertDesktopMessage } from "@milady/app-core/utils";
+} from "@miladyai/app-core/state";
+import { alertDesktopMessage } from "@miladyai/app-core/utils";
 import { useCallback, useRef, useState } from "react";
 
 export interface AvatarSelectorProps {

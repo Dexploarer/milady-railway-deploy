@@ -21,7 +21,7 @@
  * whatever JavaScript the remote page serves.
  */
 
-import { useApp } from "@milady/app-core/state";
+import { useApp } from "@miladyai/app-core/state";
 import { useRef } from "react";
 import { registerWidget } from "../registry";
 import type { WidgetDefinition, WidgetRenderProps } from "../types";

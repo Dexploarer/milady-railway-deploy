@@ -10,7 +10,7 @@ const { mockApplyUiTheme, mockUseApp, mockVrmStage } = vi.hoisted(() => ({
   mockVrmStage: vi.fn(() => React.createElement("div", null, "VrmStage")),
 }));
 
-vi.mock("@milady/app-core/state", () => ({
+vi.mock("@miladyai/app-core/state", () => ({
   applyUiTheme: (theme: "light" | "dark") => mockApplyUiTheme(theme),
   getVrmPreviewUrl: () => "/vrms/previews/milady-1.png",
   getVrmUrl: () => "/vrms/milady-1.vrm.gz",
@@ -24,11 +24,11 @@ vi.mock("@milady/app-core/state", () => ({
   useApp: () => mockUseApp(),
 }));
 
-vi.mock("@milady/app-core/components", () => ({
+vi.mock("@miladyai/app-core/components", () => ({
   LanguageDropdown: () => React.createElement("div", null, "LanguageDropdown"),
 }));
 
-vi.mock("@milady/app-core/utils", () => ({
+vi.mock("@miladyai/app-core/utils", () => ({
   resolveAppAssetUrl: (path: string) => path,
 }));
 

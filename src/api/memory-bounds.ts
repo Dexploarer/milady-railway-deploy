@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/api/memory-bounds";
+export * from "@miladyai/autonomous/api/memory-bounds";

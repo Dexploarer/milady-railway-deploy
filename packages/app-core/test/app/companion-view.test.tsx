@@ -8,7 +8,7 @@ const viewerPropsRef: { current: null | Record<string, unknown> } = {
   current: null,
 };
 
-vi.mock("@milady/app-core/state", () => ({
+vi.mock("@miladyai/app-core/state", () => ({
   useApp: () => mockUseApp(),
   getVrmPreviewUrl: () => "/vrms/previews/milady-1.png",
   getVrmUrl: () => "/vrms/milady-1.vrm.gz",
@@ -18,7 +18,7 @@ vi.mock("@milady/app-core/state", () => ({
   VRM_COUNT: 24,
 }));
 
-vi.mock("@milady/app-core/components/avatar/VrmViewer", () => ({
+vi.mock("@miladyai/app-core/components/avatar/VrmViewer", () => ({
   VrmViewer: (props: Record<string, unknown>) => {
     viewerPropsRef.current = props;
     return React.createElement("div", null, "VrmViewer");
@@ -37,7 +37,7 @@ vi.mock("../../src/components/ChatModalView.js", () => ({
 const mockUploadCustomVrm = vi.fn(async () => {});
 const mockUploadCustomBackground = vi.fn(async () => {});
 
-vi.mock("@milady/app-core/api", () => ({
+vi.mock("@miladyai/app-core/api", () => ({
   client: {
     uploadCustomVrm: (...args: unknown[]) => mockUploadCustomVrm(...args),
     uploadCustomBackground: (...args: unknown[]) =>
@@ -46,12 +46,12 @@ vi.mock("@milady/app-core/api", () => ({
   },
 }));
 
-vi.mock("@milady/app-core/utils", () => ({
+vi.mock("@miladyai/app-core/utils", () => ({
   resolveApiUrl: (p: string) => p,
   resolveAppAssetUrl: (p: string) => p,
 }));
 
-import { CompanionSceneHost } from "@milady/app-core/components/CompanionSceneHost";
+import { CompanionSceneHost } from "@miladyai/app-core/components/CompanionSceneHost";
 import { CompanionView } from "../../src/components/CompanionView";
 
 const COMPANION_ZOOM_STORAGE_KEY = "milady.companion.zoom.v1";

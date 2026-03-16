@@ -1,4 +1,4 @@
-import { computeStreamingDelta } from "@milady/app-core/state";
+import { computeStreamingDelta } from "@miladyai/app-core/state";
 import { describe, expect, it } from "vitest";
 
 function computeStreamingDeltaLegacy(

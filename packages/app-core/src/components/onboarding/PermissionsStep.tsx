@@ -1,5 +1,5 @@
-import { PermissionsOnboardingSection } from "@milady/app-core/components";
-import { useApp } from "@milady/app-core/state";
+import { PermissionsOnboardingSection } from "@miladyai/app-core/components";
+import { useApp } from "@miladyai/app-core/state";
 
 export function PermissionsStep() {
   const { handleOnboardingNext, t } = useApp();

@@ -10,9 +10,9 @@
  *   3. Everything else → plain text
  */
 
-import type { ConversationMessage, PluginInfo } from "@milady/app-core/api";
-import { client } from "@milady/app-core/api";
-import { paramsToSchema } from "@milady/app-core/components";
+import type { ConversationMessage, PluginInfo } from "@miladyai/app-core/api";
+import { client } from "@miladyai/app-core/api";
+import { paramsToSchema } from "@miladyai/app-core/components";
 import {
   ConfigRenderer,
   defaultRegistry,
@@ -20,11 +20,11 @@ import {
   type PatchOp,
   UiRenderer,
   type UiSpec,
-} from "@milady/app-core/config";
-import { useApp } from "@milady/app-core/state";
-import type { ConfigUiHint } from "@milady/app-core/types";
-import { stripAssistantStageDirections } from "@milady/app-core/utils";
-import { Button } from "@milady/ui";
+} from "@miladyai/app-core/config";
+import { useApp } from "@miladyai/app-core/state";
+import type { ConfigUiHint } from "@miladyai/app-core/types";
+import { stripAssistantStageDirections } from "@miladyai/app-core/utils";
+import { Button } from "@miladyai/ui";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 /** Reject prototype-pollution keys that should never be traversed or rendered. */

@@ -1,4 +1,4 @@
-import { isSafeEndpointUrl } from "@milady/app-core/platform";
+import { isSafeEndpointUrl } from "@miladyai/app-core/platform";
 import { describe, expect, it } from "vitest";
 
 describe("isSafeEndpointUrl", () => {

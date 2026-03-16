@@ -1,4 +1,4 @@
-import { Button, Input } from "@milady/ui";
+import { Button, Input } from "@miladyai/ui";
 import type React from "react";
 import { useRef } from "react";
 import { getLocalizedConversationTitle } from "./conversation-utils";

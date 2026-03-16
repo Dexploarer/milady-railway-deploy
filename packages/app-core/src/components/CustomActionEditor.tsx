@@ -2,9 +2,9 @@ import {
   type CustomActionDef,
   type CustomActionHandler,
   client,
-} from "@milady/app-core/api";
-import { useApp } from "@milady/app-core/state";
-import { Button } from "@milady/ui";
+} from "@miladyai/app-core/api";
+import { useApp } from "@miladyai/app-core/state";
+import { Button } from "@miladyai/ui";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
 

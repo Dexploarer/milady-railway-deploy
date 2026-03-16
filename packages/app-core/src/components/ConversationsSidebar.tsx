@@ -4,7 +4,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@milady/ui";
+} from "@miladyai/ui";
 import { useEffect, useRef, useState } from "react";
 import { ConversationListItem } from "./conversations/ConversationListItem";
 

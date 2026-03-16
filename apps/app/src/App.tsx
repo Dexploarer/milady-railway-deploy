@@ -1,1 +1,1 @@
-export { App } from "@milady/app-core";
+export { App } from "@miladyai/app-core";

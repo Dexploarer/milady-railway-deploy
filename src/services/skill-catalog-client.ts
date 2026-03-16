@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/services/skill-catalog-client";
+export * from "@miladyai/autonomous/services/skill-catalog-client";

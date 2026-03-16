@@ -1,1 +1,1 @@
-export * from "@milady/app-core/components/AvatarSelector";
+export * from "@miladyai/app-core/components/AvatarSelector";

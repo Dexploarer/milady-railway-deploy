@@ -40,7 +40,7 @@ import {
 } from "./hooks";
 import type { Tab } from "./navigation";
 import { APPS_ENABLED, COMPANION_ENABLED } from "./navigation";
-import { isIOS, isLifoPopoutValue, isNative } from "@milady/app-core/platform";
+import { isIOS, isLifoPopoutValue, isNative } from "@miladyai/app-core/platform";
 import { useApp } from "./state";
 import { type ReactNode, useCallback, useEffect, useState } from "react";
 

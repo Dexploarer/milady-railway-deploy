@@ -8,23 +8,23 @@ const viewerPropsRef: {
 } = { current: null };
 let viewerRenderCount = 0;
 
-vi.mock("@milady/app-core/api", () => ({
+vi.mock("@miladyai/app-core/api", () => ({
   client: {
     onWsEvent: vi.fn(() => () => {}),
   },
 }));
 
-vi.mock("@milady/app-core/events", () => ({
+vi.mock("@miladyai/app-core/events", () => ({
   APP_EMOTE_EVENT: "milady:app-emote",
   CHAT_AVATAR_VOICE_EVENT: "milady:chat-avatar-voice",
   STOP_EMOTE_EVENT: "stop-emote",
 }));
 
-vi.mock("@milady/app-core/utils", () => ({
+vi.mock("@miladyai/app-core/utils", () => ({
   resolveAppAssetUrl: (path: string) => path,
 }));
 
-vi.mock("@milady/app-core/components/avatar/VrmViewer", () => ({
+vi.mock("@miladyai/app-core/components/avatar/VrmViewer", () => ({
   VrmViewer: (props: Record<string, unknown>) => {
     viewerRenderCount++;
     viewerPropsRef.current = props;
@@ -32,11 +32,11 @@ vi.mock("@milady/app-core/components/avatar/VrmViewer", () => ({
   },
 }));
 
-vi.mock("@milady/app-core/components/AvatarLoader", () => ({
+vi.mock("@miladyai/app-core/components/AvatarLoader", () => ({
   AvatarLoader: () => React.createElement("div", null, "AvatarLoader"),
 }));
 
-import { VrmStage } from "@milady/app-core/components/VrmStage";
+import { VrmStage } from "@miladyai/app-core/components/VrmStage";
 
 describe("VrmStage", () => {
   beforeEach(() => {

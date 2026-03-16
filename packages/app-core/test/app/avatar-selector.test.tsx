@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { AvatarSelector } from "../../src/components/AvatarSelector";
 
-vi.mock("@milady/app-core/state", () => ({
+vi.mock("@miladyai/app-core/state", () => ({
   useApp: () => ({ t: (k: string) => k }),
   getVrmPreviewUrl: vi.fn(() => "preview.png"),
   getVrmTitle: vi.fn(() => "Avatar"),

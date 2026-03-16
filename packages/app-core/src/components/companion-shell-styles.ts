@@ -2,7 +2,7 @@
  * Style helpers and constants for the companion shell overlay.
  */
 
-import type { Tab } from "@milady/app-core/navigation";
+import type { Tab } from "@miladyai/app-core/navigation";
 import type React from "react";
 
 /* ── Overlay tab set ───────────────────────────────────────────────── */

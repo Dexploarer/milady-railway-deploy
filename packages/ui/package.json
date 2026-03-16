@@ -1,5 +1,5 @@
 {
-  "name": "@milady/ui",
+  "name": "@miladyai/ui",
   "version": "1.0.0",
   "description": "Reusable UI primitives and components for Milady applications.",
   "type": "module",

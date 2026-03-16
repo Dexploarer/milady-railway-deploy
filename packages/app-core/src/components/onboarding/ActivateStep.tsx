@@ -1,4 +1,4 @@
-import { useApp } from "@milady/app-core/state";
+import { useApp } from "@miladyai/app-core/state";
 
 export function ActivateStep() {
   const { onboardingName, handleOnboardingNext, t } = useApp();

@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/services/mcp-marketplace";
+export * from "@miladyai/autonomous/services/mcp-marketplace";

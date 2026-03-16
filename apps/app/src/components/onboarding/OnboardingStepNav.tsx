@@ -1,1 +1,1 @@
-export * from "@milady/app-core/components/onboarding/OnboardingStepNav";
+export * from "@miladyai/app-core/components/onboarding/OnboardingStepNav";

@@ -1,4 +1,4 @@
-import { ApiError, MiladyClient } from "@milady/app-core/api";
+import { ApiError, MiladyClient } from "@miladyai/app-core/api";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 function buildSseResponse(chunks: string[]): Response {

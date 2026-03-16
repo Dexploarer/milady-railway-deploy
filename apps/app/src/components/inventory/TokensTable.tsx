@@ -1,1 +1,1 @@
-export * from "@milady/app-core/components/inventory/TokensTable";
+export * from "@miladyai/app-core/components/inventory/TokensTable";

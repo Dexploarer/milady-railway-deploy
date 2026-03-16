@@ -8,16 +8,16 @@ const { mockUseApp, mockUseBugReport } = vi.hoisted(() => ({
   mockUseBugReport: vi.fn(() => ({ open: vi.fn() })),
 }));
 
-vi.mock("@milady/app-core/state", () => ({
+vi.mock("@miladyai/app-core/state", () => ({
   useApp: () => mockUseApp(),
 }));
 
-vi.mock("@milady/app-core/hooks", () => ({
+vi.mock("@miladyai/app-core/hooks", () => ({
   useBugReport: () => mockUseBugReport(),
   BugReportProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
-import { CommandPalette } from "@milady/app-core/components/CommandPalette";
+import { CommandPalette } from "@miladyai/app-core/components/CommandPalette";
 
 type PaletteContext = {
   commandPaletteOpen: boolean;

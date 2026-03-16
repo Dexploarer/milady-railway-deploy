@@ -1,21 +1,21 @@
 // @vitest-environment jsdom
 
-import * as AppContext from "@milady/app-core/state";
+import * as AppContext from "@miladyai/app-core/state";
 import React from "react";
 import { act, create, type ReactTestRenderer } from "react-test-renderer";
 import { describe, expect, it, vi } from "vitest";
 import { Header } from "./Header";
 
 // Mock the AppContext
-vi.mock("@milady/app-core/state", () => ({
+vi.mock("@miladyai/app-core/state", () => ({
   useApp: vi.fn(),
 }));
 
-vi.mock("@milady/app-core/hooks", () => ({
+vi.mock("@miladyai/app-core/hooks", () => ({
   useBugReport: () => ({ isOpen: false, open: vi.fn(), close: vi.fn() }),
 }));
 
-vi.mock("@milady/app-core/navigation", () => ({
+vi.mock("@miladyai/app-core/navigation", () => ({
   getTabGroups: () => [
     {
       label: "Chat",
@@ -26,12 +26,12 @@ vi.mock("@milady/app-core/navigation", () => ({
   ],
 }));
 
-vi.mock("@milady/app-core/components", () => ({
+vi.mock("@miladyai/app-core/components", () => ({
   LanguageDropdown: () => React.createElement("div", null, "LanguageDropdown"),
   ThemeToggle: () => React.createElement("div", null, "ThemeToggle"),
 }));
 
-vi.mock("@milady/ui", () => ({
+vi.mock("@miladyai/ui", () => ({
   IconTooltip: ({
     children,
   }: {

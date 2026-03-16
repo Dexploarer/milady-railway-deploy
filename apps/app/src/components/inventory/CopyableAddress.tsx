@@ -1,1 +1,1 @@
-export * from "@milady/app-core/components/inventory/CopyableAddress";
+export * from "@miladyai/app-core/components/inventory/CopyableAddress";

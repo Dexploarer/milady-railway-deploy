@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { useStreamPopoutNavigation } from "@milady/app-core/hooks";
+import { useStreamPopoutNavigation } from "@miladyai/app-core/hooks";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { describe, expect, it, vi } from "vitest";

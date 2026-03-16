@@ -18,7 +18,7 @@ const {
   mockSetTradePermissionMode: vi.fn(),
 }));
 
-vi.mock("@milady/app-core/state", () => ({
+vi.mock("@miladyai/app-core/state", () => ({
   useApp: () => mockUseApp(),
 }));
 
@@ -31,7 +31,7 @@ vi.mock("../../src/components/ConversationsSidebar.js", () => ({
     React.createElement("aside", null, "ConversationsSidebar Ready"),
 }));
 
-vi.mock("@milady/app-core/api", () => ({
+vi.mock("@miladyai/app-core/api", () => ({
   client: {
     getAgentAutomationMode: mockGetAgentAutomationMode,
     setAgentAutomationMode: mockSetAgentAutomationMode,

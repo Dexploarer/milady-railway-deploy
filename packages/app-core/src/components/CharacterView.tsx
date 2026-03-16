@@ -7,18 +7,18 @@ import {
   client,
   type StylePreset,
   type VoiceConfig,
-} from "@milady/app-core/api";
+} from "@miladyai/app-core/api";
 import {
   dispatchWindowEvent,
   VOICE_CONFIG_UPDATED_EVENT,
-} from "@milady/app-core/events";
-import { getVrmPreviewUrl, useApp } from "@milady/app-core/state";
+} from "@miladyai/app-core/events";
+import { getVrmPreviewUrl, useApp } from "@miladyai/app-core/state";
 import {
   PREMADE_VOICES,
   sanitizeApiKey,
   type VoicePreset,
-} from "@milady/app-core/voice";
-import { Button, Input, Textarea, ThemedSelect } from "@milady/ui";
+} from "@miladyai/app-core/voice";
+import { Button, Input, Textarea, ThemedSelect } from "@miladyai/ui";
 import { Lock, LockOpen, Volume2, VolumeX } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 

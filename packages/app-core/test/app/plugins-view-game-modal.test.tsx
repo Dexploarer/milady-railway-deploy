@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import type { PluginInfo } from "@milady/app-core/api";
+import type { PluginInfo } from "@miladyai/app-core/api";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -63,11 +63,11 @@ function ensureWindowGlobals() {
   }
 }
 
-vi.mock("@milady/app-core/state", () => ({
+vi.mock("@miladyai/app-core/state", () => ({
   useApp: () => mockUseApp(),
 }));
 
-vi.mock("@milady/app-core/api", () => ({
+vi.mock("@miladyai/app-core/api", () => ({
   client: {
     onWsEvent: (...args: unknown[]) => mockOnWsEvent(...args),
     installRegistryPlugin: vi.fn(),
@@ -77,7 +77,7 @@ vi.mock("@milady/app-core/api", () => ({
   },
 }));
 
-import { PluginsView } from "@milady/app-core/components/PluginsView";
+import { PluginsView } from "@miladyai/app-core/components/PluginsView";
 
 function hasClass(
   node: TestRenderer.ReactTestInstance,

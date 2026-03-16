@@ -7,7 +7,7 @@ import {
   type TriggerRunRecord,
   type TriggerSummary,
   type UpdateTriggerRequest,
-} from "@milady/app-core/api";
+} from "@miladyai/app-core/api";
 import React, {
   type ReactElement,
   useCallback,
@@ -31,7 +31,7 @@ const { mockUseApp } = vi.hoisted(() => ({
   mockUseApp: vi.fn(),
 }));
 
-vi.mock("@milady/app-core/state", () => ({
+vi.mock("@miladyai/app-core/state", () => ({
   useApp: () => mockUseApp(),
 }));
 

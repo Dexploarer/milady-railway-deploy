@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/runtime/onboarding-names";
+export * from "@miladyai/autonomous/runtime/onboarding-names";

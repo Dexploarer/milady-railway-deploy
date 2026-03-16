@@ -1,4 +1,4 @@
-import type { CodingAgentSession } from "@milady/app-core/api";
+import type { CodingAgentSession } from "@miladyai/app-core/api";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { describe, expect, it } from "vitest";

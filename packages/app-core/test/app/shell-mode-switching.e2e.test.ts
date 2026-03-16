@@ -10,7 +10,7 @@
  * 4. No console errors or unexpected warnings are emitted during any transition.
  */
 
-import type { Tab } from "@milady/app-core/navigation";
+import type { Tab } from "@miladyai/app-core/navigation";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -35,10 +35,10 @@ vi.mock("@capacitor/keyboard", () => ({
   },
 }));
 
-vi.mock("@milady/app-core/platform", async () => {
+vi.mock("@miladyai/app-core/platform", async () => {
   const actual = await vi.importActual<
-    typeof import("@milady/app-core/platform")
-  >("@milady/app-core/platform");
+    typeof import("@miladyai/app-core/platform")
+  >("@miladyai/app-core/platform");
   return {
     ...actual,
     isIOS: true,
@@ -48,9 +48,9 @@ vi.mock("@milady/app-core/platform", async () => {
 
 /* ── Mock every leaf component ────────────────────────────────────── */
 
-vi.mock("@milady/app-core/state", async () => {
-  const actual = await vi.importActual<typeof import("@milady/app-core/state")>(
-    "@milady/app-core/state",
+vi.mock("@miladyai/app-core/state", async () => {
+  const actual = await vi.importActual<typeof import("@miladyai/app-core/state")>(
+    "@miladyai/app-core/state",
   );
   return {
     ...actual,
@@ -61,10 +61,10 @@ vi.mock("@milady/app-core/state", async () => {
   };
 });
 
-vi.mock("@milady/app-core/components", async () => {
+vi.mock("@miladyai/app-core/components", async () => {
   const actual = await vi.importActual<
-    typeof import("@milady/app-core/components")
-  >("@milady/app-core/components");
+    typeof import("@miladyai/app-core/components")
+  >("@miladyai/app-core/components");
   return {
     ...actual,
     AdvancedPageView: () =>
@@ -262,7 +262,7 @@ vi.mock("../../../packages/app-core/src/components/KnowledgeView", () => ({
     React.createElement("section", null, "KnowledgeView Ready"),
 }));
 
-vi.mock("@milady/app-core/components/AvatarLoader", () => ({
+vi.mock("@miladyai/app-core/components/AvatarLoader", () => ({
   AvatarLoader: () => React.createElement("div", null, "AvatarLoader"),
 }));
 
@@ -307,9 +307,9 @@ vi.mock("../../../packages/app-core/src/components/LifoSandboxView", () => ({
     React.createElement("section", null, "LifoSandboxView Ready"),
 }));
 
-vi.mock("@milady/app-core/hooks", async () => {
-  const actual = await vi.importActual<typeof import("@milady/app-core/hooks")>(
-    "@milady/app-core/hooks",
+vi.mock("@miladyai/app-core/hooks", async () => {
+  const actual = await vi.importActual<typeof import("@miladyai/app-core/hooks")>(
+    "@miladyai/app-core/hooks",
   );
   return {
     ...actual,

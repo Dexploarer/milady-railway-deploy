@@ -1,1 +1,1 @@
-export * from "@milady/app-core/components/conversations/conversation-utils";
+export * from "@miladyai/app-core/components/conversations/conversation-utils";

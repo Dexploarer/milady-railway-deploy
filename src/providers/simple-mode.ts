@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/providers/simple-mode";
+export * from "@miladyai/autonomous/providers/simple-mode";

@@ -11,9 +11,9 @@
  * Activity feed runs along the right sidebar. Chat ticker at the bottom.
  */
 
-import { client, isApiError } from "@milady/app-core/api";
-import { isElectrobunRuntime } from "@milady/app-core/bridge";
-import { useApp } from "@milady/app-core/state";
+import { client, isApiError } from "@miladyai/app-core/api";
+import { isElectrobunRuntime } from "@miladyai/app-core/bridge";
+import { useApp } from "@miladyai/app-core/state";
 import {
   type CSSProperties,
   useCallback,

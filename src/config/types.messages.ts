@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/config/types.messages";
+export * from "@miladyai/autonomous/config/types.messages";

@@ -1,6 +1,6 @@
-import { useRenderGuard } from "@milady/app-core/hooks";
-import { useApp } from "@milady/app-core/state";
-import { Button } from "@milady/ui";
+import { useRenderGuard } from "@miladyai/app-core/hooks";
+import { useApp } from "@miladyai/app-core/state";
+import { Button } from "@miladyai/ui";
 import { MessageCircle, Volume2, VolumeX } from "lucide-react";
 import { memo, useCallback, useEffect } from "react";
 import { ChatModalView } from "./ChatModalView";

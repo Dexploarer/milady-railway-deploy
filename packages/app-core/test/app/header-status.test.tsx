@@ -7,15 +7,15 @@ const { mockUseApp } = vi.hoisted(() => ({
   mockUseApp: vi.fn(),
 }));
 
-vi.mock("@milady/app-core/state", () => ({
+vi.mock("@miladyai/app-core/state", () => ({
   useApp: () => mockUseApp(),
 }));
 
-vi.mock("@milady/app-core/hooks", () => ({
+vi.mock("@miladyai/app-core/hooks", () => ({
   useBugReport: () => ({ isOpen: false, open: vi.fn(), close: vi.fn() }),
 }));
 
-vi.mock("@milady/app-core/navigation", () => ({
+vi.mock("@miladyai/app-core/navigation", () => ({
   getTabGroups: () => [
     {
       label: "Chat",
@@ -26,12 +26,12 @@ vi.mock("@milady/app-core/navigation", () => ({
   ],
 }));
 
-vi.mock("@milady/app-core/components", () => ({
+vi.mock("@miladyai/app-core/components", () => ({
   LanguageDropdown: () => React.createElement("div", null, "LanguageDropdown"),
   ThemeToggle: () => React.createElement("div", null, "ThemeToggle"),
 }));
 
-vi.mock("@milady/ui", () => ({
+vi.mock("@miladyai/ui", () => ({
   IconTooltip: ({
     children,
   }: {

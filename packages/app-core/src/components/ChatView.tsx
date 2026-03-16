@@ -12,17 +12,17 @@ import {
   client,
   type ImageAttachment,
   type VoiceConfig,
-} from "@milady/app-core/api";
-import { isRoutineCodingAgentMessage } from "@milady/app-core/chat";
-import { VOICE_CONFIG_UPDATED_EVENT } from "@milady/app-core/events";
+} from "@miladyai/app-core/api";
+import { isRoutineCodingAgentMessage } from "@miladyai/app-core/chat";
+import { VOICE_CONFIG_UPDATED_EVENT } from "@miladyai/app-core/events";
 import {
   useChatAvatarVoiceBridge,
   useTimeout,
   useVoiceChat,
   type VoiceCaptureMode,
   type VoicePlaybackStartEvent,
-} from "@milady/app-core/hooks";
-import { getVrmPreviewUrl, useApp } from "@milady/app-core/state";
+} from "@miladyai/app-core/hooks";
+import { getVrmPreviewUrl, useApp } from "@miladyai/app-core/state";
 import {
   type ChangeEvent,
   type DragEvent,

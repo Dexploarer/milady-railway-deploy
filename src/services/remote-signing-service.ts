@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/services/remote-signing-service";
+export * from "@miladyai/autonomous/services/remote-signing-service";

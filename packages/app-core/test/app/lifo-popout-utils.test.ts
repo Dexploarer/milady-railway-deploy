@@ -9,7 +9,7 @@ import {
   isLifoPopoutModeAtLocation,
   isLifoPopoutValue,
   LIFO_SYNC_CHANNEL_PREFIX,
-} from "@milady/app-core/platform";
+} from "@miladyai/app-core/platform";
 import { describe, expect, it } from "vitest";
 
 describe("isLifoPopoutValue", () => {

@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import type { CustomActionDef } from "@milady/app-core/api";
+import type { CustomActionDef } from "@miladyai/app-core/api";
 import React, { useEffect, useState } from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -19,18 +19,18 @@ const { mockClient, mockUseApp, mockUseVoiceChat } = vi.hoisted(() => ({
   mockUseVoiceChat: vi.fn(),
 }));
 
-vi.mock("@milady/app-core/state", () => ({
+vi.mock("@miladyai/app-core/state", () => ({
   useApp: () => mockUseApp(),
   getVrmPreviewUrl: () => null,
 }));
 
-vi.mock("@milady/app-core/platform", () => ({
+vi.mock("@miladyai/app-core/platform", () => ({
   isElectronPlatform: () => false,
 }));
 
-vi.mock("@milady/app-core/hooks", async () => {
-  const actual = await vi.importActual<typeof import("@milady/app-core/hooks")>(
-    "@milady/app-core/hooks",
+vi.mock("@miladyai/app-core/hooks", async () => {
+  const actual = await vi.importActual<typeof import("@miladyai/app-core/hooks")>(
+    "@miladyai/app-core/hooks",
   );
   return {
     ...actual,
@@ -47,7 +47,7 @@ vi.mock("../../src/components/MessageContent", () => ({
     React.createElement("span", null, message.text),
 }));
 
-vi.mock("@milady/app-core/api", () => ({
+vi.mock("@miladyai/app-core/api", () => ({
   client: mockClient,
 }));
 

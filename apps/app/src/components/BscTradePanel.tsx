@@ -1,1 +1,1 @@
-export * from "@milady/app-core/components/BscTradePanel";
+export * from "@miladyai/app-core/components/BscTradePanel";

@@ -1,4 +1,4 @@
-import { SecretsView } from "@milady/app-core/components";
+import { SecretsView } from "@miladyai/app-core/components";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -8,7 +8,7 @@ const { mockGetSecrets, mockUpdateSecrets } = vi.hoisted(() => ({
   mockUpdateSecrets: vi.fn(),
 }));
 
-vi.mock("@milady/app-core/api", () => ({
+vi.mock("@miladyai/app-core/api", () => ({
   client: {
     getSecrets: mockGetSecrets,
     updateSecrets: mockUpdateSecrets,

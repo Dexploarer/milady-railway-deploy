@@ -1,1 +1,1 @@
-export * from "@milady/app-core/components/CompanionShell";
+export * from "@miladyai/app-core/components/CompanionShell";

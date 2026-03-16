@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/api/parse-action-block";
+export * from "@miladyai/autonomous/api/parse-action-block";

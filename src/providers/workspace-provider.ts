@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/providers/workspace-provider";
+export * from "@miladyai/autonomous/providers/workspace-provider";

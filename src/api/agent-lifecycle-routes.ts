@@ -1,7 +1,7 @@
 import {
   type AgentLifecycleRouteState,
   handleAgentLifecycleRoutes as handleAutonomousAgentLifecycleRoutes,
-} from "@milady/autonomous/api/agent-lifecycle-routes";
+} from "@miladyai/autonomous/api/agent-lifecycle-routes";
 import type { RouteHelpers, RouteRequestMeta } from "./route-helpers";
 
 export type { AgentLifecycleRouteState };

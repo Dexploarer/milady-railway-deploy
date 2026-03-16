@@ -3,11 +3,11 @@ import { StrictMode } from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@milady/app-core/utils", () => ({
+vi.mock("@miladyai/app-core/utils", () => ({
   resolveAppAssetUrl: (path: string) => path,
 }));
 
-vi.mock("@milady/app-core/components/avatar/VrmEngine", () => {
+vi.mock("@miladyai/app-core/components/avatar/VrmEngine", () => {
   class MockVrmEngine {
     static instances: MockVrmEngine[] = [];
 
@@ -62,7 +62,7 @@ vi.mock("@milady/app-core/components/avatar/VrmEngine", () => {
   };
 });
 
-import { VrmViewer } from "@milady/app-core/components/avatar/VrmViewer";
+import { VrmViewer } from "@miladyai/app-core/components/avatar/VrmViewer";
 
 type MockVrmEngineInstance = {
   setWorldUrl: ReturnType<typeof vi.fn>;

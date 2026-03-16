@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/runtime/agent-event-service";
+export * from "@miladyai/autonomous/runtime/agent-event-service";

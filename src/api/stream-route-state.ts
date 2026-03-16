@@ -1,1 +1,1 @@
-export type { StreamRouteState } from "@milady/autonomous/api/stream-route-state";
+export type { StreamRouteState } from "@miladyai/autonomous/api/stream-route-state";

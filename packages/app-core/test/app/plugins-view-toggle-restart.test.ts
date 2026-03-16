@@ -10,11 +10,11 @@ const mockHandlePluginConfigSave = vi.fn(async () => {});
 const mockSetActionNotice = vi.fn();
 const mockSetState = vi.fn();
 
-vi.mock("@milady/app-core/state", () => ({
+vi.mock("@miladyai/app-core/state", () => ({
   useApp: () => mockUseApp(),
 }));
 
-vi.mock("@milady/app-core/api", () => ({
+vi.mock("@miladyai/app-core/api", () => ({
   client: {
     onWsEvent: (...args: unknown[]) => mockOnWsEvent(...args),
     installRegistryPlugin: vi.fn(),
@@ -23,7 +23,7 @@ vi.mock("@milady/app-core/api", () => ({
   },
 }));
 
-import { PluginsView } from "@milady/app-core/components/PluginsView";
+import { PluginsView } from "@miladyai/app-core/components/PluginsView";
 
 function createDeferred<T>() {
   let resolve!: (value: T | PromiseLike<T>) => void;

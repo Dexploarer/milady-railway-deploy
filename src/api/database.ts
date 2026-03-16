@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/api/database";
+export * from "@miladyai/autonomous/api/database";

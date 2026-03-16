@@ -1,1 +1,1 @@
-export * from "@milady/app-core/components/ShellOverlays";
+export * from "@miladyai/app-core/components/ShellOverlays";

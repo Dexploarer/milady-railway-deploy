@@ -5,7 +5,7 @@
  * and recent activity count. Inspired by the peon-ping "jarvis" theme.
  */
 
-import { useApp } from "@milady/app-core/state";
+import { useApp } from "@miladyai/app-core/state";
 import { useEffect, useMemo, useRef } from "react";
 import { registerWidget } from "../registry";
 import type { WidgetDefinition, WidgetRenderProps } from "../types";

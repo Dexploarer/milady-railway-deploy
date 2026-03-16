@@ -1,4 +1,4 @@
-import type { Tab } from "@milady/app-core/navigation";
+import type { Tab } from "@miladyai/app-core/navigation";
 import { describe, expect, it } from "vitest";
 import {
   ACCENT_COLORS,

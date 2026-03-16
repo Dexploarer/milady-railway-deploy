@@ -1,1 +1,1 @@
-export * from "@milady/app-core/components/stream/overlays/built-in/index";
+export * from "@miladyai/app-core/components/stream/overlays/built-in/index";

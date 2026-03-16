@@ -1,4 +1,4 @@
-import { MiladyClient } from "@milady/app-core/api";
+import { MiladyClient } from "@miladyai/app-core/api";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 describe("MiladyClient trigger endpoints", () => {

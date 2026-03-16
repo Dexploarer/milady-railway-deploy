@@ -1,1 +1,1 @@
-export * from "@milady/autonomous/api/cloud-compat-routes";
+export * from "@miladyai/autonomous/api/cloud-compat-routes";

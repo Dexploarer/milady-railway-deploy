@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { APP_EMOTE_EVENT } from "@milady/app-core/events";
+import { APP_EMOTE_EVENT } from "@miladyai/app-core/events";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";

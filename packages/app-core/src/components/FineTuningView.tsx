@@ -9,11 +9,11 @@ import {
   type TrainingStreamEvent,
   type TrainingTrajectoryDetail,
   type TrainingTrajectoryList,
-} from "@milady/app-core/api";
-import { formatTime } from "@milady/app-core/components";
-import { useApp } from "@milady/app-core/state";
-import { confirmDesktopAction } from "@milady/app-core/utils";
-import { Button, Input } from "@milady/ui";
+} from "@miladyai/app-core/api";
+import { formatTime } from "@miladyai/app-core/components";
+import { useApp } from "@miladyai/app-core/state";
+import { confirmDesktopAction } from "@miladyai/app-core/utils";
+import { Button, Input } from "@miladyai/ui";
 import { useCallback, useEffect, useState } from "react";
 import { parsePositiveFloat, parsePositiveInteger } from "../utils/number-parsing";
 

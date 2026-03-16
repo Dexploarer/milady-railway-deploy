@@ -1,5 +1,5 @@
-import type { UiLanguage } from "@milady/app-core/i18n";
-import type { UiTheme } from "@milady/app-core/state";
+import type { UiLanguage } from "@miladyai/app-core/i18n";
+import type { UiTheme } from "@miladyai/app-core/state";
 import type { Meta, StoryObj } from "@storybook/react";
 import { fn } from "@storybook/test";
 import { CompanionHeader } from "../components/companion/CompanionHeader";

@@ -1,4 +1,4 @@
-import { ConfirmDeleteControl } from "@milady/app-core/components";
+import { ConfirmDeleteControl } from "@miladyai/app-core/components";
 import React from "react";
 import TestRenderer, { act } from "react-test-renderer";
 import { describe, expect, it, vi } from "vitest";
