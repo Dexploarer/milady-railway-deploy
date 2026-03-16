@@ -33,13 +33,12 @@ const WINDOWS_PACKAGED_TEST_PATH = path.join(
 );
 
 describe("Electrobun release workflow drift", () => {
-  it("stages the built renderer before packaging", () => {
+  it("uses the shared desktop-build script to stage bundle inputs before packaging", () => {
     const workflow = fs.readFileSync(WORKFLOW_PATH, "utf8");
 
-    expect(workflow).toContain("name: Build renderer (vite)");
-    expect(workflow).toContain("name: Stage renderer for Electrobun bundle");
+    expect(workflow).toContain("name: Stage desktop bundle inputs");
     expect(workflow).toContain(
-      "cp -r apps/app/dist apps/app/electrobun/renderer",
+      "node scripts/desktop-build.mjs stage --variant=base --build-whisper",
     );
   });
 
@@ -69,11 +68,11 @@ describe("Electrobun release workflow drift", () => {
     expect(workflow).toContain(
       "arch -x86_64 bun install --frozen-lockfile --ignore-scripts",
     );
-    expect(workflow).toContain("arch -x86_64 bunx tsdown");
-    expect(workflow).toContain("arch -x86_64 bunx vite build");
-    expect(workflow).toContain("arch -x86_64 bun run build:whisper");
     expect(workflow).toContain(
-      `arch -x86_64 electrobun build --env=\${{ needs.prepare.outputs.env }}`,
+      'MILADY_DESKTOP_COMMAND_PREFIX="arch -x86_64" node scripts/desktop-build.mjs stage --variant=base --build-whisper',
+    );
+    expect(workflow).toContain(
+      'MILADY_DESKTOP_COMMAND_PREFIX="arch -x86_64" node scripts/desktop-build.mjs package --env=${{ needs.prepare.outputs.env }}',
     );
     expect(workflow).not.toContain("arch -x86_64 bun install --ignore-scripts");
     expect(workflow).not.toContain(
@@ -100,6 +99,20 @@ describe("Electrobun release workflow drift", () => {
     expect(workflow).toContain("needs: [prepare, validate-release]");
   });
 
+  it("uses a non-matrix cache key in validate-release", () => {
+    const workflow = fs.readFileSync(WORKFLOW_PATH, "utf8");
+    const validateSection = workflow.slice(
+      workflow.indexOf("name: Validate Release Inputs"),
+      workflow.indexOf("  build:"),
+    );
+
+    expect(validateSection).toContain(
+      "key: bun-electrobun-validate-${{ hashFiles('bun.lock') }}",
+    );
+    expect(validateSection).toContain("restore-keys: bun-electrobun-validate-");
+    expect(validateSection).not.toContain("matrix.platform.artifact-name");
+  });
+
   it("verifies the Windows electrobun tarball digest before extraction", () => {
     const workflow = fs.readFileSync(WORKFLOW_PATH, "utf8");
 
@@ -114,41 +127,54 @@ describe("Electrobun release workflow drift", () => {
     );
     expect(workflow).toContain("electrobun CLI checksum mismatch");
     expect(workflow).toContain("Verified electrobun CLI SHA256:");
+    expect(workflow).toContain(
+      "process.stdout.write(fs.realpathSync(packageDir));",
+    );
+    expect(workflow).toContain(
+      'Write-Host "Resolved electrobun package dir: $resolvedElectrobunDir"',
+    );
+    expect(workflow).toContain(
+      '$cacheDir     = Join-Path $resolvedElectrobunDir ".cache"',
+    );
+    expect(workflow).toContain(
+      '$resolvedRceditDir = Join-Path $resolvedElectrobunDir "node_modules\\rcedit"',
+    );
   });
 
-  it("materializes a local electrobun package before packaging", () => {
+  it("stages the desktop bundle before restoring local electrobun caches", () => {
     const workflow = fs.readFileSync(WORKFLOW_PATH, "utf8");
+    const stageIndex = workflow.indexOf("name: Stage desktop bundle inputs");
+    const cacheIndex = workflow.indexOf(
+      "name: Cache local electrobun core downloads",
+    );
 
-    expect(workflow).toContain(
-      "name: Materialize local electrobun package for build",
-    );
-    expect(workflow).toContain(
-      "const src = fs.realpathSync('node_modules/electrobun');",
-    );
-    expect(workflow).toContain(
-      "const dest = path.resolve('apps/app/electrobun/node_modules/electrobun');",
-    );
-    expect(workflow).toContain("fs.cpSync(src, dest, { recursive: true });");
+    expect(stageIndex).toBeGreaterThan(-1);
+    expect(cacheIndex).toBeGreaterThan(stageIndex);
     expect(workflow).toContain("name: Cache local electrobun core downloads");
     expect(workflow).toContain(
       "path: apps/app/electrobun/node_modules/electrobun/.cache",
     );
-  });
-
-  it("caches whisper models for release builds and avoids repeated renderer reinstalls", () => {
-    const workflow = fs.readFileSync(WORKFLOW_PATH, "utf8");
-
-    expect(workflow).toContain("name: Cache Whisper models");
-    expect(workflow).toContain("path: ~/.cache/milady/whisper");
-    expect(workflow).toContain(
-      "restore-keys: whisper-model-$" + "{{ matrix.platform.artifact-name }}-",
-    );
-    expect(workflow).toContain(
-      "# vite output is arch-neutral JS/CSS/HTML; rely on the root workspace install",
+    expect(workflow).not.toContain(
+      "name: Materialize local electrobun package for build",
     );
     expect(workflow).not.toContain(
-      "name: Build renderer (vite)\n        # vite output is arch-neutral JS/CSS/HTML, but bun install here may pull",
+      'bun install -g "electrobun@$ELECTROBUN_VERSION"',
     );
+  });
+
+  it("caches whisper models for release builds and avoids workflow-local staging drift", () => {
+    const workflow = fs.readFileSync(WORKFLOW_PATH, "utf8");
+
+    expect(workflow).toContain("name: Cache Whisper models and binaries");
+    expect(workflow).toContain("~/.cache/milady/whisper");
+    expect(workflow).toContain(
+      "restore-keys: whisper-$" + "{{ matrix.platform.artifact-name }}-",
+    );
+    expect(workflow).toContain("name: Stage desktop bundle inputs");
+    expect(workflow).toContain(
+      "apps/app/electrobun/scripts/hdiutil-wrapper.sh",
+    );
+    expect(workflow).toContain("ELECTROBUN_REAL_HDIUTIL: /usr/bin/hdiutil");
   });
 
   it("keeps updater transport files off the public GitHub release asset list", () => {
@@ -277,6 +303,7 @@ describe("Electrobun release workflow drift", () => {
       "MILADY_TEST_WINDOWS_LAUNCHER_PATH_FILE: $" +
         "{{ runner.temp }}\\milady-windows-ui-launcher.txt",
     );
+    expect(workflow).toContain('MILADY_DISABLE_LOCAL_EMBEDDINGS: "1"');
     expect(workflow).toContain(
       'Add-Content -Path $env:GITHUB_ENV -Value "MILADY_TEST_WINDOWS_LAUNCHER_PATH=$launcherPath"',
     );
@@ -323,6 +350,7 @@ describe("Electrobun release workflow drift", () => {
     expect(workflow).toContain(
       "bunx playwright test --config playwright.electrobun.packaged.config.ts test/electrobun-packaged/electrobun-windows-startup.e2e.spec.ts",
     );
+    expect(workflow).toContain('MILADY_DISABLE_LOCAL_EMBEDDINGS: "1"');
     expect(workflow).not.toContain(
       "name: Install Playwright Chromium (Windows)",
     );

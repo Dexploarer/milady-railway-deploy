@@ -151,43 +151,25 @@ const onboardingOptions = {
       },
     ],
   },
-  inventoryProviders: [
-    {
-      id: "evm",
-      name: "EVM",
-      description: "Ethereum-compatible chains",
-      rpcProviders: [
-        {
-          id: "elizacloud",
-          name: "Eliza Cloud",
-          description: "Managed RPC",
-          envKey: null,
-          requiresKey: false,
-        },
-      ],
-    },
-    {
-      id: "solana",
-      name: "Solana",
-      description: "Solana chain",
-      rpcProviders: [
-        {
-          id: "elizacloud",
-          name: "Eliza Cloud",
-          description: "Managed RPC",
-          envKey: null,
-          requiresKey: false,
-        },
-      ],
-    },
-  ],
   sharedStyleRules: "",
 };
 
 function applyCors(res: http.ServerResponse): void {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    [
+      "Content-Type",
+      "Authorization",
+      "X-Milady-Token",
+      "X-Api-Key",
+      "X-Milady-Export-Token",
+      "X-Milady-Client-Id",
+      "X-Milady-Terminal-Token",
+      "X-Milady-UI-Language",
+    ].join(", "),
+  );
 }
 
 function json(res: http.ServerResponse, status: number, body: unknown): void {
