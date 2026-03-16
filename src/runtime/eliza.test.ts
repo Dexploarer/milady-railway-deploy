@@ -2064,7 +2064,7 @@ describe("resolveMiladyPluginImportSpecifier", () => {
     await fs.writeFile(pluginIndex, "export default {};\n");
 
     const specifier = resolveMiladyPluginImportSpecifier(
-      "@milady/plugin-retake",
+      "@miladyai/plugin-retake",
       pathToFileURL(path.join(runtimeDir, "eliza.ts")).href,
     );
 
@@ -2079,11 +2079,11 @@ describe("resolveMiladyPluginImportSpecifier", () => {
     await fs.mkdir(runtimeDir, { recursive: true });
 
     const specifier = resolveMiladyPluginImportSpecifier(
-      "@milady/plugin-x-streaming",
+      "@miladyai/plugin-x-streaming",
       pathToFileURL(path.join(runtimeDir, "eliza.ts")).href,
     );
 
-    expect(specifier).toBe("@milady/plugin-x-streaming");
+    expect(specifier).toBe("@miladyai/plugin-x-streaming");
 
     await fs.rm(tmpDir, { recursive: true, force: true });
   });

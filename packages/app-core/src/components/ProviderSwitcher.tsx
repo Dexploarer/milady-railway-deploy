@@ -5,7 +5,7 @@
  * Composes SubscriptionStatus and ApiKeyConfig sub-components.
  */
 
-import { Button, Input } from "@milady/ui";
+import { Button, Input } from "@miladyai/ui";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { client, type OnboardingOptions, type PluginParamDef } from "../api";
 import {

@@ -20,11 +20,13 @@ import type {
   VideoProvider,
   VisionConfig,
   VisionProvider,
-} from "../../../../src/config/types.milady";
-import type { DropStatus, MintResult } from "../../../../src/contracts/drop";
+} from "@miladyai/autonomous/contracts/config";
+import type { DropStatus, MintResult } from "@miladyai/autonomous/contracts/drop";
+import type { VerificationResult } from "@miladyai/autonomous/contracts/verification";
 import type {
   CloudProviderOption,
   ConnectorConfig,
+  InventoryProviderOption,
   MessageExample,
   MessageExampleContent,
   ModelOption,
@@ -34,11 +36,11 @@ import type {
   OpenRouterModelOption,
   PiAiModelOption,
   ProviderOption,
+  RpcProviderOption,
   StylePreset,
   SubscriptionProviderStatus,
   SubscriptionStatusResponse,
-} from "../../../../src/contracts/onboarding";
-import type { VerificationResult } from "../../../../src/contracts/verification";
+} from "@miladyai/autonomous/contracts/onboarding";
 import type {
   BscTradeExecuteRequest,
   BscTradeExecuteResponse,
@@ -65,20 +67,20 @@ import type {
   WalletTradingProfileResponse,
   WalletTradingProfileSourceFilter,
   WalletTradingProfileWindow,
-} from "../../../../src/contracts/wallet";
+} from "@miladyai/autonomous/contracts/wallet";
 import {
-  type DEFAULT_WALLET_RPC_SELECTIONS,
+  DEFAULT_WALLET_RPC_SELECTIONS,
   normalizeWalletRpcProviderId,
   normalizeWalletRpcSelections,
-  type WALLET_RPC_PROVIDER_OPTIONS,
-} from "../../../../src/contracts/wallet";
+  WALLET_RPC_PROVIDER_OPTIONS,
+} from "@miladyai/autonomous/contracts/wallet";
 import type {
   AllPermissionsState,
   PermissionState,
   PermissionStatus,
   SystemPermissionDefinition,
   SystemPermissionId,
-} from "../../../../src/permissions/types";
+} from "@miladyai/autonomous/contracts/permissions";
 import type { ConfigUiHint } from "../types";
 import { stripAssistantStageDirections } from "../utils/assistant-text";
 import { mergeStreamingText } from "../utils/streaming-text";
@@ -100,13 +102,13 @@ export type {
   CustomActionDef,
   CustomActionHandler,
   DatabaseProviderType,
-  DEFAULT_WALLET_RPC_SELECTIONS,
   DropStatus,
   EvmChainBalance,
   EvmNft,
   EvmTokenBalance,
   ImageConfig,
   ImageProvider,
+  InventoryProviderOption,
   MediaConfig,
   MediaMode,
   MessageExample,
@@ -121,6 +123,7 @@ export type {
   PermissionStatus,
   PiAiModelOption,
   ProviderOption,
+  RpcProviderOption,
   ReleaseChannel,
   SolanaNft,
   SolanaTokenBalance,
@@ -134,7 +137,6 @@ export type {
   VideoProvider,
   VisionConfig,
   VisionProvider,
-  WALLET_RPC_PROVIDER_OPTIONS,
   WalletAddresses,
   WalletBalancesResponse,
   WalletConfigStatus,
@@ -148,7 +150,12 @@ export type {
   WalletTradingProfileWindow,
 };
 
-export { normalizeWalletRpcProviderId, normalizeWalletRpcSelections };
+export {
+  DEFAULT_WALLET_RPC_SELECTIONS,
+  normalizeWalletRpcProviderId,
+  normalizeWalletRpcSelections,
+  WALLET_RPC_PROVIDER_OPTIONS,
+};
 
 // ---------------------------------------------------------------------------
 // Types
@@ -3221,6 +3228,7 @@ export class MiladyClient {
       name?: string;
       system?: string;
       bio?: string;
+      topics?: string[];
       style?: { all?: string[]; chat?: string[]; post?: string[] };
       postExamples?: string[];
     },

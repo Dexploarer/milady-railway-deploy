@@ -6,7 +6,7 @@ import {
   DialogTitle,
   Input,
   SectionCard,
-} from "@milady/ui";
+} from "@miladyai/ui";
 import {
   AlertCircle,
   CircleDollarSign,

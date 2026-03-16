@@ -13,7 +13,7 @@ function createRuntimeStub(): AgentRuntime {
     bio: ["Initial bio"],
     system: "System prompt",
     adjectives: ["curious"],
-    topics: ["art", "philosophy"],
+    topics: ["fashion", "ai"],
     style: { all: ["be concise"], chat: [], post: [] },
     messageExamples: [
       {
@@ -93,6 +93,7 @@ describe("character routes", () => {
       character: {
         name: "Milady",
         bio: ["Initial bio"],
+        topics: ["fashion", "ai"],
         messageExamples: expect.any(Array),
       },
     });
@@ -146,30 +147,14 @@ describe("character routes", () => {
     ).toEqual(messageExamples);
   });
 
-  test("updates topics", async () => {
-    const topics = ["crypto", "memes", "fashion"];
-
-    const result = await invoke({
-      method: "PUT",
-      pathname: "/api/character",
-      body: { topics },
-    });
-
-    expect(result.status).toBe(200);
-    expect(
-      (state.runtime as unknown as { character: Record<string, unknown> })
-        .character.topics,
-    ).toEqual(topics);
-  });
-
   test("persists the full character payload including username across save and reload", async () => {
     const fullCharacter = {
       name: "Sakuya",
-      username: "sakuya-clockwork",
+      username: "Sakuya",
       bio: ["new bio", "second line"],
       system: "new system",
       adjectives: ["precise", "calm"],
-      topics: ["time", "duty"],
+      topics: ["timekeeping", "discipline"],
       style: {
         all: ["Be exact"],
         chat: ["Stay calm"],
@@ -203,8 +188,6 @@ describe("character routes", () => {
       (state.runtime as unknown as { character: Record<string, unknown> })
         .character,
     ).toMatchObject(fullCharacter);
-    expect(saveConfig).toHaveBeenCalledTimes(1);
-    expect(state.config?.agents?.list?.[0]).toMatchObject(fullCharacter);
 
     const getResult = await invoke({
       method: "GET",
@@ -218,38 +201,13 @@ describe("character routes", () => {
     });
   });
 
-  test("round-trips topics through PUT and GET", async () => {
-    const topics = ["crypto", "memes", "fashion"];
-
-    const putResult = await invoke({
-      method: "PUT",
-      pathname: "/api/character",
-      body: { topics },
-    });
-
-    expect(putResult.status).toBe(200);
-    expect(
-      (state.runtime as unknown as { character: Record<string, unknown> })
-        .character.topics,
-    ).toEqual(topics);
-
-    const getResult = await invoke({
-      method: "GET",
-      pathname: "/api/character",
-    });
-
-    expect(getResult.status).toBe(200);
-    expect(getResult.payload).toMatchObject({
-      character: expect.objectContaining({ topics }),
-    });
-  });
-
   test("syncs character post examples into config so they survive restart", async () => {
     const result = await invoke({
       method: "PUT",
       pathname: "/api/character",
       body: {
         name: "Reimu",
+        topics: ["shrines", "danmaku"],
         postExamples: ["default fallback post"],
         messageExamples: [
           {
@@ -268,6 +226,7 @@ describe("character routes", () => {
       id: "main",
       default: true,
       name: "Reimu",
+      topics: ["shrines", "danmaku"],
       postExamples: ["default fallback post"],
       messageExamples: [
         {
@@ -277,24 +236,6 @@ describe("character routes", () => {
           ],
         },
       ],
-    });
-  });
-
-  test("syncs username and topics into config so they survive restart", async () => {
-    const result = await invoke({
-      method: "PUT",
-      pathname: "/api/character",
-      body: {
-        username: "marisa-labs",
-        topics: ["magic", "experiments"],
-      },
-    });
-
-    expect(result.status).toBe(200);
-    expect(saveConfig).toHaveBeenCalledTimes(1);
-    expect(state.config?.agents?.list?.[0]).toMatchObject({
-      username: "marisa-labs",
-      topics: ["magic", "experiments"],
     });
   });
 

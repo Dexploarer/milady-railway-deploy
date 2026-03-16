@@ -185,7 +185,7 @@ describe("plugin loading parity across modes", () => {
     expect(names.has("@elizaos/plugin-discord")).toBe(true);
     expect(names.has("@elizaos/plugin-slack")).toBe(true);
     // Unconfigured channels should NOT be loaded
-    expect(names.has("@milady/plugin-whatsapp")).toBe(false);
+    expect(names.has("@miladyai/plugin-whatsapp")).toBe(false);
     expect(names.has("@elizaos/plugin-signal")).toBe(false);
   });
 

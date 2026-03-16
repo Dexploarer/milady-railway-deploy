@@ -12,7 +12,7 @@
  *   - Web: Informational message only (no OS-level access)
  */
 
-import { Button } from "@milady/ui";
+import { Button } from "@miladyai/ui";
 import { Check } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import {

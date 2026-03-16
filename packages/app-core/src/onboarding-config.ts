@@ -3,7 +3,7 @@ import {
   normalizeOnboardingProviderId,
   type OnboardingConnection,
   type OnboardingLocalProviderId,
-} from "../../../src/contracts/onboarding";
+} from "@miladyai/autonomous/contracts/onboarding";
 
 export interface BuildOnboardingConnectionArgs {
   onboardingRunMode: "local" | "cloud" | "";
