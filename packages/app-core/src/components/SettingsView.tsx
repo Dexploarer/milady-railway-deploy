@@ -304,8 +304,8 @@ function AdvancedSection() {
             className="settings-card-button flex items-center gap-4 border border-border/50 bg-card/60 text-left backdrop-blur-md transition-all group hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_4px_20px_rgba(var(--accent),0.1)]"
             aria-haspopup="dialog"
           >
-            <div className="w-12 h-12 rounded-xl bg-bg-accent border border-border/50 flex items-center justify-center group-hover:bg-accent group-hover:border-accent transition-all shadow-sm">
-              <Download className="w-5 h-5 text-txt group-hover:text-accent-fg transition-colors" />
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-border/50 bg-bg-accent p-3 shadow-sm transition-all group-hover:border-accent group-hover:bg-accent">
+              <Download className="h-5 w-5 shrink-0 text-txt transition-colors group-hover:text-accent-fg" />
             </div>
             <div>
               <div className="font-medium text-sm">
@@ -323,8 +323,8 @@ function AdvancedSection() {
             className="settings-card-button flex items-center gap-4 border border-border/50 bg-card/60 text-left backdrop-blur-md transition-all group hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_4px_20px_rgba(var(--accent),0.1)]"
             aria-haspopup="dialog"
           >
-            <div className="w-12 h-12 rounded-xl bg-bg-accent border border-border/50 flex items-center justify-center group-hover:bg-accent group-hover:border-accent transition-all shadow-sm">
-              <Upload className="w-5 h-5 text-txt group-hover:text-accent-fg transition-colors" />
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-border/50 bg-bg-accent p-3 shadow-sm transition-all group-hover:border-accent group-hover:bg-accent">
+              <Upload className="h-5 w-5 shrink-0 text-txt transition-colors group-hover:text-accent-fg" />
             </div>
             <div>
               <div className="font-medium text-sm">
