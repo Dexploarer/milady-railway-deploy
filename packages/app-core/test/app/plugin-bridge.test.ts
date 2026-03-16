@@ -4,15 +4,6 @@
  */
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("@milady/capacitor-gateway", () => ({ Gateway: {} }));
-vi.mock("@milady/capacitor-swabble", () => ({ Swabble: {} }));
-vi.mock("@milady/capacitor-talkmode", () => ({ TalkMode: {} }));
-vi.mock("@milady/capacitor-camera", () => ({ Camera: {} }));
-vi.mock("@milady/capacitor-location", () => ({ Location: {} }));
-vi.mock("@milady/capacitor-screencapture", () => ({ ScreenCapture: {} }));
-vi.mock("@milady/capacitor-canvas", () => ({ Canvas: {} }));
-vi.mock("@milady/capacitor-desktop", () => ({ Desktop: {} }));
-
 import {
   getPluginCapabilities,
   isAndroid,

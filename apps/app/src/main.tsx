@@ -6,6 +6,7 @@
  */
 
 import "@milady/app-core/styles/styles.css";
+import "./native-plugin-entrypoints";
 
 import { App as CapacitorApp } from "@capacitor/app";
 import { Capacitor } from "@capacitor/core";
