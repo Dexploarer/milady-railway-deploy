@@ -20,7 +20,7 @@ RUN bun run build
 RUN cd packages/autonomous && bun run build || true
 
 # Production deps (preserves workspace symlinks in node_modules)
-RUN rm -rf node_modules && bun install --ignore-scripts --production
+RUN rm -rf node_modules && bun install --ignore-scripts --production --no-frozen-lockfile
 
 # Resolve workspace symlinks into real copies so Docker COPY works correctly.
 # bun install creates node_modules/@miladyai/autonomous -> ../../packages/autonomous
