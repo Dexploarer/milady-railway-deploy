@@ -18,13 +18,9 @@ import {
   type BrowserContext,
   chromium,
   type Page,
-  type Request,
 } from "@playwright/test";
 import { createServer as createViteServer, type ViteDevServer } from "vite";
-import {
-  type MockApiServer,
-  startMockApiServer,
-} from "../electrobun-packaged/mock-api";
+import { startMockApiServer } from "../electrobun-packaged/mock-api";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -489,7 +485,9 @@ async function captureOnboardingFlow(
         diagnosticsRoot,
         `initial-load--${viewport.id}.png`,
       );
-      await page.screenshot({ path: diagPath, fullPage: false }).catch(() => {});
+      await page
+        .screenshot({ path: diagPath, fullPage: false })
+        .catch(() => {});
       const html = await page.content().catch(() => "");
       await writeFile(
         path.join(diagnosticsRoot, `initial-load--${viewport.id}.html`),
@@ -547,11 +545,7 @@ async function captureOnboardingFlow(
         await page
           .screenshot({ path: diagScreenshot, fullPage: false })
           .catch(() => {});
-        await writeFile(
-          diagConsole,
-          `${consoleLines.join("\n")}\n`,
-          "utf8",
-        );
+        await writeFile(diagConsole, `${consoleLines.join("\n")}\n`, "utf8");
 
         failures.push({
           stepId: step.id,

@@ -128,7 +128,6 @@ describe("release-check package guards", () => {
     ).toBe(false);
   });
 
-
   it("flags lifecycle hooks that reference missing files", () => {
     expect(
       hasLifecycleScriptReferencingMissingFile(
