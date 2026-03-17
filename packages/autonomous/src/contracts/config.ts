@@ -2,7 +2,7 @@
  * Shared configuration contracts used across runtime, server, and app client.
  */
 
-export type DatabaseProviderType = "pglite" | "postgres";
+export type DatabaseProviderType = "pglite" | "pglite-http" | "postgres";
 
 export type MediaMode = "cloud" | "own-key";
 

@@ -2066,6 +2066,19 @@ export function applyDatabaseConfigToEnv(config: MiladyConfig): void {
   const db = config.database;
   const provider = db?.provider ?? "pglite";
 
+  if (provider === "pglite-http" && db?.pgliteHttp) {
+    process.env.PGLITE_HTTP_URL = db.pgliteHttp.url;
+    if (db.pgliteHttp.authToken) {
+      process.env.PGLITE_HTTP_AUTH_TOKEN = db.pgliteHttp.authToken;
+    }
+    delete process.env.POSTGRES_URL;
+    delete process.env.PGLITE_DATA_DIR;
+    logger.info(
+      `[milady] PGlite HTTP mode → ${db.pgliteHttp.url}`,
+    );
+    return;
+  }
+
   if (provider === "postgres" && db?.postgres) {
     const pg = db.postgres;
     let url = pg.connectionString;
@@ -3781,6 +3794,21 @@ export async function startEliza(
     // Silent — OG tracking is non-critical
   }
 
+  // 2e-ii. Initialize OpenTelemetry if diagnostics.otel is configured.
+  if (config.diagnostics?.otel?.enabled) {
+    try {
+      const { initOtel } = await import("../telemetry/otel");
+      const result = initOtel(config.diagnostics.otel);
+      if (result.started) {
+        logger.info(
+          `[milady] OpenTelemetry started → ${result.endpoint} (traces=${result.services.traces} metrics=${result.services.metrics} logs=${result.services.logs})`,
+        );
+      }
+    } catch (err) {
+      logger.warn("[milady] OpenTelemetry init failed:", err);
+    }
+  }
+
   // 2d-ii. Allow destructive migrations (e.g. dropping tables removed between
   //        plugin versions) so the runtime doesn't silently stall.  Without this
   //        the migration system throws an error that gets swallowed, leaving the
@@ -4384,6 +4412,14 @@ export async function startEliza(
       } catch (err) {
         logger.warn(`[milady] Error during shutdown: ${formatError(err)}`);
       }
+
+      try {
+        const { shutdownOtel } = await import("../telemetry/otel");
+        await shutdownOtel();
+      } catch {
+        // Best-effort
+      }
+
       process.exit(0);
     };
 

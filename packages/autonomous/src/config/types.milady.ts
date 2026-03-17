@@ -410,6 +410,15 @@ export type PgliteConfig = {
   dataDir?: string;
 };
 
+export type PgliteHttpConfig = {
+  /** PGlite HTTP server URL (e.g. "https://pglite-production.up.railway.app"). */
+  url: string;
+  /** Optional auth token sent as Bearer header. */
+  authToken?: string;
+  /** Request timeout in milliseconds. Default: 30000. */
+  timeoutMs?: number;
+};
+
 export type PostgresCredentials = {
   /** Full PostgreSQL connection string. Takes precedence over individual fields. */
   connectionString?: string;
@@ -432,6 +441,8 @@ export type DatabaseConfig = {
   provider?: DatabaseProviderType;
   /** PGLite (local embedded Postgres) configuration. */
   pglite?: PgliteConfig;
+  /** PGlite HTTP server (remote PGlite over HTTP API). */
+  pgliteHttp?: PgliteHttpConfig;
   /** Remote PostgreSQL configuration. */
   postgres?: PostgresCredentials;
 };

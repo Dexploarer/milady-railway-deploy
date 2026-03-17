@@ -747,6 +747,42 @@ export const MiladySchema = z
       })
       .strict()
       .optional(),
+    database: z
+      .object({
+        provider: z
+          .union([
+            z.literal("pglite"),
+            z.literal("pglite-http"),
+            z.literal("postgres"),
+          ])
+          .optional(),
+        pglite: z
+          .object({ dataDir: z.string().optional() })
+          .strict()
+          .optional(),
+        pgliteHttp: z
+          .object({
+            url: z.string(),
+            authToken: z.string().optional(),
+            timeoutMs: z.number().int().positive().optional(),
+          })
+          .strict()
+          .optional(),
+        postgres: z
+          .object({
+            connectionString: z.string().optional(),
+            host: z.string().optional(),
+            port: z.number().int().positive().optional(),
+            database: z.string().optional(),
+            user: z.string().optional(),
+            password: z.string().optional(),
+            ssl: z.boolean().optional(),
+          })
+          .strict()
+          .optional(),
+      })
+      .strict()
+      .optional(),
     memory: MemorySchema,
     embedding: z
       .object({
