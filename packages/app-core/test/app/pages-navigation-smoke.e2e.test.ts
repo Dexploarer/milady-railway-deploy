@@ -36,6 +36,9 @@ const { companionOverlayTabs, mockUseApp, noop } = vi.hoisted(() => ({
 vi.mock("@miladyai/app-core/state", () => ({
   useApp: () => mockUseApp(),
   getVrmUrl: vi.fn(() => "mock-vrm-url"),
+  getVrmPreviewUrl: vi.fn(() => "mock-vrm-preview"),
+  getVrmBackgroundUrl: vi.fn(() => "mock-vrm-bg"),
+  VRM_COUNT: 4,
 }));
 
 vi.mock("@miladyai/app-core/components", async () => {

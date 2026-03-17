@@ -133,16 +133,25 @@ const steps: StepSpec[] = [
     setup: null, // First step, just navigate
   },
   {
-    id: "02-connection-hosting",
-    label: "Connection — Hosting Selection",
+    id: "02-identity",
+    label: "Identity — Choose Agent",
     setup: async (page) => {
-      // Click "Create New Agent" to advance from wakeUp
+      // Click "Create New Agent" to advance from wakeUp → identity
       await page.getByText("Create New Agent").click();
       await page.waitForTimeout(600);
     },
   },
   {
-    id: "03-connection-provider",
+    id: "03-connection-hosting",
+    label: "Connection — Hosting Selection",
+    setup: async (page) => {
+      // Click "Continue" on identity step → connection
+      await page.getByText("Continue").first().click();
+      await page.waitForTimeout(600);
+    },
+  },
+  {
+    id: "04-connection-provider",
     label: "Connection — Provider Selection",
     setup: async (page) => {
       // Select "Local" hosting option — reveals provider list
@@ -151,7 +160,7 @@ const steps: StepSpec[] = [
     },
   },
   {
-    id: "04-connection-provider-config",
+    id: "05-connection-config",
     label: "Connection — Provider Config",
     setup: async (page) => {
       // Select Ollama provider — shows config + Confirm button
@@ -160,7 +169,7 @@ const steps: StepSpec[] = [
     },
   },
   {
-    id: "05-rpc",
+    id: "06-rpc",
     label: "RPC — Chain Configuration",
     setup: async (page) => {
       // Click Confirm to advance from connection to rpc
@@ -169,7 +178,7 @@ const steps: StepSpec[] = [
     },
   },
   {
-    id: "06-senses",
+    id: "07-senses",
     label: "Senses — Permissions",
     setup: async (page) => {
       // Click "Skip for now" on RPC step to advance
@@ -178,7 +187,7 @@ const steps: StepSpec[] = [
     },
   },
   {
-    id: "07-activate",
+    id: "08-activate",
     label: "Activate — Ready",
     setup: async (page) => {
       // Click "Skip for Now" on permissions step to advance
@@ -270,6 +279,21 @@ async function createPage(
   page.on("pageerror", (error) => {
     consoleLines.push(`[pageerror] ${error.message}`);
   });
+
+  // Intercept /api/config to return an empty config so onboarding doesn't
+  // resume from a partially-configured state (the mock API returns cloud
+  // config by default which causes the app to skip to "senses").
+  await page.route("**/api/config", (route) => {
+    if (route.request().method() === "GET") {
+      return route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ settings: {}, env: { vars: {} } }),
+      });
+    }
+    return route.continue();
+  });
+
   return { context, page, consoleLines };
 }
 

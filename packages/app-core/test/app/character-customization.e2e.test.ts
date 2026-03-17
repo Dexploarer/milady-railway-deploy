@@ -616,7 +616,7 @@ describe("CharacterView UI", () => {
     expect(state.selectedVrmIndex).toBe(2);
   });
 
-  it("opens the detailed customize grid when explicitly routed to the character tab", async () => {
+  it("keeps roster mode when routed to the character tab until custom mode is enabled", async () => {
     state.tab = "character";
 
     let tree: TestRenderer.ReactTestRenderer | null = null;
@@ -629,12 +629,12 @@ describe("CharacterView UI", () => {
       tree?.root.findAll(
         (node) => node.props["data-testid"] === "character-customize-grid",
       ) ?? [],
-    ).toHaveLength(1);
+    ).toHaveLength(0);
     expect(
       tree?.root.findAll(
         (node) => node.props["data-testid"] === "character-roster-grid",
       ) ?? [],
-    ).toHaveLength(0);
+    ).toHaveLength(1);
   });
 
   it("removes adjective editors from the character screen", async () => {
@@ -655,7 +655,7 @@ describe("CharacterView UI", () => {
     expect(adjectiveLabels).toHaveLength(0);
   });
 
-  it("shows the voice picker in roster mode and hides it while customizing", async () => {
+  it("shows the voice picker in roster mode and keeps it visible while customizing", async () => {
     let tree: TestRenderer.ReactTestRenderer | null = null;
 
     await act(async () => {
@@ -685,7 +685,7 @@ describe("CharacterView UI", () => {
       tree?.root.findAll(
         (node) => node.props["data-testid"] === "character-voice-picker",
       ) ?? [],
-    ).toHaveLength(0);
+    ).toHaveLength(1);
     expect(
       tree?.root.findAll(
         (node) => node.props["data-testid"] === "character-customize-grid",
@@ -702,11 +702,17 @@ describe("CharacterView UI", () => {
       tree = TestRenderer.create(React.createElement(CharacterView));
     });
 
-    // Switch to the Style step in the customize flow
+    const customizeButton = tree?.root.find(
+      (node) => node.props["data-testid"] === "character-customize-toggle",
+    );
+
+    await act(async () => {
+      customizeButton?.props.onClick();
+    });
+
     const styleTab = tree?.root.find(
       (node) =>
-        Array.isArray(node.children) &&
-        node.children.includes("characterview.style") &&
+        node.props["data-testid"] === "notebook-tab-styleRules" &&
         typeof node.props.onClick === "function",
     );
 
