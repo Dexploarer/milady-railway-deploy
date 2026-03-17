@@ -61,4 +61,4 @@ ENV PGLITE_DATA_DIR="/data/.milady/workspace/.eliza/.elizadb"
 
 RUN mkdir -p /data/.milady/workspace/.eliza/.elizadb
 
-CMD ["sh", "-lc", "mkdir -p /data/.milady && if [ ! -f /data/.milady/milady.json ] && [ -n \"${MILADY_INIT_CONFIG}\" ]; then printf '%s' \"${MILADY_INIT_CONFIG}\" > /data/.milady/milady.json; fi && MILADY_PORT=${PORT:-2138} node milady.mjs start"]
+CMD ["sh", "-lc", "mkdir -p /data/.milady && if [ ! -f /data/.milady/milady.json ] && [ -n \"${MILADY_INIT_CONFIG}\" ]; then printf '%s' \"${MILADY_INIT_CONFIG}\" > /data/.milady/milady.json; fi && MILADY_PORT=${PORT:-2138} bun milady.mjs start"]
