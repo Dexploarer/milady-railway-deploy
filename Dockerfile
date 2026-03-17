@@ -16,23 +16,28 @@ RUN bun install --ignore-scripts
 RUN node ./scripts/link-browser-server.mjs && node ./scripts/patch-deps.mjs
 RUN bun run build
 
-# Also build the autonomous workspace package
+# Build the autonomous workspace package so dist/ exists
 RUN cd packages/autonomous && bun run build || true
 
-# Production deps
+# Production deps (preserves workspace symlinks in node_modules)
 RUN rm -rf node_modules && bun install --ignore-scripts --production
 
-# ==============================================================================
-# Runtime — use Bun for native .ts support
-# ==============================================================================
-FROM oven/bun:1.3.9-debian AS runtime
+# Resolve workspace symlinks into real copies so Docker COPY works correctly.
+# bun install creates node_modules/@miladyai/autonomous -> ../../packages/autonomous
+# Docker COPY preserves symlinks but the target paths can break across stages.
+RUN find node_modules -maxdepth 3 -type l | while read link; do \
+      target="$(readlink -f "$link")" && \
+      rm "$link" && \
+      cp -a "$target" "$link"; \
+    done
 
-RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+# ==============================================================================
+# Runtime
+# ==============================================================================
+FROM node:22-bookworm AS runtime
 
-# Node.js still needed for some native modules
-COPY --from=node:22-bookworm /usr/local/bin/node /usr/local/bin/node
-COPY --from=node:22-bookworm /usr/local/lib/node_modules /usr/local/lib/node_modules
+RUN curl -fsSL https://bun.sh/install | bash -s "bun-v1.3.9"
+ENV PATH="/root/.bun/bin:${PATH}"
 
 WORKDIR /app
 ENV NODE_LLAMA_CPP_SKIP_DOWNLOAD="true"
@@ -52,7 +57,8 @@ ENV NODE_ENV=production
 ENV MILADY_API_BIND="0.0.0.0"
 ENV MILADY_STATE_DIR="/data/.milady"
 ENV MILADY_CONFIG_PATH="/data/.milady/milady.json"
+ENV PGLITE_DATA_DIR="/data/.milady/workspace/.eliza/.elizadb"
 
 RUN mkdir -p /data/.milady/workspace/.eliza/.elizadb
 
-CMD ["sh", "-c", "mkdir -p /data/.milady && if [ ! -f /data/.milady/milady.json ] && [ -n \"${MILADY_INIT_CONFIG}\" ]; then printf '%s' \"${MILADY_INIT_CONFIG}\" > /data/.milady/milady.json; fi && MILADY_PORT=${PORT:-2138} node milady.mjs start"]
+CMD ["sh", "-lc", "mkdir -p /data/.milady && if [ ! -f /data/.milady/milady.json ] && [ -n \"${MILADY_INIT_CONFIG}\" ]; then printf '%s' \"${MILADY_INIT_CONFIG}\" > /data/.milady/milady.json; fi && MILADY_PORT=${PORT:-2138} node milady.mjs start"]
